@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+      <UserSecretsId>8dcf2dae-f93f-4bec-9355-04b9a0386cbd</UserSecretsId>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- SonarCloud does not recognise file-scoped namespaces in current version. -->
+        <NoWarn>S3903</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Identity" Version="1.8.2" />
+        <PackageReference Include="Enums.NET" Version="4.0.1" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.15" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.20" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="2.7.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\EPR.RegulatorService.Facade.Core\EPR.RegulatorService.Facade.Core.csproj" />
+    </ItemGroup>
+
+        <ItemGroup>
+        <SonarQubeSetting Include="sonar.coverage.exclusions">
+            <Value>**/Program.cs,**/AddAuthHeaderOperationFilter.cs,**/HttpClientServiceCollectionExtension.cs</Value>
+        </SonarQubeSetting>
+    </ItemGroup>
+
+</Project>

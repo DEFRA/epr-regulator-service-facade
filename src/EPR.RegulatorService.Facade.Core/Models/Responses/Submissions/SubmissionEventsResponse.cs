@@ -1,0 +1,15 @@
+using EPR.RegulatorService.Facade.Core.Enums;
+
+namespace EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+
+public class RegulatorPomDecision
+{
+    public Guid FileId { get; set; }
+    
+    public string? Comments { get; set; }
+
+    public string Decision { get; set; }
+
+    public bool IsResubmissionRequired { get; set; }
+
+}

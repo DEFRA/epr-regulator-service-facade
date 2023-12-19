@@ -1,0 +1,6 @@
+variables:
+  azureSubscription: 'AZD-RWD-DEV3'
+  docker.imageName: 'eprregulatorfacadeendregistry'
+  acr.azureContainerRegistryName: 'devrwdinfac1401'
+  acr.repositoryName: 'eprregulatorfacadeendregistry'
+  ServiceName: 'devrwdwebwa3406'

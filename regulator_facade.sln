@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPR.RegulatorService.Facade.API", "src\EPR.RegulatorService.Facade.API\EPR.RegulatorService.Facade.API.csproj", "{FCB40D6B-9D12-473A-BC80-618DD1DADAFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPR.RegulatorService.Facade.Core", "src\EPR.RegulatorService.Facade.Core\EPR.RegulatorService.Facade.Core.csproj", "{E47E75A0-7FE4-4DA9-948E-AE86913BCCA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPR.RegulatorService.Facade.UnitTests", "src\EPR.RegulatorService.Facade.UnitTests\EPR.RegulatorService.Facade.UnitTests.csproj", "{2BC324C5-D5E9-48AA-945F-18F232611380}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FCB40D6B-9D12-473A-BC80-618DD1DADAFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCB40D6B-9D12-473A-BC80-618DD1DADAFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCB40D6B-9D12-473A-BC80-618DD1DADAFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCB40D6B-9D12-473A-BC80-618DD1DADAFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E47E75A0-7FE4-4DA9-948E-AE86913BCCA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E47E75A0-7FE4-4DA9-948E-AE86913BCCA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E47E75A0-7FE4-4DA9-948E-AE86913BCCA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E47E75A0-7FE4-4DA9-948E-AE86913BCCA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BC324C5-D5E9-48AA-945F-18F232611380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BC324C5-D5E9-48AA-945F-18F232611380}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BC324C5-D5E9-48AA-945F-18F232611380}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BC324C5-D5E9-48AA-945F-18F232611380}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
