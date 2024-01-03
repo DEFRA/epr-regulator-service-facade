@@ -1,4 +1,6 @@
+using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -37,15 +39,13 @@ public class ProducerService : IProducerService
 
         return await _httpClient.GetAsync(url);
     }
-    
-
-    public async Task<HttpResponseMessage> RemoveApprovedUser(Guid userId, Guid connExternalId, Guid organisationId)
+    public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
-        var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", userId, connExternalId, organisationId);
+        var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.ConnectionExternalId, model.OrganisationId);
         
-        _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", connExternalId);
+        _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", model.ConnectionExternalId);
         
-        return await _httpClient.DeleteAsync(url);
+        return await _httpClient.PostAsJsonAsync(url, model);
     }
     
 }

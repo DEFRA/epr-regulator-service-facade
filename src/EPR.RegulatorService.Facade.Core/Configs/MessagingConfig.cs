@@ -17,4 +17,8 @@ public class MessagingConfig
     public string RegulatorSubmissionRejectedResubmissionRequired { get; set; } = string.Empty;
     public string RegulatorSubmissionRejectedResubmissionNotRequired { get; set; } = string.Empty;
     public string AccountSignInUrl { get; set; } = string.Empty;
+    public string RemovedApprovedUserTemplateId { get; set; } = string.Empty;
+
+    public string DemotedDelegatedUserTemplateId { get; set; } = string.Empty;
+
 }

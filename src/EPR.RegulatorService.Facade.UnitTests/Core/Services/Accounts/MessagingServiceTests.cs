@@ -8,6 +8,7 @@ using Moq;
 using Notify.Interfaces;
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using EPR.RegulatorService.Facade.Core.Models.Organisations;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 {
@@ -501,5 +502,152 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null,
                 null), Times.Exactly(3));
         }
+        
+         [TestMethod]
+         [DataRow("", "firstName", "lastName", "123456789", 3)]
+         [DataRow("bob@hotmail.com", "", "lastName", "123456789", 3)]
+         [DataRow("bob@hotmail.com", "firstName", "","123456789", 3)]
+         [DataRow("bob@hotmail.com", "firstName", "lastName","", 3)]
+         [ExpectedException(typeof(ArgumentException))]
+        public void RemovedPerson_DelegatedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
+            string email,
+            string firstName, 
+            string lastName, 
+            string organisationNumber,
+            int serviceRoleId)
+        {
+            // Arrange
+            var model = new AssociatedPersonResults
+            {
+                Email = email,
+                FirstName = firstName,
+                LastName = lastName,
+                OrganisationId = organisationNumber,
+                ServiceRoleId = serviceRoleId,
+            };
+
+            var messagingConfig = Options.Create(new MessagingConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            // Act
+            _sut.SendRemovedApprovedPersonNotification(model, serviceRoleId );
+        }
+         
+         [TestMethod]
+         [DataRow("", "firstName", "lastName", "123456789", "Org 1", 1)]
+         [DataRow("bob@hotmail.com", "", "lastName", "123456789","Org 1", 1)]
+         [DataRow("bob@hotmail.com", "firstName", "", "123456789","Org 1", 1)]
+         [DataRow("bob@hotmail.com", "firstName", "lastName",  "123456789","", 1)]
+         [DataRow("bob@hotmail.com", "firstName", "lastName", "","Org 1", 1)]
+         [ExpectedException(typeof(ArgumentException))]
+         public void RemovedPerson_ApprovedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
+             string email,
+             string firstName, 
+             string lastName, 
+             string organisationNumber,
+             string companyName,
+             int serviceRoleId)
+         {
+             // Arrange
+             var model = new AssociatedPersonResults
+             {
+                 Email = email,
+                 FirstName = firstName,
+                 LastName = lastName,
+                 CompanyName = companyName,
+                 OrganisationId = organisationNumber,
+                 ServiceRoleId = serviceRoleId,
+             };
+
+             var messagingConfig = Options.Create(new MessagingConfig());
+             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+             // Act
+             _sut.SendRemovedApprovedPersonNotification(model, serviceRoleId );
+         }
+         
+         [TestMethod]
+         public void RemoveApprovedPerson_Email_Sends_To_ApprovedUser()
+         {
+             var emailNotificationId = "C123456";
+             // Arrange
+             var model = new AssociatedPersonResults
+             {
+                 Email = ApprovedUserRecipient,
+                 FirstName = ApprovedUserFirstName,
+                 LastName = ApprovedUserLastName,
+                 CompanyName = "Test Company",
+                 OrganisationId = "123987345",
+                 ServiceRoleId = 1,
+             };
+
+             _notificationClientMock.Setup(x => x.SendEmail(
+                     It.IsAny<string>(),
+                     It.IsAny<string>(),
+                     It.IsAny<Dictionary<string, object>>(),
+                     null,
+                     null))
+                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+
+             var messagingConfig = Options.Create(new MessagingConfig());
+
+             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+             // Act
+             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, 1);
+
+             // Assert
+             notificationId.Should().Be(emailNotificationId);
+
+             _notificationClientMock.Verify(x => x.SendEmail(
+                 It.IsAny<string>(),
+                 It.IsAny<string>(),
+                 It.IsAny<Dictionary<string, object>>(),
+                 null,
+                 null), Times.Exactly(1));
+         }
+         
+         [TestMethod]
+         public void RemoveApprovedPerson_Email_Sends_To_DemotedDelegatedUser()
+         {
+             var emailNotificationId = "P521254";
+             // Arrange
+             var model = new AssociatedPersonResults
+             {
+                 Email = ApprovedUserRecipient,
+                 FirstName = ApprovedUserFirstName,
+                 LastName = ApprovedUserLastName,
+                 CompanyName = "Test Company",
+                 OrganisationId = "123987345",
+                 ServiceRoleId = 3,
+             };
+
+             _notificationClientMock.Setup(x => x.SendEmail(
+                     It.IsAny<string>(),
+                     It.IsAny<string>(),
+                     It.IsAny<Dictionary<string, object>>(),
+                     null,
+                     null))
+                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+
+             var messagingConfig = Options.Create(new MessagingConfig());
+
+             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+             // Act
+             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, 3);
+
+             // Assert
+             notificationId.Should().Be(emailNotificationId);
+
+             _notificationClientMock.Verify(x => x.SendEmail(
+                 It.IsAny<string>(),
+                 It.IsAny<string>(),
+                 It.IsAny<Dictionary<string, object>>(),
+                 null,
+                 null), Times.Exactly(1));
+         }
     }
+    
+    
 }

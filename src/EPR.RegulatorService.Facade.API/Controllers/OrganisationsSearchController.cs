@@ -1,12 +1,15 @@
-using System.Net;
 using System.Text.Json;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
+using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
+using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -16,16 +19,22 @@ public class OrganisationsSearchController : ControllerBase
     private readonly ILogger<OrganisationsSearchController> _logger;
     private readonly IProducerService _producerService;
     private readonly IRegulatorOrganisationService _regulatorOrganisationService;
-
+    private readonly MessagingConfig _messagingConfig;
+    private readonly IMessagingService _messagingService;
+    
     public OrganisationsSearchController(
         ILogger<OrganisationsSearchController> logger,
         IProducerService producerService,
-        IRegulatorOrganisationService regulatorOrganisationService
+        IRegulatorOrganisationService regulatorOrganisationService,
+        IOptions<MessagingConfig> messagingConfig,
+        IMessagingService messagingService
         )
     {
         _logger = logger;
         _producerService = producerService;
         _regulatorOrganisationService = regulatorOrganisationService;
+        _messagingConfig = messagingConfig.Value;
+        _messagingService = messagingService;
     }
 
     [HttpGet]
@@ -124,27 +133,79 @@ public class OrganisationsSearchController : ControllerBase
         }
     }
     
-    [HttpDelete]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [Route("api/organisations/remove-approved-users")]
-    public async Task<IActionResult> RemoveApprovedPerson(Guid connExternalId, Guid organisationId)
+    public async Task<IActionResult> RemoveApprovedPerson(RemoveApprovedUsersRequest request)
     {
         try
         {
-            var userId = User.UserId();
+            request.UserId = User.UserId();
            
-            if (userId == default)
+            if (request.UserId == default)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
-            var response = await _producerService.RemoveApprovedUser(userId, connExternalId, organisationId);
-            return response.IsSuccessStatusCode ? Ok(NoContent()) : HandleError.HandleErrorWithStatusCode(response.StatusCode);
+            if (!request.NominationDecision)
+            {
+                var response = await _producerService.RemoveApprovedUser(request);
+            
+                if (response.IsSuccessStatusCode)
+                {
+                    var stringContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<AssociatedPersonResults[]>(
+                        stringContent,
+                        new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+
+                    if (result.Length > 0)
+                    {
+                        SendNotificationEmails(result);
+                    }
+
+                    return Ok(NoContent());
+                }
+                return HandleError.HandleErrorWithStatusCode(response.StatusCode);
+            }
+            
+            return Problem("Error thrown as Nomination Decision is passed as Yes", statusCode: StatusCodes.Status400BadRequest);
+            
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"Error deleting approved user for organisation {organisationId}", organisationId);
+            _logger.LogError(e,"Error deleting approved user for organisation {organisationId}", request.OrganisationId);
             return HandleError.Handle(e);
         }
+    }
+    private void SendNotificationEmails(AssociatedPersonResults[] result)
+    {
+        // send email for removed AP
+        SendRemovalEmail(result, 1);
+
+        // send email for demoted DP
+        SendRemovalEmail(result, 3 );
+    }
+    private void SendRemovalEmail(AssociatedPersonResults[] emailList,int serviceRoleId)
+    {
+        foreach (var email in emailList.Where(a => a.ServiceRoleId == serviceRoleId).ToList())
+        {
+            email.TemplateId = serviceRoleId == 1 ? _messagingConfig.RemovedApprovedUserTemplateId : _messagingConfig.DemotedDelegatedUserTemplateId;
+           
+            var emailSent = SendNotificationEmailToDeletedPerson(email,serviceRoleId);
+            
+            if (!emailSent)
+            {
+                var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
+                                   $" for company {email.CompanyName}";
+                _logger.LogError(errorMessage);
+            }
+        }
+    }
+
+    private bool SendNotificationEmailToDeletedPerson(AssociatedPersonResults email,int serviceRoleId)
+    {
+        return _messagingService.SendRemovedApprovedPersonNotification(email, serviceRoleId) != null;
     }
 }

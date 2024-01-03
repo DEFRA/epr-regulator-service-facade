@@ -5,6 +5,7 @@ using System.Diagnostics;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
+using EPR.RegulatorService.Facade.Core.Models.Organisations;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Messaging;
 
@@ -224,6 +225,51 @@ public class MessagingService : IMessagingService
         return emailIds;
     }
 
+    public string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, int serviceRoleId)
+    {
+        Dictionary<string, object> parameters = null;
+        
+        switch (serviceRoleId)
+        {
+            case 1:
+                parameters = new Dictionary<string, object>
+                {
+                    { "email", model.Email },
+                    { "firstName", model.FirstName },
+                    { "lastName", model.LastName },
+                    { "organisationNumber", model.OrganisationId.ToReferenceNumberFormat() },
+                    { "companyName", model.CompanyName }
+                };
+               ValidateRequiredRemovedApprovedPersonEmailModelParameters(model);
+                break;
+            case 3 : 
+                parameters = new Dictionary<string, object>
+                {
+                    { "email", model.Email },
+                    { "firstName", model.FirstName },
+                    { "lastName", model.LastName },
+                    { "organisationNumber", model.OrganisationId.ToReferenceNumberFormat() }
+                };
+                ValidateDemotedDelegatedPersonParameters(model);
+                break;
+        }
+        
+       
+        var response =  _notificationClient.SendEmail(model.Email, model.TemplateId, parameters);
+
+        return response.id;
+
+    }
+
+    private void ValidateRequiredRemovedApprovedPersonEmailModelParameters(AssociatedPersonResults model)
+    {
+        ValidateStringParameter(model.Email, nameof(model.Email));
+        ValidateStringParameter(model.FirstName, nameof(model.FirstName));
+        ValidateStringParameter(model.LastName, nameof(model.LastName));
+        ValidateStringParameter(model.CompanyName, nameof(model.CompanyName));
+        ValidateStringParameter(model.OrganisationId, nameof(model.OrganisationId));
+    }
+
     private void ValidateRequiredApplicationEmailModelParameters(ApplicationEmailModel model)
     {
         ValidateStringParameter(model.ApprovedPerson.Email, nameof(model.ApprovedPerson.Email));
@@ -239,6 +285,13 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.OrganisationName, nameof(model.OrganisationName));
         ValidateStringParameter(model.AccountLoginUrl, nameof(model.AccountLoginUrl));
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
+    }
+    private void ValidateDemotedDelegatedPersonParameters(AssociatedPersonResults model)
+    {
+        ValidateStringParameter(model.Email, nameof(model.Email));
+        ValidateStringParameter(model.FirstName, nameof(model.FirstName));
+        ValidateStringParameter(model.LastName, nameof(model.LastName));
+        ValidateStringParameter(model.OrganisationId, nameof(model.OrganisationId));
     }
     
     private void ValidateUserEmailParameters(UserEmailModel model)
