@@ -310,5 +310,93 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
         {
             return JsonSerializer.Serialize(RegulatorUsersMockData.GetRegulatorUsers());
         }
+        
+        [TestMethod]
+        public async Task When_creating_regulator_registration_decision_event_with_valid_data_should_return_success()
+        {
+            // Arrange
+            var request = new RegulatorRegistrationDecisionCreateRequest
+            {
+                SubmissionId = Guid.NewGuid(),
+                FileId = Guid.NewGuid(),
+                Decision = RegulatorDecision.Accepted
+            };
+            
+            var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+            _mockSubmissionsService.Setup(x =>
+                x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegulatorRegistrationDecisionEvent>(), It.IsAny<Guid>()))
+                .ReturnsAsync(handlerResponse).Verifiable();
+
+            // Act
+            var result = await _sut.CreateRegulatorRegistrationDecisionEvent(request);
+
+            // Assert
+            result.Should().BeOfType<StatusCodeResult>();
+        }
+
+        [TestMethod]
+        public async Task When_creating_regulator_registration_decision_event_with_invalid_data_should_return_400_bad_request()
+        {
+            // Arrange
+            var request = new RegulatorRegistrationDecisionCreateRequest
+            {
+                SubmissionId = Guid.NewGuid(),
+                FileId = Guid.NewGuid(),
+                Decision = RegulatorDecision.Rejected
+            };
+            var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.BadRequest)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+            _mockSubmissionsService.Setup(x =>
+                x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegulatorRegistrationDecisionEvent>(), It.IsAny<Guid>())
+            ).ReturnsAsync(handlerResponse).Verifiable();
+            
+            // Act
+            var result = await _sut.CreateRegulatorRegistrationDecisionEvent(request);
+
+            // Assert
+            result.Should().BeOfType<BadRequestResult>();
+        }
+        
+        [TestMethod]
+        public async Task When_creating_regulator_registration_decision_event_which_invalidates_model_should_return_400_bad_request()
+        {
+            // Arrange
+            var request = new RegulatorRegistrationDecisionCreateRequest
+            {
+                SubmissionId = Guid.Empty,
+                FileId = Guid.Empty,
+                Decision = RegulatorDecision.Rejected
+            };
+            var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+            _mockSubmissionsService.Setup(x =>
+                x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegulatorRegistrationDecisionEvent>(), It.IsAny<Guid>())
+            ).ReturnsAsync(handlerResponse).Verifiable();
+
+            _sut.ModelState.AddModelError(nameof(RegulatorRegistrationDecisionCreateRequest.SubmissionId),
+                string.Empty);
+
+            // Act
+            var result = await _sut.CreateRegulatorRegistrationDecisionEvent(request);
+            
+            // Assert
+            result.As<ObjectResult>().Value.Should().BeOfType<ValidationProblemDetails>();
+        }
     }
 }

@@ -135,6 +135,32 @@ public class SubmissionsController : ControllerBase
         return HandleError.HandleErrorWithStatusCode(submissions.StatusCode);
     }
     
+    [HttpPost]
+    [Route("registration/regulator-decision")]
+    public async Task<IActionResult> CreateRegulatorRegistrationDecisionEvent([FromBody] RegulatorRegistrationDecisionCreateRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem();
+        }
+
+        var regulatorRegistrationDecisionEvent = new RegulatorRegistrationDecisionEvent
+        {
+            Decision = request.Decision,
+            Comments = request.Comments,
+            FileId = request.FileId
+        };
+        
+        var submissionEvent = await _submissionService.CreateSubmissionEvent(request.SubmissionId, regulatorRegistrationDecisionEvent, User.UserId());
+        
+        if (submissionEvent.IsSuccessStatusCode)
+        {
+            return StatusCode(201);
+        }
+
+        return new BadRequestResult();
+    }
+    
     private SubmissionEmailModel CreateBaseEmailModel(List<OrganisationUser> users, RegulatorPoMDecisionCreateRequest request)
     {
         var userEmails = users.Select(user => new UserEmailModel
