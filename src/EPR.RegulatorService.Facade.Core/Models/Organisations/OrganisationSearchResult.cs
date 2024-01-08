@@ -11,4 +11,5 @@ public class OrganisationSearchResult
     public string OrganisationId { get; set; }
     public Guid ExternalId { get; set; }
     public string CompanyHouseNumber { get; set; }
+    public string OrganisationType { get; set; }
 }
