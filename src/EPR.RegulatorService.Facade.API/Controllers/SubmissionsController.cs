@@ -71,7 +71,7 @@ public class SubmissionsController : ControllerBase
             List<string> emailIds;
             if (request.Decision == RegulatorDecision.Accepted)
             {
-                emailIds = _messagingService.SubmissionAccepted(model);
+                emailIds = _messagingService.SubmissionAccepted(model, EventType.RegulatorPoMDecision);
             }
             else
             {
@@ -85,7 +85,7 @@ public class SubmissionsController : ControllerBase
 
         return new BadRequestResult();
     }
-    
+
     [HttpGet]
     [Route("pom/get-submissions")]
     public async Task<IActionResult> GetPoMSubmissions([FromQuery] PoMSubmissionsFilters request)
@@ -155,13 +155,26 @@ public class SubmissionsController : ControllerBase
         
         if (submissionEvent.IsSuccessStatusCode)
         {
-            return StatusCode(201);
+            var users = await _regulatorUsers.GetRegulatorUsers(User.UserId(), request.OrganisationId);
+            var model = CreateBaseEmailModel(users, request);
+
+            List<string> emailIds;
+            if (request.Decision == RegulatorDecision.Accepted)
+            {
+                emailIds = _messagingService.SubmissionAccepted(model, EventType.RegulatorRegistrationDecision);
+            }
+            else
+            {
+                emailIds = _messagingService.SubmissionRejected(model, null);
+            }
+            
+            return Ok(emailIds);
         }
 
         return new BadRequestResult();
     }
     
-    private SubmissionEmailModel CreateBaseEmailModel(List<OrganisationUser> users, RegulatorPoMDecisionCreateRequest request)
+    private SubmissionEmailModel CreateBaseEmailModel(List<OrganisationUser> users, AbstractDecisionRequest request)
     {
         var userEmails = users.Select(user => new UserEmailModel
         {

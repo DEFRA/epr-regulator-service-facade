@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Notify.Interfaces;
 using System.Diagnostics;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
@@ -161,7 +162,7 @@ public class MessagingService : IMessagingService
         return emailIds;
     }
 
-    public List<string> SubmissionAccepted(SubmissionEmailModel model)
+    public List<string> SubmissionAccepted(SubmissionEmailModel model, EventType type)
     {
         ValidateRequiredSubmissionEmailModelParameters(model);
 
@@ -171,6 +172,17 @@ public class MessagingService : IMessagingService
         }
 
         var emailIds = new List<string>();
+        
+        string templateId;
+
+        if (type == EventType.RegulatorPoMDecision)
+        {
+            templateId = _messagingConfig.RegulatorSubmissionAccepted;
+        }
+        else
+        {
+            templateId = _messagingConfig.RegulatorRegistrationAccepted;
+        }
         
         foreach (var userEmail in model.UserEmails)
         {
@@ -183,21 +195,29 @@ public class MessagingService : IMessagingService
                 { "accountLoginUrl", model.AccountLoginUrl }
             };
 
-            var emailId = SendEmail(userEmail.Email, _messagingConfig.RegulatorSubmissionAccepted, userEmailParameters);
+            var emailId = SendEmail(userEmail.Email, templateId, userEmailParameters);
             emailIds.Add(emailId);
         }
 
         return emailIds;
     }
 
-    public List<string> SubmissionRejected(SubmissionEmailModel model, bool resubmissionRequired)
+    public List<string> SubmissionRejected(SubmissionEmailModel model, bool? resubmissionRequired)
     {
         ValidateRequiredSubmissionEmailModelParameters(model);
         ValidateStringParameter(model.RejectionComments, nameof(model.RejectionComments));
-        
-        var templateId = resubmissionRequired
-            ? _messagingConfig.RegulatorSubmissionRejectedResubmissionRequired
-            : _messagingConfig.RegulatorSubmissionRejectedResubmissionNotRequired;
+
+        string templateId;
+        if (resubmissionRequired.HasValue)
+        {
+            templateId = resubmissionRequired.Value
+                ? _messagingConfig.RegulatorSubmissionRejectedResubmissionRequired
+                : _messagingConfig.RegulatorSubmissionRejectedResubmissionNotRequired;
+        }
+        else
+        {
+            templateId = _messagingConfig.RegulatorRegistrationRejected;
+        }
 
         foreach (var email in model.UserEmails)
         {
@@ -210,12 +230,12 @@ public class MessagingService : IMessagingService
         {
             var userEmailParameters = new Dictionary<string, object>
             {
-                { "firstName", userEmail.FirstName },
-                { "lastName", userEmail.LastName },
-                { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
-                { "organisationName", model.OrganisationName },
-                { "reasonForRejection", model.RejectionComments },
-                { "accountLoginUrl", model.AccountLoginUrl }
+                {"firstName", userEmail.FirstName},
+                {"lastName", userEmail.LastName},
+                {"organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat()},
+                {"organisationName", model.OrganisationName},
+                {"reasonForRejection", model.RejectionComments},
+                {"accountLoginUrl", model.AccountLoginUrl}
             };
 
             var emailId = SendEmail(userEmail.Email, templateId, userEmailParameters);

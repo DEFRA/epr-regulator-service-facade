@@ -8,6 +8,7 @@ using Moq;
 using Notify.Interfaces;
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
@@ -412,7 +413,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            var emailIds = _sut.SubmissionAccepted(model);
+            var emailIds = _sut.SubmissionAccepted(model, EventType.RegulatorPoMDecision);
 
             // Assert
             emailIds.Count.Should().Be(3);
@@ -424,6 +425,45 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null,
                 null), Times.Exactly(3));
         }
+        
+        [TestMethod]
+        public void RegistrationAccepted_Email_Sends_To_All_Users_With_Approved_Enrolments()
+        {
+            // Arrange
+            var model = new SubmissionEmailModel()
+            {
+                UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
+                OrganisationName = "Wallace's Company",
+                OrganisationNumber = "123987345",
+                AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
+            };
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Dictionary<string, object>>(),
+                    null,
+                    null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+
+            var messagingConfig = Options.Create(new MessagingConfig());
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            // Act
+            var emailIds = _sut.SubmissionAccepted(model, EventType.RegulatorRegistrationDecision);
+
+            // Assert
+            emailIds.Count.Should().Be(3);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null), Times.Exactly(3));
+        }
+
         
         [TestMethod]
         public void SubmissionRejected_Resubmission_Required_Email_Sends_To_All_Users_With_Approved_Enrolments()
@@ -452,6 +492,45 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 
             // Act
             var emailIds = _sut.SubmissionRejected(model, true);
+
+            // Assert
+            emailIds.Count.Should().Be(3);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null), Times.Exactly(3));
+        }
+        
+        [TestMethod]
+        public void RegistrationRejected_Email_Sends_To_All_Users_With_Approved_Enrolments()
+        {
+            // Arrange
+            var model = new SubmissionEmailModel()
+            {
+                UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
+                OrganisationName = "Wallace's Company",
+                OrganisationNumber = "123987345",
+                AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
+                RejectionComments = "This was rejected as part of a test."
+            };
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Dictionary<string, object>>(),
+                    null,
+                    null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+
+            var messagingConfig = Options.Create(new MessagingConfig());
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            // Act
+            var emailIds = _sut.SubmissionRejected(model, null);
 
             // Assert
             emailIds.Count.Should().Be(3);

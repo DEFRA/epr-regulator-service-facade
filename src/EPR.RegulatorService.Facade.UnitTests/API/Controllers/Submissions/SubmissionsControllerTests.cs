@@ -312,7 +312,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
         }
         
         [TestMethod]
-        public async Task When_creating_regulator_registration_decision_event_with_valid_data_should_return_success()
+        public async Task When_creating_regulator_registration_decision_event_with_valid_data_for_acceptance_should_return_success()
         {
             // Arrange
             var request = new RegulatorRegistrationDecisionCreateRequest
@@ -325,21 +325,70 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
             var handlerResponse =
                 _fixture
                     .Build<HttpResponseMessage>()
-                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.StatusCode, HttpStatusCode.NoContent)
                     .With(x => x.Content, new StringContent(_fixture.Create<string>()))
                     .Create();
 
             _mockSubmissionsService.Setup(x =>
-                x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegulatorRegistrationDecisionEvent>(), It.IsAny<Guid>()))
+                    x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegulatorRegistrationDecisionEvent>(), It.IsAny<Guid>()))
                 .ReturnsAsync(handlerResponse).Verifiable();
+
+            _mockRegulatorOrganisationService
+                .Setup(x => x.GetRegulatorUserList(It.IsAny<Guid>(), It.IsAny<Guid>(), true))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new StringContent(GetRegulatorUsers())
+                });
+
+            _regulatorUsersMock.Setup(x => x.GetRegulatorUsers(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .ReturnsAsync(RegulatorUsersMockData.GetRegulatorUsers());
 
             // Act
             var result = await _sut.CreateRegulatorRegistrationDecisionEvent(request);
 
             // Assert
-            result.Should().BeOfType<StatusCodeResult>();
+            result.Should().BeOfType<OkObjectResult>();
         }
 
+        [TestMethod]
+        public async Task When_creating_regulator_registration_decision_event_with_valid_data_for_rejection_should_return_success()
+        {
+            // Arrange
+            var request = new RegulatorRegistrationDecisionCreateRequest
+            {
+                SubmissionId = Guid.NewGuid(),
+                FileId = Guid.NewGuid(),
+                Decision = RegulatorDecision.Rejected
+            };
+            
+            var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.NoContent)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+            _mockSubmissionsService.Setup(x =>
+                    x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegulatorRegistrationDecisionEvent>(), It.IsAny<Guid>()))
+                .ReturnsAsync(handlerResponse).Verifiable();
+
+            _mockRegulatorOrganisationService
+                .Setup(x => x.GetRegulatorUserList(It.IsAny<Guid>(), It.IsAny<Guid>(), true))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new StringContent(GetRegulatorUsers())
+                });
+
+            _regulatorUsersMock.Setup(x => x.GetRegulatorUsers(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .ReturnsAsync(RegulatorUsersMockData.GetRegulatorUsers());
+
+            // Act
+            var result = await _sut.CreateRegulatorRegistrationDecisionEvent(request);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+        }
+        
         [TestMethod]
         public async Task When_creating_regulator_registration_decision_event_with_invalid_data_should_return_400_bad_request()
         {

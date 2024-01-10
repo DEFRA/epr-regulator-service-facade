@@ -1,5 +1,3 @@
-using EPR.RegulatorService.Facade.Core.Enums;
-
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
 
 public class RegulatorPomDecision
