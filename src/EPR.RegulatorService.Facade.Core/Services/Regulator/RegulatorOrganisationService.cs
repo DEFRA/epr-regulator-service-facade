@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 {
@@ -135,6 +136,13 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", externalId);
         
             return await _httpClient.GetAsync(url);
+        }
+        
+        public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
+        {
+            _logger.LogInformation("Attempting to fetch pending applications from the backend");
+
+            return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
         }
     }
 }

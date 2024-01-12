@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
 
@@ -13,5 +14,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         Task<HttpResponseMessage> RegulatorInvited(Guid id, string email);
         Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly);
         Task<HttpResponseMessage> GetUsersByOrganisationExternalId(Guid userId, Guid externalId);
+        Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request);
     }
 }

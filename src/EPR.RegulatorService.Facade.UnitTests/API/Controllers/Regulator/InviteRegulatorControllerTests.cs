@@ -3,6 +3,8 @@ using System.Text.Json;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
@@ -61,7 +63,8 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Regulator
             _mockRegulatorOrganisationService.Setup(x =>
                 x.RegulatorInvites(It.IsAny<AddInviteUserRequest>())).ReturnsAsync(new HttpResponseMessage()
                 {
-                    Content = new StringContent(JsonSerializer.Serialize(Token))
+                    StatusCode =  HttpStatusCode.OK,
+                    Content = new StringContent(JsonSerializer.Serialize(new AddRemoveApprovedPersonResponseModel { InviteToken = Token }))
                 });
 
             // Act
@@ -230,7 +233,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Regulator
             var objectResult = result as ObjectResult;
             objectResult.Value.Should().BeOfType(typeof(ValidationProblemDetails));
         }
-
+        
         private EnrolInvitedUserRequest GetEnrolInvitedUserRequest()
         {
             return new EnrolInvitedUserRequest

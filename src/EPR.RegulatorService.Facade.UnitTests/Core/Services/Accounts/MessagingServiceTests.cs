@@ -726,7 +726,100 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                  null,
                  null), Times.Exactly(1));
          }
+         
+         [TestMethod]
+         public void InviteNewApprovedPerson_ValidParameters_EmailSendsSuccessfully()
+         {
+             var emailNotificationId = "C123456";
+             // Arrange
+             var model = new AddRemoveNewApprovedPersonEmailModel
+             {
+                 Email = "test@test.com",
+                 FirstName = "InvitedUserFirstName",
+                 LastName = "InvitedUserLastName",
+                 OrganisationNumber = "OrganisationNumber",
+                 InviteLink = "SomeInviteLink",
+                 CompanyName = "BlahCompanyName"
+             };
+
+             _notificationClientMock.Setup(x => x.SendEmail(
+                     It.IsAny<string>(),
+                     It.IsAny<string>(),
+                     It.IsAny<Dictionary<string, object>>(),
+                     null,
+                     null))
+                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+
+             var messagingConfig = Options.Create(
+                 new MessagingConfig
+             {
+                 InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
+             });
+
+             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+             // Act
+             var notificationId = _sut.SendEmailToInvitedNewApprovedPerson(model);
+
+             // Assert
+             notificationId.Should().Be(emailNotificationId);
+
+             _notificationClientMock.Verify(x => x.SendEmail(
+                 It.Is<string>(x => x == model.Email),
+                 It.Is<string>(x => x == messagingConfig.Value.InviteNewApprovedPersonTemplateId),
+                 It.IsAny<Dictionary<string, object>>(),
+                 null,
+                 null), Times.Exactly(1));
+         }
+
+         [TestMethod]
+         [DataRow("", "InvitedUserFirstName",
+             "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
+         [DataRow("test@test.com", "",
+              "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
+         [DataRow("test@test.com", "InvitedUserFirstName",
+              "", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
+         [DataRow("test@test.com", "InvitedUserFirstName",
+              "InvitedUserLastName", "", "SomeInviteLink", "CompanyName")]
+         [DataRow("test@test.com", "InvitedUserFirstName",
+              "InvitedUserLastName", "OrganisationNumber", "", "CompanyName")]
+         [DataRow("test@test.com", "InvitedUserFirstName",
+             "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "")]
+         public void InviteNewApprovedPerson_InvalidParameters_ShouldThrowArgumentException(
+             string email, string firstName, 
+             string lastName, string organisationNumber, 
+             string inviteLink, string companyName)
+
+         {
+             var emailNotificationId = "C123456";
+             // Arrange
+             var model = new AddRemoveNewApprovedPersonEmailModel
+             {
+                 Email = email,
+                 FirstName = firstName,
+                 LastName = lastName,
+                 OrganisationNumber = organisationNumber,
+                 InviteLink = inviteLink, 
+                 CompanyName = companyName
+             };
+
+             _notificationClientMock.Setup(x => x.SendEmail(
+                     It.IsAny<string>(),
+                     It.IsAny<string>(),
+                     It.IsAny<Dictionary<string, object>>(),
+                     null,
+                     null))
+                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
+
+             var messagingConfig = Options.Create(
+                 new MessagingConfig
+                 {
+                     InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
+                 });
+
+             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+             Assert.ThrowsException<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
+         }
     }
-    
-    
 }

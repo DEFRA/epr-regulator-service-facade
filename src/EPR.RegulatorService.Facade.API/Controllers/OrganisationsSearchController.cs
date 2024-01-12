@@ -1,10 +1,15 @@
 using System.Text.Json;
+using System.Web;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models;
+using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
+using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
@@ -179,6 +184,80 @@ public class OrganisationsSearchController : ControllerBase
             return HandleError.Handle(e);
         }
     }
+    
+    [HttpPost]
+    [Route("api/organisations/add-remove-approved-users")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddRemoveApprovedUser(FacadeAddRemoveApprovedPersonRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem();
+        }
+
+        var invitedByUserId = User.UserId();
+        var invitedByUserEmail = User.Email();
+        try
+        {
+            if (invitedByUserId == default)
+            {
+                _logger.LogError("UserId not available");
+                return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
+            }
+
+            var addRemoveApprovedUserRequest = new AddRemoveApprovedUserRequest
+            {
+                OrganisationId = request.OrganisationId,
+                RemovedConnectionExternalId = request.RemovedConnectionExternalId,
+                InvitedPersonEmail = request.InvitedPersonEmail,
+                AddingOrRemovingUserEmail = invitedByUserEmail, 
+                AddingOrRemovingUserId = invitedByUserId
+            };
+                
+            var response = await _regulatorOrganisationService.AddRemoveApprovedUser(addRemoveApprovedUserRequest);
+
+            var addRemoveApprovedUserResponse = await response.Content.ReadFromJsonAsync<AddRemoveApprovedPersonResponseModel>();
+            
+            var emailModel = new AddRemoveNewApprovedPersonEmailModel
+            {
+                Email = request.InvitedPersonEmail,
+                FirstName = request.InvitedPersonFirstName,
+                LastName = request.InvitedPersonLastName,
+                OrganisationNumber = addRemoveApprovedUserResponse.OrganisationReferenceNumber,
+                CompanyName = addRemoveApprovedUserResponse.OrganisationName,
+                InviteLink =  $"{_messagingConfig.AccountCreationUrl}{HttpUtility.UrlEncode(addRemoveApprovedUserResponse.InviteToken)}"
+            };
+            
+            _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
+            _logger.LogInformation($@"Email sent to Invited new approved person. 
+                                   Organisation external Id: {request.OrganisationId}
+                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}");
+            
+            foreach (var demotedBasicUser in addRemoveApprovedUserResponse.DemotedBasicUsers)
+            {
+                demotedBasicUser.TemplateId =  _messagingConfig.DemotedDelegatedUserTemplateId;
+                _messagingService.SendRemovedApprovedPersonNotification(demotedBasicUser, 3);
+                _logger.LogInformation($@"Email sent to demoted basic user 
+                                       Organisation external Id: {request.OrganisationId}
+                                       User: {demotedBasicUser.FirstName} {demotedBasicUser.LastName}
+                                       Email: {demotedBasicUser.Email}");
+            }
+            
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, @$"Error inviting new approved person. 
+                                Organisation external Id: {request.OrganisationId}
+                                Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
+                                Invited by user email: {invitedByUserEmail}");
+            
+            return BadRequest("Failed to add / remove user");
+        }
+    }
+    
     private void SendNotificationEmails(AssociatedPersonResults[] result)
     {
         // send email for removed AP

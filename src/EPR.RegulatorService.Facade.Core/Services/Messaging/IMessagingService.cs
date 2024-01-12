@@ -13,4 +13,5 @@ public interface IMessagingService
     List<string> SubmissionAccepted(SubmissionEmailModel model, EventType type);
     List<string> SubmissionRejected(SubmissionEmailModel model, bool? resubmissionRequired);
     string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, int serviceRoleId);
+    string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model);
 }

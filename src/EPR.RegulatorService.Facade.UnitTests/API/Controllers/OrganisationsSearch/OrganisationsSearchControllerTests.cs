@@ -2,7 +2,11 @@ using System.Net;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models;
+using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
+using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
@@ -29,16 +33,21 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
         private readonly int _currentPage = 1;
         private const int PageSize = 10;
         private const string OrganisationName = "Org";
+        private MessagingConfig _messagingConfig;
 
         [TestInitialize]
         public void Setup()
         {
-            var messagingConfig = new MessagingConfig() { 
+            _messagingConfig = new MessagingConfig() { 
                 ApiKey = "test", 
-                RemovedApprovedUserTemplateId = Guid.NewGuid().ToString()
-            }; 
+                RemovedApprovedUserTemplateId = Guid.NewGuid().ToString(),
+                InviteNewApprovedPersonTemplateId = Guid.NewGuid().ToString(),
+                DemotedDelegatedUserTemplateId = Guid.NewGuid().ToString(),
+                AccountCreationUrl = "FakeAccountCreationUrl"
+            };
+            
             var mockMessagingConfig = new Mock<IOptions<MessagingConfig>>();
-            mockMessagingConfig.Setup(ap => ap.Value).Returns(messagingConfig);
+            mockMessagingConfig.Setup(ap => ap.Value).Returns(_messagingConfig);
             
             _sut = new OrganisationsSearchController(_nullLogger, 
                                                      _mockProducerService.Object, 
@@ -283,6 +292,127 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
             result.Should().NotBeNull();
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+        
+        [TestMethod]
+        public async Task ValidRequest_AddRemoveApprovedUser_OKResult()
+        {
+            var token = "someToken";
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+
+            _mockRegulatorOrganisationService
+                .Setup(x => x.AddRemoveApprovedUser(It.IsAny<AddRemoveApprovedUserRequest>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(new AddRemoveApprovedPersonResponseModel { InviteToken = token }))
+                });
+
+            _mockMessagingService
+                .Setup(x => x.SendEmailToInvitedNewApprovedPerson(It.IsAny<AddRemoveNewApprovedPersonEmailModel>()));
+            // Act
+            var result = await _sut.AddRemoveApprovedUser(request);
+            
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        }
+        
+        [TestMethod]
+        public async Task ValidRequest_AddRemoveApprovedUser_ShouldSendEmailToInvitedNewApprovedPerson()
+        {
+            var token = "someToken";
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+
+            _mockRegulatorOrganisationService
+                .Setup(x => x.AddRemoveApprovedUser(It.IsAny<AddRemoveApprovedUserRequest>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(new AddRemoveApprovedPersonResponseModel { InviteToken = token }))
+                });
+
+            _mockMessagingService
+                .Setup(x => x.SendEmailToInvitedNewApprovedPerson(It.IsAny<AddRemoveNewApprovedPersonEmailModel>()));
+            // Act
+            _ = await _sut.AddRemoveApprovedUser(request);
+            
+            // Assert
+            _mockMessagingService
+                .Verify(x => x.SendEmailToInvitedNewApprovedPerson(It.Is<AddRemoveNewApprovedPersonEmailModel>(model => model.InviteLink == $"{_messagingConfig.AccountCreationUrl}{token}")));
+        }
+        
+        [TestMethod]
+        public async Task ValidRequest_AddRemoveApprovedUser_ShouldSendEmailToDemotedBasicUsers()
+        {
+            var token = "someToken";
+            var basicServiceRoleId = 3;
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+
+            var addRemoveApprovedUserResponse = new AddRemoveApprovedPersonResponseModel
+            {
+                InviteToken = token,
+                DemotedBasicUsers = new List<AssociatedPersonResults>
+                {
+                    new AssociatedPersonResults() { Email = "demotedPerson1@email.com", OrganisationId = request.OrganisationId.ToString() },  // 2 demoted users
+                    new()
+                }
+            };
+            _mockRegulatorOrganisationService
+                .Setup(x => x.AddRemoveApprovedUser(It.IsAny<AddRemoveApprovedUserRequest>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(
+                        JsonConvert.SerializeObject(addRemoveApprovedUserResponse))
+                });
+
+            _mockMessagingService
+                .Setup(x => x.SendEmailToInvitedNewApprovedPerson(It.IsAny<AddRemoveNewApprovedPersonEmailModel>()));
+            // Act
+            _ = await _sut.AddRemoveApprovedUser(request);
+            
+            // Assert
+            _mockMessagingService
+                .Verify(x => x.SendRemovedApprovedPersonNotification(
+                        It.IsAny<AssociatedPersonResults>(), 
+                        It.Is<int>(serviceRoleId => serviceRoleId == basicServiceRoleId)),
+                    Times.Exactly(addRemoveApprovedUserResponse.DemotedBasicUsers.Count));
+
+            foreach (var demotedBasicUser in addRemoveApprovedUserResponse.DemotedBasicUsers)
+            {
+                _mockMessagingService
+                    .Verify(x => x.SendRemovedApprovedPersonNotification(
+                            It.Is<AssociatedPersonResults>(result => 
+                                result.TemplateId == _messagingConfig.DemotedDelegatedUserTemplateId
+                                && result.Email == demotedBasicUser.Email
+                                && result.OrganisationId == demotedBasicUser.OrganisationId), 
+                            It.Is<int>(serviceRoleId => serviceRoleId == basicServiceRoleId)),
+                        Times.Exactly(1));
+            }
+            
         }
     }
 }

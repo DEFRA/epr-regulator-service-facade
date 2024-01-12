@@ -14,7 +14,11 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
                 HttpContext = new DefaultHttpContext()
             };
 
-            var claims = new List<Claim> {new(ClaimConstants.ObjectId, oid.ToString())};
+            var claims = new List<Claim>
+            {
+                new(ClaimConstants.ObjectId, oid.ToString()), 
+                new("emails", "authenticatedUser@test.com")
+            };
             var identity = new ClaimsIdentity(claims, authType);
             var claimsPrincipal = new ClaimsPrincipal(identity);
 

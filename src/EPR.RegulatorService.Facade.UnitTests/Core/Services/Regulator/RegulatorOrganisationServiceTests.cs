@@ -4,6 +4,7 @@ using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using FluentAssertions;
@@ -257,6 +258,28 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Regulator
             regulators.Count.Should().Be(0);
         }
         
+        [TestMethod]
+        public async Task AddRemoveApprovedUser_SendValidRequest_ReturnCreatedResult()
+        {
+            // Arrange
+            var apiResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            var expectedUrl = string.Format($"{BaseAddress}/{_configuration.Value.Endpoints.AddRemoveApprovedUser}", new AddRemoveApprovedUserRequest());
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            // Act
+            var response = await _sut.AddRemoveApprovedUser(new AddRemoveApprovedUserRequest());
+            VerifyApiCall(expectedUrl, HttpMethod.Post);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
         private void VerifyApiCall(string expectedUrl, HttpMethod method)
         {
             _httpMessageHandlerMock.Protected().Verify("SendAsync", Times.Once(),

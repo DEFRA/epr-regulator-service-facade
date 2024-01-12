@@ -281,6 +281,38 @@ public class MessagingService : IMessagingService
 
     }
 
+    public string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model)
+    {
+        Dictionary<string, object> parameters = null;
+        
+        parameters = new Dictionary<string, object>
+        {
+            { "email", model.Email },
+            { "firstName", model.FirstName },
+            { "lastName", model.LastName },
+            { "organisationNumber", model.OrganisationNumber },
+            { "inviteLink", model.InviteLink },
+            { "companyName", model.CompanyName }
+        };
+        
+        Validate(model);
+        
+       
+        var response =  _notificationClient.SendEmail(model.Email, _messagingConfig.InviteNewApprovedPersonTemplateId, parameters);
+
+        return response.id;
+    }
+    
+    private void Validate(AddRemoveNewApprovedPersonEmailModel model)
+    {
+        ValidateStringParameter(model.Email, nameof(model.Email));
+        ValidateStringParameter(model.FirstName, nameof(model.FirstName));
+        ValidateStringParameter(model.LastName, nameof(model.LastName));
+        ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
+        ValidateStringParameter(model.InviteLink, nameof(model.InviteLink));
+        ValidateStringParameter(model.CompanyName, nameof(model.CompanyName));
+    }
+
     private void ValidateRequiredRemovedApprovedPersonEmailModelParameters(AssociatedPersonResults model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));

@@ -22,5 +22,8 @@ public class MessagingConfig
     public string RemovedApprovedUserTemplateId { get; set; } = string.Empty;
 
     public string DemotedDelegatedUserTemplateId { get; set; } = string.Empty;
+    
+    public string InviteNewApprovedPersonTemplateId { get; set; } = string.Empty;
 
+    public string AccountCreationUrl { get; set; } = string.Empty;
 }
