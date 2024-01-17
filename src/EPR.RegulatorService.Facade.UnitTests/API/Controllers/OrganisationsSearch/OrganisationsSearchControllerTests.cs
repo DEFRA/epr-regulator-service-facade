@@ -4,7 +4,6 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
-using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
@@ -195,7 +194,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
         }
 
         [TestMethod]
-        public async Task When_RemoveApprovedPerson_Valid_Result_Is_Successful()
+        public async Task When_RemoveApprovedPerson_RemoveWithoutNomination_Valid_Result_Is_Successful()
         {
             // Arrange
             var connExternalId = Guid.NewGuid();
@@ -210,15 +209,17 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
                     Email = "test@user.com",
                     OrganisationId = "12545",
                     CompanyName = "Test Company",
-                    ServiceRoleId = 1
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "RemovedApprovedUser"
                 }
             };
 
             var request = new RemoveApprovedUsersRequest
             {
-                ConnectionExternalId = connExternalId,
+                RemovedConnectionExternalId = connExternalId,
                 OrganisationId = organisationId,
-                UserId = Guid.NewGuid()
+                UserId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.Empty
             };
 
             _mockProducerService.Setup(x =>
@@ -247,7 +248,8 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
             {
                 OrganisationId = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
-                ConnectionExternalId = Guid.NewGuid()
+                RemovedConnectionExternalId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.Empty
             };
             
             _mockProducerService
@@ -275,7 +277,8 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
             {
                 OrganisationId = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
-                ConnectionExternalId = Guid.NewGuid()
+                RemovedConnectionExternalId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.Empty
             };
             
             _mockProducerService
@@ -294,6 +297,218 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
             statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
         }
         
+        [TestMethod]
+        public async Task When_RemoveApprovedPerson_NominateWithoutRemoving_Valid_Result_Is_Successful()
+        {
+            // Arrange
+            var associatedPerson = new List<AssociatedPersonResults>
+            {
+                new()
+                {
+                    FirstName = "test",
+                    LastName = "user",
+                    Email = "test@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "PromotedApprovedUser"
+                }
+            };
+
+            var request = new RemoveApprovedUsersRequest
+            {
+                RemovedConnectionExternalId =  Guid.Empty,
+                OrganisationId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.NewGuid()
+            };
+
+            _mockProducerService.Setup(x =>
+                x.RemoveApprovedUser(request)
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(associatedPerson))
+            });
+            
+            // Act
+            var result = await _sut.RemoveApprovedPerson(request);
+            
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(200);
+        }
+        
+        [TestMethod]
+        public async Task When_RemoveApprovedPerson_RemoveWithNominate_Valid_Result_Is_Successful()
+        {
+            // Arrange
+            var associatedPerson = new List<AssociatedPersonResults>
+            {
+                new()
+                {
+                    FirstName = "remove",
+                    LastName = "user",
+                    Email = "remove@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "RemovedApprovedUser"
+                },
+                new()
+                {
+                    FirstName = "nominate",
+                    LastName = "user",
+                    Email = "nominate@user.com",
+                    OrganisationId = "85214",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "PromotedApprovedUser"
+                }
+            };
+
+            var request = new RemoveApprovedUsersRequest
+            {
+                RemovedConnectionExternalId =  Guid.NewGuid(),
+                OrganisationId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.NewGuid()
+            };
+
+            _mockProducerService.Setup(x =>
+                x.RemoveApprovedUser(request)
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(associatedPerson))
+            });
+            
+            // Act
+            var result = await _sut.RemoveApprovedPerson(request);
+            
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(200);
+        }
+        
+        [TestMethod]
+        public async Task ValidRequest_RemoveApprovedUser_RemoveWithoutNomination_ShouldSendEmailToSendRemovedApprovedPersonNotification()
+        {
+           // Arrange
+           var associatedPerson = new List<AssociatedPersonResults>
+           {
+               new()
+               {
+                   FirstName = "test",
+                   LastName = "user",
+                   Email = "test@user.com",
+                   OrganisationId = "12545",
+                   CompanyName = "Test Company",
+                   ServiceRoleId = 1,
+                   EmailNotificationType = "RemovedApprovedUser"
+               }
+           };
+
+           var request = new RemoveApprovedUsersRequest
+           {
+               RemovedConnectionExternalId = Guid.NewGuid(),
+               OrganisationId = Guid.NewGuid(),
+               UserId = Guid.NewGuid(),
+               PromotedPersonExternalId = Guid.Empty
+           };
+
+           _mockProducerService.Setup(x =>
+               x.RemoveApprovedUser(request)
+           ).ReturnsAsync(new HttpResponseMessage()
+           {
+               StatusCode = HttpStatusCode.OK,
+               Content = new StringContent(JsonConvert.SerializeObject(associatedPerson))
+           });
+
+           _mockMessagingService.Setup(x =>
+               x.SendRemovedApprovedPersonNotification(It.IsAny<AssociatedPersonResults>(), It.IsAny<string>()));
+            
+            
+           // Act
+           
+           _ = await _sut.RemoveApprovedPerson(request);
+            
+            // Assert
+           
+            _mockMessagingService
+                .Verify(x => x.SendRemovedApprovedPersonNotification(
+                        It.Is<AssociatedPersonResults>(result => 
+                            result.TemplateId == _messagingConfig.RemovedApprovedUserTemplateId), 
+                        It.IsAny<string>()),
+                    Times.Exactly(1));
+        }
+        
+        [TestMethod]
+        public async Task ValidRequest_RemoveApprovedUser_RemoveWithNomination_ShouldSendEmailToSendRemovedApprovedPersonNotification()
+        {
+            // Arrange
+            var associatedPerson = new List<AssociatedPersonResults>
+            {
+                new()
+                {
+                    FirstName = "removed",
+                    LastName = "user",
+                    Email = "removed@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "RemovedApprovedUser"
+                },
+                new()
+                {
+                    FirstName = "nominated",
+                    LastName = "user",
+                    Email = "nominated@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "PromotedApprovedUser"
+                }
+            };
+
+            var request = new RemoveApprovedUsersRequest
+            {
+                RemovedConnectionExternalId = Guid.NewGuid(),
+                OrganisationId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.NewGuid()
+            };
+
+            _mockProducerService.Setup(x =>
+                x.RemoveApprovedUser(request)
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(JsonConvert.SerializeObject(associatedPerson))
+            });
+
+            _mockMessagingService.Setup(x =>
+                x.SendRemovedApprovedPersonNotification(It.IsAny<AssociatedPersonResults>(), It.IsAny<string>()));
+            
+            // Act
+           _ = await _sut.RemoveApprovedPerson(request);
+            
+            // Assert
+           
+            _mockMessagingService
+                .Verify(x => x.SendRemovedApprovedPersonNotification(
+                        It.Is<AssociatedPersonResults>(result => 
+                            result.TemplateId == _messagingConfig.RemovedApprovedUserTemplateId), 
+                        It.IsAny<string>()),
+                    Times.Exactly(1));
+            _mockMessagingService
+                .Verify(x => x.SendRemovedApprovedPersonNotification(
+                        It.Is<AssociatedPersonResults>(result => 
+                            result.TemplateId == _messagingConfig.PromotedApprovedUserTemplateId), 
+                        It.IsAny<string>()),
+                    Times.Exactly(1));
+        }
+
         [TestMethod]
         public async Task ValidRequest_AddRemoveApprovedUser_OKResult()
         {
@@ -361,7 +576,6 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
         public async Task ValidRequest_AddRemoveApprovedUser_ShouldSendEmailToDemotedBasicUsers()
         {
             var token = "someToken";
-            var basicServiceRoleId = 3;
             // Arrange
             var request = new FacadeAddRemoveApprovedPersonRequest
             {
@@ -374,10 +588,27 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
             var addRemoveApprovedUserResponse = new AddRemoveApprovedPersonResponseModel
             {
                 InviteToken = token,
-                DemotedBasicUsers = new List<AssociatedPersonResults>
+                AssociatedPersonList = new List<AssociatedPersonResults>
                 {
-                    new AssociatedPersonResults() { Email = "demotedPerson1@email.com", OrganisationId = request.OrganisationId.ToString() },  // 2 demoted users
+                    new() { 
+                        Email = "demotedPerson1@email.com", 
+                        OrganisationId = request.OrganisationId.ToString(), 
+                        FirstName = "Test", 
+                        LastName = "User",
+                        CompanyName = "Test Company",
+                        EmailNotificationType = "DemotedDelegatedUsed"
+                        
+                    },  // 2 demoted users
                     new()
+                    { 
+                        Email = "demotedPerson2@email.com", 
+                        OrganisationId = request.OrganisationId.ToString(), 
+                        FirstName = "", 
+                        LastName = "",
+                        CompanyName = "Test Company 2",
+                        EmailNotificationType = "DemotedDelegatedUsed"
+                        
+                    }
                 }
             };
             _mockRegulatorOrganisationService
@@ -398,10 +629,10 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
             _mockMessagingService
                 .Verify(x => x.SendRemovedApprovedPersonNotification(
                         It.IsAny<AssociatedPersonResults>(), 
-                        It.Is<int>(serviceRoleId => serviceRoleId == basicServiceRoleId)),
-                    Times.Exactly(addRemoveApprovedUserResponse.DemotedBasicUsers.Count));
+                        It.IsAny<string>()),
+                    Times.Exactly(addRemoveApprovedUserResponse.AssociatedPersonList.Count));
 
-            foreach (var demotedBasicUser in addRemoveApprovedUserResponse.DemotedBasicUsers)
+            foreach (var demotedBasicUser in addRemoveApprovedUserResponse.AssociatedPersonList)
             {
                 _mockMessagingService
                     .Verify(x => x.SendRemovedApprovedPersonNotification(
@@ -409,7 +640,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
                                 result.TemplateId == _messagingConfig.DemotedDelegatedUserTemplateId
                                 && result.Email == demotedBasicUser.Email
                                 && result.OrganisationId == demotedBasicUser.OrganisationId), 
-                            It.Is<int>(serviceRoleId => serviceRoleId == basicServiceRoleId)),
+                            It.IsAny<string>()),
                         Times.Exactly(1));
             }
             

@@ -583,17 +583,17 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         }
         
          [TestMethod]
-         [DataRow("", "firstName", "lastName", "123456789", 3)]
-         [DataRow("bob@hotmail.com", "", "lastName", "123456789", 3)]
-         [DataRow("bob@hotmail.com", "firstName", "","123456789", 3)]
-         [DataRow("bob@hotmail.com", "firstName", "lastName","", 3)]
+         [DataRow("", "firstName", "lastName", "123456789", "DemotedDelegatedUsed")]
+         [DataRow("bob@hotmail.com", "", "lastName", "123456789", "DemotedDelegatedUsed")]
+         [DataRow("bob@hotmail.com", "firstName", "","123456789", "DemotedDelegatedUsed")]
+         [DataRow("bob@hotmail.com", "firstName", "lastName","", "DemotedDelegatedUsed")]
          [ExpectedException(typeof(ArgumentException))]
         public void RemovedPerson_DelegatedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
             string email,
             string firstName, 
             string lastName, 
             string organisationNumber,
-            int serviceRoleId)
+            string type)
         {
             // Arrange
             var model = new AssociatedPersonResults
@@ -602,18 +602,18 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 FirstName = firstName,
                 LastName = lastName,
                 OrganisationId = organisationNumber,
-                ServiceRoleId = serviceRoleId,
+                EmailNotificationType = type 
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.SendRemovedApprovedPersonNotification(model, serviceRoleId );
+            _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType );
         }
          
          [TestMethod]
-         [DataRow("", "firstName", "lastName", "123456789", "Org 1", 1)]
+         [DataRow("", "firstName", "lastName", "123456789", "Org 1", "RemovedApprovedUser")]
          [DataRow("bob@hotmail.com", "", "lastName", "123456789","Org 1", 1)]
          [DataRow("bob@hotmail.com", "firstName", "", "123456789","Org 1", 1)]
          [DataRow("bob@hotmail.com", "firstName", "lastName",  "123456789","", 1)]
@@ -625,7 +625,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              string lastName, 
              string organisationNumber,
              string companyName,
-             int serviceRoleId)
+             string type)
          {
              // Arrange
              var model = new AssociatedPersonResults
@@ -635,14 +635,14 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                  LastName = lastName,
                  CompanyName = companyName,
                  OrganisationId = organisationNumber,
-                 ServiceRoleId = serviceRoleId,
+                 EmailNotificationType = type,
              };
 
              var messagingConfig = Options.Create(new MessagingConfig());
              _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
              // Act
-             _sut.SendRemovedApprovedPersonNotification(model, serviceRoleId );
+             _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType );
          }
          
          [TestMethod]
@@ -673,7 +673,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
              // Act
-             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, 1);
+             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "RemovedApprovedUser");
 
              // Assert
              notificationId.Should().Be(emailNotificationId);
@@ -714,7 +714,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
              // Act
-             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, 3);
+             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "DemotedDelegatedUsed");
 
              // Assert
              notificationId.Should().Be(emailNotificationId);

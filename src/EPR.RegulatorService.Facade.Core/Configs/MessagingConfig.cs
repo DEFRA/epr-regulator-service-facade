@@ -20,10 +20,8 @@ public class MessagingConfig
     public string RegulatorSubmissionRejectedResubmissionNotRequired { get; set; } = string.Empty;
     public string AccountSignInUrl { get; set; } = string.Empty;
     public string RemovedApprovedUserTemplateId { get; set; } = string.Empty;
-
     public string DemotedDelegatedUserTemplateId { get; set; } = string.Empty;
-    
+    public string PromotedApprovedUserTemplateId { get; set; } = string.Empty;
     public string InviteNewApprovedPersonTemplateId { get; set; } = string.Empty;
-
     public string AccountCreationUrl { get; set; } = string.Empty;
 }

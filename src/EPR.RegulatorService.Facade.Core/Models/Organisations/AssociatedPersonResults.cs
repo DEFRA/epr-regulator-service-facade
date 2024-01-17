@@ -12,4 +12,6 @@ public class AssociatedPersonResults
     public int ServiceRoleId { get; set; }
     
     public string TemplateId { get; set; }
+    
+    public string EmailNotificationType { get; set; }
 }

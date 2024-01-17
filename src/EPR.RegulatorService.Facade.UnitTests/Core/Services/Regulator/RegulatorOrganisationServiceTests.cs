@@ -279,7 +279,7 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Regulator
             response.Should().NotBeNull();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
-
+       
         private void VerifyApiCall(string expectedUrl, HttpMethod method)
         {
             _httpMessageHandlerMock.Protected().Verify("SendAsync", Times.Once(),

@@ -4,7 +4,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses;
 
 public class AddRemoveApprovedPersonResponseModel
 {
-    public List<AssociatedPersonResults> DemotedBasicUsers { get; set; } =
+    public List<AssociatedPersonResults> AssociatedPersonList { get; set; } =
         new ();
     public string InviteToken { get; set; }
     

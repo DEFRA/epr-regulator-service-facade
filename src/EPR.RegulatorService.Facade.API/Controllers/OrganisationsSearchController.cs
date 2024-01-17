@@ -153,30 +153,24 @@ public class OrganisationsSearchController : ControllerBase
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
-
-            if (!request.NominationDecision)
+            
+            var response = await _producerService.RemoveApprovedUser(request);
+        
+            if (response.IsSuccessStatusCode)
             {
-                var response = await _producerService.RemoveApprovedUser(request);
-            
-                if (response.IsSuccessStatusCode)
+                var stringContent = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<AssociatedPersonResults[]>(
+                    stringContent,
+                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+
+                if (result.Length > 0)
                 {
-                    var stringContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonSerializer.Deserialize<AssociatedPersonResults[]>(
-                        stringContent,
-                        new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
-
-                    if (result.Length > 0)
-                    {
-                        SendNotificationEmails(result);
-                    }
-
-                    return Ok(NoContent());
+                    SendRemovalEmail(result);
                 }
-                return HandleError.HandleErrorWithStatusCode(response.StatusCode);
+
+                return Ok(NoContent());
             }
-            
-            return Problem("Error thrown as Nomination Decision is passed as Yes", statusCode: StatusCodes.Status400BadRequest);
-            
+            return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
@@ -234,17 +228,9 @@ public class OrganisationsSearchController : ControllerBase
             _logger.LogInformation($@"Email sent to Invited new approved person. 
                                    Organisation external Id: {request.OrganisationId}
                                    User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}");
-            
-            foreach (var demotedBasicUser in addRemoveApprovedUserResponse.DemotedBasicUsers)
-            {
-                demotedBasicUser.TemplateId =  _messagingConfig.DemotedDelegatedUserTemplateId;
-                _messagingService.SendRemovedApprovedPersonNotification(demotedBasicUser, 3);
-                _logger.LogInformation($@"Email sent to demoted basic user 
-                                       Organisation external Id: {request.OrganisationId}
-                                       User: {demotedBasicUser.FirstName} {demotedBasicUser.LastName}
-                                       Email: {demotedBasicUser.Email}");
-            }
-            
+
+           // Send email to Demoted users.
+            SendRemovalEmail(addRemoveApprovedUserResponse.AssociatedPersonList.ToArray());
             return Ok();
         }
         catch (Exception e)
@@ -258,33 +244,32 @@ public class OrganisationsSearchController : ControllerBase
         }
     }
     
-    private void SendNotificationEmails(AssociatedPersonResults[] result)
+    private void SendRemovalEmail(AssociatedPersonResults[] emailList)
     {
-        // send email for removed AP
-        SendRemovalEmail(result, 1);
-
-        // send email for demoted DP
-        SendRemovalEmail(result, 3 );
-    }
-    private void SendRemovalEmail(AssociatedPersonResults[] emailList,int serviceRoleId)
-    {
-        foreach (var email in emailList.Where(a => a.ServiceRoleId == serviceRoleId).ToList())
+        foreach (var email in emailList)
         {
-            email.TemplateId = serviceRoleId == 1 ? _messagingConfig.RemovedApprovedUserTemplateId : _messagingConfig.DemotedDelegatedUserTemplateId;
-           
-            var emailSent = SendNotificationEmailToDeletedPerson(email,serviceRoleId);
-            
+            // new code
+            email.TemplateId = email.EmailNotificationType switch
+            {
+                "RemovedApprovedUser" => _messagingConfig.RemovedApprovedUserTemplateId,
+                "DemotedDelegatedUsed" => _messagingConfig.DemotedDelegatedUserTemplateId,
+                "PromotedApprovedUser" => _messagingConfig.PromotedApprovedUserTemplateId,
+                _ => email.TemplateId
+            };
+
+            var emailSent = SendNotificationEmailToDeletedPerson(email, email.EmailNotificationType);
             if (!emailSent)
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
                 _logger.LogError(errorMessage);
             }
+         
         }
     }
 
-    private bool SendNotificationEmailToDeletedPerson(AssociatedPersonResults email,int serviceRoleId)
+    private bool SendNotificationEmailToDeletedPerson(AssociatedPersonResults email,string notificationType)
     {
-        return _messagingService.SendRemovedApprovedPersonNotification(email, serviceRoleId) != null;
+        return _messagingService.SendRemovedApprovedPersonNotification(email, notificationType) != null;
     }
 }

@@ -20,6 +20,7 @@ parameters:
     - Team-6_Stig
     - Team-7_Oscar
     - Team-8_Pre-TST
+    - Team-9_Ops
   - name: envToDeploy
     displayName: 'Target env to deploy:    (select "development" for Team1/3)'
     type: string

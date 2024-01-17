@@ -41,9 +41,9 @@ public class ProducerService : IProducerService
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
-        var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.ConnectionExternalId, model.OrganisationId);
+        var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.RemovedConnectionExternalId, model.OrganisationId, model.PromotedPersonExternalId);
         
-        _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", model.ConnectionExternalId);
+        _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", model.RemovedConnectionExternalId);
         
         return await _httpClient.PostAsJsonAsync(url, model);
     }

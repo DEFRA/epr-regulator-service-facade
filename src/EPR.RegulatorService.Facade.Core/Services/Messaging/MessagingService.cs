@@ -245,13 +245,14 @@ public class MessagingService : IMessagingService
         return emailIds;
     }
 
-    public string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, int serviceRoleId)
+    public string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, string notificationType)
     {
         Dictionary<string, object> parameters = null;
         
-        switch (serviceRoleId)
+        switch (notificationType)
         {
-            case 1:
+            case "PromotedApprovedUser":
+            case "RemovedApprovedUser":
                 parameters = new Dictionary<string, object>
                 {
                     { "email", model.Email },
@@ -262,7 +263,8 @@ public class MessagingService : IMessagingService
                 };
                ValidateRequiredRemovedApprovedPersonEmailModelParameters(model);
                 break;
-            case 3 : 
+           
+            case "DemotedDelegatedUsed" : 
                 parameters = new Dictionary<string, object>
                 {
                     { "email", model.Email },
@@ -273,13 +275,13 @@ public class MessagingService : IMessagingService
                 ValidateDemotedDelegatedPersonParameters(model);
                 break;
         }
-        
        
         var response =  _notificationClient.SendEmail(model.Email, model.TemplateId, parameters);
 
         return response.id;
-
     }
+    
+    
 
     public string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model)
     {
