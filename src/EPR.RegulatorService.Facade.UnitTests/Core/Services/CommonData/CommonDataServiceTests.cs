@@ -2,15 +2,17 @@ using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
-using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 
-namespace EPR.RegulatorService.Facade.Tests.Core.Services.CommonData;
+namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.CommonData;
 
 [TestClass]
 public class CommonDataServiceTests
@@ -57,7 +59,6 @@ public class CommonDataServiceTests
         // Assert
         VerifyApiCall(_expectedUrl, HttpMethod.Get);
         response.IsSuccessStatusCode.Should().BeTrue();
-
     }
 
     [TestMethod]
@@ -73,14 +74,13 @@ public class CommonDataServiceTests
         // Assert
         VerifyApiCall(_expectedUrl, HttpMethod.Get);
         response.IsSuccessStatusCode.Should().BeFalse();
-
     }
 
     [TestMethod]
-    public async Task Should_return_success_when_creating_regulator_pom_decision()
+    public async Task Should_return_success_when_getting_regulator_pom_summary()
     {
         //Arrange
-        var req = new PoMSubmissionsGetRequest
+        var req = new GetPomSubmissionsRequest
         {
             Statuses = "Pending",
             OrganisationName = "test",
@@ -112,10 +112,10 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
-    public async Task Should_return_bad_request_when_creating_regulator_pom_decision()
+    public async Task Should_return_bad_request_when_getting_regulator_pom_summary()
     {
         //Arrange
-        var req = new PoMSubmissionsGetRequest
+        var req = new GetPomSubmissionsRequest
         {
             Statuses = "Pending",
             OrganisationName = "test",
@@ -141,6 +141,75 @@ public class CommonDataServiceTests
 
         // Act
         var response = await _sut.GetPoMSubmissions(req);
+
+        // Assert
+        VerifyApiCall(_expectedUrl, HttpMethod.Post);
+        response.IsSuccessStatusCode.Should().BeFalse();
+    }
+    
+    [TestMethod]
+    public async Task Should_return_success_when_getting_regulator_registration_summary()
+    {
+        //Arrange
+        var req = new GetRegistrationSubmissionsRequest
+        {
+            Statuses = "Pending",
+            OrganisationName = "test",
+            OrganisationReference = "123",
+            OrganisationType = "DirectProducer",
+            PageNumber = 1,
+            PageSize = 20,
+            UserId = _userId,
+            DecisionsDelta = new RegulatorRegistrationDecision[]
+            {
+                new()
+                {
+                    FileId = Guid.NewGuid(),
+                    Decision = "Approved"
+                }
+            }
+        };
+        _expectedUrl =
+            $"{BaseAddress}/{_configuration.Value.Endpoints.GetRegistrationSubmissions}";
+        SetupApiSuccessCall();
+
+        // Act
+        var response = await _sut.GetRegistrationSubmissions(req);
+
+        // Assert
+        VerifyApiCall(_expectedUrl, HttpMethod.Post);
+        response.IsSuccessStatusCode.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Should_return_bad_request_when_when_getting_regulator_registration_summary()
+    {
+        //Arrange
+        var req = new GetRegistrationSubmissionsRequest
+        {
+            Statuses = "Pending",
+            OrganisationName = "test",
+            OrganisationReference = "123",
+            OrganisationType = "DirectProducer",
+            PageNumber = 1,
+            PageSize = 20,
+            UserId = _userId,
+            DecisionsDelta = new RegulatorRegistrationDecision[]
+            {
+                new()
+                {
+                    FileId = Guid.NewGuid(),
+                    Decision = "Approved"
+                }
+            }
+        };
+        _expectedUrl =
+            $"{BaseAddress}/{_configuration.Value.Endpoints.GetRegistrationSubmissions}";
+
+        SetupApiBadRequestCall();
+
+        // Act
+        var response = await _sut.GetRegistrationSubmissions(req);
 
         // Assert
         VerifyApiCall(_expectedUrl, HttpMethod.Post);

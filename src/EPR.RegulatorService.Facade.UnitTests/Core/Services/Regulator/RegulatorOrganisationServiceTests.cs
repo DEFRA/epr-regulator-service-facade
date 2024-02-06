@@ -15,7 +15,7 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace EPR.RegulatorService.Facade.Tests.Core.Services.Regulator
+namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
 { 
     [TestClass]
     public class RegulatorOrganisationServiceTests

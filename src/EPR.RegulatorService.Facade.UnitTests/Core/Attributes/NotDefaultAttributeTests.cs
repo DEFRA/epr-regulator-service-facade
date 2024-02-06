@@ -1,7 +1,7 @@
 using EPR.RegulatorService.Facade.Core.Attributes;
 using FluentAssertions;
 
-namespace EPR.RegulatorService.Facade.Tests.Core.Attributes
+namespace EPR.RegulatorService.Facade.UnitTests.Core.Attributes
 {
     [TestClass]
     public class NotDefaultAttributeTests

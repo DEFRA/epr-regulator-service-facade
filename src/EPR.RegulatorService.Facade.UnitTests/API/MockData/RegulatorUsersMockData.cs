@@ -1,7 +1,7 @@
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
 
-namespace EPR.RegulatorService.Facade.Tests.API.MockData
+namespace EPR.RegulatorService.Facade.UnitTests.API.MockData
 {
     public static class RegulatorUsersMockData
     {

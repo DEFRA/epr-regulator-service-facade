@@ -16,4 +16,6 @@ public class SubmissionsServiceEndpoints
     public string CreateSubmissionEvent { get; set; } = null!;
     
     public string GetPoMSubmissions { get; set; } = null!;
+    
+    public string GetRegistrationSubmissions { get; set; } = null!;
 }

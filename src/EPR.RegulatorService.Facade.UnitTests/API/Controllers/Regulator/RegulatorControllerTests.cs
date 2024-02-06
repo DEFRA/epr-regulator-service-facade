@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Regulator
+namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
 {
     [TestClass]
     public class ApplicationControllerTests : Controller

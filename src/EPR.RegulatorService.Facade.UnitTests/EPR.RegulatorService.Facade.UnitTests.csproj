@@ -4,8 +4,8 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AssemblyName>EPR.RegulatorService.Facade.Tests</AssemblyName>
-        <RootNamespace>EPR.RegulatorService.Facade.Tests</RootNamespace>
+        <AssemblyName>EPR.RegulatorService.Facade.UnitTests</AssemblyName>
+        <RootNamespace>EPR.RegulatorService.Facade.UnitTests</RootNamespace>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -32,9 +32,6 @@
       <ProjectReference Include="..\EPR.RegulatorService.Facade.Core\EPR.RegulatorService.Facade.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="API\Controllers\CommonData" />
-    </ItemGroup>
 
 </Project>
 

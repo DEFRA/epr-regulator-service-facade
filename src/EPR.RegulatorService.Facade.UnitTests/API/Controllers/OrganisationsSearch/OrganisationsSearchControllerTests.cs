@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Controllers.OrganisationsSearch
+namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSearch
 {
     [TestClass]
     public class OrganisationsSearchControllerTests : Controller

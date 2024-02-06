@@ -5,4 +5,6 @@ public interface ISubmissionService
     Task<HttpResponseMessage> CreateSubmissionEvent<T>(Guid submissionId, T request, Guid userId);
     
     Task<HttpResponseMessage> GetDeltaPoMSubmissions(DateTime lastSyncTime, Guid userId);
+    
+    Task<HttpResponseMessage> GetDeltaRegistrationSubmissions(DateTime lastSyncTime, Guid userId);
 }

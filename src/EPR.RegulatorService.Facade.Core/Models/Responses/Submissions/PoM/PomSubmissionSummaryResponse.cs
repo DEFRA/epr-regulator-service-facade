@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+namespace EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 
 [ExcludeFromCodeCoverage]
 public class PomSubmissionSummaryResponse

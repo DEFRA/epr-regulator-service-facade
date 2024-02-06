@@ -9,9 +9,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Accounts
+namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
 {
-
     [TestClass]
     public class ApplicationControllerTests
     {

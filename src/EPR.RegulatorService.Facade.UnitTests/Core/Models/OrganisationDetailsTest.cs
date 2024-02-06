@@ -2,7 +2,7 @@ using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using FluentAssertions;
 
-namespace EPR.RegulatorService.Facade.Tests.Core.Models;
+namespace EPR.RegulatorService.Facade.UnitTests.Core.Models;
 
 [TestClass]
 public class OrganisationDetailsTest

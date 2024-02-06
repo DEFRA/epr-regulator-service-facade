@@ -7,15 +7,17 @@ using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
-using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using EPR.RegulatorService.Facade.Tests.API.MockData;
+using EPR.RegulatorService.Facade.UnitTests.API.MockData;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +25,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
+namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
 {
     [TestClass]
     public class SubmissionsControllerTests : Controller
@@ -180,10 +182,10 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
         }
         
         [TestMethod]
-        public async Task When_fetching_submission_events_with_valid_data_should_return_success()
+        public async Task When_fetching_pom_submission_events_with_valid_data_should_return_success()
         {
             // Arrange
-            var request = new PoMSubmissionsGetRequest
+            var request = new GetPomSubmissionsRequest
             {
                 PageNumber = 1,
                 PageSize = 20
@@ -204,7 +206,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
             }).Verifiable();
             
             _mockCommonDataService.Setup(x =>
-                x.GetPoMSubmissions(It.IsAny<PoMSubmissionsGetRequest>())
+                x.GetPoMSubmissions(It.IsAny<GetPomSubmissionsRequest>())
             ).ReturnsAsync(new HttpResponseMessage()
             {
                 Content = new StringContent(JsonSerializer.Serialize(new PaginatedResponse<PomSubmissionSummaryResponse>()))
@@ -219,10 +221,10 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
         }
         
         [TestMethod]
-        public async Task When_fetching_submission_events_from_common_data_service_with_invalid_data_should_return_bad_request()
+        public async Task When_fetching_pom_submission_events_from_common_data_service_with_invalid_data_should_return_bad_request()
         {
             // Arrange
-            var request = new PoMSubmissionsGetRequest
+            var request = new GetPomSubmissionsRequest
             {
                 PageNumber = 1,
                 PageSize = 20
@@ -243,7 +245,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
             }).Verifiable();
             
             _mockCommonDataService.Setup(x =>
-                x.GetPoMSubmissions(It.IsAny<PoMSubmissionsGetRequest>())
+                x.GetPoMSubmissions(It.IsAny<GetPomSubmissionsRequest>())
             ).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)).Verifiable();
             
             // Act
@@ -254,10 +256,10 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
         }
         
         [TestMethod]
-        public async Task When_fetching_submission_events_from_common_data_service_and_last_sync_time_returns_500_should_return_internal_service_error()
+        public async Task When_fetching_pom_submission_events_from_common_data_service_and_last_sync_time_returns_500_should_return_internal_service_error()
         {
             // Arrange
-            var request = new PoMSubmissionsGetRequest
+            var request = new GetPomSubmissionsRequest
             {
                 PageNumber = 1,
                 PageSize = 20
@@ -277,10 +279,10 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
         }
         
         [TestMethod]
-        public async Task When_fetching_submission_events_from_common_data_service_and_submissions_returns_500_should_return_internal_service_error()
+        public async Task When_fetching_pom_submission_events_from_common_data_service_and_submissions_returns_500_should_return_internal_service_error()
         {
             // Arrange
-            var request = new PoMSubmissionsGetRequest
+            var request = new GetPomSubmissionsRequest
             {
                 PageNumber = 1,
                 PageSize = 20
@@ -299,6 +301,133 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.Submissions
 
             // Act
             var result = await _sut.GetPoMSubmissions(request);
+
+            // Assert
+            result.Should().BeOfType<StatusCodeResult>();
+            var statusCodeResult = result as BadRequestResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+        
+        [TestMethod]
+        public async Task When_fetching_registration_submission_events_with_valid_data_should_return_success()
+        {
+            // Arrange
+            var request = new GetRegistrationSubmissionsRequest
+            {
+                PageNumber = 1,
+                PageSize = 20
+            };
+
+            _mockCommonDataService.Setup(x =>
+                x.GetSubmissionLastSyncTime()
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new SubmissionEventsLastSync()))
+            }).Verifiable();
+
+            _mockSubmissionsService.Setup(x =>
+                x.GetDeltaRegistrationSubmissions(It.IsAny<DateTime>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new List<RegulatorRegistrationDecision>()))
+            }).Verifiable();
+            
+            _mockCommonDataService.Setup(x =>
+                x.GetRegistrationSubmissions(It.IsAny<GetRegistrationSubmissionsRequest>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new PaginatedResponse<PomSubmissionSummaryResponse>()))
+            }).Verifiable();
+            
+            // Act
+            var result = await _sut.GetRegistrationSubmissions(request);
+
+            // Assert
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(200);
+        }
+        
+        [TestMethod]
+        public async Task When_fetching_registration_submission_events_from_common_data_service_with_invalid_data_should_return_bad_request()
+        {
+            // Arrange
+            var request = new GetRegistrationSubmissionsRequest
+            {
+                PageNumber = 1,
+                PageSize = 20
+            };
+
+            _mockCommonDataService.Setup(x =>
+                x.GetSubmissionLastSyncTime()
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new SubmissionEventsLastSync()))
+            }).Verifiable();
+
+            _mockSubmissionsService.Setup(x =>
+                x.GetDeltaRegistrationSubmissions(It.IsAny<DateTime>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new List<RegulatorRegistrationDecision>()))
+            }).Verifiable();
+            
+            _mockCommonDataService.Setup(x =>
+                x.GetRegistrationSubmissions(It.IsAny<GetRegistrationSubmissionsRequest>())
+            ).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.BadRequest)).Verifiable();
+            
+            // Act
+            var result = await _sut.GetRegistrationSubmissions(request);
+
+            // Assert
+            result.Should().BeOfType<BadRequestResult>();
+        }
+        
+        [TestMethod]
+        public async Task When_fetching_registration_submission_events_from_common_data_service_and_last_sync_time_returns_500_should_return_internal_service_error()
+        {
+            // Arrange
+            var request = new GetRegistrationSubmissionsRequest
+            {
+                PageNumber = 1,
+                PageSize = 20
+            };
+
+            _mockCommonDataService.Setup(x =>
+                x.GetSubmissionLastSyncTime()
+            ).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
+
+            // Act
+            var result = await _sut.GetRegistrationSubmissions(request);
+
+            // Assert
+            result.Should().BeOfType<StatusCodeResult>();
+            var statusCodeResult = result as BadRequestResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+        
+        [TestMethod]
+        public async Task When_fetching_registration_submission_events_from_common_data_service_and_submissions_returns_500_should_return_internal_service_error()
+        {
+            // Arrange
+            var request = new GetRegistrationSubmissionsRequest
+            {
+                PageNumber = 1,
+                PageSize = 20
+            };
+            
+            _mockCommonDataService.Setup(x =>
+                x.GetSubmissionLastSyncTime()
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new SubmissionEventsLastSync()))
+            }).Verifiable();
+
+            _mockSubmissionsService.Setup(x =>
+                x.GetDeltaRegistrationSubmissions(It.IsAny<DateTime>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
+
+            // Act
+            var result = await _sut.GetRegistrationSubmissions(request);
 
             // Assert
             result.Should().BeOfType<StatusCodeResult>();

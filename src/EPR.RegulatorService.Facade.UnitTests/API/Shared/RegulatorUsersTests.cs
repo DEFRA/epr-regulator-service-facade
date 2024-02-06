@@ -8,9 +8,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Text.Json;
-using EPR.RegulatorService.Facade.Tests.API.MockData;
+using EPR.RegulatorService.Facade.UnitTests.API.MockData;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Shared
+namespace EPR.RegulatorService.Facade.UnitTests.API.Shared
 {
     [TestClass]
     public class RegulatorUsersTests

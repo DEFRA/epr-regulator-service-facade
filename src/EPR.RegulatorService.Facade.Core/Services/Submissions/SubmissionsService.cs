@@ -32,6 +32,13 @@ public class SubmissionsService : ISubmissionService
         var url = string.Format($"{_config.Endpoints.GetPoMSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}", _config.ApiVersion);
         return await _httpClient.GetAsync(url);
     }
+    
+    public async Task<HttpResponseMessage> GetDeltaRegistrationSubmissions(DateTime lastSyncTime, Guid userId)
+    {
+        ConfigureHttpClient(userId);
+        var url = string.Format($"{_config.Endpoints.GetRegistrationSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}", _config.ApiVersion);
+        return await _httpClient.GetAsync(url);
+    }
 
     private void ConfigureHttpClient(Guid userId)
     {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 
-namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
+namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
 {
     [TestClass]
     public class SubmissionsServiceTests
@@ -21,6 +21,7 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
         private const string BaseAddress = "http://localhost";
         private const string CreateSubmissionEvent = "CreateSubmissionEvent";
         private const string GetPoMSubmissions = "GetPoMSubmissions";
+        private const string GetRegistrationSubmissions = "GetRegistrationSubmissions";
         private HttpClient _httpClient;
         private string _expectedUrl;
         private Guid _userId = Guid.NewGuid();
@@ -35,7 +36,8 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
                 Endpoints = new()
                 {
                     CreateSubmissionEvent = CreateSubmissionEvent,
-                    GetPoMSubmissions = GetPoMSubmissions
+                    GetPoMSubmissions = GetPoMSubmissions,
+                    GetRegistrationSubmissions = GetRegistrationSubmissions
                 }
             });
             _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
@@ -60,7 +62,6 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
             // Assert
             VerifyApiCall(_expectedUrl, HttpMethod.Post);
             response.IsSuccessStatusCode.Should().BeTrue();
-
         }
 
         [TestMethod]
@@ -77,7 +78,6 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
             // Assert
             VerifyApiCall(_expectedUrl, HttpMethod.Post);
             response.IsSuccessStatusCode.Should().BeFalse();
-
         }
         
         [TestMethod]
@@ -94,7 +94,6 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
             // Assert
             VerifyApiCall(_expectedUrl, HttpMethod.Get);
             response.IsSuccessStatusCode.Should().BeTrue();
-
         }
         
         [TestMethod]
@@ -111,7 +110,38 @@ namespace EPR.RegulatorService.Facade.Tests.Core.Services.Suubmissions
             // Assert
             VerifyApiCall(_expectedUrl, HttpMethod.Get);
             response.IsSuccessStatusCode.Should().BeFalse();
+        }
+        
+        [TestMethod]
+        public async Task Should_return_success_when_fetching_registration_submissions()
+        {
+            //Arrange
+            var lastSyncTime = DateTime.Now;
+            _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetRegistrationSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}";
+            SetupApiSuccessCall();
 
+            // Act
+            var response = await _sut.GetDeltaRegistrationSubmissions(lastSyncTime, _userId);
+
+            // Assert
+            VerifyApiCall(_expectedUrl, HttpMethod.Get);
+            response.IsSuccessStatusCode.Should().BeTrue();
+        }
+        
+        [TestMethod]
+        public async Task Should_return_bad_request_when_fetching_registration_submissions()
+        {
+            //Arrange
+            var lastSyncTime = DateTime.Now;
+            _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetRegistrationSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}";
+            SetupApiBadRequestCall();
+
+            // Act
+            var response = await _sut.GetDeltaRegistrationSubmissions(lastSyncTime, _userId);
+
+            // Assert
+            VerifyApiCall(_expectedUrl, HttpMethod.Get);
+            response.IsSuccessStatusCode.Should().BeFalse();
         }
 
         private void SetupApiSuccessCall()

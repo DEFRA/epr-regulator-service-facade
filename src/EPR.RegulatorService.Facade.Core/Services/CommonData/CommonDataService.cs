@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData;
@@ -22,9 +24,15 @@ public class CommonDataService : ICommonDataService
         return await _httpClient.GetAsync(_config.Endpoints.GetSubmissionEventsLastSyncTime);
     }
 
-    public async Task<HttpResponseMessage> GetPoMSubmissions(PoMSubmissionsGetRequest request)
+    public async Task<HttpResponseMessage> GetPoMSubmissions(GetPomSubmissionsRequest pomSubmissionsRequest)
     {
         var url = string.Format($"{_config.Endpoints.GetPoMSubmissions}");
-        return await _httpClient.PostAsJsonAsync(url, request);
+        return await _httpClient.PostAsJsonAsync(url, pomSubmissionsRequest);
+    }
+
+    public async Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest)
+    {
+        var url = string.Format($"{_config.Endpoints.GetRegistrationSubmissions}");
+        return await _httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 }

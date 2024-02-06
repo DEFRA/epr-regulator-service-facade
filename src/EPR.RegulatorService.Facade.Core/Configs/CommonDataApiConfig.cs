@@ -15,4 +15,6 @@ public class CommonDataServiceEndpoints
     public string GetSubmissionEventsLastSyncTime { get; set; } = null!;
     
     public string GetPoMSubmissions { get; set; } = null!;
+    
+    public string GetRegistrationSubmissions { get; set; } = null!;
 }
