@@ -249,6 +249,7 @@ public class OrganisationsSearchController : ControllerBase
         foreach (var email in emailList)
         {
             // new code
+            email.AccountSignInUrl = _messagingConfig.AccountSignInUrl;
             email.TemplateId = email.EmailNotificationType switch
             {
                 "RemovedApprovedUser" => _messagingConfig.RemovedApprovedUserTemplateId,

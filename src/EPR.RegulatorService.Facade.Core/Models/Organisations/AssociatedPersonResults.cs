@@ -14,4 +14,6 @@ public class AssociatedPersonResults
     public string TemplateId { get; set; }
     
     public string EmailNotificationType { get; set; }
+
+    public string AccountSignInUrl { get; set; }
 }

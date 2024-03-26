@@ -658,6 +658,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                  CompanyName = "Test Company",
                  OrganisationId = "123987345",
                  ServiceRoleId = 1,
+                 AccountSignInUrl = "https://www.gov.uk/report-data"
              };
 
              _notificationClientMock.Setup(x => x.SendEmail(

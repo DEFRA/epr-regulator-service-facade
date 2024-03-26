@@ -259,7 +259,8 @@ public class MessagingService : IMessagingService
                     { "firstName", model.FirstName },
                     { "lastName", model.LastName },
                     { "organisationNumber", model.OrganisationId.ToReferenceNumberFormat() },
-                    { "companyName", model.CompanyName }
+                    { "companyName", model.CompanyName },
+                    { "accountSignInUrl", model.AccountSignInUrl}
                 };
                ValidateRequiredRemovedApprovedPersonEmailModelParameters(model);
                 break;
@@ -322,6 +323,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.LastName, nameof(model.LastName));
         ValidateStringParameter(model.CompanyName, nameof(model.CompanyName));
         ValidateStringParameter(model.OrganisationId, nameof(model.OrganisationId));
+        ValidateStringParameter(model.AccountSignInUrl, nameof(model.AccountSignInUrl));
     }
 
     private void ValidateRequiredApplicationEmailModelParameters(ApplicationEmailModel model)
