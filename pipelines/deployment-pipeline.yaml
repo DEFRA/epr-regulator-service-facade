@@ -4,7 +4,7 @@ pool: DEFRA-COMMON-ubuntu2004-SSV3
 
 parameters:
 - name: teamName
- displayName: 'Select a dev environment to deploy to:    (works only with "development" as target env)'
+  displayName: 'Select a dev environment to deploy to:    (works only with "development" as target env)'
   default: 'DEV1'
   type: string
   values:
