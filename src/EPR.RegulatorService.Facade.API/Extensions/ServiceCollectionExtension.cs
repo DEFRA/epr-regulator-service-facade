@@ -1,6 +1,9 @@
-﻿using EPR.RegulatorService.Facade.Core.Configs;
+﻿using EPR.RegulatorService.Facade.Core.Clients;
+using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
+using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
 using Notify.Client;
 using Notify.Interfaces;
 
@@ -20,7 +23,9 @@ public static class ServiceCollectionExtension
         services.Configure<SubmissionsApiConfig>(configuration.GetSection(SubmissionsApiConfig.SectionName));
         services.Configure<CommonDataApiConfig>(configuration.GetSection(CommonDataApiConfig.SectionName));
         services.Configure<ServiceRolesConfig>(configuration.GetSection(ServiceRolesConfig.SectionName));
-        services.Configure<MessagingConfig>(configuration.GetSection(MessagingConfig.SectionName));        
+        services.Configure<MessagingConfig>(configuration.GetSection(MessagingConfig.SectionName));
+        services.Configure<BlobStorageConfig>(configuration.GetSection(BlobStorageConfig.SectionName));
+        services.Configure<AntivirusApiConfig>(configuration.GetSection(AntivirusApiConfig.SectionName));
     }
 
     private static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
@@ -28,5 +33,9 @@ public static class ServiceCollectionExtension
         services.AddSingleton<INotificationClient>(_ => new NotificationClient(configuration.GetValue<string>("MessagingConfig:ApiKey")));        
         services.AddSingleton<IMessagingService, MessagingService>();
         services.AddSingleton<IServiceRolesLookupService, ServiceRolesLookupService>();
+        services.AddSingleton<IBlobStorageService, BlobStorageService>();
+        services.AddScoped<IAntivirusService, AntivirusService>();
+        services.AddScoped<IAntivirusClient, AntivirusClient>();
+        services.AddScoped<AntivirusApiAuthorizationHandler>();
     }
 }
