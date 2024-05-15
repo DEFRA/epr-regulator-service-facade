@@ -1,4 +1,5 @@
-﻿using EPR.RegulatorService.Facade.Core.Clients;
+﻿using EPR.RegulatorService.Facade.API.Handlers;
+using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
