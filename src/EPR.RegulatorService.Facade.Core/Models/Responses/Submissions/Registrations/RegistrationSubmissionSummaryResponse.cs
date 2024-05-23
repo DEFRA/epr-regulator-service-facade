@@ -31,10 +31,13 @@ public class RegistrationSubmissionSummaryResponse
     public string? ServiceRole { get; set; }
     public Guid? CompanyDetailsFileId { get; set; }
     public string? CompanyDetailsFileName { get; set; }
+    public string? CompanyDetailsBlobName { get; set; }
     public Guid? PartnershipFileId { get; set; }
     public string? PartnershipFileName { get; set; }
+    public string PartnershipBlobName { get; set; }
     public Guid? BrandsFileId { get; set; }
     public string? BrandsFileName { get; set; }
+    public string BrandsBlobName { get; set; }
     public string? SubmissionPeriod { get; set; }
     public string? RegistrationDate { get; set; }
     public string? Decision { get; set; }
