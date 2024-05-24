@@ -49,7 +49,7 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            if (userId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -69,7 +69,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}");
+            _logger.LogError(e,"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}", pageSize, searchTerm, currentPage);
             return HandleError.Handle(e);
         }
     }
@@ -81,7 +81,7 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            if (userId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -113,7 +113,7 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            if (userId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -133,7 +133,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching producer organisations by external organisation id {externalId}");
+            _logger.LogError(e,"Error fetching producer organisations by external organisation id {externalId}", externalId);
             return HandleError.Handle(e);
         }
     }
@@ -148,7 +148,7 @@ public class OrganisationsSearchController : ControllerBase
         {
             request.UserId = User.UserId();
            
-            if (request.UserId == default)
+            if (request.UserId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -195,7 +195,7 @@ public class OrganisationsSearchController : ControllerBase
         var invitedByUserEmail = User.Email();
         try
         {
-            if (invitedByUserId == default)
+            if (invitedByUserId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -225,9 +225,10 @@ public class OrganisationsSearchController : ControllerBase
             };
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
-            _logger.LogInformation($@"Email sent to Invited new approved person. 
+            _logger.LogInformation(@"Email sent to Invited new approved person. 
                                    Organisation external Id: {request.OrganisationId}
-                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}");
+                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}",
+                                   request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName);
 
            // Send email to Demoted users.
             SendRemovalEmail(addRemoveApprovedUserResponse.AssociatedPersonList.ToArray());
@@ -235,10 +236,11 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, @$"Error inviting new approved person. 
+            _logger.LogError(e, @"Error inviting new approved person. 
                                 Organisation external Id: {request.OrganisationId}
                                 Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
-                                Invited by user email: {invitedByUserEmail}");
+                                Invited by user email: {invitedByUserEmail}",
+                                request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName, invitedByUserEmail);
             
             return BadRequest("Failed to add / remove user");
         }
@@ -263,9 +265,8 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
-                _logger.LogError(errorMessage);
-            }
-         
+                _logger.LogError("{errorMessage}", errorMessage);
+            }         
         }
     }
 

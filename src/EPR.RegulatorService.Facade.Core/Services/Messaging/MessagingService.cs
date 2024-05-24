@@ -381,7 +381,8 @@ public class MessagingService : IMessagingService
             var organisationNumber = parameters.Single(x => x.Key == "organisationNumber").Value.ToString();
 
             _logger.LogError(ex,
-                $"GOV UK NOTIFY ERROR. Class: {this.GetType().Name}, Method: {callingMethodName}, Organisation: {organisationNumber}, Template: {templateId}");
+                "GOV UK NOTIFY ERROR. Class: {this.GetType().Name}, Method: {callingMethodName}, Organisation: {organisationNumber}, Template: {templateId}",
+                GetType().Name, callingMethodName, organisationNumber, templateId);
         }
 
         return notificationId;

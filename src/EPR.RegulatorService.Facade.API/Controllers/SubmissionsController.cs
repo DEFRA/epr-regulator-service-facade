@@ -24,7 +24,6 @@ namespace EPR.RegulatorService.Facade.API.Controllers;
 [Route("api")]
 public class SubmissionsController : ControllerBase
 {
-    private readonly ILogger<SubmissionsController> _logger;
     private readonly ISubmissionService _submissionService;
     private readonly MessagingConfig _messagingConfig;
     private readonly IMessagingService _messagingService;
@@ -39,11 +38,10 @@ public class SubmissionsController : ControllerBase
         IMessagingService messagingService,
         ICommonDataService commonDataService)
     {
-        _logger = logger;
         _submissionService = submissionService;
         _messagingConfig = messagingConfig.Value;
         _messagingService = messagingService;
-        _regulatorUsers = new RegulatorUsers<SubmissionsController>(regulatorOrganisationService, _logger);
+        _regulatorUsers = new RegulatorUsers<SubmissionsController>(regulatorOrganisationService, logger);
         _commonDataService = commonDataService;
     }
 

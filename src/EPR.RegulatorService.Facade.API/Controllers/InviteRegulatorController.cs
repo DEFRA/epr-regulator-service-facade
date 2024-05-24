@@ -39,7 +39,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 var userId = User.UserId();
 
-                if (userId == default)
+                if (userId == Guid.Empty)
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -108,7 +108,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 var userId = User.UserId();
 
-                if (userId == default)
+                if (userId == Guid.Empty)
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -148,7 +148,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 var userId = User.UserId();
 
-                if (userId == default)
+                if (userId == Guid.Empty)
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
