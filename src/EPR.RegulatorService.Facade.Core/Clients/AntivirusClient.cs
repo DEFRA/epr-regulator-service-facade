@@ -16,7 +16,7 @@ namespace EPR.RegulatorService.Facade.Core.Clients
             _logger = logger;
         }
 
-        public async Task<HttpResponseMessage> SendFile(FileDetails fileDetails, string fileName, MemoryStream fileStream)
+        public async Task<HttpResponseMessage> VirusScanFile(FileDetails fileDetails, string fileName, MemoryStream fileStream)
         {
             try
             {

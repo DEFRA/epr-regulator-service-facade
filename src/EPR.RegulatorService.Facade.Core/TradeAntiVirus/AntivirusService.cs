@@ -31,7 +31,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus
                 PersistFile = _antivirusApiConfig.PersistFile
             };
 
-            return await _antivirusClient.SendFile(fileDetails, fileName, fileStream);
+            return await _antivirusClient.VirusScanFile(fileDetails, fileName, fileStream);
         }
 
         private string GetCollectionName(string submissionType)

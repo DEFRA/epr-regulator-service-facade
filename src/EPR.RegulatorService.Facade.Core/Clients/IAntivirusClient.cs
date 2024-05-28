@@ -4,6 +4,6 @@ namespace EPR.RegulatorService.Facade.Core.Clients
 {
     public interface IAntivirusClient
     {
-        Task<HttpResponseMessage> SendFile(FileDetails fileDetails, string fileName, MemoryStream fileStream);
+        Task<HttpResponseMessage> VirusScanFile(FileDetails fileDetails, string fileName, MemoryStream fileStream);
     }
 }

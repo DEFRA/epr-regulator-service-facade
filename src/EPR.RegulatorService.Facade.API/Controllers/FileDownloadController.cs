@@ -71,6 +71,6 @@ public class FileDownloadController : ControllerBase
             return file;
         }
 
-        return new OkObjectResult("The file was found but it was flagged as infected. It will not be downloaded.");
+        return new OkObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = 403 };
     }
 }

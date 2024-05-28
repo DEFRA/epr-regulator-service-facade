@@ -44,7 +44,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Clients
 
             // Act / Assert
             await _systemUnderTest
-                .Invoking(x => x.SendFile(fileDetails, FileName, fileStream))
+                .Invoking(x => x.VirusScanFile(fileDetails, FileName, fileStream))
                 .Should()
                 .NotThrowAsync();
 
@@ -65,7 +65,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Clients
 
             // Act / Assert
             await _systemUnderTest
-                .Invoking(x => x.SendFile(fileDetails, FileName, fileStream))
+                .Invoking(x => x.VirusScanFile(fileDetails, FileName, fileStream))
                 .Should()
                 .ThrowAsync<HttpRequestException>();
 
