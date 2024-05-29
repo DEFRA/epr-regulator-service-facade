@@ -10,6 +10,10 @@ using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
+using EPR.RegulatorService.Facade.API.Handlers;
+using EPR.RegulatorService.Facade.Core.Clients;
+using Microsoft.Extensions.Azure;
+
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -25,6 +29,8 @@ public static class HttpClientServiceCollectionExtension
             services.BuildServiceProvider().GetRequiredService<IOptions<SubmissionsApiConfig>>().Value;
         var commonDataSettings =
             services.BuildServiceProvider().GetRequiredService<IOptions<CommonDataApiConfig>>().Value;
+        var blobStorageSettings = services.BuildServiceProvider().GetRequiredService<IOptions<BlobStorageConfig>>();
+        var antivirusSettings = services.BuildServiceProvider().GetRequiredService<IOptions<AntivirusApiConfig>>().Value;
 
         services.AddHttpClient<IApplicationService, ApplicationService>((sp, client) =>
             {
@@ -78,7 +84,28 @@ public static class HttpClientServiceCollectionExtension
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime)
             });
-        
+        if (antivirusSettings.EnableDirectAccess)
+        {
+            services.AddHttpClient<IAntivirusClient, AntivirusClient>(client =>
+            {
+                client.BaseAddress = new Uri($"{antivirusSettings.BaseUrl}/");
+                client.Timeout = TimeSpan.FromSeconds(antivirusSettings.Timeout);
+            });
+        }
+        else
+        {
+            services.AddHttpClient<IAntivirusClient, AntivirusClient>(client =>
+            {
+                client.BaseAddress = new Uri($"{antivirusSettings.BaseUrl}/v1/");
+                client.Timeout = TimeSpan.FromSeconds(antivirusSettings.Timeout);
+                client.DefaultRequestHeaders.Add("OCP-APIM-Subscription-Key", antivirusSettings.SubscriptionKey);
+            }).AddHttpMessageHandler<AntivirusApiAuthorizationHandler>();
+        }
+
+        services.AddAzureClients(cb =>
+        {
+            cb.AddBlobServiceClient(blobStorageSettings.Value.ConnectionString);
+        });
         return services;
     }
 
