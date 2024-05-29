@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -71,6 +72,6 @@ public class FileDownloadController : ControllerBase
             return file;
         }
 
-        return new ForbidResult("The file was found but it was flagged as infected. It will not be downloaded.");
+        return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") {  StatusCode = StatusCodes.Status403Forbidden };
     }
 }

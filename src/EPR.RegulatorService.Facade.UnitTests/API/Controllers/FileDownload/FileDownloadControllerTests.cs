@@ -144,7 +144,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.FileDownload
         }
 
         [TestMethod]
-        public async Task Should_return_OkObjectResult_when_AntiVirusServiceReturnsMalicious()
+        public async Task Should_return_ForbiddenObjectResult_when_AntiVirusServiceReturnsMalicious()
         {
             // Arrange
             _mockBlobStorageService
@@ -165,11 +165,12 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.FileDownload
                 .ReturnsAsync(_passedSubmissionResponse);
 
             // Act
-            var result = await _sut.DownloadFile(_fileDownloadRequest) as OkObjectResult;
+            var result = await _sut.DownloadFile(_fileDownloadRequest);
 
             // Assert
-            result.Should().BeOfType<ForbidResult>();
-            result.Value.Should().Be(FileInfectedError);
+            result.Should().BeOfType<ObjectResult>();
+            ((ObjectResult)result).StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+            ((ObjectResult)result).Value.Should().Be(FileInfectedError);
         }
 
         [TestMethod]
