@@ -168,7 +168,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.FileDownload
             var result = await _sut.DownloadFile(_fileDownloadRequest) as OkObjectResult;
 
             // Assert
-            result.Should().BeOfType<OkObjectResult>();
+            result.Should().BeOfType<ForbidResult>();
             result.Value.Should().Be(FileInfectedError);
         }
 
