@@ -4,6 +4,7 @@ public class SubmissionEmailModel
 {
     public string OrganisationNumber { get; set; }
     public string OrganisationName { get; set; }
+    public string SubmissionPeriod { get; set; }
     public string AccountLoginUrl { get; set; }
     public string RejectionComments { get; set; }
     public List<UserEmailModel> UserEmails { get; set; } = new();
