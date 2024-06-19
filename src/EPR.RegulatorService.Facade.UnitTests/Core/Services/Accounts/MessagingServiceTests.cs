@@ -397,6 +397,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
                 OrganisationName = "Wallace's Company",
                 OrganisationNumber = "123987345",
+                SubmissionPeriod = "Jan to July 2023",
                 AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
             };
 
@@ -435,6 +436,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
                 OrganisationName = "Wallace's Company",
                 OrganisationNumber = "123987345",
+                SubmissionPeriod = "Jan to July 2023",
                 AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
             };
 
@@ -474,6 +476,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
                 OrganisationName = "Wallace's Company",
                 OrganisationNumber = "123987345",
+                SubmissionPeriod = "Jan to July 2023",
                 AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
                 RejectionComments = "This was rejected as part of a test."
             };
@@ -513,6 +516,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
                 OrganisationName = "Wallace's Company",
                 OrganisationNumber = "123987345",
+                SubmissionPeriod = "Jan to July 2023",
                 AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
                 RejectionComments = "This was rejected as part of a test."
             };
@@ -552,6 +556,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 UserEmails = _fixture.CreateMany<UserEmailModel>(3).ToList(),
                 OrganisationName = "Wallace's Company",
                 OrganisationNumber = "123987345",
+                SubmissionPeriod = "Jan to July 2023",
                 AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
                 RejectionComments = "This was rejected as part of a test."
             };
