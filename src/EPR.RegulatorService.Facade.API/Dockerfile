@@ -1,4 +1,4 @@
-﻿FROM defradigital/dotnetcore:dotnet6.0 AS base
+﻿FROM defradigital/dotnetcore:dotnet8.0 AS base
 ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
 
