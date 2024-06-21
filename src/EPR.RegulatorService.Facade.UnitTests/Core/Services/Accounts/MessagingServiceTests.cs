@@ -614,10 +614,10 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
          
          [TestMethod]
          [DataRow("", "firstName", "lastName", "123456789", "Org 1", "RemovedApprovedUser")]
-         [DataRow("bob@hotmail.com", "", "lastName", "123456789","Org 1", 1)]
-         [DataRow("bob@hotmail.com", "firstName", "", "123456789","Org 1", 1)]
-         [DataRow("bob@hotmail.com", "firstName", "lastName",  "123456789","", 1)]
-         [DataRow("bob@hotmail.com", "firstName", "lastName", "","Org 1", 1)]
+         [DataRow("bob@hotmail.com", "", "lastName", "123456789","Org 1", "RemovedApprovedUser")]
+         [DataRow("bob@hotmail.com", "firstName", "", "123456789","Org 1", "RemovedApprovedUser")]
+         [DataRow("bob@hotmail.com", "firstName", "lastName",  "123456789","", "RemovedApprovedUser")]
+         [DataRow("bob@hotmail.com", "firstName", "lastName", "","Org 1", "RemovedApprovedUser")]
          [ExpectedException(typeof(ArgumentException))]
          public void RemovedPerson_ApprovedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
              string email,
