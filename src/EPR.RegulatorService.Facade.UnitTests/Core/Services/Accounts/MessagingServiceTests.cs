@@ -88,6 +88,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailId});
 
@@ -103,6 +104,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 ApprovedUserRecipient,
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Once);
 
@@ -176,6 +178,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -193,6 +196,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(4));
         }
@@ -278,6 +282,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -295,6 +300,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(2));
         }
@@ -367,6 +373,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -384,6 +391,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(2));
         }
@@ -405,6 +413,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -422,6 +431,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(3));
         }
@@ -443,6 +453,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -460,6 +471,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(3));
         }
@@ -483,6 +495,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -500,6 +513,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(3));
         }
@@ -522,6 +536,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -539,6 +554,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(3));
         }
@@ -561,6 +577,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
@@ -578,6 +595,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Exactly(3));
         }
@@ -662,12 +680,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              };
 
              _notificationClientMock.Setup(x => x.SendEmail(
-                     It.IsAny<string>(),
-                     It.IsAny<string>(),
-                     It.IsAny<Dictionary<string, object>>(),
-                     null,
-                     null))
-                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
 
              var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -680,11 +699,12 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              notificationId.Should().Be(emailNotificationId);
 
              _notificationClientMock.Verify(x => x.SendEmail(
-                 It.IsAny<string>(),
-                 It.IsAny<string>(),
-                 It.IsAny<Dictionary<string, object>>(),
-                 null,
-                 null), Times.Exactly(1));
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null), Times.Exactly(1));
          }
          
          [TestMethod]
@@ -703,12 +723,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              };
 
              _notificationClientMock.Setup(x => x.SendEmail(
-                     It.IsAny<string>(),
-                     It.IsAny<string>(),
-                     It.IsAny<Dictionary<string, object>>(),
-                     null,
-                     null))
-                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
 
              var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -721,11 +742,12 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              notificationId.Should().Be(emailNotificationId);
 
              _notificationClientMock.Verify(x => x.SendEmail(
-                 It.IsAny<string>(),
-                 It.IsAny<string>(),
-                 It.IsAny<Dictionary<string, object>>(),
-                 null,
-                 null), Times.Exactly(1));
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null), Times.Exactly(1));
          }
          
          [TestMethod]
@@ -744,12 +766,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              };
 
              _notificationClientMock.Setup(x => x.SendEmail(
-                     It.IsAny<string>(),
-                     It.IsAny<string>(),
-                     It.IsAny<Dictionary<string, object>>(),
-                     null,
-                     null))
-                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
 
              var messagingConfig = Options.Create(
                  new MessagingConfig
@@ -766,11 +789,12 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              notificationId.Should().Be(emailNotificationId);
 
              _notificationClientMock.Verify(x => x.SendEmail(
-                 It.Is<string>(x => x == model.Email),
-                 It.Is<string>(x => x == messagingConfig.Value.InviteNewApprovedPersonTemplateId),
-                 It.IsAny<Dictionary<string, object>>(),
-                 null,
-                 null), Times.Exactly(1));
+                It.Is<string>(x => x == model.Email),
+                It.Is<string>(x => x == messagingConfig.Value.InviteNewApprovedPersonTemplateId),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null), Times.Exactly(1));
          }
 
          [TestMethod]
@@ -805,12 +829,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              };
 
              _notificationClientMock.Setup(x => x.SendEmail(
-                     It.IsAny<string>(),
-                     It.IsAny<string>(),
-                     It.IsAny<Dictionary<string, object>>(),
-                     null,
-                     null))
-                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
 
              var messagingConfig = Options.Create(
                  new MessagingConfig
