@@ -13,7 +13,11 @@ public class RegistrationSubmissionsFilters
     public string? OrganisationType { get; set; }
     
     public string? Statuses { get; set; }
-    
+
+    public string? SubmissionYears { get; set; }
+
+    public string? SubmissionPeriods { get; set; }
+
     [Required]
     public int? PageNumber { get; set; }
 
