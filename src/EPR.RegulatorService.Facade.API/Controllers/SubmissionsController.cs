@@ -212,6 +212,8 @@ public class SubmissionsController : ControllerBase
             OrganisationType = request.OrganisationType,
             PageNumber = request.PageNumber,
             Statuses = request.Statuses,
+            SubmissionYears = request.SubmissionYears,
+            SubmissionPeriods = request.SubmissionPeriods,
             UserId = User.UserId(),
             DecisionsDelta = deltaRegistrationDecisions,
             PageSize = request.PageSize
