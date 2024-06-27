@@ -20,6 +20,7 @@ public class PomSubmissionSummaryResponse
     public string? ServiceRole { get; set; }
     public Guid? FileId { get; set; }
     public string? SubmissionPeriod { get; set; }
+    public string? ActualSubmissionPeriod { get; set; }
     public string? SubmittedDate { get; set; }
     public string? Decision { get; set; }
     public bool? IsResubmissionRequired { get; set; }
