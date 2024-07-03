@@ -83,6 +83,8 @@ public class CommonDataServiceTests
         var req = new GetPomSubmissionsRequest
         {
             Statuses = "Pending",
+            SubmissionYears = "2023",
+            SubmissionPeriods = "January to June 2023",
             OrganisationName = "test",
             OrganisationReference = "123",
             OrganisationType = "DirectProducer",
@@ -118,6 +120,8 @@ public class CommonDataServiceTests
         var req = new GetPomSubmissionsRequest
         {
             Statuses = "Pending",
+            SubmissionYears = "2023",
+            SubmissionPeriods = "January to June 2023",
             OrganisationName = "test",
             OrganisationReference = "123",
             OrganisationType = "DirectProducer",
