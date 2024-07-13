@@ -468,6 +468,16 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
                     CompanyName = "Test Company",
                     ServiceRoleId = 1,
                     EmailNotificationType = "PromotedApprovedUser"
+                },
+                new()
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Email = "nominated@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "PromotedApprovedUser"
                 }
             };
 
