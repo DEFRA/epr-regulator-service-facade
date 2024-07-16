@@ -9,6 +9,7 @@ using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using System.Net;
 using System.Security.Claims;
@@ -18,6 +19,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.FileDownload
     [TestClass]
     public class FileDownloadControllerTests : Controller
     {
+        private readonly NullLogger<ApplicationController> _nullLogger = new();
         private const string SubmissionsServiceError = "There was an error communicating with the submissions API.";
         private const string BlobStorageServiceError = "Error occurred during download from blob storage";
         private const string FileInfectedError = "The file was found but it was flagged as infected. It will not be downloaded.";
@@ -40,7 +42,7 @@ namespace EPR.RegulatorService.Facade.Tests.API.Controllers.FileDownload
                 new Claim(ClaimTypes.Email, "testuser@test.com"),
             }, "Test"));
 
-            _sut = new FileDownloadController(_mockBlobStorageService.Object, _mockSubmissionService.Object, _mockAntiVirusService.Object);
+            _sut = new FileDownloadController(_nullLogger, _mockBlobStorageService.Object, _mockSubmissionService.Object, _mockAntiVirusService.Object);
             _sut.ControllerContext = new ControllerContext();
             _sut.ControllerContext.HttpContext = new DefaultHttpContext() { User = user };
 
