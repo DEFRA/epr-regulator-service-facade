@@ -468,6 +468,16 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
                     CompanyName = "Test Company",
                     ServiceRoleId = 1,
                     EmailNotificationType = "PromotedApprovedUser"
+                },
+                new()
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Email = "nominated@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "PromotedApprovedUser"
                 }
             };
 
@@ -630,9 +640,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
                 .Verify(x => x.SendRemovedApprovedPersonNotification(
                         It.IsAny<AssociatedPersonResults>(), 
                         It.IsAny<string>()),
-                    Times.Exactly(addRemoveApprovedUserResponse.AssociatedPersonList.Count));
-
-            foreach (var demotedBasicUser in addRemoveApprovedUserResponse.AssociatedPersonList)
+                    Times.Exactly(1));
+            var usersWithName = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
+            foreach (var demotedBasicUser in usersWithName)
             {
                 _mockMessagingService
                     .Verify(x => x.SendRemovedApprovedPersonNotification(

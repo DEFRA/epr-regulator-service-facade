@@ -7,7 +7,6 @@ using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
-using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
@@ -165,6 +164,7 @@ public class OrganisationsSearchController : ControllerBase
 
                 if (result.Length > 0)
                 {
+                    result = result.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
                     SendRemovalEmail(result);
                 }
 
@@ -229,8 +229,9 @@ public class OrganisationsSearchController : ControllerBase
                                    Organisation external Id: {request.OrganisationId}
                                    User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}");
 
-           // Send email to Demoted users.
-            SendRemovalEmail(addRemoveApprovedUserResponse.AssociatedPersonList.ToArray());
+            // Send email to Demoted users.
+            var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
+            SendRemovalEmail(emailUser);
             return Ok();
         }
         catch (Exception e)
