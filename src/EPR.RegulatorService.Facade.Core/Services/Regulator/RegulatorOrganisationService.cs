@@ -66,21 +66,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
                         logData = $"Create regulator organisation name {request.Name} service content response is {content}";
-                        _logger.LogInformation(logData);
+                        LogInformation(logData);
 
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
                         logData = $"Create regulator organisation name {request.Name} service nation is {nationName}";
-                        _logger.LogInformation(logData);
+                        LogInformation(logData);
 
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
                         logData = $"Get regulator organisation service failed: {createdOrganisation}";
-                        _logger.LogError(logData);
+                        LogError(logData, null);
                     }
                 }
 
@@ -88,7 +88,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                LogError(ex.Message, ex);
 
                 return Result<CreateRegulatorOrganisationResponseModel>.FailedResult(string.Empty, HttpStatusCode.BadRequest);
             }
@@ -96,21 +96,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<HttpResponseMessage> RegulatorInvites(AddInviteUserRequest request)
         {
-            _logger.LogInformation("Attempting to fetch pending applications from the backend");
+            LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorInvitation, GetStringContent(request));
         }
 
         public async Task<HttpResponseMessage> RegulatorEnrollment(EnrolInvitedUserRequest request)
         {
-            _logger.LogInformation("Attempting to fetch pending applications from the backend");
+            LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorEnrollment, GetStringContent(request));
         }
 
         public async Task<HttpResponseMessage> RegulatorInvited(Guid id, string email)
         {
-            _logger.LogInformation("Attempting to fetch pending invite token from the backend");
+            LogInformation("Attempting to fetch pending invite token from the backend");
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
@@ -120,9 +120,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
         {
             var url = $"{_config.Endpoints.GetRegulatorUsers}?userId={userId}&organisationId={organisationId}&getApprovedUsersOnly={true}";
-        
-            _logger.LogInformation("Attempting to fetch the users for organisation id {OrganisationId} from the backend", organisationId);
-        
+
+            string logData = $"Attempting to fetch the users for organisation id {organisationId} from the backend";
+            LogInformation(logData);
+
+
             return await _httpClient.GetAsync(url);
         }
 
@@ -138,7 +140,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
 
             string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
-            _logger.LogInformation(logData);
+            LogInformation(logData);
         
             return await _httpClient.GetAsync(url);
         }
@@ -148,6 +150,24 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
+        }
+
+        private void LogInformation(string data)
+        {
+            if (data != null)
+            {
+                data = data.Replace('\n', '_').Replace('\r', '_');
+                _logger.LogInformation(data);
+            }
+        }
+
+        private void LogError(string data, Exception ex)
+        {
+            if (data != null)
+            {
+                data = data.Replace('\n', '_').Replace('\r', '_');
+                _logger.LogError(data, ex);
+            }
         }
     }
 }
