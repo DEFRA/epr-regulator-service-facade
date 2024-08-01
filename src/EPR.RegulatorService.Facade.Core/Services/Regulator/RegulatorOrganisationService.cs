@@ -52,7 +52,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Create regulator organisation name {request.Name} service response is successful");
+                    string logData = $"Create regulator organisation name {request.Name} service response is successful";
+                    _logger.LogInformation(logData);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
@@ -64,19 +65,22 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
-                        _logger.LogInformation($"Create regulator organisation name {request.Name} service content response is {content}");
+                        logData = $"Create regulator organisation name {request.Name} service content response is {content}";
+                        _logger.LogInformation(logData);
 
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
-                        _logger.LogInformation($"Create regulator organisation name {request.Name} service nation is {nationName}");
+                        logData = $"Create regulator organisation name {request.Name} service nation is {nationName}";
+                        _logger.LogInformation(logData);
 
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
-                        _logger.LogError($"Get regulator organisation service failed: {createdOrganisation}");
+                        logData = $"Get regulator organisation service failed: {createdOrganisation}";
+                        _logger.LogError(logData);
                     }
                 }
 
@@ -132,8 +136,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> GetUsersByOrganisationExternalId(Guid userId, Guid externalId)
         {
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
-        
-            _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", externalId);
+
+            string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
+            _logger.LogInformation(logData);
         
             return await _httpClient.GetAsync(url);
         }

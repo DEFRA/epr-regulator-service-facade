@@ -1,4 +1,5 @@
-﻿using EPR.RegulatorService.Facade.API.Extensions;
+﻿using Azure.Core;
+using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
@@ -87,7 +88,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error when creating the invite regulator user for id {request.UserId}");
+                Log($"Error when creating the invite regulator user for id {request.UserId}");
 
                 return HandleError.Handle(e);
             }
@@ -127,7 +128,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error when creating the enrollment for id {request.UserId}");
+                Log($"Error when creating the enrollment for id {request.UserId}");
 
                 return HandleError.Handle(e);
             }
@@ -170,9 +171,18 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error when retriving the invite regulator token for user {User.UserId()}");
-
+                Log($"Error when retriving the invite regulator token for user {User.UserId()}");
+                
                 return HandleError.Handle(e);
+            }
+        }
+
+        private void Log(string data)
+        {
+            if (data != null)
+            {
+                data = data.Replace('\n', '_').Replace('\r', '_');
+                _logger.LogError(data);
             }
         }
     }

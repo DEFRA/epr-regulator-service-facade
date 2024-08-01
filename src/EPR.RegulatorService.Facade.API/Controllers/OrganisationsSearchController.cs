@@ -12,6 +12,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -68,7 +69,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}");
+            var logData = $"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}";
+            _logger.LogError(e, logData);
             return HandleError.Handle(e);
         }
     }
@@ -95,12 +97,14 @@ public class OrganisationsSearchController : ControllerBase
                 return Ok(organisationDetails);
             }
 
-            _logger.LogError("Fetching organisation details for {externalId} resulted in unsuccessful request: {statusCode}", externalId, response.StatusCode);
+            string logData = $"Fetching organisation details for {externalId} resulted in unsuccessful request: {response.StatusCode}";
+            _logger.LogError(logData);
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"Error fetching organisation details for {externalId}", externalId);
+            string logData = $"Error fetching organisation details for {externalId}";
+            _logger.LogError(e,logData);
             return HandleError.Handle(e);
         }
     }
@@ -132,7 +136,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching producer organisations by external organisation id {externalId}");
+            string logData = $"Error fetching producer organisations by external organisation id {externalId}";
+            _logger.LogError(e, logData);
             return HandleError.Handle(e);
         }
     }
@@ -174,7 +179,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"Error deleting approved user for organisation {organisationId}", request.OrganisationId);
+            string logData = $"Error deleting approved user for organisation {request.OrganisationId}";
+            _logger.LogError(e, logData);
             return HandleError.Handle(e);
         }
     }
@@ -225,9 +231,11 @@ public class OrganisationsSearchController : ControllerBase
             };
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
-            _logger.LogInformation($@"Email sent to Invited new approved person. 
+
+            string logData = $@"Email sent to Invited new approved person. 
                                    Organisation external Id: {request.OrganisationId}
-                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}");
+                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}";
+            _logger.LogInformation(logData);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
@@ -236,11 +244,11 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, @$"Error inviting new approved person. 
+            string logData = @$"Error inviting new approved person. 
                                 Organisation external Id: {request.OrganisationId}
                                 Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
-                                Invited by user email: {invitedByUserEmail}");
-            
+                                Invited by user email: {invitedByUserEmail}";
+            _logger.LogError(e, logData);
             return BadRequest("Failed to add / remove user");
         }
     }
