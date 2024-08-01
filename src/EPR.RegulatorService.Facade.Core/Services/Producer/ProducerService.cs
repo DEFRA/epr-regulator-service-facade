@@ -34,12 +34,14 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
 
-        if (allowedSchemes.Contains(uri.Scheme))
+        if (userId == null) 
+        {
+            return null;
+        }
+        else
         {
             return await _httpClient.GetAsync(url);
         }
-
-        return null;
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
