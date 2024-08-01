@@ -14,8 +14,6 @@ public class ProducerService : IProducerService
     private readonly ILogger<ProducerService> _logger;
     private readonly AccountsServiceApiConfig _config;
 
-    private readonly string[] allowedSchemes = { "https" };
-
     public ProducerService(
         HttpClient httpClient,
         ILogger<ProducerService> logger,
@@ -30,34 +28,18 @@ public class ProducerService : IProducerService
     {
         var url = string.Format($"{_config.Endpoints.GetOrganisationsBySearchTerm}", userId, currentPage, pageSize, searchTerm);
 
-        Uri uri = new Uri(url);
-
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
-
-        if (userId == null) 
-        {
-            return null;
-        }
-        else
-        {
-            return await _httpClient.GetAsync(url);
-        }
+        
+        return await _httpClient.GetAsync(url);
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
     {
         var url = string.Format($"{_config.Endpoints.GetOrganisationDetails}", userId, externalId);
 
-        Uri uri = new Uri(url);
-
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
 
-        if (allowedSchemes.Contains(uri.Scheme))
-        {
-            return await _httpClient.GetAsync(url);
-        }
-
-        return null;
+        return await _httpClient.GetAsync(url);
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
