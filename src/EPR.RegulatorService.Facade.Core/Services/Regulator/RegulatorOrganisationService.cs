@@ -53,7 +53,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                 if (response.IsSuccessStatusCode)
                 {
                     string logData = $"Create regulator organisation name {request.Name} service response is successful";
-                    _logger.LogInformation(logData);
+                    LogInformation(logData);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
