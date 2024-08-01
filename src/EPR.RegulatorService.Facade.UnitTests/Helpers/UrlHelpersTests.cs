@@ -27,5 +27,33 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
             Debug.Assert(urlToCheck != null);
             Debug.Assert(urlToCheck == urlToPass);
         }
+
+        [TestMethod]
+        public async Task CheckReturnUrlWithEmptyAddress()
+        {
+            // Arrange
+            string urlToPass = "";
+
+            // Act
+            string urlToCheck = UrlHelpers.CheckRequestURL(urlToPass);
+
+            // Assert
+            Debug.Assert(urlToCheck != null);
+            Debug.Assert(urlToCheck == urlToPass);
+        }
+
+        [TestMethod]
+        public async Task CheckReturnUrlWithHostName()
+        {
+            // Arrange
+            string urlToPass = "http://defra.gov.uk/";
+
+            // Act
+            string urlToCheck = UrlHelpers.CheckRequestURL(urlToPass);
+
+            // Assert
+            Debug.Assert(urlToCheck != null);
+            Debug.Assert(urlToCheck == urlToPass);
+        }
     }
 }
