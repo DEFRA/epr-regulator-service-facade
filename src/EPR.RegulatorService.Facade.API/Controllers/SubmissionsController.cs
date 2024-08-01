@@ -122,6 +122,8 @@ public class SubmissionsController : ControllerBase
             OrganisationType = request.OrganisationType,
             PageNumber = request.PageNumber,
             Statuses = request.Statuses,
+            SubmissionYears = request.SubmissionYears,
+            SubmissionPeriods = request.SubmissionPeriods,
             UserId = User.UserId(),
             DecisionsDelta = deltaPoMDecisions,
             PageSize = request.PageSize
@@ -160,7 +162,7 @@ public class SubmissionsController : ControllerBase
         {
             var users = await _regulatorUsers.GetRegulatorUsers(User.UserId(), request.OrganisationId);
             var model = CreateBaseEmailModel(users, request);
-
+           
             List<string> emailIds;
             if (request.Decision == RegulatorDecision.Accepted)
             {
@@ -210,6 +212,8 @@ public class SubmissionsController : ControllerBase
             OrganisationType = request.OrganisationType,
             PageNumber = request.PageNumber,
             Statuses = request.Statuses,
+            SubmissionYears = request.SubmissionYears,
+            SubmissionPeriods = request.SubmissionPeriods,
             UserId = User.UserId(),
             DecisionsDelta = deltaRegistrationDecisions,
             PageSize = request.PageSize
@@ -240,6 +244,7 @@ public class SubmissionsController : ControllerBase
             UserEmails = userEmails,
             OrganisationNumber = request.OrganisationNumber,
             OrganisationName = request.OrganisationName,
+            SubmissionPeriod = request.SubmissionPeriod,
             RejectionComments = request.Comments,
             AccountLoginUrl = _messagingConfig.AccountSignInUrl
         };

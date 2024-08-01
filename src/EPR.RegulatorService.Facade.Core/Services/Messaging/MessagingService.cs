@@ -191,8 +191,9 @@ public class MessagingService : IMessagingService
                 { "firstName", userEmail.FirstName },
                 { "lastName", userEmail.LastName },
                 { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
+                { "submissionPeriod", model.SubmissionPeriod },
                 { "organisationName", model.OrganisationName },
-                { "accountLoginUrl", model.AccountLoginUrl }
+                { "accountLoginUrl", model.AccountLoginUrl }             
             };
 
             var emailId = SendEmail(userEmail.Email, templateId, userEmailParameters);
@@ -234,6 +235,7 @@ public class MessagingService : IMessagingService
                 {"lastName", userEmail.LastName},
                 {"organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat()},
                 {"organisationName", model.OrganisationName},
+                {"submissionPeriod", model.SubmissionPeriod},
                 {"reasonForRejection", model.RejectionComments},
                 {"accountLoginUrl", model.AccountLoginUrl}
             };
@@ -341,6 +343,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.OrganisationName, nameof(model.OrganisationName));
         ValidateStringParameter(model.AccountLoginUrl, nameof(model.AccountLoginUrl));
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
+        ValidateStringParameter(model.SubmissionPeriod, nameof(model.SubmissionPeriod));
     }
     private void ValidateDemotedDelegatedPersonParameters(AssociatedPersonResults model)
     {
