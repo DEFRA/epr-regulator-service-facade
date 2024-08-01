@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models;
@@ -13,6 +14,9 @@ public class ProducerService : IProducerService
     private readonly HttpClient _httpClient;
     private readonly ILogger<ProducerService> _logger;
     private readonly AccountsServiceApiConfig _config;
+
+    private readonly string[] allowedSchemes = { "https" };
+    private readonly string[] allowedDomains = { "trusted1.example.com", "trusted2.example.com" };
 
     public ProducerService(
         HttpClient httpClient,
@@ -30,7 +34,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
         
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(CheckRequestURL(url));
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
@@ -39,7 +43,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
 
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(CheckRequestURL(url));
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
@@ -49,5 +53,19 @@ public class ProducerService : IProducerService
         
         return await _httpClient.PostAsJsonAsync(url, model);
     }
-    
+
+    public string CheckRequestURL(string location)
+    {
+        if  (location == null || location == string.Empty) return string.Empty;
+
+        Uri uri = new Uri(location);
+        
+        if (!allowedDomains.Contains(uri.Host) && !allowedSchemes.Contains(uri.Scheme))
+        {
+            return string.Empty;
+        }
+
+        return uri.ToString();
+    }
+
 }
