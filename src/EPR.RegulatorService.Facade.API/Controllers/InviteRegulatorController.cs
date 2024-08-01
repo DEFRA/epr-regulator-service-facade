@@ -1,10 +1,13 @@
 ﻿using Azure.Core;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
+using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -88,7 +91,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                Log($"Error when creating the invite regulator user for id {request.UserId}");
+                string logData = $"Error when creating the invite regulator user for id {request.UserId}";
+                LogHelpers.Log(_logger, logData, LogLevel.Error);
 
                 return HandleError.Handle(e);
             }
@@ -128,7 +132,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                Log($"Error when creating the enrollment for id {request.UserId}");
+                string logData = $"Error when creating the enrollment for id {request.UserId}";
+                LogHelpers.Log(_logger, logData, LogLevel.Error);
 
                 return HandleError.Handle(e);
             }
@@ -171,18 +176,10 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                Log($"Error when retriving the invite regulator token for user {User.UserId()}");
-                
-                return HandleError.Handle(e);
-            }
-        }
+                string logData = $"Error when retriving the invite regulator token for user {User.UserId()}";
+                LogHelpers.Log(_logger, logData, LogLevel.Error);
 
-        private void Log(string data)
-        {
-            if (data != null)
-            {
-                data = data.Replace('\n', '_').Replace('\r', '_');
-                _logger.LogError(data);
+                return HandleError.Handle(e);
             }
         }
     }

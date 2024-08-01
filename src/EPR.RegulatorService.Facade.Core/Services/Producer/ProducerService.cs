@@ -1,11 +1,12 @@
-using System;
-using System.Net;
-using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Producer;
 
@@ -14,9 +15,6 @@ public class ProducerService : IProducerService
     private readonly HttpClient _httpClient;
     private readonly ILogger<ProducerService> _logger;
     private readonly AccountsServiceApiConfig _config;
-
-    private readonly string[] allowedSchemes = { "https", "http" };
-    private readonly string[] allowedDomains = { "localhost" };
 
     public ProducerService(
         HttpClient httpClient,
@@ -34,7 +32,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
         
-        return await _httpClient.GetAsync(CheckRequestURL(url));
+        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
@@ -43,7 +41,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
 
-        return await _httpClient.GetAsync(CheckRequestURL(url));
+        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
@@ -52,19 +50,5 @@ public class ProducerService : IProducerService
         _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", model.RemovedConnectionExternalId);
         
         return await _httpClient.PostAsJsonAsync(url, model);
-    }
-
-    public string CheckRequestURL(string location)
-    {
-        if  (location == null || location == string.Empty) return string.Empty;
-
-        Uri uri = new Uri(location);
-        
-        if (!allowedDomains.Contains(uri.Host) && !allowedSchemes.Contains(uri.Scheme))
-        {
-            return string.Empty;
-        }
-
-        return uri.ToString();
     }
 }

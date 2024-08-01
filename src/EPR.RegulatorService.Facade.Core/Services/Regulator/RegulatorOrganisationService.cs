@@ -1,5 +1,7 @@
 ﻿using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
 using Microsoft.Extensions.Logging;
@@ -7,7 +9,6 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 {
@@ -16,9 +17,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         private readonly HttpClient _httpClient;
         private readonly ILogger<RegulatorOrganisationService> _logger;
         private readonly AccountsServiceApiConfig _config;
-
-        private readonly string[] allowedSchemes = { "https", "http" };
-        private readonly string[] allowedDomains = { "localhost" };
 
         public RegulatorOrganisationService(
             HttpClient httpClient,
@@ -33,7 +31,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
             string url = $"{_config.Endpoints.GetRegulator}{nation}";
-            var response = await _httpClient.GetAsync(CheckRequestURL(url));
+            var response = await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -118,7 +116,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(CheckRequestURL(url));
+            return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -129,7 +127,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             LogInformation(logData);
 
 
-            return await _httpClient.GetAsync(CheckRequestURL(url));
+            return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
         }
 
         private StringContent GetStringContent(object request)
@@ -146,7 +144,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
             LogInformation(logData);
         
-            return await _httpClient.GetAsync(CheckRequestURL(url));
+            return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
@@ -172,20 +170,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                 data = data.Replace('\n', '_').Replace('\r', '_');
                 _logger.LogError(data, ex);
             }
-        }
-
-        public string CheckRequestURL(string location)
-        {
-            if (!location.Contains("http") || location == null || location == string.Empty) return location;
-
-            Uri uri = new Uri(location);
-
-            if (!allowedDomains.Contains(uri.Host) && !allowedSchemes.Contains(uri.Scheme))
-            {
-                return string.Empty;
-            }
-
-            return uri.ToString();
         }
     }
 }

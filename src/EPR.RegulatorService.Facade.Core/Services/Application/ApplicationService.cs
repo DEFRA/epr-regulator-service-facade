@@ -1,8 +1,10 @@
-using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Helpers;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using EPR.RegulatorService.Facade.Core.Models.Applications;
+using System.Net.Http.Json;
+using EPR.RegulatorService.Facade.Core.Helpers;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
 
@@ -11,9 +13,6 @@ public class ApplicationService : IApplicationService
     private readonly HttpClient _httpClient;
     private readonly ILogger<ApplicationService> _logger;
     private readonly AccountsServiceApiConfig _config;
-
-    private readonly string[] allowedSchemes = { "https", "http" };
-    private readonly string[] allowedDomains = { "localhost" };
 
     public ApplicationService(
         HttpClient httpClient,
@@ -31,7 +30,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
-        return await _httpClient.GetAsync(CheckRequestURL(url));
+        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -40,7 +39,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {organisationId}", organisationId);
 
-        return await _httpClient.GetAsync(CheckRequestURL(url));
+        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
@@ -68,31 +67,8 @@ public class ApplicationService : IApplicationService
         var url = string.Format($"{_config.Endpoints.UserOrganisations}?userId={userId}");
 
         var logData = $"Attempting to fetch the organisations for user {userId}";
-        Log(logData);
+        LogHelpers.Log(_logger, logData, LogLevel.Information);
 
         return await _httpClient.GetAsync(url);
-    }
-
-    private void Log(string data)
-    {
-        if (data != null)
-        {
-            data = data.Replace('\n', '_').Replace('\r', '_');
-            _logger.LogInformation(data);
-        }
-    }
-
-    public string CheckRequestURL(string location)
-    {
-        if (!location.Contains("http") || location == null || location == string.Empty) return location;
-
-        Uri uri = new Uri(location);
-
-        if (!allowedDomains.Contains(uri.Host) && !allowedSchemes.Contains(uri.Scheme))
-        {
-            return string.Empty;
-        }
-
-        return uri.ToString();
     }
 }

@@ -1,9 +1,12 @@
 using System.Diagnostics.Eventing.Reader;
+using System.Drawing.Printing;
 using System.Text.Json;
 using System.Web;
+using Azure;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
@@ -71,7 +74,8 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             var logData = $"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}";
-            LogError(logData, e);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
+
             return HandleError.Handle(e);
         }
     }
@@ -99,13 +103,15 @@ public class OrganisationsSearchController : ControllerBase
             }
 
             string logData = $"Fetching organisation details for {externalId} resulted in unsuccessful request: {response.StatusCode}";
-            LogError(logData, null);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
+
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
             string logData = $"Error fetching organisation details for {externalId}";
-            LogError(logData, e);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
+
             return HandleError.Handle(e);
         }
     }
@@ -138,7 +144,8 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = $"Error fetching producer organisations by external organisation id {externalId}";
-            LogError(logData, e);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
+
             return HandleError.Handle(e);
         }
     }
@@ -181,7 +188,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = $"Error deleting approved user for organisation {request.OrganisationId}";
-            LogError(logData, e);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
             return HandleError.Handle(e);
         }
     }
@@ -236,7 +243,8 @@ public class OrganisationsSearchController : ControllerBase
             string logData = $@"Email sent to Invited new approved person. 
                                    Organisation external Id: {request.OrganisationId}
                                    User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}";
-            LogInformation(logData);
+            
+            LogHelpers.Log(_logger, logData, LogLevel.Information);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
@@ -249,7 +257,7 @@ public class OrganisationsSearchController : ControllerBase
                                 Organisation external Id: {request.OrganisationId}
                                 Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
                                 Invited by user email: {invitedByUserEmail}";
-            LogError(logData, e);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
             return BadRequest("Failed to add / remove user");
         }
     }
@@ -273,7 +281,7 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
-                LogError(errorMessage, null);
+                LogHelpers.Log(_logger, errorMessage, LogLevel.Error);
             }
          
         }
@@ -282,22 +290,5 @@ public class OrganisationsSearchController : ControllerBase
     private bool SendNotificationEmailToDeletedPerson(AssociatedPersonResults email,string notificationType)
     {
         return _messagingService.SendRemovedApprovedPersonNotification(email, notificationType) != null;
-    }
-
-    private void LogInformation(string data)
-    {
-        if (data != null)
-        {
-            data = data.Replace('\n', '_').Replace('\r', '_');
-            _logger.LogInformation(data);
-        }
-    }
-    private void LogError(string data, Exception ex)
-    {
-        if (data != null)
-        {
-            data = data.Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(data, ex);
-        }
     }
 }
