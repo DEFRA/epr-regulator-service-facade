@@ -15,8 +15,8 @@ public class ProducerService : IProducerService
     private readonly ILogger<ProducerService> _logger;
     private readonly AccountsServiceApiConfig _config;
 
-    private readonly string[] allowedSchemes = { "https" };
-    private readonly string[] allowedDomains = { "trusted1.example.com", "trusted2.example.com" };
+    private readonly string[] allowedSchemes = { "https", "http" };
+    private readonly string[] allowedDomains = { "localhost" };
 
     public ProducerService(
         HttpClient httpClient,
@@ -67,5 +67,4 @@ public class ProducerService : IProducerService
 
         return uri.ToString();
     }
-
 }

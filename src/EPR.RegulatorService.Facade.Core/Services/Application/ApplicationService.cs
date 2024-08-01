@@ -12,6 +12,9 @@ public class ApplicationService : IApplicationService
     private readonly ILogger<ApplicationService> _logger;
     private readonly AccountsServiceApiConfig _config;
 
+    private readonly string[] allowedSchemes = { "https", "http" };
+    private readonly string[] allowedDomains = { "localhost" };
+
     public ApplicationService(
         HttpClient httpClient,
         ILogger<ApplicationService> logger,
@@ -28,7 +31,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(CheckRequestURL(url));
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -37,7 +40,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {organisationId}", organisationId);
 
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(CheckRequestURL(url));
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
@@ -77,5 +80,19 @@ public class ApplicationService : IApplicationService
             data = data.Replace('\n', '_').Replace('\r', '_');
             _logger.LogInformation(data);
         }
+    }
+
+    public string CheckRequestURL(string location)
+    {
+        if (!location.Contains("http") || location == null || location == string.Empty) return location;
+
+        Uri uri = new Uri(location);
+
+        if (!allowedDomains.Contains(uri.Host) && !allowedSchemes.Contains(uri.Scheme))
+        {
+            return string.Empty;
+        }
+
+        return uri.ToString();
     }
 }

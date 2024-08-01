@@ -17,6 +17,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         private readonly ILogger<RegulatorOrganisationService> _logger;
         private readonly AccountsServiceApiConfig _config;
 
+        private readonly string[] allowedSchemes = { "https", "http" };
+        private readonly string[] allowedDomains = { "localhost" };
+
         public RegulatorOrganisationService(
             HttpClient httpClient,
             ILogger<RegulatorOrganisationService> logger,
@@ -115,7 +118,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(url);
+            return await _httpClient.GetAsync(CheckRequestURL(url));
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -126,7 +129,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             LogInformation(logData);
 
 
-            return await _httpClient.GetAsync(url);
+            return await _httpClient.GetAsync(CheckRequestURL(url));
         }
 
         private StringContent GetStringContent(object request)
@@ -143,7 +146,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
             LogInformation(logData);
         
-            return await _httpClient.GetAsync(url);
+            return await _httpClient.GetAsync(CheckRequestURL(url));
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
@@ -169,6 +172,20 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                 data = data.Replace('\n', '_').Replace('\r', '_');
                 _logger.LogError(data, ex);
             }
+        }
+
+        public string CheckRequestURL(string location)
+        {
+            if (!location.Contains("http") || location == null || location == string.Empty) return location;
+
+            Uri uri = new Uri(location);
+
+            if (!allowedDomains.Contains(uri.Host) && !allowedSchemes.Contains(uri.Scheme))
+            {
+                return string.Empty;
+            }
+
+            return uri.ToString();
         }
     }
 }
