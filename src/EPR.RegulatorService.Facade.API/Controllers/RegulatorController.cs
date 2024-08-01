@@ -5,6 +5,8 @@ using EPR.RegulatorService.Facade.API.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Applications.Users;
+using System.Drawing.Printing;
+using Azure.Core;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -46,7 +48,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}");
+            string logError = $"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}";
+            LogError(logError, e);
             return HandleError.Handle(e);
         }
     }
@@ -78,7 +81,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching applications for organisation {organisationId}");
+            string logError = $"Error fetching applications for organisation {organisationId}";
+            LogError(logError, e);
             return HandleError.Handle(e);
         }
     }
@@ -115,7 +119,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}");
+            string logError = $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}";
+            LogError(logError, e);
             return HandleError.Handle(e);
         }
     }
@@ -145,7 +150,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error transferring the organisation {request.OrganisationId} to {request.TransferNationId} by the user {User.UserId()}");
+            string logError = $"Error transferring the organisation {request.OrganisationId} to {request.TransferNationId} by the user {User.UserId()}";
+            LogError(logError, e);
             return HandleError.Handle(e);
         }
     }
@@ -159,26 +165,40 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             if (userId == Guid.Empty)
             {
-                _logger.LogError($"Unable to get the OId for the user when attempting to get organisation details");
+                string logError = $"Unable to get the OId for the user when attempting to get organisation details";
+                LogError(logError, null);
+
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
             var response = await _applicationService.GetUserOrganisations(userId);
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("Fetched the organisations list successfully for the user {userId}", userId);
+                string logInfo = $"Fetched the organisations list successfully for the user {userId}";
+                _logger.LogInformation(logInfo);
                 return Ok(response.Content.ReadFromJsonAsync<UserOrganisationsListModel>().Result);
             }
             else
             {
-                _logger.LogError("Failed to fetch the organisations list for the user {userId}", userId);
+                string logError = $"Failed to fetch the organisations list for the user {userId}";
+                LogError(logError, null);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching the organisations list for the user");
+            string logError = "Error fetching the organisations list for the user";
+            LogError(logError, e);
             return HandleError.Handle(e);
+        }
+    }
+
+    private void LogError(string data, Exception ex)
+    {
+        if (data != null)
+        {
+            data = data.Replace('\n', '_').Replace('\r', '_');
+            _logger.LogError(data, ex);
         }
     }
 }
