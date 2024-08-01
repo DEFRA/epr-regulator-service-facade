@@ -3,6 +3,8 @@ using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
+using EPR.RegulatorService.Facade.Core.Helpers;
+using System.Drawing.Printing;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -29,7 +31,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             if (userId == default)
             {
                 string logData = "UserId not available";
-                LogError(logData, null);
+                LogHelpers.Log(_logger, logData, LogLevel.Error);
+
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
@@ -53,12 +56,12 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             if (userId == default)
             {
                 string logError = "UserId not available";
-                LogError(logError, null);
+                LogHelpers.Log(_logger, logError, LogLevel.Error);
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
             string logData = $"Creating the selected regulator organisation {request.Name}";
-            LogInformation(logData);
+            LogHelpers.Log(_logger, logData, LogLevel.Information);
 
             var response = await _regulatorOrganisationService.CreateRegulatorOrganisation(request);
 
@@ -72,22 +75,6 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
 
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
-        }
-        private void LogInformation(string data)
-        {
-            if (data != null)
-            {
-                data = data.Replace('\n', '_').Replace('\r', '_');
-                _logger.LogInformation(data);
-            }
-        }
-        private void LogError(string data, Exception ex)
-        {
-            if (data != null)
-            {
-                data = data.Replace('\n', '_').Replace('\r', '_');
-                _logger.LogError(data, ex);
-            }
         }
     }
 }
