@@ -7,6 +7,8 @@ using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Applications.Users;
 using System.Drawing.Printing;
 using Azure.Core;
+using EPR.RegulatorService.Facade.Core.Helpers;
+using Notify.Models;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -49,7 +51,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}";
-            LogError(logError, e);
+            LogHelpers.Log(_logger, logError, LogLevel.Error);
             return HandleError.Handle(e);
         }
     }
@@ -82,7 +84,8 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error fetching applications for organisation {organisationId}";
-            LogError(logError, e);
+            LogHelpers.Log(_logger, logError, LogLevel.Error, e);
+
             return HandleError.Handle(e);
         }
     }
@@ -120,7 +123,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}";
-            LogError(logError, e);
+            LogHelpers.Log(_logger, logError, LogLevel.Error);
             return HandleError.Handle(e);
         }
     }
@@ -151,7 +154,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error transferring the organisation {request.OrganisationId} to {request.TransferNationId} by the user {User.UserId()}";
-            LogError(logError, e);
+            LogHelpers.Log(_logger, logError, LogLevel.Error);
             return HandleError.Handle(e);
         }
     }
@@ -166,7 +169,8 @@ public class RegulatorController :  ControllerBase
             if (userId == Guid.Empty)
             {
                 string logError = $"Unable to get the OId for the user when attempting to get organisation details";
-                LogError(logError, null);
+                LogHelpers.Log(_logger, logError, LogLevel.Error);
+
 
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
@@ -181,24 +185,15 @@ public class RegulatorController :  ControllerBase
             else
             {
                 string logError = $"Failed to fetch the organisations list for the user {userId}";
-                LogError(logError, null);
+                LogHelpers.Log(_logger, logError, LogLevel.Error);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }
         catch (Exception e)
         {
             string logError = "Error fetching the organisations list for the user";
-            LogError(logError, e);
+            LogHelpers.Log(_logger, logError, LogLevel.Error);
             return HandleError.Handle(e);
-        }
-    }
-
-    private void LogError(string data, Exception ex)
-    {
-        if (data != null)
-        {
-            data = data.Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(data, ex);
         }
     }
 }

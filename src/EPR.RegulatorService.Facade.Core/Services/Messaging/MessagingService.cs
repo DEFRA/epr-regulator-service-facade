@@ -7,6 +7,7 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
+using EPR.RegulatorService.Facade.Core.Helpers;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Messaging;
 
@@ -384,18 +385,9 @@ public class MessagingService : IMessagingService
             var organisationNumber = parameters.Single(x => x.Key == "organisationNumber").Value.ToString();
 
             string logData = $"GOV UK NOTIFY ERROR. Class: {this.GetType().Name}, Method: {callingMethodName}, Organisation: {organisationNumber}, Template: {templateId}";
-            LogError(logData, ex);
+            LogHelpers.Log(_logger, logData, LogLevel.Error);
         }
 
         return notificationId;
-    }
-
-    private void LogError(string data, Exception ex)
-    {
-        if (data != null)
-        {
-            data = data.Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(data, ex);
-        }
     }
 }
