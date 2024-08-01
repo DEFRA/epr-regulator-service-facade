@@ -7,11 +7,12 @@ namespace EPR.RegulatorService.Facade.Core.Extensions
     {
         public static string GetDisplayName(this Enum enumValue)
         {
+            string stringEnumeratedValue = string.Empty;
             if (enumValue.GetType().GetMember(enumValue.ToString())[0] != null)
             {
-                return enumValue.GetType().GetMember(enumValue.ToString())[0].GetCustomAttribute<DisplayAttribute>()?.GetName();
+                stringEnumeratedValue = enumValue.GetType().GetMember(enumValue.ToString())[0].GetCustomAttribute<DisplayAttribute>()?.GetName();
             }
-            return string.Empty;
+            return stringEnumeratedValue;
         }
     }
 }

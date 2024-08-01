@@ -20,8 +20,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Enums
 
             // Act
             var result = EnumExtensions.GetDisplayName(submissionType);
-
-            
+                        
             // Assert
             result.ToLower().Should().Be(SubmissionType.Registration.ToString().ToLower());
         }
