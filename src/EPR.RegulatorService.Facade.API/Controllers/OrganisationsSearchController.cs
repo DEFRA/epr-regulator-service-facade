@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using System.Text.Json;
 using System.Web;
 using EPR.RegulatorService.Facade.API.Extensions;
@@ -70,7 +71,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             var logData = $"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}";
-            _logger.LogError(e, logData);
+            LogError(logData, e);
             return HandleError.Handle(e);
         }
     }
@@ -98,13 +99,13 @@ public class OrganisationsSearchController : ControllerBase
             }
 
             string logData = $"Fetching organisation details for {externalId} resulted in unsuccessful request: {response.StatusCode}";
-            _logger.LogError(logData);
+            LogError(logData, null);
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
             string logData = $"Error fetching organisation details for {externalId}";
-            _logger.LogError(e,logData);
+            LogError(logData, e);
             return HandleError.Handle(e);
         }
     }
@@ -137,7 +138,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = $"Error fetching producer organisations by external organisation id {externalId}";
-            _logger.LogError(e, logData);
+            LogError(logData, e);
             return HandleError.Handle(e);
         }
     }
@@ -180,7 +181,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = $"Error deleting approved user for organisation {request.OrganisationId}";
-            _logger.LogError(e, logData);
+            LogError(logData, e);
             return HandleError.Handle(e);
         }
     }
@@ -235,7 +236,7 @@ public class OrganisationsSearchController : ControllerBase
             string logData = $@"Email sent to Invited new approved person. 
                                    Organisation external Id: {request.OrganisationId}
                                    User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}";
-            _logger.LogInformation(logData);
+            LogInformation(logData);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
@@ -248,7 +249,7 @@ public class OrganisationsSearchController : ControllerBase
                                 Organisation external Id: {request.OrganisationId}
                                 Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
                                 Invited by user email: {invitedByUserEmail}";
-            _logger.LogError(e, logData);
+            LogError(logData, e);
             return BadRequest("Failed to add / remove user");
         }
     }
@@ -272,7 +273,7 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
-                _logger.LogError(errorMessage);
+                LogError(errorMessage, null);
             }
          
         }
@@ -281,5 +282,22 @@ public class OrganisationsSearchController : ControllerBase
     private bool SendNotificationEmailToDeletedPerson(AssociatedPersonResults email,string notificationType)
     {
         return _messagingService.SendRemovedApprovedPersonNotification(email, notificationType) != null;
+    }
+
+    private void LogInformation(string data)
+    {
+        if (data != null)
+        {
+            data = data.Replace('\n', '_').Replace('\r', '_');
+            _logger.LogInformation(data);
+        }
+    }
+    private void LogError(string data, Exception ex)
+    {
+        if (data != null)
+        {
+            data = data.Replace('\n', '_').Replace('\r', '_');
+            _logger.LogError(data, ex);
+        }
     }
 }
