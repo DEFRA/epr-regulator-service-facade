@@ -2,7 +2,7 @@ using EPR.RegulatorService.Facade.Core.Helpers;
 using System.Diagnostics;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
+namespace EPR.RegulatorService.Facade.UnitTests.Helpers
 {
     [TestClass]
     public class UrlHelpersTests
