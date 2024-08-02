@@ -1,7 +1,4 @@
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using FluentAssertions;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -23,6 +20,19 @@ namespace EPR.RegulatorService.Facade.UnitTests.Enums
                         
             // Assert
             result.ToLower().Should().Be(SubmissionType.Registration.ToString().ToLower());
+        }
+
+        [TestMethod]
+        public async Task CheckTheEnumeratedTypeReturnEntryString()
+        {
+            // Arrange
+            SubmissionType submissionType = new();
+
+            // Act
+            var result = EnumExtensions.GetDisplayName(submissionType);
+
+            // Assert
+            result.Should().Be(string.Empty);
         }
     }
 }
