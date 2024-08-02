@@ -233,7 +233,20 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             var objectResult = result as ObjectResult;
             objectResult.Value.Should().BeOfType(typeof(ValidationProblemDetails));
         }
-        
+
+        [TestMethod]
+        public async Task Invalid_CreateInviteEnrollment_ReturnBadResultResult()
+        {
+            // Arrange
+            var request = GetInviteEnrollmentRequest();
+
+            // Act
+            var result = await _sut.CreateInviteEnrollment(request) as OkObjectResult;
+
+            // Assert
+            result.Should().BeNull();
+        }
+
         private EnrolInvitedUserRequest GetEnrolInvitedUserRequest()
         {
             return new EnrolInvitedUserRequest
