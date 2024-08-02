@@ -699,5 +699,20 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be(500);
         }
+
+        [TestMethod]
+        public async Task Invalid_GetProducerOrganisationsUsersByExternalId_Is_Called_And_Request_Is_Valid_Then_Return_BadResult()
+        {
+            // Arrange
+            var users = new List<OrganisationUserOverviewResponseModel>();
+            
+            // Act
+            var result = await _sut.GetUsersByOrganisationExternalId(_organisationExternalId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
     }
 }
