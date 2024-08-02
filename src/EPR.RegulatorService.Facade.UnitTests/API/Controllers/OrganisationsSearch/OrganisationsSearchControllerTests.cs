@@ -655,5 +655,49 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
             }
             
         }
+
+        [TestMethod]
+        public async Task InValidRequest_AddRemoveApprovedUser_BadResult()
+        {
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+        
+            _mockMessagingService
+                .Setup(x => x.SendEmailToInvitedNewApprovedPerson(It.IsAny<AddRemoveNewApprovedPersonEmailModel>()));
+            // Act
+            var result = await _sut.AddRemoveApprovedUser(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Invalid_RemoveApprovedPerson_Exception_Handled()
+        {
+            // Arrange
+            var request = new RemoveApprovedUsersRequest
+            {
+                OrganisationId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                RemovedConnectionExternalId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.Empty
+            };
+
+            // Act
+            var result = await _sut.RemoveApprovedPerson(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
     }
 }
