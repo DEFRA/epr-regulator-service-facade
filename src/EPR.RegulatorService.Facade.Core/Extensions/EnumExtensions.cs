@@ -11,7 +11,7 @@ namespace EPR.RegulatorService.Facade.Core.Extensions
         public static string GetDisplayName(this Enum enumValue)
         {
             string stringEnumeratedValue = string.Empty;
-            if (Enum.IsDefined(typeof(SubmissionType), enumValue) && enumValue.GetType().GetMember(enumValue.ToString())[0] != null)
+            if (Enum.IsDefined(typeof(SubmissionType), enumValue) && enumValue.GetType().GetMember(enumValue.ToString()).Length == 1)
             {
                 stringEnumeratedValue = enumValue.GetType().GetMember(enumValue.ToString())[0].GetCustomAttribute<DisplayAttribute>()?.GetName();
             }
