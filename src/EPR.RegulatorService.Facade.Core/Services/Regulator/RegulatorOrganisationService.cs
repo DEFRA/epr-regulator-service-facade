@@ -1,5 +1,4 @@
 ﻿using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
@@ -31,7 +30,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
             string url = $"{_config.Endpoints.GetRegulator}{nation}";
-            var response = await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+            var response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -55,7 +54,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                 if (response.IsSuccessStatusCode)
                 {
                     string logData = $"Create regulator organisation name {request.Name} service response is successful";
-                    LogHelpers.Log(_logger, logData, LogLevel.Information);
+                    _logger.LogInformation(logData);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
@@ -68,21 +67,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
                         logData = $"Create regulator organisation name {request.Name} service content response is {content}";
-                        LogHelpers.Log(_logger, logData, LogLevel.Information);
+                        _logger.LogInformation(logData);
 
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
                         logData = $"Create regulator organisation name {request.Name} service nation is {nationName}";
-                        LogHelpers.Log(_logger, logData, LogLevel.Information);
+                        _logger.LogInformation(logData);
 
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
                         logData = $"Get regulator organisation service failed: {createdOrganisation}";
-                        LogHelpers.Log(_logger, logData, LogLevel.Information);
+                        _logger.LogInformation(logData);
                     }
                 }
 
@@ -90,7 +89,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             }
             catch (Exception ex)
             {
-                LogHelpers.Log(_logger, ex.Message, LogLevel.Error, ex);
+                _logger.LogError(ex.Message, ex);
 
                 return Result<CreateRegulatorOrganisationResponseModel>.FailedResult(string.Empty, HttpStatusCode.BadRequest);
             }
@@ -99,7 +98,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> RegulatorInvites(AddInviteUserRequest request)
         {
             string logData = "Attempting to fetch pending applications from the backend";
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorInvitation, GetStringContent(request));
         }
@@ -107,7 +106,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> RegulatorEnrollment(EnrolInvitedUserRequest request)
         {
             string logData = "Attempting to fetch pending applications from the backend";
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorEnrollment, GetStringContent(request));
         }
@@ -115,11 +114,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> RegulatorInvited(Guid id, string email)
         {
             string logData = "Attempting to fetch pending applications from the backend";
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+            return await _httpClient.GetAsync(url);
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -127,9 +126,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             var url = $"{_config.Endpoints.GetRegulatorUsers}?userId={userId}&organisationId={organisationId}&getApprovedUsersOnly={true}";
 
             string logData = $"Attempting to fetch the users for organisation id {organisationId} from the backend";
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
-            return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+            return await _httpClient.GetAsync(url);
         }
 
         private StringContent GetStringContent(object request)
@@ -144,9 +143,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
 
             string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
-            return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+            return await _httpClient.GetAsync(url);
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)

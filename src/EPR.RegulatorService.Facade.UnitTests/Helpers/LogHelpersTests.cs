@@ -3,6 +3,7 @@ using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Services.Application;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -55,7 +56,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Helpers
             // Arrange
 
             // Act
-            LogHelpers.Log(_logger, "Test the logger", Microsoft.Extensions.Logging.LogLevel.Information);
+            _logger.LogInformation("Test the logger");
 
             // Assert
         }
@@ -66,7 +67,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Helpers
             // Arrange
 
             // Act
-            LogHelpers.Log(_logger, "Test the logger. Error", Microsoft.Extensions.Logging.LogLevel.Error);
+            _logger.LogError("Test the logger");
 
             // Assert
         }

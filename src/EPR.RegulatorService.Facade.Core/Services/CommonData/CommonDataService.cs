@@ -1,6 +1,5 @@
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using Microsoft.Extensions.Options;

@@ -4,7 +4,6 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
-using EPR.RegulatorService.Facade.Core.Helpers;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
 
@@ -24,13 +23,17 @@ public class ApplicationService : IApplicationService
         _config = options.Value;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Style",
+    "IDE0017:Simplify object initialization",
+    Justification = "<Pending>")]
     public async Task<HttpResponseMessage> PendingApplications(Guid userId, int currentPage, int pageSize, string organisationName, string applicationType)
     {
         var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
 
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
-        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+        return await _httpClient.GetAsync(url);
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -39,7 +42,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {organisationId}", organisationId);
 
-        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+        return await _httpClient.GetAsync(url);
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
@@ -67,7 +70,7 @@ public class ApplicationService : IApplicationService
         var url = string.Format($"{_config.Endpoints.UserOrganisations}?userId={userId}");
 
         var logData = $"Attempting to fetch the organisations for user {userId}";
-        LogHelpers.Log(_logger, logData, LogLevel.Information);
+        _logger.LogInformation(logData);
 
         return await _httpClient.GetAsync(url);
     }

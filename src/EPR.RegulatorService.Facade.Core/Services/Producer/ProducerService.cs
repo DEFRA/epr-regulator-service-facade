@@ -1,11 +1,8 @@
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Net;
 using System.Net.Http.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Producer;
@@ -32,7 +29,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
         
-        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+        return await _httpClient.GetAsync(url);
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
@@ -41,7 +38,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
 
-        return await _httpClient.GetAsync(UrlHelpers.CheckRequestURL(url));
+        return await _httpClient.GetAsync(url);
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {

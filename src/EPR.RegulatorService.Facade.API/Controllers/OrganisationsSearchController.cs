@@ -74,7 +74,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             var logData = $"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}";
-            LogHelpers.Log(_logger, logData, LogLevel.Error);
+            _logger.LogError(logData, e);
 
             return HandleError.Handle(e);
         }
@@ -103,14 +103,14 @@ public class OrganisationsSearchController : ControllerBase
             }
 
             string logData = $"Fetching organisation details for {externalId} resulted in unsuccessful request: {response.StatusCode}";
-            LogHelpers.Log(_logger, logData, LogLevel.Error);
+            _logger.LogInformation(logData);
 
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
             string logData = $"Error fetching organisation details for {externalId}";
-            LogHelpers.Log(_logger, logData, LogLevel.Error);
+            _logger.LogError(logData, e);
 
             return HandleError.Handle(e);
         }
@@ -144,7 +144,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = $"Error fetching producer organisations by external organisation id {externalId}";
-            LogHelpers.Log(_logger, logData, LogLevel.Error);
+            _logger.LogError(logData, e);
 
             return HandleError.Handle(e);
         }
@@ -188,7 +188,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = $"Error deleting approved user for organisation {request.OrganisationId}";
-            LogHelpers.Log(_logger, logData, LogLevel.Error);
+            _logger.LogError(logData, e);
             return HandleError.Handle(e);
         }
     }
@@ -244,7 +244,7 @@ public class OrganisationsSearchController : ControllerBase
                                    Organisation external Id: {request.OrganisationId}
                                    User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}";
             
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
@@ -257,7 +257,7 @@ public class OrganisationsSearchController : ControllerBase
                                 Organisation external Id: {request.OrganisationId}
                                 Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
                                 Invited by user email: {invitedByUserEmail}";
-            LogHelpers.Log(_logger, logData, LogLevel.Error);
+            _logger.LogError(logData, e);
             return BadRequest("Failed to add / remove user");
         }
     }
@@ -281,7 +281,7 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
-                LogHelpers.Log(_logger, errorMessage, LogLevel.Error);
+                _logger.LogError(errorMessage);
             }
          
         }

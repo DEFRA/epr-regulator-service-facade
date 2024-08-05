@@ -31,7 +31,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             if (userId == default)
             {
                 string logData = "UserId not available";
-                LogHelpers.Log(_logger, logData, LogLevel.Error);
+                _logger.LogError(logData);
 
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
@@ -56,12 +56,12 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             if (userId == default)
             {
                 string logError = "UserId not available";
-                LogHelpers.Log(_logger, logError, LogLevel.Error);
+                _logger.LogError(logError);
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
             string logData = $"Creating the selected regulator organisation {request.Name}";
-            LogHelpers.Log(_logger, logData, LogLevel.Information);
+            _logger.LogInformation(logData);
 
             var response = await _regulatorOrganisationService.CreateRegulatorOrganisation(request);
 

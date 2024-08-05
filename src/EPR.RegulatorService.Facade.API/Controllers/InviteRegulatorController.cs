@@ -7,6 +7,7 @@ using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 
 namespace EPR.RegulatorService.Facade.API.Controllers
@@ -92,7 +93,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             catch (Exception e)
             {
                 string logData = $"Error when creating the invite regulator user for id {request.UserId}";
-                LogHelpers.Log(_logger, logData, LogLevel.Error);
+                _logger.LogError(logData, LogLevel.Error, e);
 
                 return HandleError.Handle(e);
             }
@@ -133,7 +134,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             catch (Exception e)
             {
                 string logData = $"Error when creating the enrollment for id {request.UserId}";
-                LogHelpers.Log(_logger, logData, LogLevel.Error);
+                _logger.LogError(logData, LogLevel.Error);
 
                 return HandleError.Handle(e);
             }
@@ -177,7 +178,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             catch (Exception e)
             {
                 string logData = $"Error when retriving the invite regulator token for user {User.UserId()}";
-                LogHelpers.Log(_logger, logData, LogLevel.Error);
+                _logger.LogError(logData, e);
 
                 return HandleError.Handle(e);
             }

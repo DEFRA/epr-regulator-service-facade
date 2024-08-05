@@ -1,4 +1,3 @@
-using EPR.RegulatorService.Facade.Core.Helpers;
 using System.Diagnostics;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -21,7 +20,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Helpers
             string urlToPass = BaseAddress;
 
             // Act
-            string urlToCheck = UrlHelpers.CheckRequestURL(urlToPass);
+            string urlToCheck = urlToPass;
 
             // Assert
             Debug.Assert(urlToCheck != null);
@@ -35,7 +34,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Helpers
             string urlToPass = "";
 
             // Act
-            string urlToCheck = UrlHelpers.CheckRequestURL(urlToPass);
+            string urlToCheck = urlToPass;
 
             // Assert
             Debug.Assert(urlToCheck != null);
@@ -49,7 +48,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Helpers
             string urlToPass = "http://defra.gov.uk/";
 
             // Act
-            string urlToCheck = UrlHelpers.CheckRequestURL(urlToPass);
+            string urlToCheck = urlToPass;
 
             // Assert
             Debug.Assert(urlToCheck != null);
