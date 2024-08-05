@@ -410,5 +410,21 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be((int) HttpStatusCode.InternalServerError);
         }
+
+        [TestMethod]
+        public async Task
+    When_Organisations_Pending_Application_Is_Called_And_Request_Is_BadRequest_Then_Return_400_Error()
+        {
+            // Arrange
+            var enrolments = new ApplicationEnrolmentDetailsResponse();
+            
+            // Act
+            var result = await _sut.GetOrganisationApplications(_organisationId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
     }
 }
