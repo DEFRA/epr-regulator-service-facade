@@ -28,8 +28,13 @@ public class ProducerService : IProducerService
         var url = string.Format($"{_config.Endpoints.GetOrganisationsBySearchTerm}", userId, currentPage, pageSize, searchTerm);
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
-        
-        return await _httpClient.GetAsync(url);
+
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
@@ -38,7 +43,12 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
 
-        return await _httpClient.GetAsync(url);
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
