@@ -23,17 +23,18 @@ public class ApplicationService : IApplicationService
         _config = options.Value;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-    "Style",
-    "IDE0017:Simplify object initialization",
-    Justification = "<Pending>")]
     public async Task<HttpResponseMessage> PendingApplications(Guid userId, int currentPage, int pageSize, string organisationName, string applicationType)
     {
-        var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
-
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
-        return await _httpClient.GetAsync(url);
+        var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
+
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+        
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -42,7 +43,12 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {organisationId}", organisationId);
 
-        return await _httpClient.GetAsync(url);
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
