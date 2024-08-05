@@ -240,10 +240,10 @@ public class OrganisationsSearchController : ControllerBase
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
 
-            string logData = String.Format("Email sent to Invited new approved person. Organisation external Id: {OrganisationId} User: {InvitedPersonFirstName} {InvitedPersonLastName}", 
-                request.OrganisationId, 
-                request.InvitedPersonFirstName, 
-                request.InvitedPersonLastName);
+            string logData = String.Format("Email sent to Invited new approved person. Organisation external Id: {0} User: {1} {2}",
+                                request.OrganisationId,
+                                request.InvitedPersonFirstName,
+                                request.InvitedPersonLastName);
 
             _logger.LogInformation(logData);
 
