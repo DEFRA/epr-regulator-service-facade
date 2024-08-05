@@ -60,7 +60,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
-            string logData = $"Creating the selected regulator organisation {request.Name}";
+            string logData = string.Format("Creating the selected regulator organisation {0}", request.Name);
+
             _logger.LogInformation(logData);
 
             var response = await _regulatorOrganisationService.CreateRegulatorOrganisation(request);
