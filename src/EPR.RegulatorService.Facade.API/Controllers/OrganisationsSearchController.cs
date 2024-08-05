@@ -185,8 +185,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = $"Error deleting approved user for organisation {request.OrganisationId}";
-            _logger.LogError(logData, e);
+            _logger.LogError("Error when retriving the invite regulator token for user {0}", User.UserId().ToString(), e);
             return HandleError.Handle(e);
         }
     }

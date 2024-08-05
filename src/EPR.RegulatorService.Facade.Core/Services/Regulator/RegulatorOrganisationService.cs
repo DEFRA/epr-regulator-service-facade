@@ -55,8 +55,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string logData = String.Format("Create regulator organisation name {0} service response is successful", request.Name);
-                    _logger.LogInformation(logData);
+                    _logger.LogInformation("Create regulator organisation name {0} service response is successful", request.Name);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
@@ -96,24 +95,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<HttpResponseMessage> RegulatorInvites(AddInviteUserRequest request)
         {
-            string logData = "Attempting to fetch pending applications from the backend";
-            _logger.LogInformation(logData);
+            _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorInvitation, GetStringContent(request));
         }
 
         public async Task<HttpResponseMessage> RegulatorEnrollment(EnrolInvitedUserRequest request)
         {
-            string logData = "Attempting to fetch pending applications from the backend";
-            _logger.LogInformation(logData);
+            _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorEnrollment, GetStringContent(request));
         }
 
         public async Task<HttpResponseMessage> RegulatorInvited(Guid id, string email)
         {
-            string logData = "Attempting to fetch pending applications from the backend";
-            _logger.LogInformation(logData);
+            _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
@@ -124,8 +120,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             var url = $"{_config.Endpoints.GetRegulatorUsers}?userId={userId}&organisationId={organisationId}&getApprovedUsersOnly={true}";
 
-            string logData = $"Attempting to fetch the users for organisation id {organisationId} from the backend";
-            _logger.LogInformation(logData);
+            _logger.LogInformation("Attempting to fetch the users for organisation id {0} from the backend", organisationId);
 
             return await _httpClient.GetAsync(url);
         }
@@ -141,7 +136,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
 
-            string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
+            string logData = string.Format($"Attempting to fetch the users for organisation external id {0} from the backend", externalId);
             _logger.LogInformation(logData);
 
             var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
