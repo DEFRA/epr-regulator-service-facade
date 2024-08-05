@@ -102,15 +102,13 @@ public class OrganisationsSearchController : ControllerBase
                 return Ok(organisationDetails);
             }
 
-            string logData = $"Fetching organisation details for {externalId} resulted in unsuccessful request: {response.StatusCode}";
-            _logger.LogInformation(logData);
+            _logger.LogInformation("Fetching organisation details for {0} resulted in unsuccessful request: {1}", externalId, response.StatusCode);
 
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            string logData = $"Error fetching organisation details for {externalId}";
-            _logger.LogError(logData, e);
+            _logger.LogError("Error fetching organisation details for {0}", externalId, e);
 
             return HandleError.Handle(e);
         }
@@ -143,7 +141,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = $"Error fetching producer organisations by external organisation id {externalId}";
+            string logData = string.Format($"Error fetching producer organisations by external organisation id", externalId);
             _logger.LogError(logData, e);
 
             return HandleError.Handle(e);
