@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
@@ -20,7 +21,12 @@ public class CommonDataService : ICommonDataService
     }
     public async Task<HttpResponseMessage> GetSubmissionLastSyncTime()
     {
-        return await _httpClient.GetAsync(_config.Endpoints.GetSubmissionEventsLastSyncTime);
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = _config.Endpoints.GetSubmissionEventsLastSyncTime
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
 
     public async Task<HttpResponseMessage> GetPoMSubmissions(GetPomSubmissionsRequest pomSubmissionsRequest)
