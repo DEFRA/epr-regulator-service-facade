@@ -55,7 +55,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string logData = $"Create regulator organisation name {request.Name} service response is successful";
+                    string logData = String.Format("Create regulator organisation name {0} service response is successful", request.Name);
                     _logger.LogInformation(logData);
 
                     string headerValue = response.Headers.GetValues("Location").First();
@@ -68,21 +68,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
-                        logData = $"Create regulator organisation name {request.Name} service content response is {content}";
+                        logData = String.Format("Create regulator organisation name {0} service response is {1}", request.Name, content);
                         _logger.LogInformation(logData);
 
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
-                        logData = $"Create regulator organisation name {request.Name} service nation is {nationName}";
+                        logData = string.Format("Create regulator organisation name {0} service nation is {1}", request.Name, nationName);
                         _logger.LogInformation(logData);
 
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
-                        logData = $"Get regulator organisation service failed: {createdOrganisation}";
+                        logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation);
                         _logger.LogInformation(logData);
                     }
                 }
