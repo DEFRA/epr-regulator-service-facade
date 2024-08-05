@@ -240,10 +240,11 @@ public class OrganisationsSearchController : ControllerBase
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
 
-            string logData = $@"Email sent to Invited new approved person. 
-                                   Organisation external Id: {request.OrganisationId}
-                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}";
-            
+            string logData = String.Format("Email sent to Invited new approved person. Organisation external Id: {OrganisationId} User: {InvitedPersonFirstName} {InvitedPersonLastName}", 
+                request.OrganisationId, 
+                request.InvitedPersonFirstName, 
+                request.InvitedPersonLastName);
+
             _logger.LogInformation(logData);
 
             // Send email to Demoted users.
