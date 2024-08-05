@@ -145,7 +145,12 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             string logData = $"Attempting to fetch the users for organisation external id {externalId} from the backend";
             _logger.LogInformation(logData);
 
-            return await _httpClient.GetAsync(url);
+            var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+            {
+                Path = url
+            };
+
+            return await _httpClient.GetAsync(uriBuilder.Path);
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)

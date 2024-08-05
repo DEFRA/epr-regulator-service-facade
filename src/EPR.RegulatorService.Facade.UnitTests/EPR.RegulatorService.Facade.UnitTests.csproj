@@ -33,6 +33,10 @@
       <ProjectReference Include="..\EPR.RegulatorService.Facade.Core\EPR.RegulatorService.Facade.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Helpers\" />
+    </ItemGroup>
+
 
 </Project>
 
