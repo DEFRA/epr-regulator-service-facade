@@ -126,7 +126,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             return await _httpClient.GetAsync(url);
         }
 
-        private StringContent GetStringContent(object request)
+        private static StringContent GetStringContent(object request)
         {
             string jsonRequest = JsonSerializer.Serialize(request);
 

@@ -184,7 +184,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
             await _sut.GovNotification(govNotificationRequestModel);
         }
 
-        private GovNotificationRequestModel GetGovNotificationRequestModel()
+        private static GovNotificationRequestModel GetGovNotificationRequestModel()
         {
             return new GovNotificationRequestModel
             {
@@ -199,7 +199,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
             };
         }
 
-        private ApplicationEmailModel GetApplicationEmailModel()
+        private static ApplicationEmailModel GetApplicationEmailModel()
         {
             var applicationEmailModel = new ApplicationEmailModel()
             {

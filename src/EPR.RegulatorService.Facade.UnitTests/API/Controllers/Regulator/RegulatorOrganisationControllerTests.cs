@@ -96,7 +96,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         }
 
-        private CreateRegulatorAccountRequest CreateRegulatorAccountRequest()
+        private static CreateRegulatorAccountRequest CreateRegulatorAccountRequest()
         {
             return new CreateRegulatorAccountRequest
             {

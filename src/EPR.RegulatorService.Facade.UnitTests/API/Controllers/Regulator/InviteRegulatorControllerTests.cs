@@ -260,7 +260,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result!.Should().BeNull();
         }
 
-        private EnrolInvitedUserRequest GetEnrolInvitedUserRequest()
+        private static EnrolInvitedUserRequest GetEnrolInvitedUserRequest()
         {
             return new EnrolInvitedUserRequest
             {
@@ -272,7 +272,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             };
         }
 
-        private RegulatorInviteEnrollmentRequest GetInviteEnrollmentRequest()
+        private static RegulatorInviteEnrollmentRequest GetInviteEnrollmentRequest()
         {
             return new RegulatorInviteEnrollmentRequest
             {
