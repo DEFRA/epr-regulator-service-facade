@@ -247,6 +247,19 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result.Should().BeNull();
         }
 
+        [TestMethod]
+        public async Task EnrolInvitedUser_SendInValidRequest_ReturnException()
+        {
+            // Arrange
+            var request = GetEnrolInvitedUserRequest();
+
+            // Act
+            var result = await _sut.EnrolInvitedUser(request) as BadRequestResult;
+
+            // Assert
+            result!.Should().BeNull();
+        }
+
         private EnrolInvitedUserRequest GetEnrolInvitedUserRequest()
         {
             return new EnrolInvitedUserRequest
