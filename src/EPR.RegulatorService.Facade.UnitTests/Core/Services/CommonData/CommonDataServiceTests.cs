@@ -97,6 +97,7 @@ public class CommonDataServiceTests
                 {
                     FileId = Guid.NewGuid(),
                     Decision = "Approved",
+                    Comments = "Test",
                     IsResubmissionRequired = false
                 }
             }
@@ -203,6 +204,7 @@ public class CommonDataServiceTests
                 new()
                 {
                     FileId = Guid.NewGuid(),
+                    Comments = "Test",
                     Decision = "Approved"
                 }
             }
