@@ -360,7 +360,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.LastName, nameof(model.LastName));
     }
     
-    private void ValidateStringParameter(string parameter, string parameterName)
+    private static void ValidateStringParameter(string parameter, string parameterName)
     {
         if (string.IsNullOrWhiteSpace(parameter))
         {

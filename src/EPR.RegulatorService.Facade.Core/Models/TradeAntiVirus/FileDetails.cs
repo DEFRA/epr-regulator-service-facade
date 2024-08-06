@@ -5,7 +5,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus
     [ExcludeFromCodeCoverage]
     public class FileDetails
     {
-        public string Service => "epr";
+        public static string Service => "epr";
 
         public Guid Key { get; set; }
 
