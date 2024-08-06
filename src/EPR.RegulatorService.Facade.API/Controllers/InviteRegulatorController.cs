@@ -92,7 +92,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError("Error when creating the invite regulator user for id {0}", request.UserId, LogLevel.Error, e);
+                _logger.LogError(e, "Error when creating the invite regulator user for id {0}", request.UserId);
 
                 return HandleError.Handle(e);
             }
