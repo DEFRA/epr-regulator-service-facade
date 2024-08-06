@@ -172,6 +172,7 @@ public class CommonDataServiceTests
                 new()
                 {
                     FileId = Guid.NewGuid(),
+                    Comments = "Test",
                     Decision = "Approved"
                 }
             }

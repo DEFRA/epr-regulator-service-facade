@@ -184,8 +184,8 @@ public class RegulatorController :  ControllerBase
             }
             else
             {
-                string logError = $"Failed to fetch the organisations list for the user {userId}";
-                _logger.LogInformation(logError);
+                string logInfo = $"Failed to fetch the organisations list for the user {userId}";
+                _logger.LogInformation(logInfo);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }

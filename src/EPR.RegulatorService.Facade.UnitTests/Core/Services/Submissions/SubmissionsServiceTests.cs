@@ -33,6 +33,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
             _configuration = Options.Create(new SubmissionsApiConfig()
             {
                 BaseUrl = BaseAddress,
+                Timeout = 60,
+                ServiceRetryCount = 0,
                 Endpoints = new()
                 {
                     CreateSubmissionEvent = CreateSubmissionEvent,
