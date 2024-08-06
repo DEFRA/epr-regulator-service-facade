@@ -114,7 +114,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(url);
+            return await _httpClient.GetAsync(CheckURL(url));
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -155,7 +155,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
         }
 
-        public string CheckURL(string url)
+        private string CheckURL(string url)
         {
             string[] allowedSchemes = { "https", "http" };
             

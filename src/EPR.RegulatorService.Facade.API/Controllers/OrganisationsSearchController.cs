@@ -140,7 +140,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format($"Error fetching producer organisations by external organisation id", externalId);
+            string logData = string.Format($"Error fetching producer organisations by external organisation id {0}", externalId);
             _logger.LogError(logData, e);
 
             return HandleError.Handle(e);
@@ -184,7 +184,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError("Error when retriving the invite regulator token for user {0}", User.UserId().ToString(), e);
+            string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString());
+            _logger.LogError(logData, e);
             return HandleError.Handle(e);
         }
     }
