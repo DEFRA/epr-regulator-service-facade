@@ -308,7 +308,7 @@ public class MessagingService : IMessagingService
         return response.id;
     }
     
-    private void Validate(AddRemoveNewApprovedPersonEmailModel model)
+    private static void Validate(AddRemoveNewApprovedPersonEmailModel model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
         ValidateStringParameter(model.FirstName, nameof(model.FirstName));
@@ -318,7 +318,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.CompanyName, nameof(model.CompanyName));
     }
 
-    private void ValidateRequiredRemovedApprovedPersonEmailModelParameters(AssociatedPersonResults model)
+    private static void ValidateRequiredRemovedApprovedPersonEmailModelParameters(AssociatedPersonResults model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
         ValidateStringParameter(model.FirstName, nameof(model.FirstName));
@@ -328,7 +328,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.AccountSignInUrl, nameof(model.AccountSignInUrl));
     }
 
-    private void ValidateRequiredApplicationEmailModelParameters(ApplicationEmailModel model)
+    private static void ValidateRequiredApplicationEmailModelParameters(ApplicationEmailModel model)
     {
         ValidateStringParameter(model.ApprovedPerson.Email, nameof(model.ApprovedPerson.Email));
         ValidateStringParameter(model.ApprovedPerson.FirstName, nameof(model.ApprovedPerson.FirstName));
@@ -338,14 +338,14 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
     }
     
-    private void ValidateRequiredSubmissionEmailModelParameters(SubmissionEmailModel model)
+    private static void ValidateRequiredSubmissionEmailModelParameters(SubmissionEmailModel model)
     {
         ValidateStringParameter(model.OrganisationName, nameof(model.OrganisationName));
         ValidateStringParameter(model.AccountLoginUrl, nameof(model.AccountLoginUrl));
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
         ValidateStringParameter(model.SubmissionPeriod, nameof(model.SubmissionPeriod));
     }
-    private void ValidateDemotedDelegatedPersonParameters(AssociatedPersonResults model)
+    private static void ValidateDemotedDelegatedPersonParameters(AssociatedPersonResults model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
         ValidateStringParameter(model.FirstName, nameof(model.FirstName));
@@ -353,7 +353,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.OrganisationId, nameof(model.OrganisationId));
     }
     
-    private void ValidateUserEmailParameters(UserEmailModel model)
+    private static void ValidateUserEmailParameters(UserEmailModel model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
         ValidateStringParameter(model.FirstName, nameof(model.FirstName));
