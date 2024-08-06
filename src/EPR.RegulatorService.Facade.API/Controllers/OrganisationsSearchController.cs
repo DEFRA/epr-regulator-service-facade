@@ -250,10 +250,13 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = @$"Error inviting new approved person. 
-                                Organisation external Id: {request.OrganisationId}
-                                Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
-                                Invited by user email: {invitedByUserEmail}";
+
+            string logData = string.Format("Error inviting new approved person. Organisation external Id: {0} Invited user: {1} {2} Invited by user email: {3}", 
+                request.OrganisationId, 
+                request.InvitedPersonFirstName,
+                request.InvitedPersonLastName,
+                invitedByUserEmail);
+
             _logger.LogError(logData, e);
             return BadRequest("Failed to add / remove user");
         }
