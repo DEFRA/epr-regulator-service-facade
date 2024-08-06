@@ -129,7 +129,7 @@ public class OrganisationsSearchController : ControllerBase
 
             if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
-                _logger.LogError("UserId not available");
+                _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
             
@@ -142,7 +142,7 @@ public class OrganisationsSearchController : ControllerBase
                 return Ok(result);
             }
             
-            _logger.LogError("Failed to fetch organisations");
+            _logger.LogInformation("Failed to fetch organisations");
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
@@ -168,7 +168,7 @@ public class OrganisationsSearchController : ControllerBase
 
             if (!Guid.TryParse(request.UserId.ToString(), out validUserId))
             {
-                _logger.LogError("UserId not available");
+                _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
             

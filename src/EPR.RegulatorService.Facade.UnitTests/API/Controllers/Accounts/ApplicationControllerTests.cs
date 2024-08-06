@@ -2,6 +2,7 @@ using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Accounts;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
+using EPR.RegulatorService.Facade.Core.Models.Results;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -157,7 +158,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
             govNotificationRequestModel.Decision = "";
 
             // Act
-            await _sut.GovNotification(govNotificationRequestModel);
+            var result = _sut.GovNotification(govNotificationRequestModel);
+
+            result.Should().NotBeNull();
         }
 
         [TestMethod]
