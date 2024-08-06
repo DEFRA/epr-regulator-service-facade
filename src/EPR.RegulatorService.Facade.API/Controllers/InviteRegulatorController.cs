@@ -132,7 +132,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(string.Format("Error when creating the enrollment for id {0}", request.UserId), LogLevel.Error);
+                string logData = string.Format("Error when creating the enrollment for id {0}", request.UserId);
+                _logger.LogError(logData, LogLevel.Error);
 
                 return HandleError.Handle(e);
             }
