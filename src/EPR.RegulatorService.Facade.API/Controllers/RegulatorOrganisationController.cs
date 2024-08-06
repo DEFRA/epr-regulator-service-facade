@@ -30,7 +30,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
             Guid validUserId;
 
-            if (!Guid.TryParse(userId.ToString(), out validUserId))
+            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 string logData = "UserId not available";
                 _logger.LogError(logData);
@@ -57,7 +57,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
             Guid validUserId;
 
-            if (!Guid.TryParse(userId.ToString(), out validUserId))
+            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 string logError = "UserId not available";
                 _logger.LogError(logError);

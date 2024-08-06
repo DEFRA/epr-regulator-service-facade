@@ -32,7 +32,7 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             Guid validUserId;
 
-            if (!Guid.TryParse(userId.ToString(), out validUserId))
+            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -67,7 +67,7 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             Guid validUserId;
 
-            if (!Guid.TryParse(userId.ToString(), out validUserId))
+            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -103,7 +103,7 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             Guid validUserId;
 
-            if (!Guid.TryParse(userId.ToString(), out validUserId))
+            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -143,7 +143,7 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             Guid validUserId;
 
-            if (!Guid.TryParse(userId.ToString(), out validUserId))
+            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
