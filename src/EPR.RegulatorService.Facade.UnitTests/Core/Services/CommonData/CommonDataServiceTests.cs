@@ -33,6 +33,8 @@ public class CommonDataServiceTests
         _configuration = Options.Create(new CommonDataApiConfig()
         {
             BaseUrl = BaseAddress,
+            Timeout = 0,
+            ServiceRetryCount = 0,
             Endpoints = new()
             {
                 GetPoMSubmissions = GetPoMSubmissions
