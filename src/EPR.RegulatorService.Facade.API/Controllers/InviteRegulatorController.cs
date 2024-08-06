@@ -44,9 +44,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 var userId = User.UserId();
                 Guid validUserId;
-                bool userIdIsValid = Guid.TryParse(userId.ToString(), out validUserId);
-
-                if (userIdIsValid = false)
+                
+                if (!Guid.TryParse(userId.ToString(), out validUserId))
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -114,8 +113,9 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 }
 
                 var userId = User.UserId();
+                Guid validUserId;
 
-                if (userId == default)
+                if (!Guid.TryParse(userId.ToString(), out validUserId))
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
