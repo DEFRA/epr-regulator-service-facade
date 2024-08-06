@@ -30,7 +30,9 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -63,7 +65,9 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -97,7 +101,9 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -135,7 +141,9 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);

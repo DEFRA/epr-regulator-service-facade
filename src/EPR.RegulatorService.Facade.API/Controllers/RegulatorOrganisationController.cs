@@ -28,7 +28,9 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         {
             var userId = User.UserId();
 
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 string logData = "UserId not available";
                 _logger.LogError(logData);
@@ -53,7 +55,9 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
             var userId = User.UserId();
 
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 string logError = "UserId not available";
                 _logger.LogError(logError);

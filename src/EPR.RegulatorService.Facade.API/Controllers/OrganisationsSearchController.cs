@@ -19,6 +19,7 @@ using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -53,7 +54,9 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -86,7 +89,9 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -120,7 +125,9 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(userId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -156,8 +163,10 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             request.UserId = User.UserId();
-           
-            if (request.UserId == default)
+
+            Guid validUserId;
+
+            if (!Guid.TryParse(request.UserId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -206,7 +215,9 @@ public class OrganisationsSearchController : ControllerBase
         var invitedByUserEmail = User.Email();
         try
         {
-            if (invitedByUserId == default)
+            Guid validUserId;
+
+            if (!Guid.TryParse(invitedByUserId.ToString(), out validUserId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
