@@ -176,7 +176,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError("Error when retriving the invite regulator token for user {0}", User.UserId(), e);
+                _logger.LogError(e, "Error when retriving the invite regulator token for user {0}", User.UserId());
 
                 return HandleError.Handle(e);
             }

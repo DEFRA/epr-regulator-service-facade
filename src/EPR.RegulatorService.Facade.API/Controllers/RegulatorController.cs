@@ -51,7 +51,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = string.Format("Error fetching {0} Pending applications for organisation {1} on page {2}", pageSize, organisationName, currentPage).Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(logError, e);
+            _logger.LogError(e, logError);
             return HandleError.Handle(e);
         }
     }
@@ -84,7 +84,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error fetching applications for organisation {organisationId}";
-            _logger.LogError(logError, e);
+            _logger.LogError(e, logError);
 
             return HandleError.Handle(e);
         }
@@ -123,7 +123,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}";
-            _logger.LogError(logError, e);
+            _logger.LogError(e, logError);
             return HandleError.Handle(e);
         }
     }
@@ -154,7 +154,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error transferring the organisation {request.OrganisationId} to {request.TransferNationId} by the user {User.UserId()}";
-            _logger.LogError(logError, e);
+            _logger.LogError(e, logError);
             return HandleError.Handle(e);
         }
     }
@@ -192,7 +192,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = "Error fetching the organisations list for the user";
-            _logger.LogError(logError, e);
+            _logger.LogError(e, logError);
             return HandleError.Handle(e);
         }
     }

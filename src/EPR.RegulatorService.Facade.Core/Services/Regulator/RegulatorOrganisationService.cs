@@ -88,7 +88,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, ex.Message);
 
                 return Result<CreateRegulatorOrganisationResponseModel>.FailedResult(string.Empty, HttpStatusCode.BadRequest);
             }

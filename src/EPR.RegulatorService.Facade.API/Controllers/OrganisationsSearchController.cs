@@ -73,7 +73,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError("Error fetching {0} organisations by {1} on page {2}", pageSize, searchTerm, currentPage, e);
+            _logger.LogError(e, "Error fetching {0} organisations by {1} on page {2}", pageSize);
 
             return HandleError.Handle(e);
         }
@@ -107,7 +107,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError("Error fetching organisation details for {0}", externalId, e);
+            _logger.LogError(e, "Error fetching organisation details for {0}", externalId);
 
             return HandleError.Handle(e);
         }
@@ -141,7 +141,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format($"Error fetching producer organisations by external organisation id {0}", externalId);
-            _logger.LogError(logData, e);
+            _logger.LogError(e, logData);
 
             return HandleError.Handle(e);
         }
@@ -185,7 +185,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString()).Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(logData, e);
+            _logger.LogError(e, logData);
             return HandleError.Handle(e);
         }
     }
@@ -258,7 +258,7 @@ public class OrganisationsSearchController : ControllerBase
                 request.InvitedPersonLastName,
                 invitedByUserEmail).Replace('\n', '_').Replace('\r', '_');
 
-            _logger.LogError(logData, e);
+            _logger.LogError(e, logData);
             return BadRequest("Failed to add / remove user");
         }
     }
