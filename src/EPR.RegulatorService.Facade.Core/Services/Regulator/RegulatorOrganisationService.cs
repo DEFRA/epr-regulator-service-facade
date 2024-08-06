@@ -5,6 +5,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -16,7 +17,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         private readonly HttpClient _httpClient;
         private readonly ILogger<RegulatorOrganisationService> _logger;
         private readonly AccountsServiceApiConfig _config;
-
+        
         public RegulatorOrganisationService(
             HttpClient httpClient,
             ILogger<RegulatorOrganisationService> logger,
@@ -29,9 +30,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
-            string url = $"{_config.Endpoints.GetRegulator}{nation}";
+            string url = string.Format("{0}{1}", _config.Endpoints.GetRegulator, nation);
 
-            #pragma warning disable S5144
             var response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
