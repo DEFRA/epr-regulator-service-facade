@@ -80,7 +80,7 @@ public class ApplicationController : ControllerBase
             }
         }
 
-        throw new Exception("Invalid Request");
+        return BadRequest();
     }
 
     private static void CopyDelegatedUsersFromRequestToModel(GovNotificationRequestModel request, ApplicationEmailModel model)

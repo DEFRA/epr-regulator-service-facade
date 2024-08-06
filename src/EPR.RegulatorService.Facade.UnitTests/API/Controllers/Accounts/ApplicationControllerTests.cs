@@ -150,8 +150,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public async Task AccountsController_Throws_500_On_Error()
+        public async Task AccountsController_Throws_BadRequest_On_Error()
         {
             // Arrange
             var govNotificationRequestModel = GetGovNotificationRequestModel();
