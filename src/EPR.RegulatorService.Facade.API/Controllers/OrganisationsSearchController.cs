@@ -184,7 +184,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString());
+            string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString()).Replace('\n', '_').Replace('\r', '_');
             _logger.LogError(logData, e);
             return HandleError.Handle(e);
         }
@@ -240,7 +240,7 @@ public class OrganisationsSearchController : ControllerBase
             string logData = String.Format("Email sent to Invited new approved person. Organisation external Id: {0} User: {1} {2}",
                                 request.OrganisationId,
                                 request.InvitedPersonFirstName,
-                                request.InvitedPersonLastName);
+                                request.InvitedPersonLastName).Replace('\n', '_').Replace('\r', '_');
 
             _logger.LogInformation(logData);
 
@@ -256,7 +256,7 @@ public class OrganisationsSearchController : ControllerBase
                 request.OrganisationId, 
                 request.InvitedPersonFirstName,
                 request.InvitedPersonLastName,
-                invitedByUserEmail);
+                invitedByUserEmail).Replace('\n', '_').Replace('\r', '_');
 
             _logger.LogError(logData, e);
             return BadRequest("Failed to add / remove user");
