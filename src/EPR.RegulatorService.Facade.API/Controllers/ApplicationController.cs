@@ -33,7 +33,8 @@ public class ApplicationController : ControllerBase
             {
                 _logger.LogInformation($"Attempting to send ApprovedPersonAccepted email");
                 string? messageId = _messagingService.ApprovedPersonAccepted(model);
-                _logger.LogInformation($"Email sent:{0}", messageId);
+                string logData = string.Format("Email sent:{0}", messageId);
+                _logger.LogInformation(logData);
                 return Ok(messageId);
             }
             else if (request.DelegatedUsers.Count == 1)
@@ -82,7 +83,7 @@ public class ApplicationController : ControllerBase
         throw new Exception("Invalid Request");
     }
 
-    private void CopyDelegatedUsersFromRequestToModel(GovNotificationRequestModel request, ApplicationEmailModel model)
+    private static void CopyDelegatedUsersFromRequestToModel(GovNotificationRequestModel request, ApplicationEmailModel model)
     {
         request.DelegatedUsers.ForEach(delegatedPerson => 
             model.DelegatedPeople.Add(new UserEmailModel()
