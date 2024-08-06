@@ -3,6 +3,7 @@ using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -32,7 +33,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             string url = string.Format("{0}{1}", _config.Endpoints.GetRegulator, nation);
 
-            var response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(CheckURL(url));
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -152,6 +153,23 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
+        }
+
+        public string CheckURL(string url)
+        {
+            string[] allowedSchemes = { "https", "http" };
+            
+            var uri = new UriBuilder(_httpClient.BaseAddress)
+            {
+                Path = url
+            };
+            
+            if (allowedSchemes.Contains(uri.Scheme))
+            {
+                return url;
+            }
+
+            return string.Empty;
         }
     }
 }
