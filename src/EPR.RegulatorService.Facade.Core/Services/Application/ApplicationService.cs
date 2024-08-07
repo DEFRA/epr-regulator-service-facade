@@ -76,7 +76,7 @@ public class ApplicationService : IApplicationService
         var url = string.Format($"{_config.Endpoints.UserOrganisations}?userId={userId}");
 
         var logData = $"Attempting to fetch the organisations for user {userId}";
-        _logger.LogInformation(logData);
+        _logger.LogInformation("{Message}", logData);
 
         return await _httpClient.GetAsync(url);
     }

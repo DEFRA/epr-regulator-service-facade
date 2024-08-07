@@ -50,7 +50,7 @@ public class ApplicationController : ControllerBase
 
                 var messageIds = _messagingService.DelegatedPersonAccepted(model);
                 string logData = string.Format("Emails sent:{0}", String.Join(',', messageIds));
-                _logger.LogInformation(logData);
+                _logger.LogInformation("{Message}", logData);
                 return Ok(messageIds);
             }
         }
@@ -64,7 +64,7 @@ public class ApplicationController : ControllerBase
                 
                 var messageIds = _messagingService.ApprovedPersonRejected(model);
                 string logData = string.Format("Emails sent:{0}", String.Join(',', messageIds));
-                _logger.LogInformation(logData);
+                _logger.LogInformation("{Message}", logData);
                 return Ok(messageIds);
             }
             else if (request.RegulatorRole == RegulatorRole.Delegated)
@@ -75,7 +75,7 @@ public class ApplicationController : ControllerBase
                 
                 var messageIds = _messagingService.DelegatedPersonRejected(model);
                 string logData = string.Format("Emails sent:{0}", String.Join(',', messageIds));
-                _logger.LogInformation(logData);
+                _logger.LogInformation("{Message}", logData);
                 return Ok(messageIds);
             }
         }

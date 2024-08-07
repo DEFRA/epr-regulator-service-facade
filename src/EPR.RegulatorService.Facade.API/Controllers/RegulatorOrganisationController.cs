@@ -66,7 +66,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
             string logData = string.Format("Creating the selected regulator organisation {0}", request.Name).Replace('\n', '_').Replace('\r', '_');
 
-            _logger.LogInformation(logData);
+            _logger.LogInformation("{Message}", logData);
 
             var response = await _regulatorOrganisationService.CreateRegulatorOrganisation(request);
 

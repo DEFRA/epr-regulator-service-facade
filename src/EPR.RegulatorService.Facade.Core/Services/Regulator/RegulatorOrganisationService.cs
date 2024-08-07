@@ -58,7 +58,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                 {
                     string logData = string.Format("Create regulator organisation name {0} service response is successful", request.Name);
                     logData = logData.Replace('\n', '_');
-                    _logger.LogInformation(logData);
+                    _logger.LogInformation("{Message}", logData);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
@@ -71,21 +71,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
                         logData = string.Format("Create regulator organisation name {0} service response is {1}", request.Name, content).Replace('\n', '_');
-                        _logger.LogInformation(logData);
+                        _logger.LogInformation("{Message}", logData);
                         
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
                         logData = string.Format("Create regulator organisation name {0} service nation is {1}", request.Name, nationName).Replace('\n', '_');
-                        _logger.LogInformation(logData);
+                        _logger.LogInformation("{Message}", logData);
 
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
                         logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation).Replace('\n', '_').Replace('\r', '_');
-                        _logger.LogInformation(logData);
+                        _logger.LogInformation("{Message}", logData);
                     }
                 }
 
@@ -143,7 +143,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
 
             string logData = string.Format($"Attempting to fetch the users for organisation external id {0} from the backend", externalId);
-            _logger.LogInformation(logData);
+            _logger.LogInformation("{Message}", logData);
 
             var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
             {

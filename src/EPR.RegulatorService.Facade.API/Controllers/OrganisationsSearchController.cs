@@ -254,7 +254,7 @@ public class OrganisationsSearchController : ControllerBase
                                 request.InvitedPersonFirstName,
                                 request.InvitedPersonLastName).Replace('\n', '_').Replace('\r', '_');
 
-            _logger.LogInformation(logData);
+            _logger.LogInformation("{Message}", logData);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
