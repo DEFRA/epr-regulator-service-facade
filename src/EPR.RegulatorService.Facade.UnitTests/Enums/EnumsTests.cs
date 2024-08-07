@@ -23,7 +23,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Enums
         }
 
         [TestMethod]
-        public async Task CheckTheEnumeratedTypeReturnEntryString()
+        public async Task CheckTheEnumeratedTypeReturnEmptyString()
         {
             // Arrange
             SubmissionType submissionType = new();

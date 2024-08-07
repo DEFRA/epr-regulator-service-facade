@@ -194,6 +194,28 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
         }
 
         [TestMethod]
+        public async Task When_GetProducerOrganisationsUsersByExternalId_Is_Called_And_Service_Is_InValid_Then_Null()
+        {
+            // Arrange
+            var users = new List<OrganisationUserOverviewResponseModel>();
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.GetUsersByOrganisationExternalId(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(users)),
+                StatusCode = HttpStatusCode.BadRequest
+            });
+
+            // Act
+            var result = await _sut.GetUsersByOrganisationExternalId(_organisationExternalId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
         public async Task When_RemoveApprovedPerson_RemoveWithoutNomination_Valid_Result_Is_Successful()
         {
             // Arrange
