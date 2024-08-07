@@ -68,7 +68,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
-                        _logger.LogInformation("Create regulator organisation name {0} service response is {1}", request.Name, content);
+                        string logData = string.Format("Create regulator organisation name {0} service response is {1}", request.Name, content);
+                        _logger.LogInformation(logData);
                         
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
@@ -80,7 +81,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     }
                     else
                     {
-                        _logger.LogInformation("Get regulator organisation service failed: {0}", createdOrganisation);
+                        string logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation);
+                        _logger.LogInformation(logData);
                     }
                 }
 
