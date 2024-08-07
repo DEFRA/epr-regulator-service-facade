@@ -1,4 +1,6 @@
-﻿using EPR.RegulatorService.Facade.API.Controllers;
+﻿using Azure;
+using EPR.RegulatorService.Facade.API.Controllers;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
@@ -8,6 +10,8 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json;
+using System.Drawing.Printing;
 using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
@@ -94,6 +98,49 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             // Assert
             result!.Should().NotBeNull();
             result!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task GetRegulatorAccountByNation_Should_return_ServerError_When_UserId_Is_Empty()
+        {
+            // Arrange
+            var response = new CheckRegulatorOrganisationExistResponseModel
+            {
+                CreatedOn = DateTime.Now,
+                ExternalId = Guid.NewGuid(),
+            };
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.GetRegulatorOrganisationByNation(It.IsAny<string>())).ReturnsAsync(response);
+
+            // Act
+            var result = await _sut.GetRegulatorAccountByNation(It.IsAny<string>());
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
+        public async Task Should_return_ServerError_When_UserId_Is_Empty()
+        {
+            // Arrange
+            var request = CreateRegulatorAccountRequest();
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.CreateRegulatorOrganisation(It.IsAny<CreateRegulatorAccountRequest>()))
+                .ReturnsAsync(Result<CreateRegulatorOrganisationResponseModel>.FailedResult(string.Empty, HttpStatusCode.BadRequest));
+
+            // Act
+            var result = await _sut.CreateRegulatorOrganisation(request) as BadRequestResult;
+
+            // Assert
+            result!.Should().BeNull();
         }
 
         private static CreateRegulatorAccountRequest CreateRegulatorAccountRequest()
