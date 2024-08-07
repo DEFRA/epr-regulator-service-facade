@@ -60,7 +60,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 string logError = "UserId not available";
-                _logger.LogError(logError);
+                _logger.LogError("{Message}", logError);
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
