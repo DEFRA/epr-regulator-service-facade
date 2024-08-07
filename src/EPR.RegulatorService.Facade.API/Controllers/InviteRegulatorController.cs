@@ -137,7 +137,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             catch (Exception e)
             {
                 string logData = string.Format("Error when creating the enrollment for id {0}", request.UserId).Replace('\n', '_');
-                _logger.LogError(e, logData, LogLevel.Error);
+                _logger.LogError(e, "{Message}", logData);
 
                 return HandleError.Handle(e);
             }
