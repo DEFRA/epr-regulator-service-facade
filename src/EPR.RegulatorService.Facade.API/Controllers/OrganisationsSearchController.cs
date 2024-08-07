@@ -168,7 +168,7 @@ public class OrganisationsSearchController : ControllerBase
 
             Guid validUserId;
 
-            if (!Guid.TryParse(request.UserId.ToString(), out validUserId))
+            if ((!Guid.TryParse(request.UserId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
