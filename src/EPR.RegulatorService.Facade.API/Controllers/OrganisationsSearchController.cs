@@ -76,7 +76,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error fetching {0} organisations by {1} on page {2}", currentPage, pageSize, searchTerm).Replace('\n', '_').Replace('\r', '_');
+            string logData = string.Format("Error fetching {0} organisations by {1} on page {2}", currentPage, pageSize, searchTerm).Replace('\n', '_');
             _logger.LogError(e, "{Message}", logData);
 
             return HandleError.Handle(e);
@@ -194,7 +194,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString()).Replace('\n', '_').Replace('\r', '_');
+            string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString()).Replace('\n', '_');
             _logger.LogError(e, logData);
             return HandleError.Handle(e);
         }
@@ -252,7 +252,7 @@ public class OrganisationsSearchController : ControllerBase
             string logData = String.Format("Email sent to Invited new approved person. Organisation external Id: {0} User: {1} {2}",
                                 request.OrganisationId,
                                 request.InvitedPersonFirstName,
-                                request.InvitedPersonLastName).Replace('\n', '_').Replace('\r', '_');
+                                request.InvitedPersonLastName).Replace('\n', '_');
 
             _logger.LogInformation("{Message}", logData);
 
@@ -268,7 +268,7 @@ public class OrganisationsSearchController : ControllerBase
                 request.OrganisationId, 
                 request.InvitedPersonFirstName,
                 request.InvitedPersonLastName,
-                invitedByUserEmail).Replace('\n', '_').Replace('\r', '_');
+                invitedByUserEmail).Replace('\n', '_');
 
             _logger.LogError(e, logData);
             return BadRequest("Failed to add / remove user");

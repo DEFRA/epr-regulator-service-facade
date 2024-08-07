@@ -84,7 +84,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     }
                     else
                     {
-                        logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation).Replace('\n', '_').Replace('\r', '_');
+                        logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation).Replace('\n', '_');
                         _logger.LogInformation("{Message}", logData);
                     }
                 }

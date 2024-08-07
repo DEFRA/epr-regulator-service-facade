@@ -134,8 +134,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                string logData = string.Format("Error when creating the enrollment for id {0}", request.UserId).Replace('\n', '_').Replace('\r', '_');
-                _logger.LogError(e, logData, LogLevel.Error);
+                string logData = string.Format("Error when creating the enrollment for id {0}", request.UserId);
+                _logger.LogError(e, logData.Replace('\n', '_'), LogLevel.Error);
 
                 return HandleError.Handle(e);
             }
@@ -180,7 +180,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error when retriving the invite regulator token for user {0}", User.UserId());
+                _logger.LogError(e, "Error when retriving the invite regulator token for user {UserId}", User.UserId());
 
                 return HandleError.Handle(e);
             }

@@ -52,7 +52,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = string.Format("Error fetching {0} Pending applications for organisation {1} on page {2}", pageSize, organisationName, currentPage).Replace('\n', '_').Replace('\r', '_');
+            string logError = string.Format("Error fetching {0} Pending applications for organisation {1} on page {2}", pageSize, organisationName, currentPage).Replace('\n', '_');
             _logger.LogError(e, logError);
             return HandleError.Handle(e);
         }
