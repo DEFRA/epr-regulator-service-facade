@@ -52,8 +52,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = string.Format("Error fetching {0} Pending applications for organisation {1} on page {2}", pageSize, organisationName, currentPage).Replace('\n', '_');
-            _logger.LogError(e, logError);
+            string logError = string.Format("Error fetching {0} Pending applications for organisation {1} on page {2}", pageSize, organisationName, currentPage);
+            _logger.LogError(e, logError.Replace('\n', '_'));
             return HandleError.Handle(e);
         }
     }
@@ -88,7 +88,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error fetching applications for organisation {organisationId}";
-            _logger.LogError(e, logError);
+            _logger.LogError(e, logError.Replace('\n', '_'));
 
             return HandleError.Handle(e);
         }
@@ -129,7 +129,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}";
-            _logger.LogError(e, logError);
+            _logger.LogError(e, logError.Replace('\n', '_'));
             return HandleError.Handle(e);
         }
     }
@@ -161,8 +161,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = $"Error transferring the organisation {request.OrganisationId} to {request.TransferNationId} by the user {User.UserId()}";
-            _logger.LogError(e, logError);
+            string logError = string.Format($"Error transferring the organisation {0} to {1} by the user {2}", request.OrganisationId, request.TransferNationId, User.UserId());
+            _logger.LogError(e, logError.Replace('\n', '_'));
             return HandleError.Handle(e);
         }
     }
@@ -200,7 +200,7 @@ public class RegulatorController :  ControllerBase
         catch (Exception e)
         {
             string logError = "Error fetching the organisations list for the user";
-            _logger.LogError(e, logError);
+            _logger.LogError(e, logError.Replace('\n', '_'));
             return HandleError.Handle(e);
         }
     }
