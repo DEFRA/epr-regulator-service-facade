@@ -107,14 +107,14 @@ public class OrganisationsSearchController : ControllerBase
                 return Ok(organisationDetails);
             }
 
-            _logger.LogInformation("Fetching organisation details for {0} resulted in unsuccessful request: {1}", externalId, response.StatusCode);
+            _logger.LogInformation("Fetching organisation details for {ExternalId} resulted in unsuccessful request: {StatusCode}", externalId, response.StatusCode);
 
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            string logData = "Error fetching organisation details for {0}";
-            _logger.LogError(e, logData, externalId);
+            string logData = string.Format("Error fetching organisation details for {0}", externalId);
+            _logger.LogError(e, logData);
             return HandleError.Handle(e);
         }
     }
