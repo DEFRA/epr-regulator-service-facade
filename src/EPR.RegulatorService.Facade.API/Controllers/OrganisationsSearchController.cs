@@ -76,7 +76,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error fetching {0} organisations by {1} on page {2}", currentPage, pageSize, searchTerm);
+            string logData = string.Format("Error fetching {0} organisations by {1} on page {2}", currentPage, pageSize, searchTerm).Replace('\n', '_').Replace('\r', '_');
             _logger.LogError(e, logData);
 
             return HandleError.Handle(e);
