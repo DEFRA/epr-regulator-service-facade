@@ -77,7 +77,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format("Error fetching {0} organisations by {1} on page {2}", currentPage, pageSize, searchTerm).Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(e, logData);
+            _logger.LogError(e, "{Message}", logData);
 
             return HandleError.Handle(e);
         }
@@ -113,8 +113,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching organisation details for {0}", externalId);
-
+            string logData = "Error fetching organisation details for {0}";
+            _logger.LogError(e, logData, externalId);
             return HandleError.Handle(e);
         }
     }
@@ -294,7 +294,7 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
-                _logger.LogError(errorMessage);
+                _logger.LogError("{Message}", errorMessage);
             }
          
         }
