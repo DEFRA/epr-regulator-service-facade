@@ -56,7 +56,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string logData = string.Format("Create regulator organisation name {request.Name} service response is successful", request.Name).Replace('\n', '_').Replace('\r', '_');
+                    _logger.LogInformation($"Create regulator organisation name {request.Name} service response is successful");
+                    string logData = string.Format("Create regulator organisation name {0} service response is successful", request.Name).Replace('\n', '_');
                     _logger.LogInformation(logData);
 
                     string headerValue = response.Headers.GetValues("Location").First();
@@ -69,21 +70,21 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
 
-                        logData = string.Format("Create regulator organisation name {request.Name} service response is {content}", request.Name, content).Replace('\n', '_').Replace('\r', '_');
+                        logData = string.Format("Create regulator organisation name {0} service response is {1}", request.Name, content).Replace('\n', '_').Replace('\r', '_');
                         _logger.LogInformation(logData);
                         
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
-                        logData = string.Format("Create regulator organisation name {request.Name} service nation is {nationName}", request.Name, nationName).Replace('\n', '_').Replace('\r', '_');
+                        logData = string.Format("Create regulator organisation name {0} service nation is {1}", request.Name, nationName).Replace('\n', '_').Replace('\r', '_');
                         _logger.LogInformation(logData);
 
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
-                        logData = string.Format("Get regulator organisation service failed: {createdOrganisation}", createdOrganisation).Replace('\n', '_').Replace('\r', '_');
+                        logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation).Replace('\n', '_').Replace('\r', '_');
                         _logger.LogInformation(logData);
                     }
                 }
