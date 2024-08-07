@@ -384,7 +384,7 @@ public class MessagingService : IMessagingService
             var organisationNumber = parameters.Single(x => x.Key == "organisationNumber").Value.ToString();
 
             string logData = string.Format("GOV UK NOTIFY ERROR. Class: {0}, Method: {1}, Organisation: {2}, Template: {3}", this.GetType().Name, callingMethodName, organisationNumber, templateId).Replace('\n', '_').Replace('\r', '_');
-            _logger.LogError(logData, LogLevel.Error);
+            _logger.LogError(ex, logData, LogLevel.Error);
         }
 
         return notificationId;
