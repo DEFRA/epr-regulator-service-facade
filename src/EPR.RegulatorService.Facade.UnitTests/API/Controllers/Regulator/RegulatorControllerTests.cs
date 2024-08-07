@@ -242,6 +242,32 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
         }
 
         [TestMethod]
+        public async Task When_Update_Enrolment_Is_Called_And_Request_Is_Unauthorizied_Then_Return_500()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x =>
+                x.UpdateEnrolment(It.IsAny<ManageRegulatorEnrolmentRequest>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.Unauthorized
+            });
+
+            // Act
+            var result = await _sut.UpdateEnrolment(
+                new UpdateEnrolmentRequest
+                {
+                    EnrolmentId = _organisationId,
+                    EnrolmentStatus = "Approved",
+                    Comments = String.Empty
+                });
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
         public async Task
             When_Transfer_Organisation_Nation_Is_Called_And_Request_Is_Invalid_Then_Return_400_Bad_Request()
         {
