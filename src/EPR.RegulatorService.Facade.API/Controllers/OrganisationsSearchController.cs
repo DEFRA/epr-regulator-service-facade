@@ -149,7 +149,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format($"Error fetching producer organisations by external organisation id {0}", externalId);
-            _logger.LogError(e, logData);
+            _logger.LogError(e, logData.Replace('\n', '_'));
 
             return HandleError.Handle(e);
         }
@@ -195,7 +195,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString()).Replace('\n', '_');
-            _logger.LogError(e, logData);
+            _logger.LogError(e, logData.Replace('\n', '_'));
             return HandleError.Handle(e);
         }
     }
@@ -268,9 +268,9 @@ public class OrganisationsSearchController : ControllerBase
                 request.OrganisationId, 
                 request.InvitedPersonFirstName,
                 request.InvitedPersonLastName,
-                invitedByUserEmail).Replace('\n', '_');
+                invitedByUserEmail);
 
-            _logger.LogError(e, logData);
+            _logger.LogError(e, logData.Replace('\n', '_'));
             return BadRequest("Failed to add / remove user");
         }
     }
@@ -294,7 +294,7 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
                                    $" for company {email.CompanyName}";
-                _logger.LogError("{Message}", errorMessage);
+                _logger.LogError("{Message}", errorMessage.Replace('\n', '_'));
             }
          
         }
