@@ -177,7 +177,7 @@ public class RegulatorController :  ControllerBase
             if (userId == Guid.Empty)
             {
                 string logError = $"Unable to get the OId for the user when attempting to get organisation details";
-                _logger.LogInformation(logError);
+                _logger.LogInformation("{Message}", logError);
 
 
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -187,7 +187,7 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 string logInfo = string.Format("Fetched the organisations list successfully for the user {0}", userId);
-                _logger.LogInformation(logInfo.Replace('\n', '_'));
+                _logger.LogInformation("{Message}", logInfo.Replace('\n', '_'));
                 return Ok(response.Content.ReadFromJsonAsync<UserOrganisationsListModel>().Result);
             }
             else

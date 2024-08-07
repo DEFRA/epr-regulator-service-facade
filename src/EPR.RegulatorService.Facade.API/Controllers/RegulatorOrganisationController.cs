@@ -33,7 +33,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
             {
                 string logData = "UserId not available";
-                _logger.LogError(logData);
+                _logger.LogError("{Message}", logData);
 
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
