@@ -413,6 +413,52 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
 
         [TestMethod]
         public async Task
+    When_Organisations_Pending_Application_Is_Called_And_User_Is_Not_Valid_Then_Return_Null()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x =>
+                x.GetOrganisationPendingApplications(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.Forbidden));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.GetOrganisationApplications(_organisationId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+
+        [TestMethod]
+        public async Task When_Update_Enrolment_Is_Called_And_User_Is_Not_Valid_Then_Return_Null()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x =>
+                x.UpdateEnrolment(It.IsAny<ManageRegulatorEnrolmentRequest>())
+            ).ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.Forbidden));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.UpdateEnrolment(
+                new UpdateEnrolmentRequest
+                {
+                    EnrolmentId = _organisationId,
+                    EnrolmentStatus = "Approved",
+                    Comments = String.Empty
+                });
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task
     When_Organisations_Pending_Application_Is_Called_And_Request_Is_BadRequest_Then_Return_400_Error()
         {
             // Arrange

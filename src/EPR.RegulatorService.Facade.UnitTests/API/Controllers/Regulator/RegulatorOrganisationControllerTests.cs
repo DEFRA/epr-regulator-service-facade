@@ -125,7 +125,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
         }
 
         [TestMethod]
-        public async Task Should_return_ServerError_When_UserId_Is_Empty()
+        public async Task CreateRegulatorOrganisation_Should_return_ServerError_When_UserId_Is_Empty()
         {
             // Arrange
             var request = CreateRegulatorAccountRequest();
