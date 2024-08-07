@@ -34,7 +34,7 @@ public class ApplicationController : ControllerBase
                 _logger.LogInformation($"Attempting to send ApprovedPersonAccepted email");
                 string? messageId = _messagingService.ApprovedPersonAccepted(model);
                 string logData = string.Format("Email sent:{0}", messageId);
-                _logger.LogInformation(logData);
+                _logger.LogInformation("{Message}", logData);
                 return Ok(messageId);
             }
             else if (request.DelegatedUsers.Count == 1)
