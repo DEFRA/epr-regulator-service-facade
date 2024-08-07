@@ -114,7 +114,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format("Error fetching organisation details for {0}", externalId);
-            _logger.LogError(e, logData);
+            _logger.LogError(e, logData.Replace('\n', '_'));
             return HandleError.Handle(e);
         }
     }
