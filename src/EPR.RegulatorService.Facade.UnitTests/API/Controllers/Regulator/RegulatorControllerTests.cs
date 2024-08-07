@@ -472,5 +472,28 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             var statusCodeResult = result as OkObjectResult;
             statusCodeResult?.StatusCode.Should().Be(null);
         }
+
+        [TestMethod]
+        public async Task Should_return_null_when_invalid_response()
+        {
+            // Arrange
+            var enrolments = new List<OrganisationEnrolments> { };
+
+            _mockRegulatorService.Setup(x =>
+                    x.PendingApplications(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(),
+                        It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(enrolments)),
+                    StatusCode = HttpStatusCode.Unauthorized
+                });
+
+            // Act
+            var result = await _sut.PendingApplications(_currentPage, PageSize, OrganisationName, ServiceRoleId);
+
+            // Assert
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
     }
 }
