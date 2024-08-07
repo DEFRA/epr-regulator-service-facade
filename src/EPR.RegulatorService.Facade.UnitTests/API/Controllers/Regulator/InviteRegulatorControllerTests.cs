@@ -260,6 +260,48 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result!.Should().BeNull();
         }
 
+        [TestMethod]
+        public async Task CreateInviteEnrollment_InValidUser_ReturnNullObjectResult()
+        {
+            // Arrange
+            var request = GetInviteEnrollmentRequest();
+
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.RegulatorInvites(It.IsAny<AddInviteUserRequest>())).ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonSerializer.Serialize(new AddRemoveApprovedPersonResponseModel { InviteToken = Token }))
+                });
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.CreateInviteEnrollment(request) as OkObjectResult;
+
+            // Assert
+            result!.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task EnrolInvitedUser_SendInValidUser_ReturnNull()
+        {
+            // Arrange
+            var request = GetEnrolInvitedUserRequest();
+
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.RegulatorEnrollment(request)).ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                });
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.EnrolInvitedUser(request) as NoContentResult;
+
+            // Assert
+            result!.Should().BeNull();
+        }
+
         private static EnrolInvitedUserRequest GetEnrolInvitedUserRequest()
         {
             return new EnrolInvitedUserRequest
