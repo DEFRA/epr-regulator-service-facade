@@ -113,8 +113,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error fetching organisation details for {0}", externalId);
-            _logger.LogError(e, logData.Replace('\n', '_'));
+            string logData = string.Format("Error fetching organisation details for {0}", externalId).Replace('\n', '_');
+            _logger.LogError(e, "{Message}", logData);
             return HandleError.Handle(e);
         }
     }
@@ -148,8 +148,9 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format($"Error fetching producer organisations by external organisation id {0}", externalId);
-            _logger.LogError(e, logData.Replace('\n', '_'));
+            string logData = string.Format($"Error fetching producer organisations by external organisation id {0}", externalId).Replace('\n', '_');
+            
+            _logger.LogError(e, "{Message}", logData);
 
             return HandleError.Handle(e);
         }
@@ -195,7 +196,7 @@ public class OrganisationsSearchController : ControllerBase
         catch (Exception e)
         {
             string logData = string.Format("Error when retriving the invite regulator token for user {0}", User.UserId().ToString()).Replace('\n', '_');
-            _logger.LogError(e, logData.Replace('\n', '_'));
+            _logger.LogError(e, "{Message}", logData);
             return HandleError.Handle(e);
         }
     }
@@ -268,9 +269,9 @@ public class OrganisationsSearchController : ControllerBase
                 request.OrganisationId, 
                 request.InvitedPersonFirstName,
                 request.InvitedPersonLastName,
-                invitedByUserEmail);
+                invitedByUserEmail).Replace('\n', '_');
 
-            _logger.LogError(e, logData.Replace('\n', '_'));
+            _logger.LogError(e, "{Message}", logData);
             return BadRequest("Failed to add / remove user");
         }
     }

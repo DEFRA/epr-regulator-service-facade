@@ -95,7 +95,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             {
                 string logData = string.Format("Error when creating the invite regulator user for id {0}", request.UserId).Replace('\n', '_');
 
-                _logger.LogError(e, logData);
+                _logger.LogError(e, "{Message}", logData);
 
                 return HandleError.Handle(e);
             }
