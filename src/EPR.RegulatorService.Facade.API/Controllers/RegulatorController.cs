@@ -186,14 +186,14 @@ public class RegulatorController :  ControllerBase
 
             if (response.IsSuccessStatusCode)
             {
-                string logInfo = $"Fetched the organisations list successfully for the user {userId}";
-                _logger.LogInformation(logInfo);
+                string logInfo = string.Format("Fetched the organisations list successfully for the user {0}", userId);
+                _logger.LogInformation(logInfo.Replace('\n', '_'));
                 return Ok(response.Content.ReadFromJsonAsync<UserOrganisationsListModel>().Result);
             }
             else
             {
-                string logInfo = $"Failed to fetch the organisations list for the user {userId}";
-                _logger.LogInformation(logInfo);
+                string logInfo = string.Format("Failed to fetch the organisations list for the user {0}", userId);
+                _logger.LogInformation("{Message}", logInfo.Replace('\n', '_'));
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }
