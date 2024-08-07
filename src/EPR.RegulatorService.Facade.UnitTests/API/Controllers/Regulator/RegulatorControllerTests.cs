@@ -521,5 +521,58 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             var statusCodeResult = result as OkObjectResult;
             statusCodeResult?.StatusCode.Should().Be(null);
         }
+
+        [TestMethod]
+        public async Task
+    When_Transfer_Organisation_Nation_Is_Called_And_User_Is_Not_Valid_Then_Return_Null()
+        {
+            // Arrange
+            var request = new OrganisationTransferNationRequest
+            {
+                OrganisationId = _organisationId,
+                TransferNationId = 3,
+                TransferComments = "Incorrect nation"
+            };
+            _mockRegulatorService.Setup(x =>
+                x.TransferOrganisationNation(It.IsAny<OrganisationTransferNationRequest>())
+            ).ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.Forbidden));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.TransferOrganisationNation(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task
+    When_Transfer_Organisation_Nation_Is_Called_And_RequestIsNotPostive_Then_Return_500()
+        {
+            // Arrange
+            var request = new OrganisationTransferNationRequest
+            {
+                OrganisationId = _organisationId,
+                TransferNationId = 3,
+                TransferComments = String.Empty
+            };
+            _mockRegulatorService.Setup(x =>
+                x.TransferOrganisationNation(It.IsAny<OrganisationTransferNationRequest>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.TooManyRequests
+            });
+
+            // Act
+            var result = await _sut.TransferOrganisationNation(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
     }
 }
