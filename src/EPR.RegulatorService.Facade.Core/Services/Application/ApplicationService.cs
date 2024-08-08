@@ -29,12 +29,7 @@ public class ApplicationService : IApplicationService
 
         var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
 
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-        {
-            Path = url
-        };
-        
-        return await _httpClient.GetAsync(uriBuilder.Path);
+        return await _httpClient.GetAsync(url);
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -43,12 +38,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {organisationId}", organisationId);
 
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-        {
-            Path = url
-        };
-
-        return await _httpClient.GetAsync(uriBuilder.Path);
+        return await _httpClient.GetAsync(url);
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
