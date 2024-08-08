@@ -31,7 +31,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
-            string url = string.Format("{0}{1}", _config.Endpoints.GetRegulator, nation);
+            var url = string.Format($"{_config.Endpoints.GetRegulator}", nation);
 #pragma warning disable S5144
             var response = await _httpClient.GetAsync(url);
 #pragma warning enable S5144
