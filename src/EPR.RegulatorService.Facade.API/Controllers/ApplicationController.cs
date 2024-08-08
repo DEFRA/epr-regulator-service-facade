@@ -33,8 +33,7 @@ public class ApplicationController : ControllerBase
             {
                 _logger.LogInformation($"Attempting to send ApprovedPersonAccepted email");
                 string? messageId = _messagingService.ApprovedPersonAccepted(model);
-                string logData = string.Format("Email sent:{0}", messageId);
-                _logger.LogInformation("{Message}", logData.Replace('\n', '_'));
+                _logger.LogInformation($"Email sent: {0}", messageId);
                 return Ok(messageId);
             }
             else if (request.DelegatedUsers.Count == 1)
@@ -49,8 +48,7 @@ public class ApplicationController : ControllerBase
                 });
 
                 var messageIds = _messagingService.DelegatedPersonAccepted(model);
-                string logData = string.Format("Emails sent:{0}", String.Join(',', messageIds));
-                _logger.LogInformation("{Message}", logData.Replace('\n', '_'));
+                _logger.LogInformation($"Email sent: {0}", messageIds);
                 return Ok(messageIds);
             }
         }
@@ -63,8 +61,7 @@ public class ApplicationController : ControllerBase
                 CopyDelegatedUsersFromRequestToModel(request, model);
                 
                 var messageIds = _messagingService.ApprovedPersonRejected(model);
-                string logData = string.Format("Emails sent:{0}", String.Join(',', messageIds));
-                _logger.LogInformation("{Message}", logData.Replace('\n', '_'));
+                _logger.LogInformation($"Email sent: {0}", messageIds);
                 return Ok(messageIds);
             }
             else if (request.RegulatorRole == RegulatorRole.Delegated)
@@ -74,8 +71,7 @@ public class ApplicationController : ControllerBase
                 CopyDelegatedUsersFromRequestToModel(request, model);
                 
                 var messageIds = _messagingService.DelegatedPersonRejected(model);
-                string logData = string.Format("Emails sent:{0}", String.Join(',', messageIds));
-                _logger.LogInformation("{Message}", logData.Replace('\n', '_'));
+                _logger.LogInformation($"Email sent: {0}", messageIds);
                 return Ok(messageIds);
             }
         }
