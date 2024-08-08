@@ -33,7 +33,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             string url = string.Format("{0}{1}", _config.Endpoints.GetRegulator, nation);
 
-            var response = await _httpClient.GetAsync(CheckURL(url));
+            var response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -119,7 +119,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(CheckURL(url));
+            return await _httpClient.GetAsync(url);
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -159,23 +159,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
-        }
-
-        private string CheckURL(string url)
-        {
-            string[] allowedSchemes = { "https", "http" };
-            
-            var uri = new UriBuilder(_httpClient.BaseAddress)
-            {
-                Path = url
-            };
-            
-            if (allowedSchemes.Contains(uri.Scheme))
-            {
-                return url;
-            }
-
-            return string.Empty;
         }
     }
 }
