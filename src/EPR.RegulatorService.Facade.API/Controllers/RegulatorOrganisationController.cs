@@ -5,6 +5,7 @@ using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using System.Drawing.Printing;
+using EPR.RegulatorService.Facade.Core.Extensions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -28,9 +29,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         {
             var userId = User.UserId();
 
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 string logData = "UserId not available";
                 _logger.LogError("{Message}", logData);
@@ -55,9 +54,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
             var userId = User.UserId();
 
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 string logError = "UserId not available";
                 _logger.LogError("{Message}", logError);

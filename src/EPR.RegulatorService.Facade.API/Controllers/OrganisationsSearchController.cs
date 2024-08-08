@@ -6,6 +6,7 @@ using Azure;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
@@ -54,9 +55,8 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
 
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -90,9 +90,8 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -126,9 +125,8 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -166,9 +164,9 @@ public class OrganisationsSearchController : ControllerBase
         {
             request.UserId = User.UserId();
 
-            Guid validUserId;
+            var userId = User.UserId();
 
-            if ((!Guid.TryParse(request.UserId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);

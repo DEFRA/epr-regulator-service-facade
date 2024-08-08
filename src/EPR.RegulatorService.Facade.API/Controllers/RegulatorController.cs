@@ -9,6 +9,7 @@ using System.Drawing.Printing;
 using Azure.Core;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using Notify.Models;
+using EPR.RegulatorService.Facade.Core.Extensions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -30,9 +31,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -65,9 +65,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -101,9 +100,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -141,9 +139,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            Guid validUserId;
-
-            if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            
+            if (!GuidExtensions.ValidGuid(userId))
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);

@@ -1,7 +1,6 @@
-﻿using Azure.Core;
-using EPR.RegulatorService.Facade.API.Extensions;
+﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
-using EPR.RegulatorService.Facade.Core.Helpers;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
@@ -43,9 +42,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 }
 
                 var userId = User.UserId();
-                Guid validUserId;
                 
-                if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+                if (!GuidExtensions.ValidGuid(userId))
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -115,9 +113,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 }
 
                 var userId = User.UserId();
-                Guid validUserId;
-
-                if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+                
+                if (!GuidExtensions.ValidGuid(userId))
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -158,9 +155,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 var userId = User.UserId();
 
-                Guid validUserId;
-
-                if ((!Guid.TryParse(userId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+                if (!GuidExtensions.ValidGuid(userId))
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
