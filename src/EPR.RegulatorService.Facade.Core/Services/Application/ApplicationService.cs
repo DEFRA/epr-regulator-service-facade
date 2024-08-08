@@ -36,7 +36,7 @@ public class ApplicationService : IApplicationService
     {
         var url = string.Format($"{_config.Endpoints.GetOrganisationsApplications}", userId, organisationId);
 
-        _logger.LogInformation("Attempting to fetch applications for the organisation {organisationId}", organisationId);
+        _logger.LogInformation("Attempting to fetch applications for the organisation {OrganisationId}", organisationId);
 
         return await _httpClient.GetAsync(url);
     }
@@ -45,8 +45,7 @@ public class ApplicationService : IApplicationService
     {
         var url = string.Format($"{_config.Endpoints.ManageEnrolment}");
 
-        _logger.LogInformation("User {userId} attempting to update the enrolment {enrolmentId}", request.UserId,
-            request.EnrolmentId);
+        _logger.LogInformation("User {UserId} attempting to update the enrolment {EnrolmentId}", request.UserId, request.EnrolmentId);
 
         return await _httpClient.PostAsJsonAsync(url, request);
     }
@@ -55,7 +54,7 @@ public class ApplicationService : IApplicationService
     {
         var url = string.Format($"{_config.Endpoints.TransferOrganisationNation}");
 
-        _logger.LogInformation("User {userId} attempting to transfer the organisation {organisationId} to {NationName}",
+        _logger.LogInformation("User {UserId} attempting to transfer the organisation {OrganisationId} to {NationName}",
              request.UserId, request.OrganisationId, request.TransferNationId);
 
         return await _httpClient.PostAsJsonAsync(url, request);
