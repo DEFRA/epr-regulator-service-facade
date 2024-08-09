@@ -73,7 +73,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     if (createdOrganisation.IsSuccessStatusCode)
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
-                        _logger.LogInformation("Create regulator organisation name {0} service response is {1}", request.Name, content);
+                        _logger.LogInformation("Create regulator organisation name {Name} service response is {Content}", request.Name, content);
 
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
