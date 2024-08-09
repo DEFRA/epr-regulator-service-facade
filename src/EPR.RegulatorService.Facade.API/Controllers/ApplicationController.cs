@@ -34,7 +34,7 @@ public class ApplicationController : ControllerBase
             {
                 _logger.LogInformation($"Attempting to send ApprovedPersonAccepted email");
                 string? messageId = _messagingService.ApprovedPersonAccepted(model);
-                _logger.LogInformation("Email sent: {MessageIds}", messageId);
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageId));
                 return Ok(messageId);
             }
             else if (request.DelegatedUsers.Count == 1)
@@ -49,7 +49,7 @@ public class ApplicationController : ControllerBase
                 });
 
                 var messageIds = _messagingService.DelegatedPersonAccepted(model);
-                _logger.LogInformation("Email sent: {MessageIds}", messageIds);
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageIds));
                 return Ok(messageIds);
             }
         }
@@ -62,7 +62,7 @@ public class ApplicationController : ControllerBase
                 CopyDelegatedUsersFromRequestToModel(request, model);
                 
                 var messageIds = _messagingService.ApprovedPersonRejected(model);
-                _logger.LogInformation("Email sent: {MessageIds}", messageIds);
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageIds));
                 return Ok(messageIds);
             }
             else if (request.RegulatorRole == RegulatorRole.Delegated)
@@ -72,7 +72,7 @@ public class ApplicationController : ControllerBase
                 CopyDelegatedUsersFromRequestToModel(request, model);
                 
                 var messageIds = _messagingService.DelegatedPersonRejected(model);
-                _logger.LogInformation("Email sent: {MessageIds}", messageIds);
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageIds));
                 return Ok(messageIds);
             }
         }

@@ -6,7 +6,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace EPR.RegulatorService.Facade.UnitTests.Enums
 {
     [TestClass]
-    public class EnumsTests
+    public class GuidExtenstionsTests
     {
         [TestMethod]
         public async Task CheckTheEnumeratedTypeReturn()

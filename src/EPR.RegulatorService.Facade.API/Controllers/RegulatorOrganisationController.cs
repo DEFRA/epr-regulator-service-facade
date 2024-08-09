@@ -29,7 +29,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         {
             var userId = User.UserId();
 
-            if (!GuidExtensions.ValidGuid(userId))
+            if (!userId.IsValidGuid())
             {
                 string logData = "UserId not available";
                 _logger.LogError("{Message}", logData);
@@ -53,8 +53,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
 
             var userId = User.UserId();
-
-            if (!GuidExtensions.ValidGuid(userId))
+            
+            if (!userId.IsValidGuid())
             {
                 string logError = "UserId not available";
                 _logger.LogError("{Message}", logError);

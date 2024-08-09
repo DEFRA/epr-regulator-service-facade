@@ -56,7 +56,7 @@ public class OrganisationsSearchController : ControllerBase
         {
             var userId = User.UserId();
 
-            if (!GuidExtensions.ValidGuid(userId))
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -91,7 +91,7 @@ public class OrganisationsSearchController : ControllerBase
         {
             var userId = User.UserId();
             
-            if (!GuidExtensions.ValidGuid(userId))
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -126,7 +126,7 @@ public class OrganisationsSearchController : ControllerBase
         {
             var userId = User.UserId();
             
-            if (!GuidExtensions.ValidGuid(userId))
+            if (!userId.IsValidGuid())
             {
                 _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -166,7 +166,7 @@ public class OrganisationsSearchController : ControllerBase
 
             var userId = User.UserId();
 
-            if (!GuidExtensions.ValidGuid(userId))
+            if (!userId.IsValidGuid())
             {
                 _logger.LogInformation("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);

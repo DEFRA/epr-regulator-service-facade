@@ -90,8 +90,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     }
                     else
                     {
-                        logData = string.Format("Get regulator organisation service failed: {0}", createdOrganisation).Replace('\n', '_');
-                        _logger.LogInformation("{Message}", logData);
+                        _logger.LogError("Get regulator organisation service failed: {0}", createdOrganisation);
                     }
                 }
 
@@ -154,8 +153,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
 
-            string logData = string.Format($"Attempting to fetch the users for organisation external id {0} from the backend", externalId);
-            _logger.LogInformation("{Message}", logData);
+            _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", externalId);
 
             var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
             {
