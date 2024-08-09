@@ -90,7 +90,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     }
                     else
                     {
-                        _logger.LogError("Get regulator organisation service failed: {0}", createdOrganisation);
+                        _logger.LogError("Get regulator organisation service failed: {CreatedOrganisation}", createdOrganisation);
                     }
                 }
 
