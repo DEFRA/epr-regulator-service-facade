@@ -76,8 +76,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error fetching {0} organisations by {1} on page {2}", currentPage, pageSize, searchTerm).Replace('\n', '_');
-            _logger.LogError(e, "{Message}", logData);
+            _logger.LogError(e, "Error fetching {PageSize} organisations by {SearchTerm} on page {CurrentPage}", pageSize, searchTerm, currentPage);
 
             return HandleError.Handle(e);
         }
@@ -106,7 +105,7 @@ public class OrganisationsSearchController : ControllerBase
                 return Ok(organisationDetails);
             }
 
-            _logger.LogInformation("Fetching organisation details for {ExternalId} resulted in unsuccessful request: {StatusCode}", externalId, response.StatusCode);
+            _logger.LogError("Fetching organisation details for {ExternalId} resulted in unsuccessful request: {StatusCode}", externalId, response.StatusCode);
 
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }

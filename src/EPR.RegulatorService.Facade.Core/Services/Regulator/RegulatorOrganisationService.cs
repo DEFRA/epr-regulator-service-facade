@@ -62,9 +62,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string logData = string.Format("Create regulator organisation name {0} service response is successful", request.Name);
-                    logData = logData.Replace('\n', '_');
-                    _logger.LogInformation("{Message}", logData);
+                    _logger.LogInformation("Create regulator organisation name {Name} service response is successful", request.Name);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
@@ -75,17 +73,13 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     if (createdOrganisation.IsSuccessStatusCode)
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
+                        _logger.LogInformation("Create regulator organisation name {0} service response is {1}", request.Name, content);
 
-                        logData = string.Format("Create regulator organisation name {0} service response is {1}", request.Name, content).Replace('\n', '_');
-                        _logger.LogInformation("{Message}", logData);
-                        
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
-                        logData = string.Format("Create regulator organisation name {0} service nation is {1}", request.Name, nationName).Replace('\n', '_');
-                        _logger.LogInformation("{Message}", logData);
-
+                        _logger.LogInformation("Create regulator organisation name {Name} service nation is {NationName}", request.Name, nationName);
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
