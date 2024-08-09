@@ -41,7 +41,7 @@ public class ProducerService : IProducerService
     {
         var url = string.Format($"{_config.Endpoints.GetOrganisationDetails}", userId, externalId);
 
-        _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
+        _logger.LogInformation("Attempting to fetch organisation details for organisation'{ExternalId}'", externalId);
 
         var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
         {
@@ -54,7 +54,7 @@ public class ProducerService : IProducerService
     {
         var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.RemovedConnectionExternalId, model.OrganisationId, model.PromotedPersonExternalId);
         
-        _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", model.RemovedConnectionExternalId);
+        _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", model.RemovedConnectionExternalId);
         
         return await _httpClient.PostAsJsonAsync(url, model);
     }

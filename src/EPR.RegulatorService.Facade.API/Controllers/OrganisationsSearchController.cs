@@ -210,9 +210,7 @@ public class OrganisationsSearchController : ControllerBase
         var invitedByUserEmail = User.Email();
         try
         {
-            Guid validUserId;
-
-            if ((!Guid.TryParse(invitedByUserId.ToString(), out validUserId)) || validUserId == Guid.Empty)
+            if (!invitedByUserId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
