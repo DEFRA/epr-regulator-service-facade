@@ -20,6 +20,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<INotificationClient> _notificationClientMock = new();
         private readonly NullLogger<MessagingService> _nullLogger = new();
+        private const string InvalidUserRecipient = "john.smith@gmail.com.com";
         private const string ApprovedUserRecipient = "john.smith@gmail.com";
         private const string ApprovedUserFirstName = "John";
         private const string ApprovedUserLastName = "Smith";
@@ -827,5 +828,50 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 
              Assert.ThrowsException<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
          }
+
+
+        [TestMethod]
+        public void Incorrect_Email_Causes_Exception()
+        {
+            // Arrange
+            var model = new ApplicationEmailModel
+            {
+                ApprovedPerson = new UserEmailModel()
+                {
+                    Email = InvalidUserRecipient,
+                    FirstName = ApprovedUserFirstName,
+                    LastName = ApprovedUserLastName
+                },
+                OrganisationName = "Wallace's Company",
+                OrganisationNumber = "123987345",
+                AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
+            };
+
+            var emailId = Guid.NewGuid().ToString();
+            _notificationClientMock.Setup(x => x.SendEmail(
+                    ApprovedUserRecipient,
+                    It.IsAny<string>(),
+                    It.IsAny<Dictionary<string, object>>(),
+                    null,
+                    null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailId });
+
+            var messagingConfig = Options.Create(new MessagingConfig());
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            // Act
+            string? approvedPersonAccepted = _sut.ApprovedPersonAccepted(model);
+
+            // Assert
+            _notificationClientMock.Verify(x => x.SendEmail(
+                InvalidUserRecipient,
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null), Times.Once);
+
+            approvedPersonAccepted.Should().Be(null);
+        }
     }
 }

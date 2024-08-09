@@ -1,9 +1,13 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
+
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -38,8 +42,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 }
 
                 var userId = User.UserId();
-
-                if (userId == default)
+                
+                if (!userId.IsValidGuid())
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -87,7 +91,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error when creating the invite regulator user for id {request.UserId}");
+                _logger.LogError(e, "Error when creating the invite regulator user for id {UserId}", request.UserId);
 
                 return HandleError.Handle(e);
             }
@@ -107,8 +111,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 }
 
                 var userId = User.UserId();
-
-                if (userId == default)
+                
+                if (!userId.IsValidGuid())
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -127,7 +131,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error when creating the enrollment for id {request.UserId}");
+                _logger.LogError(e, "Error when creating the invite regulator user for id {UserId}", request.UserId);
 
                 return HandleError.Handle(e);
             }
@@ -148,7 +152,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 var userId = User.UserId();
 
-                if (userId == default)
+                if (!userId.IsValidGuid())
                 {
                     _logger.LogError("UserId not available");
                     return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -170,7 +174,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError($"Error when retriving the invite regulator token for user {User.UserId()}");
+                _logger.LogError(e, "Error when retriving the invite regulator token for user {UserId}", User.UserId());
 
                 return HandleError.Handle(e);
             }

@@ -33,6 +33,8 @@ public class CommonDataServiceTests
         _configuration = Options.Create(new CommonDataApiConfig()
         {
             BaseUrl = BaseAddress,
+            Timeout = 0,
+            ServiceRetryCount = 0,
             Endpoints = new()
             {
                 GetPoMSubmissions = GetPoMSubmissions
@@ -97,6 +99,7 @@ public class CommonDataServiceTests
                 {
                     FileId = Guid.NewGuid(),
                     Decision = "Approved",
+                    Comments = "Test",
                     IsResubmissionRequired = false
                 }
             }
@@ -169,6 +172,7 @@ public class CommonDataServiceTests
                 new()
                 {
                     FileId = Guid.NewGuid(),
+                    Comments = "Test",
                     Decision = "Approved"
                 }
             }
@@ -203,6 +207,7 @@ public class CommonDataServiceTests
                 new()
                 {
                     FileId = Guid.NewGuid(),
+                    Comments = "Test",
                     Decision = "Approved"
                 }
             }

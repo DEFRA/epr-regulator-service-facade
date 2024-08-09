@@ -1,8 +1,9 @@
-using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Net.Http.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Producer;
 
@@ -28,24 +29,33 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
 
-        return await _httpClient.GetAsync(url);
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
     {
         var url = string.Format($"{_config.Endpoints.GetOrganisationDetails}", userId, externalId);
 
-        _logger.LogInformation("Attempting to fetch organisation details for organisation'{externalId}'", externalId);
+        _logger.LogInformation("Attempting to fetch organisation details for organisation'{ExternalId}'", externalId);
 
-        return await _httpClient.GetAsync(url);
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Path);
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
         var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.RemovedConnectionExternalId, model.OrganisationId, model.PromotedPersonExternalId);
         
-        _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", model.RemovedConnectionExternalId);
+        _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", model.RemovedConnectionExternalId);
         
         return await _httpClient.PostAsJsonAsync(url, model);
     }
-    
 }

@@ -3,6 +3,9 @@ using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
+using EPR.RegulatorService.Facade.Core.Helpers;
+using System.Drawing.Printing;
+using EPR.RegulatorService.Facade.Core.Extensions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -26,9 +29,10 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         {
             var userId = User.UserId();
 
-            if (userId == default)
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
+
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
@@ -48,14 +52,14 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             }
 
             var userId = User.UserId();
-
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 
-            _logger.LogInformation($"Creating the selected regulator organisation {request.Name}");
+            _logger.LogInformation("Creating the selected regulator organisation {Name}", request.Name);
 
             var response = await _regulatorOrganisationService.CreateRegulatorOrganisation(request);
 

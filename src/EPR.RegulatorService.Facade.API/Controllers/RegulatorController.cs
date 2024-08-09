@@ -5,6 +5,12 @@ using EPR.RegulatorService.Facade.API.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Applications.Users;
+using System.Drawing.Printing;
+using Azure.Core;
+using EPR.RegulatorService.Facade.Core.Helpers;
+using Notify.Models;
+using EPR.RegulatorService.Facade.Core.Extensions;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -26,7 +32,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -46,7 +53,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}");
+            _logger.LogError(e, "Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}", pageSize, organisationName, currentPage);
             return HandleError.Handle(e);
         }
     }
@@ -58,7 +65,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -78,7 +86,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching applications for organisation {organisationId}");
+            _logger.LogError(e, "Error fetching applications for organisation {organisationId}", organisationId);
+
             return HandleError.Handle(e);
         }
     }
@@ -90,7 +99,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -115,7 +125,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}");
+            _logger.LogError(e, "Error updating the enrolment {EnrollementId} by the user {UserId}", updateEnrolmentRequest.EnrolmentId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -127,7 +137,8 @@ public class RegulatorController :  ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -145,7 +156,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error transferring the organisation {request.OrganisationId} to {request.TransferNationId} by the user {User.UserId()}");
+            _logger.LogError(e, "Error transferring the organisation {organisationId} to {transferNationId} by the user {userId}", request.OrganisationId, request.TransferNationId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -159,7 +170,7 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             if (userId == Guid.Empty)
             {
-                _logger.LogError($"Unable to get the OId for the user when attempting to get organisation details");
+                _logger.LogError("Unable to get the OId for the user when attempting to get organisation details");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
             var response = await _applicationService.GetUserOrganisations(userId);
@@ -177,7 +188,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching the organisations list for the user");
+            _logger.LogError(e, "Failed to fetch the organisations list for the user");
             return HandleError.Handle(e);
         }
     }

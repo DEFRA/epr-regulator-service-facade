@@ -107,7 +107,26 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Producer
             response.Should().NotBeNull();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
-        
+
+        [TestMethod]
+        public async Task Should_return_empty_list_when_no_results_for_organisation_by_externalId()
+        {
+            // Arrange
+            var expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationDetails}";
+            SetupApiCall<OrganisationDetails>(0, expectedUrl);
+
+            // Act
+            var result =
+                await _sut.GetOrganisationDetails(_userId, _externalId);
+
+            // Assert
+            VerifyApiCall(expectedUrl, HttpMethod.Get);
+            var responseString = await result.Content.ReadAsStringAsync();
+
+            var organisation = JsonConvert.DeserializeObject<List<OrganisationDetails>>(responseString);
+            organisation.Count.Should().Be(0);
+        }
+
         private void SetupApiCall<T>(int itemCount, string expectedUrl)
         {
             var apiResponse = _fixture.CreateMany<T>(itemCount).ToList();

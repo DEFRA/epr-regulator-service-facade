@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -31,6 +31,10 @@
     <ItemGroup>
       <ProjectReference Include="..\EPR.RegulatorService.Facade.API\EPR.RegulatorService.Facade.API.csproj" />
       <ProjectReference Include="..\EPR.RegulatorService.Facade.Core\EPR.RegulatorService.Facade.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Helpers\" />
     </ItemGroup>
 
 
