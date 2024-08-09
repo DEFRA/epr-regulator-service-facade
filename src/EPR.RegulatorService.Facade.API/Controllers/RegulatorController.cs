@@ -125,7 +125,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error updating the enrolment {0} by the user {1}", updateEnrolmentRequest.EnrolmentId, User.UserId());
+            _logger.LogError(e, "Error updating the enrolment {EnrollementId} by the user {UserId}", updateEnrolmentRequest.EnrolmentId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -182,7 +182,7 @@ public class RegulatorController :  ControllerBase
             }
             else
             {
-                _logger.LogInformation("Failed to fetch the organisations list for the user {0}", userId);
+                _logger.LogInformation("Failed to fetch the organisations list for the user {userId}", userId);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }
