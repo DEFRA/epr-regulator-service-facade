@@ -130,8 +130,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             var url = $"{_config.Endpoints.GetRegulatorUsers}?userId={userId}&organisationId={organisationId}&getApprovedUsersOnly={true}";
 
-            string logData = string.Format($"Attempting to fetch the users for organisation id {0} from the backend", organisationId);
-            _logger.LogInformation("{Message}", logData);
+            _logger.LogInformation("Attempting to fetch the users for organisation id {OrganisationId} from the backend", organisationId);
 
             return await _httpClient.GetAsync(url);
         }

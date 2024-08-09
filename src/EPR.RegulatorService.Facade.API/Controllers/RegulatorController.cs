@@ -170,7 +170,7 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             if (userId == Guid.Empty)
             {
-                _logger.LogInformation("Unable to get the OId for the user when attempting to get organisation details");
+                _logger.LogError("Unable to get the OId for the user when attempting to get organisation details");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
             var response = await _applicationService.GetUserOrganisations(userId);
@@ -182,7 +182,7 @@ public class RegulatorController :  ControllerBase
             }
             else
             {
-                _logger.LogInformation("Failed to fetch the organisations list for the user {userId}", userId);
+                _logger.LogError("Failed to fetch the organisations list for the user {userId}", userId);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }

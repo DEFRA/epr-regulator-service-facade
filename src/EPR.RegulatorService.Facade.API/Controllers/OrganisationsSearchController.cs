@@ -111,8 +111,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            string logData = string.Format("Error fetching organisation details for {0}", externalId).Replace('\n', '_');
-            _logger.LogError(e, "{Message}", logData);
+            _logger.LogError(e, "Error fetching organisation details for {0}", externalId);
             return HandleError.Handle(e);
         }
     }
@@ -243,13 +242,7 @@ public class OrganisationsSearchController : ControllerBase
             };
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
-
-            string logData = String.Format("Email sent to Invited new approved person. Organisation external Id: {0} User: {1} {2}",
-                                request.OrganisationId,
-                                request.InvitedPersonFirstName,
-                                request.InvitedPersonLastName).Replace('\n', '_');
-
-            _logger.LogInformation("{Message}", logData);
+            _logger.LogInformation(@"Email sent to Invited new approved person. Organisation external Id: {OrganisationId} User: {InvitedPersonFirstName} {InvitedPersonLastName}", request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
