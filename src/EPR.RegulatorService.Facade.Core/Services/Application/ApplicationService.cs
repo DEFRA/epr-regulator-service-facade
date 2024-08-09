@@ -3,6 +3,7 @@ using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Net.Http.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
@@ -29,7 +30,12 @@ public class ApplicationService : IApplicationService
 
         var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
 
-        return await _httpClient.GetAsync(url);
+        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+        {
+            Path = url
+        };
+
+        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)

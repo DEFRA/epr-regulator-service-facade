@@ -31,9 +31,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
-#pragma warning disable S5144
             var response = await _httpClient.GetAsync($"{_config.Endpoints.GetRegulator}{nation}");
-#pragma warning enable S5144
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -119,7 +117,12 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(url);
+            var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
+            {
+                Path = url
+            };
+
+            return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
