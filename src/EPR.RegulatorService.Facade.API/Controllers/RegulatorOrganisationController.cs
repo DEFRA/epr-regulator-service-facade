@@ -31,8 +31,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
             if (!userId.IsValidGuid())
             {
-                string logData = "UserId not available";
-                _logger.LogError("{Message}", logData);
+                _logger.LogError("UserId not available");
 
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
@@ -56,8 +55,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
             
             if (!userId.IsValidGuid())
             {
-                string logError = "UserId not available";
-                _logger.LogError("{Message}", logError);
+                _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
 

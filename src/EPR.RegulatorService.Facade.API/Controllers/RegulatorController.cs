@@ -10,6 +10,7 @@ using Azure.Core;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using Notify.Models;
 using EPR.RegulatorService.Facade.Core.Extensions;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -52,8 +53,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = string.Format("Error fetching {0} Pending applications for organisation {1} on page {2}", pageSize, organisationName, currentPage).Replace('\n', '_');
-            _logger.LogError(e, "{Message}", logError);
+            _logger.LogError(e, "Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}", pageSize, organisationName, currentPage);
             return HandleError.Handle(e);
         }
     }
@@ -86,9 +86,8 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = $"Error fetching applications for organisation {organisationId}";
-            _logger.LogError(e, "{Message}", logError.Replace('\n', '_'));
-            
+            _logger.LogError(e, "Error fetching applications for organisation {organisationId}", organisationId);
+
             return HandleError.Handle(e);
         }
     }
@@ -126,8 +125,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = $"Error updating the enrolment {updateEnrolmentRequest.EnrolmentId} by the user {User.UserId()}";
-            _logger.LogError(e, "{Message}", logError.Replace('\n', '_'));
+            _logger.LogError(e, string.Format("Error updating the enrolment {0} by the user {1}", updateEnrolmentRequest.EnrolmentId, User.UserId()));
             return HandleError.Handle(e);
         }
     }
@@ -158,8 +156,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            string logError = string.Format($"Error transferring the organisation {0} to {1} by the user {2}", request.OrganisationId, request.TransferNationId, User.UserId());
-            _logger.LogError(e, "{Message}", logError.Replace('\n', '_'));
+            _logger.LogError(e, "Error transferring the organisation {0} to {1} by the user {2}", request.OrganisationId, request.TransferNationId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -173,31 +170,25 @@ public class RegulatorController :  ControllerBase
             var userId = User.UserId();
             if (userId == Guid.Empty)
             {
-                string logError = $"Unable to get the OId for the user when attempting to get organisation details";
-                _logger.LogInformation("{Message}", logError);
-
-
+                _logger.LogInformation("Unable to get the OId for the user when attempting to get organisation details");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
             var response = await _applicationService.GetUserOrganisations(userId);
 
             if (response.IsSuccessStatusCode)
             {
-                string logInfo = string.Format("Fetched the organisations list successfully for the user {0}", userId);
-                _logger.LogInformation("{Message}", logInfo.Replace('\n', '_'));
+                _logger.LogInformation("Fetched the organisations list successfully for the user {0}", userId);
                 return Ok(response.Content.ReadFromJsonAsync<UserOrganisationsListModel>().Result);
             }
             else
             {
-                string logInfo = string.Format("Failed to fetch the organisations list for the user {0}", userId);
-                _logger.LogInformation("{Message}", logInfo.Replace('\n', '_'));
+                _logger.LogInformation("Failed to fetch the organisations list for the user {0}", userId);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }
         catch (Exception e)
         {
-            string logError = "Error fetching the organisations list for the user";
-            _logger.LogError(e, "{Message}", logError.Replace('\n', '_'));
+            _logger.LogError(e, "Failed to fetch the organisations list for the user");
             return HandleError.Handle(e);
         }
     }
