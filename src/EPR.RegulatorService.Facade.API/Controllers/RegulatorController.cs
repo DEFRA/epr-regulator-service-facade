@@ -125,7 +125,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, string.Format("Error updating the enrolment {0} by the user {1}", updateEnrolmentRequest.EnrolmentId, User.UserId()));
+            _logger.LogError(e, "Error updating the enrolment {0} by the user {1}", updateEnrolmentRequest.EnrolmentId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -156,7 +156,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error transferring the organisation {0} to {1} by the user {2}", request.OrganisationId, request.TransferNationId, User.UserId());
+            _logger.LogError(e, "Error transferring the organisation {organisationId} to {transferNationId} by the user {userId}", request.OrganisationId, request.TransferNationId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -177,7 +177,7 @@ public class RegulatorController :  ControllerBase
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("Fetched the organisations list successfully for the user {0}", userId);
+                _logger.LogInformation("Fetched the organisations list successfully for the user {userId}", userId);
                 return Ok(response.Content.ReadFromJsonAsync<UserOrganisationsListModel>().Result);
             }
             else
