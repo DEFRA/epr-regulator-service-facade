@@ -111,7 +111,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching organisation details for {0}", externalId);
+            _logger.LogError(e, "Error fetching organisation details for {ExternalId}", externalId);
             return HandleError.Handle(e);
         }
     }
