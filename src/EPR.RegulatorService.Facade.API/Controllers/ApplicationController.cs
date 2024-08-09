@@ -5,6 +5,7 @@ using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using Microsoft.Extensions.Options;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
+using EPR.RegulatorService.Facade.Core.Exceptions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -76,7 +77,7 @@ public class ApplicationController : ControllerBase
             }
         }
 
-        throw new Exception("Invalid Request");
+        throw new RegulatorFacadeException("Invalid Request");
     }
 
     private static void CopyDelegatedUsersFromRequestToModel(GovNotificationRequestModel request, ApplicationEmailModel model)
