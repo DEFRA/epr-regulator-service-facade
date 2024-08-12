@@ -26,7 +26,7 @@ public class CommonDataService : ICommonDataService
             Path = _config.Endpoints.GetSubmissionEventsLastSyncTime
         };
 
-        return await _httpClient.GetAsync(uriBuilder.Path);
+        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
     }
 
     public async Task<HttpResponseMessage> GetPoMSubmissions(GetPomSubmissionsRequest pomSubmissionsRequest)

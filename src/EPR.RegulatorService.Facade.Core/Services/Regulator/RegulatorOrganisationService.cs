@@ -153,7 +153,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                 Path = url
             };
 
-            return await _httpClient.GetAsync(uriBuilder.Path);
+            return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)

@@ -34,7 +34,7 @@ public class ProducerService : IProducerService
             Path = url
         };
 
-        return await _httpClient.GetAsync(uriBuilder.Path);
+        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
@@ -48,7 +48,7 @@ public class ProducerService : IProducerService
             Path = url
         };
 
-        return await _httpClient.GetAsync(uriBuilder.Path);
+        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
