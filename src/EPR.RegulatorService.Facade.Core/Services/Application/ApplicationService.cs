@@ -3,6 +3,8 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
+using System.Text;
+using EPR.RegulatorService.Facade.Core.Models.Requests;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
 
@@ -67,5 +69,14 @@ public class ApplicationService : IApplicationService
         _logger.LogInformation("Attempting to fetch the organisations for user '{userId}'", userId);
 
         return await _httpClient.GetAsync(url);
+    }
+
+    public async Task<HttpResponseMessage> AcceptOrRejectUserDetailsChangeRequestAsync(ManageUserDetailsChangeRequest request)
+    {
+        var url = string.Format($"{_config.Endpoints.ManageUserDetailsChange}");
+
+        _logger.LogInformation("Regulator {userId} attempting to Accept Or Reject user details change request {enrolmentId}", request.RegulatorUserId, request.ChangeHistoryExternalId);
+
+        return await _httpClient.PostAsJsonAsync(url, request);
     }
 }

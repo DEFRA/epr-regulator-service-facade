@@ -29,8 +29,8 @@
         public string GetOrganisationsBySearchTerm { get; set; } = null!;
         public string GetUsersByOrganisationExternalId { get; set; } = null!;
         public string GetOrganisationDetails { get; set; } = null!;
-        public string RegulatorRemoveApprovedUser { get; set; } = null!;
-        
+        public string RegulatorRemoveApprovedUser { get; set; } = null!;    
         public string AddRemoveApprovedUser { get; set; } = null!;
+        public string ManageUserDetailsChange { get; private set; } = null!;
     }
 }

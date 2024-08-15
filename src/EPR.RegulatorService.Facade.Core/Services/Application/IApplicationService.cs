@@ -1,5 +1,6 @@
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
 
+using EPR.RegulatorService.Facade.Core.Models.Requests;
 using Models.Applications;
 
 public interface IApplicationService
@@ -13,4 +14,5 @@ public interface IApplicationService
     Task<HttpResponseMessage> TransferOrganisationNation(OrganisationTransferNationRequest request);
     
     Task<HttpResponseMessage> GetUserOrganisations(Guid userId);
+    Task<HttpResponseMessage> AcceptOrRejectUserDetailsChangeRequestAsync(ManageUserDetailsChangeRequest request);
 }
