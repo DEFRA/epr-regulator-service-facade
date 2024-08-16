@@ -11,6 +11,7 @@ using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext
 using Notify.Models;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
+using System.Text.RegularExpressions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -200,35 +201,40 @@ public class RegulatorController :  ControllerBase
     {
         try
         {
+            if (request == null || request.ChangeHistoryExternalId == default || (!request.HasRegulatorAccepted && string.IsNullOrEmpty(request.RegulatorComment)))
+                return Problem(statusCode: StatusCodes.Status400BadRequest, title: $"user change details accept or reject request is not valid", type: "user-change-details-accept-reject-empty");
+            var userId = User.UserId();
+            if (userId == default)
+            {
+                _logger.LogError("UserId not available");
+                return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
+            }
+            request.UserId = userId;
             var response = await _applicationService.AcceptOrRejectUserDetailsChangeRequestAsync(request);
             if (response.IsSuccessStatusCode)
             {
+                _logger.LogInformation($"Accept Or Reject User Details Change Request for externalId {request.ChangeHistoryExternalId} is success");
                 var responseContent = await response.Content.ReadFromJsonAsync<RegulatorUserDetailsUpdateResponse>();
-                if (responseContent.HasUserDetailsAcceptedOrRejected && responseContent.ChangeHistory != null)
+                if ((responseContent.HasUserDetailsChangeAccepted || responseContent.HasUserDetailsChangeRejected) && responseContent.ChangeHistory != null)
                 {
-                    _logger.LogInformation($"Accept Or Reject User Details Change Request for externalId {request.ChangeHistoryExternalId} is success");
                     try
                     {
                         var ch = responseContent.ChangeHistory;
                         var notifyEmailInput = new UserDetailsChangeNotificationEmailInput()
                         {
                             Nation = ch.Nation,
-                            ExternalIdReference = ch.ExternalId,
                             ContactEmailAddress = ch.EmailAddress,
-                            ContactTelephone = ch.Telephone,
-                            OrganisationName = ch.OrganisationName,
-                            OrganisationNumber = ch.OrganisationNumber,
                             NewFirstName = ch.NewValues.FirstName,
                             NewLastName = ch.NewValues.LastName,
                             NewJobTitle = ch.NewValues.JobTitle,
                             OldFirstName = ch.OldValues.FirstName,
                             OldLastName = ch.OldValues.LastName,
-                            OldJobTitle = ch.OldValues.JobTitle
+                            OldJobTitle = ch.OldValues.JobTitle,
+                            RejectionComment = ch.ApproverComments
                         };
-
-                        var notificationId = _messagingService.SendAcceptRejectUserDetailChangeEmailToEprUser(notifyEmailInput);
-
-                        _logger.LogInformation("Send accept reject user Detail change notification email {notificationId} to EprUser sent successfully", notificationId);
+                        if (responseContent.HasUserDetailsChangeAccepted)
+                            _messagingService.SendAcceptedUserDetailChangeEmail(notifyEmailInput);
+                        else _messagingService.SendRejectedUserDetailChangeEmail(notifyEmailInput);
                     }
                     catch (Exception ex)
                     {

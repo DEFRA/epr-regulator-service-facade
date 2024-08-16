@@ -24,6 +24,7 @@ public class MessagingConfig
     public string PromotedApprovedUserTemplateId { get; set; } = string.Empty;
     public string InviteNewApprovedPersonTemplateId { get; set; } = string.Empty;
     public string AccountCreationUrl { get; set; } = string.Empty;
-    public string UserDetailChangeRequestTemplateId { get; set; } = string.Empty;
-    
+    public string UserDetailChangeAcceptedTemplateId { get; set; } = string.Empty;
+    public string UserDetailChangeRejectedTemplateId { get; set; } = string.Empty;
+
 }

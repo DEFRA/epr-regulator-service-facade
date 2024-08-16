@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Messaging;
 
@@ -313,38 +314,6 @@ public class MessagingService : IMessagingService
         return response.id;
     }
 
-    public string? SendAcceptRejectUserDetailChangeEmailToEprUser(UserDetailsChangeNotificationEmailInput input)
-    {
-        var parameters = new Dictionary<string, object>();
-        parameters.Add("firstName", input.OldFirstName);
-        parameters.Add("lastName", input.OldLastName);
-        parameters.Add("organisationName", input.OrganisationName);
-        parameters.Add("organisationNumber", input.OrganisationNumber);
-        parameters.Add("jobTitle", input.OldJobTitle);
-        parameters.Add("updatedfirstName", input.NewFirstName);
-        parameters.Add("updatedlastName", input.NewLastName);
-        parameters.Add("updatedjobTitle", input.NewJobTitle);
-        parameters.Add("email", input.ContactEmailAddress);
-        parameters.Add("telephoneNumber", input.ContactTelephone);
-        parameters.Add("externalId", input.ExternalIdReference);
-
-        var templateId = _messagingConfig.UserDetailChangeRequestTemplateId;
-
-        var recipient = GetEprPackagingRegulatorEmail(input.Nation);
-
-        string? notificationId = null;
-        try
-        {
-            var response = _notificationClient.SendEmail(recipient, templateId, parameters);
-            notificationId = response.id;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, ExceptionLogMessage, input.OrganisationNumber, $"{input.OldFirstName} {input.OldLastName}", templateId);
-        }
-        return notificationId;
-    }
-
     private void Validate(AddRemoveNewApprovedPersonEmailModel model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
@@ -452,5 +421,48 @@ public class MessagingService : IMessagingService
             _logger.LogError(ex, "Regular Expression timeout out {Nation}", nation);
             throw new ArgumentException("Nation not valid");
         }
+    }
+
+    public string? SendAcceptedUserDetailChangeEmail(UserDetailsChangeNotificationEmailInput input)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("firstName", input.NewFirstName);
+        parameters.Add("lastName", input.NewLastName);
+        var templateId = _messagingConfig.UserDetailChangeAcceptedTemplateId;
+        // var regulatorEmail = GetEprPackagingRegulatorEmail(input.Nation);
+        string? notificationId = null;
+        try
+        {
+            var response = _notificationClient.SendEmail(input.ContactEmailAddress, templateId, parameters);
+            notificationId = response.id;
+            _logger.LogInformation("Accepted user detail change notification email {notificationId} to user sent successfully", notificationId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ExceptionLogMessage, input.OrganisationNumber, $"{input.OldFirstName} {input.OldLastName}", templateId);
+        }
+        return notificationId;
+    }
+
+    public string? SendRejectedUserDetailChangeEmail(UserDetailsChangeNotificationEmailInput input)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("firstName", input.OldFirstName);
+        parameters.Add("lastName", input.OldLastName);
+        parameters.Add("rejection reason", input.RejectionComment);
+        var templateId = _messagingConfig.UserDetailChangeRejectedTemplateId;
+        // var regulatorEmail = GetEprPackagingRegulatorEmail(input.Nation);
+        string? notificationId = null;
+        try
+        {
+            var response = _notificationClient.SendEmail(input.ContactEmailAddress, templateId, parameters);
+            notificationId = response.id;
+            _logger.LogInformation("rejection user detail change notification email {notificationId} to user sent successfully", notificationId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ExceptionLogMessage, input.OrganisationNumber, $"{input.OldFirstName} {input.OldLastName}", templateId);
+        }
+        return notificationId;
     }
 }

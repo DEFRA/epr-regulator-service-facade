@@ -59,7 +59,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             _sut.ApprovedPersonAccepted(model);
@@ -92,8 +93,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailId});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             string? approvedPersonAccepted = _sut.ApprovedPersonAccepted(model);
@@ -146,7 +147,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             _sut.ApprovedPersonRejected(model);
@@ -180,8 +182,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.ApprovedPersonRejected(model);
@@ -226,7 +228,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             _sut.DelegatedPersonAccepted(model);
@@ -248,7 +251,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             _sut.DelegatedPersonAccepted(applicationEmailModel);
@@ -282,8 +286,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.DelegatedPersonAccepted(model);
@@ -337,7 +341,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             _sut.DelegatedPersonRejected(model);
@@ -371,8 +376,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.DelegatedPersonRejected(model);
@@ -410,8 +415,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.SubmissionAccepted(model, EventType.RegulatorPoMDecision);
@@ -449,8 +454,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.SubmissionAccepted(model, EventType.RegulatorRegistrationDecision);
@@ -490,8 +495,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.SubmissionRejected(model, true);
@@ -530,8 +535,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.SubmissionRejected(model, null);
@@ -570,8 +575,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
 
             var messagingConfig = Options.Create(new MessagingConfig());
-
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             var emailIds = _sut.SubmissionRejected(model, false);
@@ -611,7 +616,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
-            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
             // Act
             _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType );
@@ -644,7 +650,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              };
 
              var messagingConfig = Options.Create(new MessagingConfig());
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
              // Act
              _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType );
@@ -675,8 +682,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                  .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
 
              var messagingConfig = Options.Create(new MessagingConfig());
-
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
              // Act
              var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "RemovedApprovedUser");
@@ -716,8 +723,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                  .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
 
              var messagingConfig = Options.Create(new MessagingConfig());
-
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
              // Act
              var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "DemotedDelegatedUsed");
@@ -761,8 +768,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
              {
                  InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
              });
-
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
              // Act
              var notificationId = _sut.SendEmailToInvitedNewApprovedPerson(model);
@@ -822,8 +829,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                  {
                      InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
                  });
-
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
 
              Assert.ThrowsException<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
          }

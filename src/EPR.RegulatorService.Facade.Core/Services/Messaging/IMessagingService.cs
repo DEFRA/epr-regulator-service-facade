@@ -14,5 +14,6 @@ public interface IMessagingService
     List<string> SubmissionRejected(SubmissionEmailModel model, bool? resubmissionRequired);
     string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model);
     string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, string notificationType);
-    string? SendAcceptRejectUserDetailChangeEmailToEprUser(UserDetailsChangeNotificationEmailInput input);
+    string? SendAcceptedUserDetailChangeEmail(UserDetailsChangeNotificationEmailInput input);
+    string? SendRejectedUserDetailChangeEmail(UserDetailsChangeNotificationEmailInput input);
 }

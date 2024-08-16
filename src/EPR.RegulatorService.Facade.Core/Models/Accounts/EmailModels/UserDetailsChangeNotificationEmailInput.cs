@@ -14,7 +14,10 @@ public class UserDetailsChangeNotificationEmailInput
     public string OldJobTitle { get; set; } = default!;
     public string OrganisationName { get; set; } = default!;
     public string OrganisationNumber { get; set; } = default!;
+    public string? RejectionComment { get; set; } = default!;
     public Guid ExternalIdReference { get; set; }
     public string? ContactTelephone { get; set; } = default!;
     public string? ContactEmailAddress { get; set; } = default!;
+    public string? RegulatorEmailAddress { get; set; } = default!;
+    
 }

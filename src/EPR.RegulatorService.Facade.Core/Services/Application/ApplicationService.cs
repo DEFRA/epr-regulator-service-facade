@@ -75,7 +75,7 @@ public class ApplicationService : IApplicationService
     {
         var url = string.Format($"{_config.Endpoints.ManageUserDetailsChange}");
 
-        _logger.LogInformation("Regulator {userId} attempting to Accept Or Reject user details change request {enrolmentId}", request.RegulatorUserId, request.ChangeHistoryExternalId);
+        _logger.LogInformation("Regulator {userId} attempting to Accept Or Reject user details change request {enrolmentId}", request.UserId, request.ChangeHistoryExternalId);
 
         return await _httpClient.PostAsJsonAsync(url, request);
     }

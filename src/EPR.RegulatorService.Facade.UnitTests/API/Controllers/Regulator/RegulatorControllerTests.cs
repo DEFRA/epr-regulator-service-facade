@@ -2,6 +2,7 @@ using System.Net;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Services.Application;
+using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
     {
         private readonly NullLogger<RegulatorController> _nullLogger = new();
         private readonly Mock<IApplicationService> _mockRegulatorService = new();
+        private readonly Mock<IMessagingService> _messagingServiceMock = new();
         private RegulatorController _sut;
 
         private readonly Guid _oid = Guid.NewGuid();
@@ -28,7 +30,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
         [TestInitialize]
         public void Setup()
         {
-            _sut = new RegulatorController(_nullLogger, _mockRegulatorService.Object);
+            _sut = new RegulatorController(_nullLogger, _mockRegulatorService.Object, _messagingServiceMock.Object);
             _sut.AddDefaultContextWithOid(_oid, "TestAuth");
         }
 

@@ -7,7 +7,8 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses;
 [ExcludeFromCodeCoverage]
 public class RegulatorUserDetailsUpdateResponse
 {
-    public bool HasUserDetailsAcceptedOrRejected { get; set; } = false;
+    public bool HasUserDetailsChangeAccepted { get; set; } = false;
+    public bool HasUserDetailsChangeRejected { get; set; } = false;
 
     public ChangeHistoryModel? ChangeHistory { get; set; }
 }
