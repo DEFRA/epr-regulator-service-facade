@@ -878,6 +878,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     It.IsAny<string>(),
                     It.IsAny<Dictionary<string, object>>(),
                     null,
+                    null,
                     null))
                 .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailId });
 
@@ -893,6 +894,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 InvalidUserRecipient,
                 It.IsAny<string>(),
                 It.IsAny<Dictionary<string, object>>(),
+                null,
                 null,
                 null), Times.Once);
 
