@@ -66,8 +66,9 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<PaginatedResponse<OrganisationSearchResult>>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(result);
             }
             
@@ -100,8 +101,9 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var organisationDetails = JsonSerializer.Deserialize<OrganisationDetailResults>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(organisationDetails);
             }
 
@@ -134,8 +136,9 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<List<OrganisationUserOverviewResponseModel>>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(result);
             }
 
@@ -173,9 +176,10 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<AssociatedPersonResults[]>(
                     stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
 
                 if (result.Length > 0)
                 {

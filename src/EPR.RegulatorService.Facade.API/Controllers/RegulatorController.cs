@@ -43,8 +43,9 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationEnrolments>>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(paginatedResponse);
             }
 
@@ -76,8 +77,9 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<ApplicationEnrolmentDetailsResponse>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(result);
             }
 

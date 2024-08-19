@@ -3,12 +3,12 @@ ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
 
 FROM defradigital/dotnetcore-development:dotnet8.0 AS build
-COPY --chmod=644 ["EPR.RegulatorService.Facade.API/EPR.RegulatorService.Facade.API.csproj", "EPR.RegulatorService.Facade.API/"]
-COPY --chmod=644 ["EPR.RegulatorService.Facade.Core/EPR.RegulatorService.Facade.Core.csproj", "EPR.RegulatorService.Facade.Core/"]
+COPY --chown=dotnet:dotnet --chmod=644 ["EPR.RegulatorService.Facade.API/EPR.RegulatorService.Facade.API.csproj", "EPR.RegulatorService.Facade.API/"]
+COPY --chown=dotnet:dotnet --chmod=644 ["EPR.RegulatorService.Facade.Core/EPR.RegulatorService.Facade.Core.csproj", "EPR.RegulatorService.Facade.Core/"]
 RUN dotnet restore "EPR.RegulatorService.Facade.API/EPR.RegulatorService.Facade.API.csproj"
 
-COPY --chmod=644 EPR.RegulatorService.Facade.API/. ./EPR.RegulatorService.Facade.API/.
-COPY --chmod=644 EPR.RegulatorService.Facade.Core/. ./EPR.RegulatorService.Facade.Core/.
+COPY --chown=dotnet:dotnet --chmod=644 EPR.RegulatorService.Facade.API/. ./EPR.RegulatorService.Facade.API/.
+COPY --chown=dotnet:dotnet --chmod=644 EPR.RegulatorService.Facade.Core/. ./EPR.RegulatorService.Facade.Core/.
 
 WORKDIR "/home/dotnet/EPR.RegulatorService.Facade.API"
 RUN dotnet build "EPR.RegulatorService.Facade.API.csproj" -c Release -o /home/dotnet/build

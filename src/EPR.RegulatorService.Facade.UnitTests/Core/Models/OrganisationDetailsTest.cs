@@ -46,8 +46,9 @@ public class OrganisationDetailsTest
         }";
 
         //Act
+        var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
         var deserialized = JsonSerializer.Deserialize<OrganisationDetailResults>(sampleInput,
-            new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+            options);
 
         //Assert
         deserialized.CompanyUserInformation.Should().NotBeEmpty();
