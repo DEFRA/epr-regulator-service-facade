@@ -109,7 +109,7 @@ public static class HttpClientServiceCollectionExtension
         return services;
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(int retryCount)
+    private static Polly.Retry.AsyncRetryPolicy<HttpResponseMessage> GetRetryPolicy(int retryCount)
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
