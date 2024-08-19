@@ -21,8 +21,12 @@ public class RegulatorFacadeException : Exception
     {
     }
 
+// Disable the warning.
+#pragma warning disable SYSLIB0051
     protected RegulatorFacadeException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
     }
+// Re-enable the warning.
+#pragma warning restore SYSLIB0051
 }
