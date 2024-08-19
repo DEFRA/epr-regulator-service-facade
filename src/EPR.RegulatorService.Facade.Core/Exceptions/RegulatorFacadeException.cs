@@ -20,9 +20,4 @@ public class RegulatorFacadeException : Exception
         : base(message, inner)
     {
     }
-
-    protected RegulatorFacadeException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
 }
