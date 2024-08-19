@@ -7,6 +7,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Models;
 [TestClass]
 public class OrganisationDetailsTest
 {
+    private readonly JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+
     [TestMethod]
     public void OrganisationDetailsCanBeDeserialized()
     {
@@ -46,7 +48,6 @@ public class OrganisationDetailsTest
         }";
 
         //Act
-        var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
         var deserialized = JsonSerializer.Deserialize<OrganisationDetailResults>(sampleInput,
             options);
 

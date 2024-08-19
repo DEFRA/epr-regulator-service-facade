@@ -18,6 +18,7 @@ public class RegulatorController :  ControllerBase
 {
     private readonly ILogger<RegulatorController> _logger;
     private readonly IApplicationService _applicationService;
+    private readonly JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
 
     public RegulatorController(ILogger<RegulatorController> logger, IApplicationService applicationService)
     {
@@ -43,7 +44,6 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationEnrolments>>(stringContent,
                     options);
                 return Ok(paginatedResponse);
@@ -77,7 +77,6 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<ApplicationEnrolmentDetailsResponse>(stringContent,
                     options);
                 return Ok(result);
