@@ -33,7 +33,7 @@ public class OrganisationsSearchController : ControllerBase
     private readonly MessagingConfig _messagingConfig;
     private readonly IMessagingService _messagingService;
     private readonly JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-
+    
     public OrganisationsSearchController(
         ILogger<OrganisationsSearchController> logger,
         IProducerService producerService,
@@ -101,7 +101,7 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+                
                 var organisationDetails = JsonSerializer.Deserialize<OrganisationDetailResults>(stringContent,
                     options);
                 return Ok(organisationDetails);
@@ -136,7 +136,6 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<List<OrganisationUserOverviewResponseModel>>(stringContent,
                     options);
                 return Ok(result);
@@ -176,7 +175,6 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 var result = JsonSerializer.Deserialize<AssociatedPersonResults[]>(
                     stringContent,
                     options);
