@@ -30,12 +30,7 @@ public class ApplicationService : IApplicationService
 
         var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
 
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-        {
-            Path = url
-        };
-
-        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+        return await _httpClient.GetAsync(FormatURL(url));
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -44,7 +39,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {OrganisationId}", organisationId);
 
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(FormatURL(url));
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
@@ -53,7 +48,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("User {UserId} attempting to update the enrolment {EnrolmentId}", request.UserId, request.EnrolmentId);
 
-        return await _httpClient.PostAsJsonAsync(url, request);
+        return await _httpClient.PostAsJsonAsync(FormatURL(url), request);
     }
 
     public async Task<HttpResponseMessage> TransferOrganisationNation(OrganisationTransferNationRequest request)
@@ -63,7 +58,7 @@ public class ApplicationService : IApplicationService
         _logger.LogInformation("User {UserId} attempting to transfer the organisation {OrganisationId} to {NationName}",
              request.UserId, request.OrganisationId, request.TransferNationId);
 
-        return await _httpClient.PostAsJsonAsync(url, request);
+        return await _httpClient.PostAsJsonAsync(FormatURL(url), request);
     }
 
     public async Task<HttpResponseMessage> GetUserOrganisations(Guid userId)
@@ -72,6 +67,22 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch the organisations for user '{UserId}'", userId);
 
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(FormatURL(url));
+    }
+
+    private string FormatURL(string url)
+    {
+        UriBuilder uriBuilder = new UriBuilder(_httpClient.BaseAddress);
+
+        if (_httpClient.BaseAddress.ToString().ToLower().Contains("api"))
+        {
+            uriBuilder.Path = _httpClient.BaseAddress.AbsolutePath + "/" + url;
+            return uriBuilder.Uri.LocalPath;
+        }
+        else
+        {
+            uriBuilder.Path = url;
+            return uriBuilder.Uri.LocalPath;
+        }
     }
 }
