@@ -73,8 +73,7 @@ public class ApplicationService : IApplicationService
     private string FormatURL(string url)
     {
         UriBuilder uriBuilder = new UriBuilder(_httpClient.BaseAddress);
-
-        if (_httpClient.BaseAddress.ToString().ToLower().Contains("api"))
+        if (_httpClient.BaseAddress.ToString().Contains("api"))
         {
             uriBuilder.Path = _httpClient.BaseAddress.AbsolutePath + "/" + url;
             return uriBuilder.Uri.LocalPath;
