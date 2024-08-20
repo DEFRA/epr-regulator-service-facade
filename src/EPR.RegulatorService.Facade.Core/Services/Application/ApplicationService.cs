@@ -3,8 +3,7 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
-using System.Text;
-using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Accounts;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
 
@@ -71,12 +70,30 @@ public class ApplicationService : IApplicationService
         return await _httpClient.GetAsync(url);
     }
 
-    public async Task<HttpResponseMessage> AcceptOrRejectUserDetailsChangeRequestAsync(ManageUserDetailsChangeRequest request)
+    public async Task<HttpResponseMessage> AcceptOrRejectUserDetailChangeRequestAsync(UpdateUserDetailRequest request)
     {
-        var url = string.Format($"{_config.Endpoints.ManageUserDetailsChange}");
+        var url = string.Format($"{_config.Endpoints.ApproveOrRejectChangeRequest}");
 
         _logger.LogInformation("Regulator {userId} attempting to Accept Or Reject user details change request {enrolmentId}", request.UserId, request.ChangeHistoryExternalId);
 
         return await _httpClient.PostAsJsonAsync(url, request);
+    }
+
+    public async Task<HttpResponseMessage> GetPendingUserDetailChangeRequestsAsync(Guid userId, int currentPage, int pageSize, string organisationName, string applicationType)
+    {
+        var url = string.Format($"{_config.Endpoints.PendingUserDetailChangeRequests}", userId, currentPage, pageSize, organisationName, applicationType);
+
+        _logger.LogInformation("Attempting to fetch pending user detail change requests from the backend");
+
+        return await _httpClient.GetAsync(url);
+    }
+
+    public async Task<HttpResponseMessage> GetUserDetailChangeRequestAsync(Guid externalId)
+    {
+        var url = string.Format($"{_config.Endpoints.GetUserDetailChangeRequest}?externalId={externalId}");
+
+        _logger.LogInformation("Attempting to fetch user detail change request for externalId '{externalId}'", externalId);
+
+        return await _httpClient.GetAsync(url);
     }
 }

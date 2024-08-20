@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using EPR.RegulatorService.Facade.Core.Models.Applications;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Accounts;
 
@@ -40,5 +41,11 @@ public class ChangeHistoryModel
     public string? Telephone { get; set; }
 
     public string? EmailAddress { get; set; }
+
+    public string OrganisationType { get; set; }
+    public string OrganisationReferenceNumber { get; set; }
+    public string CompaniesHouseNumber { get; set; }
+
+    public AddressModel BusinessAddress { get; set; }
 
 }

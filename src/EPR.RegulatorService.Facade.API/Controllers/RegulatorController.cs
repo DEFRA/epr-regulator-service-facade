@@ -12,6 +12,7 @@ using Notify.Models;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using System.Text.RegularExpressions;
+using EPR.RegulatorService.Facade.Core.Models.Accounts;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -197,7 +198,7 @@ public class RegulatorController :  ControllerBase
     [Route("api/accounts/manage-user-changes")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AcceptOrRejectUserDetailsChangeRequest([FromBody] ManageUserDetailsChangeRequest request)
+    public async Task<IActionResult> AcceptOrRejectUserDetailsChangeRequest([FromBody] UpdateUserDetailsRequest request)
     {
         try
         {
@@ -209,8 +210,13 @@ public class RegulatorController :  ControllerBase
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
-            request.UserId = userId;
-            var response = await _applicationService.AcceptOrRejectUserDetailsChangeRequestAsync(request);
+
+            var response = await _applicationService.AcceptOrRejectUserDetailChangeRequestAsync(new UpdateUserDetailRequest {
+                UserId = userId,
+                ChangeHistoryExternalId = request.ChangeHistoryExternalId,
+                HasRegulatorAccepted = request.HasRegulatorAccepted,
+                RegulatorComment = request.RegulatorComment
+            });
             if (response.IsSuccessStatusCode)
             {
                 _logger.LogInformation($"Accept Or Reject User Details Change Request for externalId {request.ChangeHistoryExternalId} is success");
@@ -253,6 +259,70 @@ public class RegulatorController :  ControllerBase
         {
             _logger.LogError($"Error in Accept Or Reject User Details Change Request for externalId {request.ChangeHistoryExternalId}");
             return HandleError.Handle(exception);
+        }
+    }
+
+    [HttpGet]
+    [Route("api/accounts/pending-user-change-requests")]
+    public async Task<IActionResult> PendingUserChangeRequests(int currentPage, int pageSize, string organisationName, string applicationType)
+    {
+        try
+        {
+            var userId = User.UserId();
+            if (userId == default)
+            {
+                _logger.LogError("UserId not available");
+                return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
+            }
+
+            var response = await _applicationService.GetPendingUserDetailChangeRequestsAsync(userId, currentPage, pageSize, organisationName, applicationType);
+            if (response.IsSuccessStatusCode)
+            {
+                var stringContent = await response.Content.ReadAsStringAsync();
+                var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationEnrolments>>(stringContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return Ok(paginatedResponse);
+            }
+
+            _logger.LogError("Failed to fetch pending applications");
+            return HandleError.HandleErrorWithStatusCode(response.StatusCode);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}");
+            return HandleError.Handle(e);
+        }
+    }
+
+    [HttpGet]
+    [Route("api/accounts/{externalId}/pending-user-change")]
+    public async Task<IActionResult> GetUserDetailChangeRequest(Guid externalId)
+    {
+        try
+        {
+            var userId = User.UserId();
+            if (userId == default)
+            {
+                _logger.LogError("UserId not available");
+                return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
+            }
+
+            var response = await _applicationService.GetOrganisationPendingApplications(userId, externalId);
+            if (response.IsSuccessStatusCode)
+            {
+                var stringContent = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<ApplicationEnrolmentDetailsResponse>(stringContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return Ok(result);
+            }
+
+            _logger.LogError("Failed to fetch pending applications");
+            return HandleError.HandleErrorWithStatusCode(response.StatusCode);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Error fetching applications for organisation {externalId}");
+            return HandleError.Handle(e);
         }
     }
 }

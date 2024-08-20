@@ -2,10 +2,9 @@
 
 namespace EPR.RegulatorService.Facade.Core.Models.Requests;
 [ExcludeFromCodeCoverage]
-public class ManageUserDetailsChangeRequest
+public class UpdateUserDetailsRequest
 {
-    public Guid UserId { get; set; }
-
+  
     public Guid ChangeHistoryExternalId { get; set; }
 
     public bool HasRegulatorAccepted { get; set; } = false;
