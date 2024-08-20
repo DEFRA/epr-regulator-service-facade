@@ -274,22 +274,21 @@ public class RegulatorController :  ControllerBase
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
-
             var response = await _applicationService.GetPendingUserDetailChangeRequestsAsync(userId, currentPage, pageSize, organisationName, applicationType);
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationEnrolments>>(stringContent,
+                var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationUserDetailChangeRequest>>(stringContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 return Ok(paginatedResponse);
             }
 
-            _logger.LogError("Failed to fetch pending applications");
+            _logger.LogError("Failed to fetch pending User Detail Change Requests");
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}");
+            _logger.LogError(e, $"Error fetching {pageSize} Pending User Detail Change Requests for organisation {organisationName} on page {currentPage}");
             return HandleError.Handle(e);
         }
     }
