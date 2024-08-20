@@ -3,6 +3,8 @@ ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
 
 FROM defradigital/dotnetcore-development:dotnet8.0 AS build
+USER root
+
 COPY ["EPR.RegulatorService.Facade.API/EPR.RegulatorService.Facade.API.csproj", "EPR.RegulatorService.Facade.API/"]
 COPY ["EPR.RegulatorService.Facade.Core/EPR.RegulatorService.Facade.Core.csproj", "EPR.RegulatorService.Facade.Core/"]
 RUN dotnet restore "EPR.RegulatorService.Facade.API/EPR.RegulatorService.Facade.API.csproj"
