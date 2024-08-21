@@ -44,8 +44,9 @@ public class ChangeHistoryModel
 
     public string OrganisationType { get; set; }
     public string OrganisationReferenceNumber { get; set; }
-    public string CompaniesHouseNumber { get; set; }
 
     public AddressModel BusinessAddress { get; set; }
+
+    public string? ServiceRole { get; set; }
 
 }

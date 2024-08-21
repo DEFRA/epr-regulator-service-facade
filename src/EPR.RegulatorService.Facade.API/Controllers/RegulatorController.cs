@@ -8,10 +8,8 @@ using EPR.RegulatorService.Facade.Core.Models.Applications.Users;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
-using Notify.Models;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
-using System.Text.RegularExpressions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
@@ -274,22 +272,21 @@ public class RegulatorController :  ControllerBase
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
             }
-
             var response = await _applicationService.GetPendingUserDetailChangeRequestsAsync(userId, currentPage, pageSize, organisationName, applicationType);
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationEnrolments>>(stringContent,
+                var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationUserDetailChangeRequest>>(stringContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 return Ok(paginatedResponse);
             }
 
-            _logger.LogError("Failed to fetch pending applications");
+            _logger.LogError("Failed to fetch pending User Detail Change Requests");
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}");
+            _logger.LogError(e, $"Error fetching {pageSize} Pending User Detail Change Requests for organisation {organisationName} on page {currentPage}");
             return HandleError.Handle(e);
         }
     }
@@ -311,7 +308,7 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ApplicationEnrolmentDetailsResponse>(stringContent,
+                var result = JsonSerializer.Deserialize<ChangeHistoryModel>(stringContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 return Ok(result);
             }

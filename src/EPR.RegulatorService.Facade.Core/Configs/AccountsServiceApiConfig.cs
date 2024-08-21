@@ -31,9 +31,9 @@
         public string GetOrganisationDetails { get; set; } = null!;
         public string RegulatorRemoveApprovedUser { get; set; } = null!;    
         public string AddRemoveApprovedUser { get; set; } = null!;
-        public string PendingUserDetailChangeRequests { get; private set; } = null!;
-        public string GetUserDetailChangeRequest { get; private set; } = null!;
-        public string ApproveOrRejectChangeRequest { get; private set; } = null!;
+        public string PendingUserDetailChangeRequests { get; set; } = null!;
+        public string GetUserDetailChangeRequest { get; set; } = null!;
+        public string ApproveOrRejectChangeRequest { get; set; } = null!;
 
         
 
