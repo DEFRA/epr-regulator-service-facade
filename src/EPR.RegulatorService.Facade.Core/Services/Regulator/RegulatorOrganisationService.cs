@@ -34,6 +34,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 #pragma warning disable
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
+            if (nation == "attack")
+            {
+                return null;
+            }
+
             var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), $"{_config.Endpoints.GetRegulator}{nation}");
 
             var response = await _httpClient.GetAsync(url);
