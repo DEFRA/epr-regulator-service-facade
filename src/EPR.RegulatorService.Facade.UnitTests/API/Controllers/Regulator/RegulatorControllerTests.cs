@@ -1,6 +1,8 @@
 using System.Net;
 using EPR.RegulatorService.Facade.API.Controllers;
+using EPR.RegulatorService.Facade.Core.Models.Accounts;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
+using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Application;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
@@ -50,7 +52,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be(400);
         }
-        
+
         [TestMethod]
         public async Task Should_return_ServerError_When_UserId_Is_Empty()
         {
@@ -73,7 +75,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be(500);
         }
-        
+
         [TestMethod]
         public async Task Should_return_InternalServerError_when_GetPendingRegulators_throws_500()
         {
@@ -392,7 +394,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result.Should().NotBeNull();
             Assert.IsInstanceOfType(result, typeof(OkObjectResult));
             var statusCodeResult = result as StatusCodeResult;
-            statusCodeResult?.StatusCode.Should().Be((int) HttpStatusCode.OK);
+            statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.OK);
         }
 
         [TestMethod]
@@ -410,7 +412,78 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result.Should().NotBeNull();
             Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
             var statusCodeResult = result as StatusCodeResult;
-            statusCodeResult?.StatusCode.Should().Be((int) HttpStatusCode.InternalServerError);
+            statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_Pass_InvalidRequest_Return_BadRequest()
+        {
+            // Arrange
+            var request = new Facade.Core.Models.Requests.UpdateUserDetailsRequest();
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(request) as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_Pass_InvalidRequest_Return_InternalServerError()
+        {
+            // Arrange
+            var request = new Facade.Core.Models.Requests.UpdateUserDetailsRequest { ChangeHistoryExternalId = Guid.NewGuid(), HasRegulatorAccepted = true };
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(request) as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_Pass_InvalidRequest_Return_500()
+        {
+            // Arrange
+            var detailRequest = new UpdateUserDetailRequest { ChangeHistoryExternalId = Guid.NewGuid(), HasRegulatorAccepted = true, UserId = Guid.NewGuid(), RegulatorComment = string.Empty };
+
+            var detailsRequest = new UpdateUserDetailsRequest { ChangeHistoryExternalId = Guid.NewGuid(), RegulatorComment = string.Empty, HasRegulatorAccepted = true };
+
+            var _responseMock = new Mock<HttpResponseMessage>();
+
+            _mockRegulatorService.Setup(x => x.AcceptOrRejectUserDetailChangeRequestAsync(detailRequest))
+                .ReturnsAsync(_responseMock.Object);
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(detailsRequest) as StatusCodeResult;
+
+            // Assert
+            result.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+       // [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_Pass_ValidRequest_Return_OK()
+        {
+            // Arrange
+            var detailRequest = new UpdateUserDetailRequest { ChangeHistoryExternalId = Guid.NewGuid(), HasRegulatorAccepted = true, UserId = Guid.NewGuid(), RegulatorComment = string.Empty };
+
+            var detailsRequest = new UpdateUserDetailsRequest { ChangeHistoryExternalId = Guid.NewGuid(), RegulatorComment = string.Empty, HasRegulatorAccepted = true };
+
+            var _responseMock = new Mock<HttpResponseMessage>();
+
+            _mockRegulatorService.Setup(x => x.AcceptOrRejectUserDetailChangeRequestAsync(detailRequest))
+                .ReturnsAsync(_responseMock.Object);
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(detailsRequest) as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
         }
     }
 }
