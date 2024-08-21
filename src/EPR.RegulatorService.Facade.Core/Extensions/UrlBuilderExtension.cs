@@ -14,7 +14,7 @@ namespace EPR.RegulatorService.Facade.Core.Extensions
             
             if (!allowedSchemes.Contains(uriBuilder.Scheme))
             {
-                throw new ArgumentException();
+                return string.Empty;
             }
 
             if (!string.IsNullOrEmpty(baseAddress) && string.IsNullOrEmpty(url))
