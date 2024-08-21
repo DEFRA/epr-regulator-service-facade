@@ -27,27 +27,27 @@ public class ProducerService : IProducerService
     
     public async Task<HttpResponseMessage> GetOrganisationsBySearchTerm(Guid userId, int currentPage, int pageSize, string searchTerm)
     {
-        var url = string.Format($"{_config.Endpoints.GetOrganisationsBySearchTerm}", userId, currentPage, pageSize, searchTerm);
+        var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), string.Format($"{_config.Endpoints.GetOrganisationsBySearchTerm}", userId, currentPage, pageSize, searchTerm));
         
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
         
-        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
+        return await _httpClient.GetAsync(url);
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
     {
-        var url = string.Format($"{_config.Endpoints.GetOrganisationDetails}", userId, externalId);
+        var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), string.Format($"{_config.Endpoints.GetOrganisationDetails}", userId, externalId));
 
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{ExternalId}'", externalId);
 
-        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
+        return await _httpClient.GetAsync(url);
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
-        var url = string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.RemovedConnectionExternalId, model.OrganisationId, model.PromotedPersonExternalId);
+        var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), string.Format($"{_config.Endpoints.RegulatorRemoveApprovedUser}", model.UserId, model.RemovedConnectionExternalId, model.OrganisationId, model.PromotedPersonExternalId));
         
         _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", model.RemovedConnectionExternalId);
         
-        return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), model);
+        return await _httpClient.PostAsJsonAsync(url, model);
     }
 }
