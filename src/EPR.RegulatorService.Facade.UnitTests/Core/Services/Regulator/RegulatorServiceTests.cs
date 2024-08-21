@@ -11,6 +11,7 @@ using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using EPR.RegulatorService.Facade.Core.Models.Accounts;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
 {
@@ -25,11 +26,15 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
         private const string GetOrganisationsApplications = "GetOrganisationsApplications";
         private const string ManageEnrolment = "ManageEnrolment";
         private const string TransferOrganisationNation = "TransferOrganisationNation";
+        private const string ApproveOrRejectChangeRequest = "ApproveOrRejectChangeRequest";
+        private const string GetUserDetailChangeRequest = "GetUserDetailChangeRequest";
+        private const string PendingUserDetailChangeRequests = "PendingUserDetailChangeRequests";
         private const string UserOrganisations = "UserOrganisations";
         private HttpClient _httpClient;
         private readonly NullLogger<ApplicationService> _logger = new();
         private Guid _userId = Guid.NewGuid();
         private Guid _organisationId = Guid.NewGuid();
+        private Guid _externalId = Guid.NewGuid();
         private readonly int _currentPage = 1;
         private readonly int _pageSize = 10;
         private readonly string _organisationName = "Org";
@@ -50,7 +55,10 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
                     PendingApplications = PendingApplications,
                     ManageEnrolment = ManageEnrolment,
                     TransferOrganisationNation = TransferOrganisationNation,
-                    UserOrganisations = UserOrganisations
+                    UserOrganisations = UserOrganisations,
+                    ApproveOrRejectChangeRequest = ApproveOrRejectChangeRequest,
+                    GetUserDetailChangeRequest = GetUserDetailChangeRequest,
+                    PendingUserDetailChangeRequests = PendingUserDetailChangeRequests
                 }
             });
             _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
@@ -126,7 +134,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
 
         [TestMethod]
         public async Task
-            When_Get_Enrolments_For_Organisation_Is_Invoked_And_Gets_Exception_From_Account_Service_Then_Throw_Exception_OnInternalServerError()
+         When_Get_Enrolments_For_Organisation_Is_Invoked_And_Gets_Exception_From_Account_Service_Then_Throw_Exception_OnInternalServerError()
         {
             // Arrange
             var apiResponse = _fixture
@@ -305,7 +313,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
             // Assert
             response.Should().BeEquivalentTo(apiResponse);
         }
-        
+
         [TestMethod]
         public async Task When_Get_Regulator_Organisations_Is_Invoked_And_Gets_200_From_RegulatorOrganisationService_Then_Return_Success()
         {
@@ -328,7 +336,77 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
             // Assert
             response.Should().BeEquivalentTo(apiResponse);
         }
-        
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailChangeRequestAsync_Passed_ValidData_Then_Return_Success()
+        {
+            // Arrange
+            var request = new UpdateUserDetailRequest();
+            var apiResponse = _fixture
+                .Build<HttpResponseMessage>()
+                .With(x => x.StatusCode, HttpStatusCode.OK)
+                .Create();
+            var expectedUrl = $"{BaseAddress}/{ApproveOrRejectChangeRequest}";
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            // Act
+            HttpResponseMessage response = await _sut.AcceptOrRejectUserDetailChangeRequestAsync(request);
+            VerifyApiCall(expectedUrl, HttpMethod.Post);
+            // Assert
+            response.Should().BeEquivalentTo(apiResponse);
+        }
+
+        [TestMethod]
+        public async Task GetPendingUserDetailChangeRequestsAsync_Passed_ValidData_Then_Return_Success()
+        {
+            // Arrange
+            var apiResponse = _fixture
+                .Build<HttpResponseMessage>()
+                .With(x => x.StatusCode, HttpStatusCode.OK)
+                .Create();
+            var expectedUrl = $"{BaseAddress}/{PendingUserDetailChangeRequests}";
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            // Act
+            HttpResponseMessage response = await _sut.GetPendingUserDetailChangeRequestsAsync(Guid.NewGuid(), _currentPage, _pageSize, _organisationName, "");
+            VerifyApiCall(expectedUrl, HttpMethod.Get);
+            // Assert
+            response.Should().BeEquivalentTo(apiResponse);
+        }
+
+        [TestMethod]
+        public async Task GetUserDetailChangeRequestAsync_Passed_ValidData_Then_Return_Success()
+        {
+            // Arrange
+            var apiResponse = _fixture
+                .Build<HttpResponseMessage>()
+                .With(x => x.StatusCode, HttpStatusCode.OK)
+                .Create();
+            var expectedUrl = $"{BaseAddress}/{GetUserDetailChangeRequest}?externalId={_externalId}";
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            // Act
+            HttpResponseMessage response = await _sut.GetUserDetailChangeRequestAsync(_externalId);
+            VerifyApiCall(expectedUrl, HttpMethod.Get);
+            // Assert
+            response.Should().BeEquivalentTo(apiResponse);
+        }
+
         private void SetupApiCall(int itemCount)
         {
             var apiResponse = _fixture.CreateMany<OrganisationEnrolments>(itemCount).ToList();
