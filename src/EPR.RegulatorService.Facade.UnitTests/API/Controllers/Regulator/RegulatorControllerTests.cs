@@ -530,7 +530,52 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
 
             // Assert
             result.Should().NotBeNull();
-           result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task GetUserDetailChangeRequest_Pass_InvalidRequest_Return_InternalServerError()
+        {
+            // Arrange
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.GetUserDetailChangeRequest(It.IsAny<Guid>()) as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task GetUserDetailChangeRequest_No_Content_ToSerialise_Return_500()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x => x.GetOrganisationPendingApplications(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .ReturnsAsync(new HttpResponseMessage());
+
+            // Act
+            var result = await _sut.GetUserDetailChangeRequest(It.IsAny<Guid>()) as StatusCodeResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task GetUserDetailChangeRequest_Pass_ValidRequest_Return_OK()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x => x.GetOrganisationPendingApplications(It.IsAny<Guid>(), It.IsAny<Guid>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                { Content = new StringContent(JsonConvert.SerializeObject(It.IsAny<ApplicationEnrolmentDetailsResponse>())) });
+
+            // Act
+            var result = await _sut.GetUserDetailChangeRequest(It.IsAny<Guid>()) as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
         }
     }
 }
