@@ -54,9 +54,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                string test = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.CreateRegulator);
-                string test2 = _config.Endpoints.CreateRegulator;
-
                 var response = await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.CreateRegulator), stringContent);
 
                 if (response.IsSuccessStatusCode)

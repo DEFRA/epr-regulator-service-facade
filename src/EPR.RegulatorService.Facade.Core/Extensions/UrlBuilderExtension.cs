@@ -10,7 +10,7 @@
 
             if (!string.IsNullOrEmpty(baseAddress) && string.IsNullOrEmpty(url))
             {
-                if (baseAddress.EndsWith("/"))
+                if (baseAddress.EndsWith('/'))
                 {
                     return baseAddress;
                 }
