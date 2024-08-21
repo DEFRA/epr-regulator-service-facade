@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Submissions;
@@ -22,22 +23,22 @@ public class SubmissionsService : ISubmissionService
        ConfigureHttpClient(userId); 
        
        var url = string.Format($"{_config.Endpoints.CreateSubmissionEvent}", _config.ApiVersion, submissionId);
-       
-       return await _httpClient.PostAsJsonAsync(url, request);
+        
+       return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), request);
     }
 
     public async Task<HttpResponseMessage> GetDeltaPoMSubmissions(DateTime lastSyncTime, Guid userId)
     {
         ConfigureHttpClient(userId);
         var url = string.Format($"{_config.Endpoints.GetPoMSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}", _config.ApiVersion);
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
     
     public async Task<HttpResponseMessage> GetDeltaRegistrationSubmissions(DateTime lastSyncTime, Guid userId)
     {
         ConfigureHttpClient(userId);
         var url = string.Format($"{_config.Endpoints.GetRegistrationSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}", _config.ApiVersion);
-        return await _httpClient.GetAsync(url);
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
 
     private void ConfigureHttpClient(Guid userId)
