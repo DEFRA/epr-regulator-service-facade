@@ -19,8 +19,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         private readonly HttpClient _httpClient;
         private readonly ILogger<RegulatorOrganisationService> _logger;
         private readonly AccountsServiceApiConfig _config;
-        private readonly string[] allowedSchemes = { "https", "http" };
-
+        
         public RegulatorOrganisationService(
             HttpClient httpClient,
             ILogger<RegulatorOrganisationService> logger,
@@ -36,12 +35,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), $"{_config.Endpoints.GetRegulator}{nation}");
 
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             var response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
@@ -55,12 +48,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<Result<CreateRegulatorOrganisationResponseModel>> CreateRegulatorOrganisation(CreateRegulatorAccountRequest request)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             try
             {
                 string jsonRequest = JsonSerializer.Serialize(request);
@@ -109,12 +96,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<HttpResponseMessage> RegulatorInvites(AddInviteUserRequest request)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
             
             return await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.RegulatorInvitation), GetStringContent(request));
@@ -122,12 +103,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<HttpResponseMessage> RegulatorEnrollment(EnrolInvitedUserRequest request)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorEnrollment, GetStringContent(request));
@@ -135,12 +110,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<HttpResponseMessage> RegulatorInvited(Guid id, string email)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
@@ -150,12 +119,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             var url = $"{_config.Endpoints.GetRegulatorUsers}?userId={userId}&organisationId={organisationId}&getApprovedUsersOnly={true}";
 
             _logger.LogInformation("Attempting to fetch the users for organisation id {OrganisationId} from the backend", organisationId);
@@ -172,12 +135,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         
         public async Task<HttpResponseMessage> GetUsersByOrganisationExternalId(Guid userId, Guid externalId)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
 
             _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", externalId);
@@ -187,12 +144,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
         {
-            Uri uri = new Uri(_httpClient.BaseAddress.ToString());
-            if (!allowedSchemes.Contains(uri.Scheme))
-            {
-                return null;
-            }
-
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
             
             return await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.AddRemoveApprovedUser), GetStringContent(request));
