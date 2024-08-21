@@ -33,9 +33,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
 
-            var url = $"{_config.Endpoints.GetRegulator}{nation}";
+            var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), $"{_config.Endpoints.GetRegulator}{nation}");
 
-            var response = await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
+            var response = await _httpClient.GetAsync(url);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
