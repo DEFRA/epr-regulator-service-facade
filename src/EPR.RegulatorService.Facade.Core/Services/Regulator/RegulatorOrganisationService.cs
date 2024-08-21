@@ -54,7 +54,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(_config.Endpoints.CreateRegulator, stringContent);
+                string test = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.CreateRegulator);
+                string test2 = _config.Endpoints.CreateRegulator;
+
+                var response = await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.CreateRegulator), stringContent);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -97,8 +100,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> RegulatorInvites(AddInviteUserRequest request)
         {
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
-
-            return await _httpClient.PostAsync(_config.Endpoints.RegulatorInvitation, GetStringContent(request));
+            
+            return await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.RegulatorInvitation), GetStringContent(request));
         }
 
         public async Task<HttpResponseMessage> RegulatorEnrollment(EnrolInvitedUserRequest request)
@@ -123,7 +126,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             _logger.LogInformation("Attempting to fetch the users for organisation id {OrganisationId} from the backend", organisationId);
 
-            return await _httpClient.GetAsync(url);
+            return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
         }
 
         private static StringContent GetStringContent(object request)
@@ -145,8 +148,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
         {
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
-
-            return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
+            
+            return await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.AddRemoveApprovedUser), GetStringContent(request));
         }
     }
 }

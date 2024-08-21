@@ -20,25 +20,22 @@ public class CommonDataService : ICommonDataService
         _httpClient = httpClient;
         _config = options.Value;
     }
+    
     public async Task<HttpResponseMessage> GetSubmissionLastSyncTime()
     {
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-        {
-            Path = _config.Endpoints.GetSubmissionEventsLastSyncTime
-        };
-       
-        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.GetSubmissionEventsLastSyncTime));
     }
 
     public async Task<HttpResponseMessage> GetPoMSubmissions(GetPomSubmissionsRequest pomSubmissionsRequest)
     {
         var url = string.Format($"{_config.Endpoints.GetPoMSubmissions}");
-        return await _httpClient.PostAsJsonAsync(url, pomSubmissionsRequest);
+        
+        return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), pomSubmissionsRequest);
     }
 
     public async Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest)
     {
         var url = string.Format($"{_config.Endpoints.GetRegistrationSubmissions}");
-        return await _httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
+        return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), registrationSubmissionsRequest);
     }
 }

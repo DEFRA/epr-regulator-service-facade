@@ -4,9 +4,19 @@
     {
         public static string FormatURL(string baseAddress, string url)
         {
+            if (baseAddress == null) { return string.Empty; }
+
             UriBuilder uriBuilder = new UriBuilder(baseAddress);
 
-            if (url.StartsWith("http")) 
+            if (!string.IsNullOrEmpty(baseAddress) && string.IsNullOrEmpty(url))
+            {
+                if (baseAddress.EndsWith("/"))
+                {
+                    return baseAddress;
+                }
+                return baseAddress + "/";
+            }
+            else if (String.IsNullOrEmpty(url) || url.StartsWith("http")) 
             {
                 return url;
             }
