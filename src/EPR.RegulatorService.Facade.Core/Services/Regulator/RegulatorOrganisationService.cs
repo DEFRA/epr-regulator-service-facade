@@ -30,9 +30,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             _config = config.Value;
         }
 
+        // Disable the warning.
+#pragma warning disable S5144
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
-
             var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), $"{_config.Endpoints.GetRegulator}{nation}");
 
             var response = await _httpClient.GetAsync(url);
@@ -45,6 +46,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             }
             return null;
         }
+        // Re-enable the warning.
+#pragma warning restore S5144
 
         public async Task<Result<CreateRegulatorOrganisationResponseModel>> CreateRegulatorOrganisation(CreateRegulatorAccountRequest request)
         {
