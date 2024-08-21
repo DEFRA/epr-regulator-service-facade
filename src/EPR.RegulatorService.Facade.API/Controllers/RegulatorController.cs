@@ -8,10 +8,8 @@ using EPR.RegulatorService.Facade.Core.Models.Applications.Users;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
-using Notify.Models;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
-using System.Text.RegularExpressions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
@@ -310,7 +308,7 @@ public class RegulatorController :  ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ApplicationEnrolmentDetailsResponse>(stringContent,
+                var result = JsonSerializer.Deserialize<ChangeHistoryModel>(stringContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 return Ok(result);
             }
