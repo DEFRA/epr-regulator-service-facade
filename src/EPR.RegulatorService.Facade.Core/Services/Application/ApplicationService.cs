@@ -1,4 +1,6 @@
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using Microsoft.Extensions.Logging;
@@ -30,7 +32,7 @@ public class ApplicationService : IApplicationService
 
         var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
 
-        return await _httpClient.GetAsync(FormatURL(url));
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
 
     public async Task<HttpResponseMessage> GetOrganisationPendingApplications(Guid userId, Guid organisationId)
@@ -39,7 +41,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch applications for the organisation {OrganisationId}", organisationId);
 
-        return await _httpClient.GetAsync(FormatURL(url));
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
 
     public async Task<HttpResponseMessage> UpdateEnrolment(ManageRegulatorEnrolmentRequest request)
@@ -48,7 +50,7 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("User {UserId} attempting to update the enrolment {EnrolmentId}", request.UserId, request.EnrolmentId);
 
-        return await _httpClient.PostAsJsonAsync(FormatURL(url), request);
+        return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), request);
     }
 
     public async Task<HttpResponseMessage> TransferOrganisationNation(OrganisationTransferNationRequest request)
@@ -58,7 +60,7 @@ public class ApplicationService : IApplicationService
         _logger.LogInformation("User {UserId} attempting to transfer the organisation {OrganisationId} to {NationName}",
              request.UserId, request.OrganisationId, request.TransferNationId);
 
-        return await _httpClient.PostAsJsonAsync(FormatURL(url), request);
+        return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), request);
     }
 
     public async Task<HttpResponseMessage> GetUserOrganisations(Guid userId)
@@ -67,21 +69,6 @@ public class ApplicationService : IApplicationService
 
         _logger.LogInformation("Attempting to fetch the organisations for user '{UserId}'", userId);
 
-        return await _httpClient.GetAsync(FormatURL(url));
-    }
-
-    private string FormatURL(string url)
-    {
-        UriBuilder uriBuilder = new UriBuilder(_httpClient.BaseAddress);
-        if (_httpClient.BaseAddress.ToString().Contains("api"))
-        {
-            uriBuilder.Path = _httpClient.BaseAddress.AbsolutePath + "/" + url;
-            return uriBuilder.Uri.LocalPath;
-        }
-        else
-        {
-            uriBuilder.Path = url;
-            return uriBuilder.Uri.LocalPath;
-        }
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
 }

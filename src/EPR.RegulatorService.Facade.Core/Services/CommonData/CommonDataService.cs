@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using Microsoft.Extensions.Options;
@@ -25,7 +26,7 @@ public class CommonDataService : ICommonDataService
         {
             Path = _config.Endpoints.GetSubmissionEventsLastSyncTime
         };
-
+       
         return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
     }
 

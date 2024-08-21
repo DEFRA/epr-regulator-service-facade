@@ -1,4 +1,5 @@
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,12 +30,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisations by searchTerm '{searchTerm}'", searchTerm);
 
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-        {
-            Path = url
-        };
-
-        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
     
     public async Task<HttpResponseMessage> GetOrganisationDetails(Guid userId, Guid externalId)
@@ -43,12 +39,7 @@ public class ProducerService : IProducerService
 
         _logger.LogInformation("Attempting to fetch organisation details for organisation'{ExternalId}'", externalId);
 
-        var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-        {
-            Path = url
-        };
-
-        return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+        return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
     }
     public async Task<HttpResponseMessage> RemoveApprovedUser(RemoveApprovedUsersRequest model)
     {
@@ -56,6 +47,6 @@ public class ProducerService : IProducerService
         
         _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", model.RemovedConnectionExternalId);
         
-        return await _httpClient.PostAsJsonAsync(url, model);
+        return await _httpClient.PostAsJsonAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url), model);
     }
 }

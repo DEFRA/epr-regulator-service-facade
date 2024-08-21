@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
@@ -34,12 +35,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = $"{_config.Endpoints.GetRegulator}{nation}";
 
-            var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-            {
-                Path = url
-            };
-
-            var response = await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+            var response = await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -118,12 +114,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-            {
-                Path = url
-            };
-
-            return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+            return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -148,12 +139,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", externalId);
 
-            var uriBuilder = new UriBuilder(_httpClient.BaseAddress)
-            {
-                Path = url
-            };
-
-            return await _httpClient.GetAsync(uriBuilder.Uri.LocalPath);
+            return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
