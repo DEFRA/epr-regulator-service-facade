@@ -465,7 +465,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
         }
 
-       // [TestMethod]
+        // [TestMethod]
         public async Task AcceptOrRejectUserDetailsChangeRequest_Pass_ValidRequest_Return_OK()
         {
             // Arrange
@@ -484,6 +484,53 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             // Assert
             result.Should().NotBeNull();
             result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public async Task PendingUserChangeRequests_Pass_InvalidRequest_Return_InternalServerError()
+        {
+            // Arrange
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.PendingUserChangeRequests(1, 1, "", "") as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task PendingUserChangeRequests_Pass_ValidRequest_Return_OK()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x => x.GetPendingUserDetailChangeRequestsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(It.IsAny<OrganisationEnrolments>()))
+                });
+
+            // Act
+            var result = await _sut.PendingUserChangeRequests(It.IsAny<int>(), It.IsAny<int>(), "Org", "") as ObjectResult;
+
+            // Assert
+            result.Should().NotBeNull();
+            result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public async Task PendingUserChangeRequests_No_Content_ToSerialise_Return_500()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x => x.GetPendingUserDetailChangeRequestsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage());
+
+            // Act
+            var result = await _sut.PendingUserChangeRequests(It.IsAny<int>(), It.IsAny<int>(), "Org", "") as StatusCodeResult;
+
+            // Assert
+            result.Should().NotBeNull();
+           result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
         }
     }
 }
