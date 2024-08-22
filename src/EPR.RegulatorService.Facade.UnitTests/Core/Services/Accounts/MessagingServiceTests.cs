@@ -836,7 +836,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
          }
 
         [TestMethod]
-        //[DataRow("test@test.com", "", "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
         public void SendAcceptedUserDetailChangeEmail_ValidParameters_EmailSendsSuccessfully()
         {
             // Arrange
@@ -871,6 +870,53 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 
             // Act
             var notificationId = _sut.SendAcceptedUserDetailChangeEmail(model);
+
+            // Assert
+            notificationId.Should().Be(emailNotificationId);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null), Times.Once);
+        }
+
+        [TestMethod]
+        public void SendRejectedUserDetailChangeEmail_ValidParameters_EmailSendsSuccessfully()
+        {
+            // Arrange
+            var emailNotificationId = "C123456";
+            var testContactEmailAddress = "testemail@test.com";
+            var testRegulatorEmailAddress = "test@test.com";
+
+
+            var model = new UserDetailsChangeNotificationEmailInput
+            {
+                ContactEmailAddress = testContactEmailAddress,
+                RegulatorEmailAddress = testRegulatorEmailAddress,
+                OldFirstName = "",
+                NewFirstName = "",
+            };
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Dictionary<string, object>>(),
+                    null,
+                    null))
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
+
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
+                });
+            var regulatorEmailConfig = Options.Create(new EprPackagingRegulatorEmailConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, regulatorEmailConfig, _nullLogger);
+
+            // Act
+            var notificationId = _sut.SendRejectedUserDetailChangeEmail(model);
 
             // Assert
             notificationId.Should().Be(emailNotificationId);
