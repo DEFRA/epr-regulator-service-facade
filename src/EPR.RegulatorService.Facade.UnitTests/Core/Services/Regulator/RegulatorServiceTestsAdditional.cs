@@ -20,7 +20,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
         private ApplicationService _sut;
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock = new();
-        private const string BaseAddress = "http://localhost/api";
+        private const string BaseAddress = "http://localhost";
         private const string PendingApplications = "PendingApplications";
         private const string GetOrganisationsApplications = "GetOrganisationsApplications";
         private const string ManageEnrolment = "ManageEnrolment";

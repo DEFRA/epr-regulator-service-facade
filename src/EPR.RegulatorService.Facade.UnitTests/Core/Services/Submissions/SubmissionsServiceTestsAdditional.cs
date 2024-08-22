@@ -18,7 +18,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock = new();
         private IOptions<SubmissionsApiConfig> _configuration = default!;
-        private const string BaseAddress = "http://localhost/api";
+        private const string BaseAddress = "http://localhost";
         private const string CreateSubmissionEvent = "CreateSubmissionEvent";
         private const string GetPoMSubmissions = "GetPoMSubmissions";
         private const string GetRegistrationSubmissions = "GetRegistrationSubmissions";

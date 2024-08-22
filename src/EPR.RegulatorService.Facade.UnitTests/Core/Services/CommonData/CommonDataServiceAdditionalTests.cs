@@ -21,7 +21,7 @@ public class CommonDataServiceAdditionalTests
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock = new();
     private IOptions<CommonDataApiConfig> _configuration = default!;
-    private const string BaseAddress = "http://localhost/api";
+    private const string BaseAddress = "http://localhost";
     private const string GetPoMSubmissions = "GetPoMSubmissions";
     private HttpClient _httpClient;
     private string _expectedUrl;
