@@ -1,12 +1,17 @@
 using System.Net;
+using System.Text.Json;
+using System.Text;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Models.Accounts;
+using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Application;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -576,6 +581,243 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             // Assert
             result.Should().NotBeNull();
             result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        }
+
+        public async Task AcceptOrRejectUserDetailsChangeRequest_ThrowsException_WhenSendingEmailFails()
+        {
+            // Arrange
+            var request = new UpdateUserDetailsRequest
+            {
+                ChangeHistoryExternalId = Guid.NewGuid(),
+                HasRegulatorAccepted = false,
+                RegulatorComment = "Rejected"
+            };
+
+            var responseContent = new RegulatorUserDetailsUpdateResponse
+            {
+                HasUserDetailsChangeRejected = true,
+                ChangeHistory = new ChangeHistoryModel
+                {
+                    EmailAddress = "user@example.com",
+                    ApproverComments = "Rejected",
+                    OrganisationId = 1,
+                    OrganisationName = "OrganisationName",
+                    OrganisationType = "OrganisationType",
+                    OrganisationReferenceNumber = "OrgRef123",
+                    ServiceRole = "ServiceRole",
+                    BusinessAddress = new AddressModel
+                    {
+                        Street = "123 Street",
+                        Country = "Country",
+                        Postcode = "Postcode"
+                    }
+                }
+            };
+
+            var responseContentJson = System.Text.Json.JsonSerializer.Serialize(responseContent, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(responseContentJson, Encoding.UTF8, "application/json")
+            };
+
+            _mockRegulatorService.Setup(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()))
+                .ReturnsAsync(response);
+
+            var errorMessage = $"failed to send Accept Reject User Detail Change Email To for  for externalId {request.ChangeHistoryExternalId}";
+
+            _messagingServiceMock.Setup(service =>
+                service.SendAcceptedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()))
+                .Throws(new Exception(errorMessage));
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(request);
+
+            // Assert
+            var internalServerErrorResult = result as ObjectResult;
+            Assert.IsNotNull(internalServerErrorResult);
+            Assert.AreEqual(StatusCodes.Status200OK, internalServerErrorResult.StatusCode);
+
+            _mockRegulatorService.Verify(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()),
+                Times.Once());
+
+            _messagingServiceMock.Verify(service =>
+                service.SendRejectedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
+                Times.Never());
+
+            _messagingServiceMock.Verify(service =>
+                service.SendAcceptedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
+                Times.Never());
+        }
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_ReturnsOk_ForAValidRequest()
+        {
+            // Arrange
+            var request = new UpdateUserDetailsRequest
+            {
+                ChangeHistoryExternalId = Guid.NewGuid(),
+                HasRegulatorAccepted = true,
+                RegulatorComment = "Approved"
+            };
+
+            var responseContent = new RegulatorUserDetailsUpdateResponse
+            {
+                HasUserDetailsChangeAccepted = true,
+                ChangeHistory = new ChangeHistoryModel
+                {
+                    Nation = "Nation",
+                    EmailAddress = "user@example.com",
+                    NewValues = new UserDetailsChangeModel
+                    {
+                        FirstName = "NewFirstName",
+                        LastName = "NewLastName",
+                        JobTitle = "NewJobTitle"
+                    },
+                    OldValues = new UserDetailsChangeModel
+                    {
+                        FirstName = "OldFirstName",
+                        LastName = "OldLastName",
+                        JobTitle = "OldJobTitle"
+                    },
+                    ApproverComments = "Approved",
+                    OrganisationId = 1,
+                    OrganisationName = "OrganisationName",
+                    OrganisationType = "OrganisationType",
+                    OrganisationReferenceNumber = "OrgRef123",
+                    ServiceRole = "ServiceRole",
+                    BusinessAddress = new AddressModel
+                    {
+                        Street = "123 Street",
+                        Country = "Country",
+                        Postcode = "Postcode"
+                    }
+                }
+            };
+
+            var responseContentJson = System.Text.Json.JsonSerializer.Serialize(responseContent, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(responseContentJson, Encoding.UTF8, "application/json")
+            };
+
+            _mockRegulatorService.Setup(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(request);
+
+            // Assert
+            var okResult = result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(StatusCodes.Status200OK, okResult.StatusCode);
+            Assert.IsInstanceOfType(okResult.Value, typeof(RegulatorUserDetailsUpdateResponse));
+
+            _mockRegulatorService.Verify(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()),
+                Times.Once());
+
+            _messagingServiceMock.Verify(service =>
+                service.SendAcceptedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
+                Times.Once());
+
+            _messagingServiceMock.Verify(service =>
+                service.SendRejectedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
+                Times.Never());
+        }
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_ReturnsOk_ForARejectedRequest()
+        {
+            // Arrange
+            var request = new UpdateUserDetailsRequest
+            {
+                ChangeHistoryExternalId = Guid.NewGuid(),
+                HasRegulatorAccepted = false,
+                RegulatorComment = "Rejected"
+            };
+
+            var responseContent = new RegulatorUserDetailsUpdateResponse
+            {
+                HasUserDetailsChangeRejected = true,
+                ChangeHistory = new ChangeHistoryModel
+                {
+                    Nation = "Nation",
+                    EmailAddress = "user@example.com",
+                    NewValues = new UserDetailsChangeModel
+                    {
+                        FirstName = "NewFirstName",
+                        LastName = "NewLastName",
+                        JobTitle = "NewJobTitle"
+                    },
+                    OldValues = new UserDetailsChangeModel
+                    {
+                        FirstName = "OldFirstName",
+                        LastName = "OldLastName",
+                        JobTitle = "OldJobTitle"
+                    },
+                    ApproverComments = "Rejected",
+                    OrganisationId = 1,
+                    OrganisationName = "OrganisationName",
+                    OrganisationType = "OrganisationType",
+                    OrganisationReferenceNumber = "OrgRef123",
+                    ServiceRole = "ServiceRole",
+                    BusinessAddress = new AddressModel
+                    {
+                        Street = "123 Street",
+                        Country = "Country",
+                        Postcode = "Postcode"
+                    }
+                }
+            };
+
+            var responseContentJson = System.Text.Json.JsonSerializer.Serialize(responseContent, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            });
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(responseContentJson, Encoding.UTF8, "application/json")
+            };
+
+            _mockRegulatorService.Setup(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(request);
+
+            // Assert
+            var okResult = result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(StatusCodes.Status200OK, okResult.StatusCode);
+            Assert.IsInstanceOfType(okResult.Value, typeof(RegulatorUserDetailsUpdateResponse));
+
+            _mockRegulatorService.Verify(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()),
+                Times.Once());
+
+            _messagingServiceMock.Verify(service =>
+                service.SendRejectedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
+                Times.Once());
+
+            _messagingServiceMock.Verify(service =>
+                service.SendAcceptedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
+                Times.Never());
         }
     }
 }
