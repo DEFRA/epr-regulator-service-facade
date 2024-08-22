@@ -2,7 +2,6 @@ using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Accounts;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
-using EPR.RegulatorService.Facade.Core.Models.Results;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;

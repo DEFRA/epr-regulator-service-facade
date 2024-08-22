@@ -5,12 +5,7 @@ using EPR.RegulatorService.Facade.API.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Applications.Users;
-using System.Drawing.Printing;
-using Azure.Core;
-using EPR.RegulatorService.Facade.Core.Helpers;
-using Notify.Models;
 using EPR.RegulatorService.Facade.Core.Extensions;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -54,7 +49,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching {pageSize} Pending applications for organisation {organisationName} on page {currentPage}", pageSize, organisationName, currentPage);
+            _logger.LogError(e, "Error fetching {PageSize} Pending applications for organisation {OrganisationName} on page {CurrentPage}", pageSize, organisationName, currentPage);
             return HandleError.Handle(e);
         }
     }
@@ -87,7 +82,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching applications for organisation {organisationId}", organisationId);
+            _logger.LogError(e, "Error fetching applications for organisation {OrganisationId}", organisationId);
 
             return HandleError.Handle(e);
         }
@@ -157,7 +152,7 @@ public class RegulatorController :  ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error transferring the organisation {organisationId} to {transferNationId} by the user {userId}", request.OrganisationId, request.TransferNationId, User.UserId());
+            _logger.LogError(e, "Error transferring the organisation {OrganisationId} to {TransferNationId} by the user {UserId}", request.OrganisationId, request.TransferNationId, User.UserId());
             return HandleError.Handle(e);
         }
     }
@@ -178,12 +173,12 @@ public class RegulatorController :  ControllerBase
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("Fetched the organisations list successfully for the user {userId}", userId);
+                _logger.LogInformation("Fetched the organisations list successfully for the user {UserId}", userId);
                 return Ok(response.Content.ReadFromJsonAsync<UserOrganisationsListModel>().Result);
             }
             else
             {
-                _logger.LogError("Failed to fetch the organisations list for the user {userId}", userId);
+                _logger.LogError("Failed to fetch the organisations list for the user {UserId}", userId);
                 return HandleError.HandleErrorWithStatusCode(response.StatusCode);
             }
         }

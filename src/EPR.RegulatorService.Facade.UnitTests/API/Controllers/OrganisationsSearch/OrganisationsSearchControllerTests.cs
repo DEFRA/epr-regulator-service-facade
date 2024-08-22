@@ -726,7 +726,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
         public async Task Invalid_GetProducerOrganisationsUsersByExternalId_Is_Called_And_Request_Is_Valid_Then_Return_BadResult()
         {
             // Arrange
-            var users = new List<OrganisationUserOverviewResponseModel>();
+            _ = new List<OrganisationUserOverviewResponseModel>();
             
             // Act
             var result = await _sut.GetUsersByOrganisationExternalId(_organisationExternalId);

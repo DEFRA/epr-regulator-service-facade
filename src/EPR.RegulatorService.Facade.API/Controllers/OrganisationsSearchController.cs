@@ -1,13 +1,9 @@
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing.Printing;
 using System.Text.Json;
 using System.Web;
-using Azure;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Extensions;
-using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
@@ -17,10 +13,8 @@ using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -146,7 +140,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error fetching producer organisations by external organisation id {externalId}", externalId);
+            _logger.LogError(e, "Error fetching producer organisations by external organisation id {ExternalId}", externalId);
 
             return HandleError.Handle(e);
         }
@@ -191,7 +185,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error deleting approved user for organisation {organisationId}", request.OrganisationId);
+            _logger.LogError(e, "Error deleting approved user for organisation {OrganisationId}", request.OrganisationId);
             return HandleError.Handle(e);
         }
     }
@@ -274,7 +268,7 @@ public class OrganisationsSearchController : ControllerBase
             var emailSent = SendNotificationEmailToDeletedPerson(email, email.EmailNotificationType);
             if (!emailSent)
             {
-                _logger.LogError("Error sending the notification email to user {firstName} {lastName} for company {companyName}", email.FirstName, email.LastName, email.CompanyName);
+                _logger.LogError("Error sending the notification email to user {FirstName} {LastName} for company {CompanyName}", email.FirstName, email.LastName, email.CompanyName);
             }
          
         }

@@ -3,8 +3,6 @@ using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
-using EPR.RegulatorService.Facade.Core.Helpers;
-using System.Drawing.Printing;
 using EPR.RegulatorService.Facade.Core.Extensions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers

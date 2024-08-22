@@ -1,6 +1,4 @@
-﻿using Azure;
-using EPR.RegulatorService.Facade.API.Controllers;
-using EPR.RegulatorService.Facade.Core.Models.Applications;
+﻿using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
@@ -10,8 +8,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
-using System.Drawing.Printing;
 using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator

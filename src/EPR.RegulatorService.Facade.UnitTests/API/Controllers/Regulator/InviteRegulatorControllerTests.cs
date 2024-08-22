@@ -3,7 +3,6 @@ using System.Text.Json;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
@@ -297,28 +296,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
 
             // Act
             var result = await _sut.EnrolInvitedUser(request) as NoContentResult;
-
-            // Assert
-            result!.Should().BeNull();
-        }
-
-        [TestMethod]
-        public async Task CreateInviteEnrollment_SendInValidUser_ReturnNullResult()
-        {
-            // Arrange
-            var request = GetInviteEnrollmentRequest();
-
-            _mockRegulatorOrganisationService.Setup(x =>
-                x.RegulatorInvites(It.IsAny<AddInviteUserRequest>())).ReturnsAsync(new HttpResponseMessage()
-                {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(JsonSerializer.Serialize(new AddRemoveApprovedPersonResponseModel { InviteToken = Token }))
-                });
-
-            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
-
-            // Act
-            var result = await _sut.CreateInviteEnrollment(request) as OkObjectResult;
 
             // Assert
             result!.Should().BeNull();

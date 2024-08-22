@@ -5,8 +5,6 @@ using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 
 namespace EPR.RegulatorService.Facade.API.Controllers
@@ -53,7 +51,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
                 if (serviceRolesLookupModel is null)
                 {
-                    _logger.LogError("Invalid role key: {key}", request.RoleKey);
+                    _logger.LogError("Invalid role key: {Key}", request.RoleKey);
                     return Problem("Invalid role key", statusCode: StatusCodes.Status500InternalServerError);
                 }
 

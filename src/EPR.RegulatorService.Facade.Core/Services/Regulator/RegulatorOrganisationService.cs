@@ -1,13 +1,10 @@
 ﻿using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -30,18 +27,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             _config = config.Value;
         }
 
-        // Disable the warning.
-#pragma warning disable
         public async Task<CheckRegulatorOrganisationExistResponseModel?> GetRegulatorOrganisationByNation(string nation)
         {
-            if (nation == "attack")
-            {
-                return null;
-            }
-
-            var url = UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), $"{_config.Endpoints.GetRegulator}{nation}");
-
-            var response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync($"{_config.Endpoints.GetRegulator}{nation}");
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
@@ -51,8 +39,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             }
             return null;
         }
-        // Re-enable the warning.
-#pragma warning restore
 
         public async Task<Result<CreateRegulatorOrganisationResponseModel>> CreateRegulatorOrganisation(CreateRegulatorAccountRequest request)
         {
@@ -62,7 +48,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.CreateRegulator), stringContent);
+                var response = await _httpClient.PostAsync(_config.Endpoints.CreateRegulator, stringContent);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -106,7 +92,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         {
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
             
-            return await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.RegulatorInvitation), GetStringContent(request));
+            return await _httpClient.PostAsync(_config.Endpoints.RegulatorInvitation, GetStringContent(request));
         }
 
         public async Task<HttpResponseMessage> RegulatorEnrollment(EnrolInvitedUserRequest request)
@@ -122,7 +108,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
-            return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
+            return await _httpClient.GetAsync(url);
         }
         
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
@@ -131,7 +117,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             _logger.LogInformation("Attempting to fetch the users for organisation id {OrganisationId} from the backend", organisationId);
 
-            return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
+            return await _httpClient.GetAsync(url);
         }
 
         private static StringContent GetStringContent(object request)
@@ -147,14 +133,14 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
             _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", externalId);
 
-            return await _httpClient.GetAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), url));
+            return await _httpClient.GetAsync(url);
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
         {
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
             
-            return await _httpClient.PostAsync(UrlBuilderExtention.FormatURL(_httpClient.BaseAddress.ToString(), _config.Endpoints.AddRemoveApprovedUser), GetStringContent(request));
+            return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
         }
     }
 }

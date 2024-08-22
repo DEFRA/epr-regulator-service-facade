@@ -488,7 +488,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
     When_Organisations_Pending_Application_Is_Called_And_Request_Is_BadRequest_Then_Return_400_Error()
         {
             // Arrange
-            var enrolments = new ApplicationEnrolmentDetailsResponse();
+            _ = new ApplicationEnrolmentDetailsResponse();
             
             // Act
             var result = await _sut.GetOrganisationApplications(_organisationId);

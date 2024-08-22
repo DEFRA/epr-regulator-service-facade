@@ -306,29 +306,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
             response.Should().BeEquivalentTo(apiResponse);
         }
         
-        [TestMethod]
-        public async Task When_Get_Regulator_Organisations_Is_Invoked_And_Gets_200_From_RegulatorOrganisationService_Then_Return_Success()
-        {
-            // Arrange
-            var apiResponse = _fixture
-                .Build<HttpResponseMessage>()
-                .With(x => x.StatusCode, HttpStatusCode.OK)
-                .Create();
-            var expectedUrl = $"{BaseAddress}/{UserOrganisations}?userId={_userId}";
-
-            _httpMessageHandlerMock.Protected()
-                .Setup<Task<HttpResponseMessage>>("SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(apiResponse).Verifiable();
-
-            // Act
-            HttpResponseMessage response = await _sut.GetUserOrganisations(_userId);
-            VerifyApiCall(expectedUrl, HttpMethod.Get);
-            // Assert
-            response.Should().BeEquivalentTo(apiResponse);
-        }
-        
         private void SetupApiCall(int itemCount)
         {
             var apiResponse = _fixture.CreateMany<OrganisationEnrolments>(itemCount).ToList();

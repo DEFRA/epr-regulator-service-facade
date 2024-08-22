@@ -1,17 +1,16 @@
 using EPR.RegulatorService.Facade.Core.Extensions;
 using FluentAssertions;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Extensions
 {
     [TestClass]
-    public class GuidExtenstionsTests
+    public class GuidExtensionsTests
     {
         [TestMethod]
-        public async Task CheckValidGuid_ValidGuid_ReturnsTrue()
+        public void CheckValidGuid_ValidGuid_ReturnsTrue()
         {
             // Arrange
-            Guid userGuid = Guid.NewGuid();
+            var userGuid = Guid.NewGuid();
 
             // Act
             var result = userGuid.IsValidGuid();
@@ -21,10 +20,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.Extensions
         }
 
         [TestMethod]
-        public async Task CheckValidGuid_EmptyGuid_ReturnsFalse()
+        public void CheckValidGuid_EmptyGuid_ReturnsFalse()
         {
-            Guid userGuid = Guid.NewGuid();
-            userGuid = default(Guid);
+            var userGuid = Guid.Empty;
 
             // Act
             var result = userGuid.IsValidGuid();

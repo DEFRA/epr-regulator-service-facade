@@ -1,5 +1,4 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 

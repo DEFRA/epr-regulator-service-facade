@@ -4,7 +4,6 @@ using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
