@@ -470,27 +470,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
         }
 
-        // [TestMethod]
-        public async Task AcceptOrRejectUserDetailsChangeRequest_Pass_ValidRequest_Return_OK()
-        {
-            // Arrange
-            var detailRequest = new UpdateUserDetailRequest { ChangeHistoryExternalId = Guid.NewGuid(), HasRegulatorAccepted = true, UserId = Guid.NewGuid(), RegulatorComment = string.Empty };
-
-            var detailsRequest = new UpdateUserDetailsRequest { ChangeHistoryExternalId = Guid.NewGuid(), RegulatorComment = string.Empty, HasRegulatorAccepted = true };
-
-            var _responseMock = new Mock<HttpResponseMessage>();
-
-            _mockRegulatorService.Setup(x => x.AcceptOrRejectUserDetailChangeRequestAsync(detailRequest))
-                .ReturnsAsync(_responseMock.Object);
-
-            // Act
-            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(detailsRequest) as ObjectResult;
-
-            // Assert
-            result.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        }
-
         [TestMethod]
         public async Task PendingUserChangeRequests_Pass_InvalidRequest_Return_InternalServerError()
         {
@@ -583,6 +562,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result?.StatusCode.Should().Be((int)HttpStatusCode.OK);
         }
 
+        [TestMethod]
         public async Task AcceptOrRejectUserDetailsChangeRequest_ThrowsException_WhenSendingEmailFails()
         {
             // Arrange
@@ -818,6 +798,36 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             _messagingServiceMock.Verify(service =>
                 service.SendAcceptedUserDetailChangeEmail(It.IsAny<UserDetailsChangeNotificationEmailInput>()),
                 Times.Never());
+        }
+
+        [TestMethod]
+        public async Task AcceptOrRejectUserDetailsChangeRequest_FailedRequest_ReturnsErrorResponse()
+        {
+            // Arrange
+            var request = new UpdateUserDetailsRequest
+            {
+                ChangeHistoryExternalId = Guid.NewGuid(),
+                HasRegulatorAccepted = true,
+                RegulatorComment = "Approved"
+            };
+
+            var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+            _mockRegulatorService.Setup(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _sut.AcceptOrRejectUserDetailsChangeRequest(request);
+
+            // Assert
+            var badRequestResult = result as StatusCodeResult;
+            Assert.IsNotNull(badRequestResult);
+            Assert.AreEqual(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
+
+            _mockRegulatorService.Verify(service =>
+                service.AcceptOrRejectUserDetailChangeRequestAsync(It.IsAny<UpdateUserDetailRequest>()),
+                Times.Once());
         }
     }
 }
