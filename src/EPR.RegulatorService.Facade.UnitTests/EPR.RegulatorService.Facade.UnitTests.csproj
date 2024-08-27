@@ -43,6 +43,11 @@
       <PackageReference Update="SonarAnalyzer.CSharp" Version="9.30.0.95878" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Core\Services\BlobStorage\" />
+      <Folder Include="Helpers\" />
+    </ItemGroup>
+
 
 </Project>
 

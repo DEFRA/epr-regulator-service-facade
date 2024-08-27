@@ -1,5 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Results;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 {
@@ -16,7 +16,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         private readonly HttpClient _httpClient;
         private readonly ILogger<RegulatorOrganisationService> _logger;
         private readonly AccountsServiceApiConfig _config;
-
+        
         public RegulatorOrganisationService(
             HttpClient httpClient,
             ILogger<RegulatorOrganisationService> logger,
@@ -52,7 +52,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Create regulator organisation name {request.Name} service response is successful");
+                    _logger.LogInformation("Create regulator organisation name {Name} service response is successful", request.Name);
 
                     string headerValue = response.Headers.GetValues("Location").First();
 
@@ -63,20 +63,18 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
                     if (createdOrganisation.IsSuccessStatusCode)
                     {
                         string content = await createdOrganisation.Content.ReadAsStringAsync();
-
-                        _logger.LogInformation($"Create regulator organisation name {request.Name} service content response is {content}");
+                        _logger.LogInformation("Create regulator organisation name {Name} service response is {Content}", request.Name, content);
 
                         var result = JsonSerializer.Deserialize<CreateRegulatorOrganisationResponseModel>(content)!;
 
                         result.Nation = nationName;
 
-                        _logger.LogInformation($"Create regulator organisation name {request.Name} service nation is {nationName}");
-
+                        _logger.LogInformation("Create regulator organisation name {Name} service nation is {NationName}", request.Name, nationName);
                         return Result<CreateRegulatorOrganisationResponseModel>.SuccessResult(result);
                     }
                     else
                     {
-                        _logger.LogError($"Get regulator organisation service failed: {createdOrganisation}");
+                        _logger.LogError("Get regulator organisation service failed: {CreatedOrganisation}", createdOrganisation);
                     }
                 }
 
@@ -84,7 +82,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, ex);
+                _logger.LogError(ex, "{Message}", ex.Message);
 
                 return Result<CreateRegulatorOrganisationResponseModel>.FailedResult(string.Empty, HttpStatusCode.BadRequest);
             }
@@ -93,7 +91,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> RegulatorInvites(AddInviteUserRequest request)
         {
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
-
+            
             return await _httpClient.PostAsync(_config.Endpoints.RegulatorInvitation, GetStringContent(request));
         }
 
@@ -106,7 +104,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
 
         public async Task<HttpResponseMessage> RegulatorInvited(Guid id, string email)
         {
-            _logger.LogInformation("Attempting to fetch pending invite token from the backend");
+            _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
             var url = string.Format($"{_config.Endpoints.RegulatorInvitedUser}", id, email);
 
@@ -116,13 +114,13 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> GetRegulatorUserList(Guid userId, Guid organisationId, bool getApprovedUsersOnly)
         {
             var url = $"{_config.Endpoints.GetRegulatorUsers}?userId={userId}&organisationId={organisationId}&getApprovedUsersOnly={true}";
-        
+
             _logger.LogInformation("Attempting to fetch the users for organisation id {OrganisationId} from the backend", organisationId);
-        
+
             return await _httpClient.GetAsync(url);
         }
 
-        private StringContent GetStringContent(object request)
+        private static StringContent GetStringContent(object request)
         {
             string jsonRequest = JsonSerializer.Serialize(request);
 
@@ -132,16 +130,16 @@ namespace EPR.RegulatorService.Facade.Core.Services.Regulator
         public async Task<HttpResponseMessage> GetUsersByOrganisationExternalId(Guid userId, Guid externalId)
         {
             var url = string.Format($"{_config.Endpoints.GetUsersByOrganisationExternalId}", userId, externalId);
-        
-            _logger.LogInformation("Attempting to fetch the users for organisation external id {externalId} from the backend", externalId);
-        
+
+            _logger.LogInformation("Attempting to fetch the users for organisation external id {ExternalId} from the backend", externalId);
+
             return await _httpClient.GetAsync(url);
         }
         
         public async Task<HttpResponseMessage> AddRemoveApprovedUser(AddRemoveApprovedUserRequest request)
         {
             _logger.LogInformation("Attempting to fetch pending applications from the backend");
-
+            
             return await _httpClient.PostAsync(_config.Endpoints.AddRemoveApprovedUser, GetStringContent(request));
         }
     }

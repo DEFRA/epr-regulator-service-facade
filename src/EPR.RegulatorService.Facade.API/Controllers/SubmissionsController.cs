@@ -86,6 +86,7 @@ public class SubmissionsController : ControllerBase
             return Ok(emailIds);
         }
 
+        _logger.LogError("BadRequest");
         return new BadRequestResult();
     }
 

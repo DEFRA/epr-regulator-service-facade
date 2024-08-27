@@ -1,4 +1,3 @@
-using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
@@ -8,11 +7,12 @@ using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
 {
     [TestClass]
-    public class SubmissionsServiceTests
+    public class SubmissionsServiceTestsAdditional
     {
         private SubmissionsService _sut;
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());

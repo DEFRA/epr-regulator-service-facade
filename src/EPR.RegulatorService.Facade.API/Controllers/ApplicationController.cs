@@ -5,6 +5,7 @@ using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using Microsoft.Extensions.Options;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
+using EPR.RegulatorService.Facade.Core.Exceptions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -33,7 +34,7 @@ public class ApplicationController : ControllerBase
             {
                 _logger.LogInformation($"Attempting to send ApprovedPersonAccepted email");
                 string? messageId = _messagingService.ApprovedPersonAccepted(model);
-                _logger.LogInformation($"Email sent: {messageId}");
+                _logger.LogInformation("Email sent:{MessageIds}", String.Join(',', messageId));
                 return Ok(messageId);
             }
             else if (request.DelegatedUsers.Count == 1)
@@ -48,7 +49,7 @@ public class ApplicationController : ControllerBase
                 });
 
                 var messageIds = _messagingService.DelegatedPersonAccepted(model);
-                _logger.LogInformation($"Emails sent:{String.Join(',', messageIds)}");
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageIds));
                 return Ok(messageIds);
             }
         }
@@ -61,7 +62,7 @@ public class ApplicationController : ControllerBase
                 CopyDelegatedUsersFromRequestToModel(request, model);
                 
                 var messageIds = _messagingService.ApprovedPersonRejected(model);
-                _logger.LogInformation($"Emails sent:{String.Join(',', messageIds)}");
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageIds));
                 return Ok(messageIds);
             }
             else if (request.RegulatorRole == RegulatorRole.Delegated)
@@ -71,15 +72,15 @@ public class ApplicationController : ControllerBase
                 CopyDelegatedUsersFromRequestToModel(request, model);
                 
                 var messageIds = _messagingService.DelegatedPersonRejected(model);
-                _logger.LogInformation($"Emails sent:{String.Join(',', messageIds)}");
+                _logger.LogInformation("Emails sent:{MessageIds}", String.Join(',', messageIds));
                 return Ok(messageIds);
             }
         }
 
-        throw new Exception("Invalid Request");
+        throw new RegulatorFacadeException("Invalid Request");
     }
 
-    private void CopyDelegatedUsersFromRequestToModel(GovNotificationRequestModel request, ApplicationEmailModel model)
+    private static void CopyDelegatedUsersFromRequestToModel(GovNotificationRequestModel request, ApplicationEmailModel model)
     {
         request.DelegatedUsers.ForEach(delegatedPerson => 
             model.DelegatedPeople.Add(new UserEmailModel()

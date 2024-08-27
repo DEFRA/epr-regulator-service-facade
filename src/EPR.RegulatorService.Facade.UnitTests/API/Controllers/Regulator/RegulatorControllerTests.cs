@@ -1,4 +1,3 @@
-using System.Net;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Services.Application;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
 {
@@ -242,6 +242,32 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
         }
 
         [TestMethod]
+        public async Task When_Update_Enrolment_Is_Called_And_Request_Is_Unauthorizied_Then_Return_500()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x =>
+                x.UpdateEnrolment(It.IsAny<ManageRegulatorEnrolmentRequest>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.Unauthorized
+            });
+
+            // Act
+            var result = await _sut.UpdateEnrolment(
+                new UpdateEnrolmentRequest
+                {
+                    EnrolmentId = _organisationId,
+                    EnrolmentStatus = "Approved",
+                    Comments = String.Empty
+                });
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
         public async Task
             When_Transfer_Organisation_Nation_Is_Called_And_Request_Is_Invalid_Then_Return_400_Bad_Request()
         {
@@ -409,6 +435,211 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             Assert.IsInstanceOfType(result, typeof(StatusCodeResult));
             var statusCodeResult = result as StatusCodeResult;
             statusCodeResult?.StatusCode.Should().Be((int) HttpStatusCode.InternalServerError);
+        }
+
+        [TestMethod]
+        public async Task
+    When_Organisations_Pending_Application_Is_Called_And_User_Is_Not_Valid_Then_Return_Null()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x =>
+                x.GetOrganisationPendingApplications(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.Forbidden));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.GetOrganisationApplications(_organisationId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+
+        [TestMethod]
+        public async Task When_Update_Enrolment_Is_Called_And_User_Is_Not_Valid_Then_Return_Null()
+        {
+            // Arrange
+            _mockRegulatorService.Setup(x =>
+                x.UpdateEnrolment(It.IsAny<ManageRegulatorEnrolmentRequest>())
+            ).ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.Forbidden));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.UpdateEnrolment(
+                new UpdateEnrolmentRequest
+                {
+                    EnrolmentId = _organisationId,
+                    EnrolmentStatus = "Approved",
+                    Comments = String.Empty
+                });
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task
+    When_Organisations_Pending_Application_Is_Called_And_Request_Is_BadRequest_Then_Return_400_Error()
+        {
+            // Arrange
+            _ = new ApplicationEnrolmentDetailsResponse();
+            
+            // Act
+            var result = await _sut.GetOrganisationApplications(_organisationId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task Should_return_null_when_invalid_response()
+        {
+            // Arrange
+            var enrolments = new List<OrganisationEnrolments> { };
+
+            _mockRegulatorService.Setup(x =>
+                    x.PendingApplications(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(),
+                        It.IsAny<string>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(enrolments)),
+                    StatusCode = HttpStatusCode.Unauthorized
+                });
+
+            // Act
+            var result = await _sut.PendingApplications(_currentPage, PageSize, OrganisationName, ServiceRoleId);
+
+            // Assert
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task
+    When_Transfer_Organisation_Nation_Is_Called_And_User_Is_Not_Valid_Then_Return_Null()
+        {
+            // Arrange
+            var request = new OrganisationTransferNationRequest
+            {
+                OrganisationId = _organisationId,
+                TransferNationId = 3,
+                TransferComments = "Incorrect nation"
+            };
+            _mockRegulatorService.Setup(x =>
+                x.TransferOrganisationNation(It.IsAny<OrganisationTransferNationRequest>())
+            ).ThrowsAsync(new HttpRequestException("Test exception", null, HttpStatusCode.Forbidden));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.TransferOrganisationNation(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task
+    When_Transfer_Organisation_Nation_Is_Called_And_RequestIsNotPostive_Then_Return_500()
+        {
+            // Arrange
+            var request = new OrganisationTransferNationRequest
+            {
+                OrganisationId = _organisationId,
+                TransferNationId = 3,
+                TransferComments = String.Empty
+            };
+            _mockRegulatorService.Setup(x =>
+                x.TransferOrganisationNation(It.IsAny<OrganisationTransferNationRequest>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.TooManyRequests
+            });
+
+            // Act
+            var result = await _sut.TransferOrganisationNation(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
+        public async Task
+        When_Organisations_Pending_Application_Is_Called_And_Request_Is_InValid_Then_Return_500()
+        {
+            // Arrange
+            var enrolments = new ApplicationEnrolmentDetailsResponse();
+            _mockRegulatorService.Setup(x =>
+                x.GetOrganisationPendingApplications(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(enrolments)),
+                StatusCode = HttpStatusCode.TooManyRequests
+            });
+
+            // Act
+            var result = await _sut.GetOrganisationApplications(_organisationId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
+        public async Task When_User_Details_Is_Called_And_Request_Is_InValid_Then_Return_500()
+        {
+            // Arrange
+            var enrolments = new ApplicationEnrolmentDetailsResponse();
+            _mockRegulatorService.Setup(x =>
+                x.GetUserOrganisations(It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(enrolments))
+            });
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.GetUserDetails();
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task When_User_Organisations_Is_Called_And_Request_Is_InValid_Then_Return_500()
+        {
+            // Arrange
+            var enrolments = new ApplicationEnrolmentDetailsResponse();
+            _mockRegulatorService.Setup(x =>
+                x.GetUserOrganisations(It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(enrolments)),
+                StatusCode = HttpStatusCode.TooManyRequests
+            });
+
+            // Act
+            var result = await _sut.GetUserDetails();
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
         }
     }
 }

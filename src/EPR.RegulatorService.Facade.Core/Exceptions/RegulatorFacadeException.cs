@@ -5,25 +5,25 @@ using System.Runtime.Serialization;
 
 [ExcludeFromCodeCoverage]
 [Serializable]
-public class BlobStorageServiceException : Exception
+public class RegulatorFacadeException : Exception
 {
-    public BlobStorageServiceException()
+    public RegulatorFacadeException()
     {
     }
 
-    public BlobStorageServiceException(string message)
+    public RegulatorFacadeException(string message)
         : base(message)
     {
     }
 
-    public BlobStorageServiceException(string message, Exception inner)
+    public RegulatorFacadeException(string message, Exception inner)
         : base(message, inner)
     {
     }
 
 // Disable the warning.
 #pragma warning disable SYSLIB0051
-    protected BlobStorageServiceException(SerializationInfo info, StreamingContext context)
+    protected RegulatorFacadeException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
     }

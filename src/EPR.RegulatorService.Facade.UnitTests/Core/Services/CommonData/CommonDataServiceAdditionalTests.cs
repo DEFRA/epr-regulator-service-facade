@@ -15,7 +15,7 @@ using Moq.Protected;
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.CommonData;
 
 [TestClass]
-public class CommonDataServiceTests
+public class CommonDataServiceAdditionalTests
 {
     private CommonDataService _sut;
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());

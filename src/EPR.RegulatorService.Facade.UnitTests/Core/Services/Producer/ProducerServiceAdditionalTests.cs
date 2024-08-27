@@ -16,7 +16,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Producer
 {
     [TestClass]
-    public class ProducerServiceTests
+    public class ProducerServiceAdditionalTests
     {
         private ProducerService _sut;
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
@@ -69,7 +69,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Producer
         public async Task Should_return_empty_list_when_no_results_for_organisation_by_searchTerm()
         {
             // Arrange
-            var expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationsBySearchTerm}";
+            var expectedUrl = string.Format($"{BaseAddress}/{_configuration.Value.Endpoints.RegulatorRemoveApprovedUser}", new RemoveApprovedUsersRequest());
             SetupApiCall<OrganisationSearchResult>(0, expectedUrl);
 
             // Act

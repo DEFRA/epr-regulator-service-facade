@@ -32,13 +32,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         builder.Configuration.Bind("AzureAdB2C", options);
     });
 
+
 // Authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 
 // General Config
 builder.Services.AddControllers()
@@ -77,4 +74,4 @@ app.MapHealthChecks(
     builder.Configuration.GetValue<string>("HealthCheckPath"),
     HealthCheckOptionBuilder.Build()).AllowAnonymous();
 
-app.Run();
+await app.RunAsync();

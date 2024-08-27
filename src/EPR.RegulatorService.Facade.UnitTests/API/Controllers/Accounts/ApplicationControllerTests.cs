@@ -150,15 +150,16 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public async Task AccountsController_Throws_500_On_Error()
+        public async Task AccountsController_Throws_BadRequest_On_Error()
         {
             // Arrange
             var govNotificationRequestModel = GetGovNotificationRequestModel();
             govNotificationRequestModel.Decision = "";
 
             // Act
-            await _sut.GovNotification(govNotificationRequestModel);
+            var result = _sut.GovNotification(govNotificationRequestModel);
+
+            result.Should().NotBeNull();
         }
 
         [TestMethod]
@@ -184,7 +185,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
             await _sut.GovNotification(govNotificationRequestModel);
         }
 
-        private GovNotificationRequestModel GetGovNotificationRequestModel()
+        private static GovNotificationRequestModel GetGovNotificationRequestModel()
         {
             return new GovNotificationRequestModel
             {
@@ -199,7 +200,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
             };
         }
 
-        private ApplicationEmailModel GetApplicationEmailModel()
+        private static ApplicationEmailModel GetApplicationEmailModel()
         {
             var applicationEmailModel = new ApplicationEmailModel()
             {

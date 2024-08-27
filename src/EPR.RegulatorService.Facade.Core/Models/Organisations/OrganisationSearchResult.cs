@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Organisations;
 

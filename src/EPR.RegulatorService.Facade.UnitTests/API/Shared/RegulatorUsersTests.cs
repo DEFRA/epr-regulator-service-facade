@@ -54,5 +54,27 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Shared
         {
             return JsonSerializer.Serialize(RegulatorUsersMockData.GetRegulatorUsers());
         }
+
+        [TestMethod]
+        public async Task When_Get_Regulator_Users_For_Organisation_should_return_null()
+        {
+            // Arrange
+            var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.BadRequest)
+                    .With(x => x.Content, new StringContent(GetRegulatorUsers()))
+                    .Create();
+
+            _regulatorOrganisationServiceMock
+                .Setup(x => x.GetRegulatorUserList(_userId, _organisationId, true))
+                .ReturnsAsync(handlerResponse);
+
+            // Act
+            var result = await _SubmissionsControllerRegulatorUsers.GetRegulatorUsers(_userId, _organisationId);
+
+            // Assert
+            result.Should().BeNull();
+        }
     }
 }

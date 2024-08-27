@@ -15,7 +15,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
 {
     [TestClass]
-    public class RegulatorServiceTests
+    public class RegulatorServiceTestsAdditional
     {
         private ApplicationService _sut;
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());

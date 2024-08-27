@@ -257,7 +257,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
             var regulators = JsonConvert.DeserializeObject<List<OrganisationUserOverviewResponseModel>>(responseString);
             regulators.Count.Should().Be(0);
         }
-        
+
         [TestMethod]
         public async Task AddRemoveApprovedUser_SendValidRequest_ReturnCreatedResult()
         {
@@ -279,7 +279,104 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
             response.Should().NotBeNull();
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
-       
+
+        [TestMethod]
+        public async Task When_Create_Regulator_Organisation_Is_Invoked_And_Gets_BadRequest()
+        {
+            // Arrange
+            var apiResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            var expectedUrl = string.Format($"{BaseAddress}/{_configuration.Value.Endpoints.CreateRegulator}", new CreateRegulatorOrganisationResponseModel());
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            // Act
+            var response = await _sut.CreateRegulatorOrganisation(new CreateRegulatorAccountRequest());
+            VerifyApiCall(expectedUrl, HttpMethod.Post);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task When_Create_Regulator_Organisation_Is_Invoked_And_Gets_ExpectedResult()
+        {
+            // Arrange
+            const string nation = "testNation";
+
+            var apiResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            apiResponse.Headers.Add("location", "testLocation=" + nation);
+            var expectedUrl = string.Format($"{BaseAddress}/{_configuration.Value.Endpoints.CreateRegulator}", new CreateRegulatorOrganisationResponseModel());
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            var apiResponse1 = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new CheckRegulatorOrganisationExistResponseModel()))
+            };
+
+            const string expectedUrl1 = $"{BaseAddress}/{GetRegulator}{nation}";
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl1),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse1).Verifiable();
+
+            // Act
+            var response = await _sut.CreateRegulatorOrganisation(new CreateRegulatorAccountRequest());
+            VerifyApiCall(expectedUrl, HttpMethod.Post);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [TestMethod]
+        public async Task When_Create_Regulator_Organisation_Is_Invoked_And_CreatedOrganisation_Gets_BadRequest()
+        {
+            // Arrange
+            const string nation = "testNation";
+
+            var apiResponse = new HttpResponseMessage(HttpStatusCode.OK);
+            apiResponse.Headers.Add("location", "testLocation=" + nation);
+            var expectedUrl = string.Format($"{BaseAddress}/{_configuration.Value.Endpoints.CreateRegulator}", new CreateRegulatorOrganisationResponseModel());
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse).Verifiable();
+
+            var apiResponse1 = new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+            };
+
+            const string expectedUrl1 = $"{BaseAddress}/{GetRegulator}{nation}";
+
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == expectedUrl1),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(apiResponse1).Verifiable();
+
+            // Act
+            var response = await _sut.CreateRegulatorOrganisation(new CreateRegulatorAccountRequest());
+            VerifyApiCall(expectedUrl, HttpMethod.Post);
+
+            // Assert
+            response.Should().NotBeNull();
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
         private void VerifyApiCall(string expectedUrl, HttpMethod method)
         {
             _httpMessageHandlerMock.Protected().Verify("SendAsync", Times.Once(),

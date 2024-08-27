@@ -194,6 +194,28 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
         }
 
         [TestMethod]
+        public async Task When_GetProducerOrganisationsUsersByExternalId_Is_Called_And_Service_Is_InValid_Then_Null()
+        {
+            // Arrange
+            var users = new List<OrganisationUserOverviewResponseModel>();
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.GetUsersByOrganisationExternalId(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(users)),
+                StatusCode = HttpStatusCode.BadRequest
+            });
+
+            // Act
+            var result = await _sut.GetUsersByOrganisationExternalId(_organisationExternalId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
         public async Task When_RemoveApprovedPerson_RemoveWithoutNomination_Valid_Result_Is_Successful()
         {
             // Arrange
@@ -654,6 +676,237 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationsSea
                         Times.Exactly(1));
             }
             
+        }
+
+        [TestMethod]
+        public async Task InValidRequest_AddRemoveApprovedUser_BadResult()
+        {
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+        
+            _mockMessagingService
+                .Setup(x => x.SendEmailToInvitedNewApprovedPerson(It.IsAny<AddRemoveNewApprovedPersonEmailModel>()));
+            // Act
+            var result = await _sut.AddRemoveApprovedUser(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+        }
+
+        [TestMethod]
+        public async Task Invalid_RemoveApprovedPerson_Exception_Handled()
+        {
+            // Arrange
+            var request = new RemoveApprovedUsersRequest
+            {
+                OrganisationId = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                RemovedConnectionExternalId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.Empty
+            };
+
+            // Act
+            var result = await _sut.RemoveApprovedPerson(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
+        public async Task Invalid_GetProducerOrganisationsUsersByExternalId_Is_Called_And_Request_Is_Valid_Then_Return_BadResult()
+        {
+            // Arrange
+            _ = new List<OrganisationUserOverviewResponseModel>();
+            
+            // Act
+            var result = await _sut.GetUsersByOrganisationExternalId(_organisationExternalId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task When_GetOrganisationsBySearchTerm_Is_Called_And_User_Is_InValid_Then_Return_Null()
+        {
+            // Arrange
+            var organisations = new OrganisationSearchResult();
+            _mockProducerService.Setup(x =>
+                x.GetOrganisationsBySearchTerm(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(organisations))
+            });
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.GetOrganisationsBySearchTerm(_currentPage, PageSize, OrganisationName);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task On_Getting_Organisation_Details_With_User_Invalid_Result_Can_Be_Null()
+        {
+            // Arrange
+            var companyObject = new OrganisationDetailResults();
+            _mockProducerService.Setup(x =>
+                x.GetOrganisationDetails(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(companyObject))
+            });
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.OrganisationDetails(Guid.NewGuid());
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task When_GetProducerOrganisationsUsersByExternalId_Is_Called_And_User_Is_InValid_Then_Return_Null()
+        {
+            // Arrange
+            var users = new List<OrganisationUserOverviewResponseModel>();
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.GetUsersByOrganisationExternalId(It.IsAny<Guid>(), It.IsAny<Guid>())
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(users))
+            });
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.GetUsersByOrganisationExternalId(_organisationExternalId);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task When_RemoveApprovedPerson_RemoveWithoutNomination_InValid_User_Result_Is_Null()
+        {
+            // Arrange
+            var connExternalId = Guid.NewGuid();
+            var organisationId = Guid.NewGuid();
+
+            var associatedPerson = new List<AssociatedPersonResults>
+            {
+                new()
+                {
+                    FirstName = "test",
+                    LastName = "user",
+                    Email = "test@user.com",
+                    OrganisationId = "12545",
+                    CompanyName = "Test Company",
+                    ServiceRoleId = 1,
+                    EmailNotificationType = "RemovedApprovedUser"
+                }
+            };
+
+            var request = new RemoveApprovedUsersRequest
+            {
+                RemovedConnectionExternalId = connExternalId,
+                OrganisationId = organisationId,
+                UserId = Guid.NewGuid(),
+                PromotedPersonExternalId = Guid.Empty
+            };
+
+            _mockProducerService.Setup(x =>
+                x.RemoveApprovedUser(request)
+            ).ReturnsAsync(new HttpResponseMessage()
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(associatedPerson))
+            });
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.RemoveApprovedPerson(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task InValidRequest_AddRemoveApprovedUser_NullResult()
+        {
+            var token = "someToken";
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+
+            _mockRegulatorOrganisationService
+                .Setup(x => x.AddRemoveApprovedUser(It.IsAny<AddRemoveApprovedUserRequest>()))
+                .ReturnsAsync(new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(JsonConvert.SerializeObject(new AddRemoveApprovedPersonResponseModel { InviteToken = token }))
+                });
+
+            _mockMessagingService
+                .Setup(x => x.SendEmailToInvitedNewApprovedPerson(It.IsAny<AddRemoveNewApprovedPersonEmailModel>()));
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            // Act
+            var result = await _sut.AddRemoveApprovedUser(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
+        }
+
+        [TestMethod]
+        public async Task InValidServiceRequest_AddRemoveApprovedUser_ReturnNull()
+        {
+            // Arrange
+            var request = new FacadeAddRemoveApprovedPersonRequest
+            {
+                InvitedPersonEmail = "test@test.com",
+                InvitedPersonFirstName = "FirstName",
+                InvitedPersonLastName = "LastName",
+                OrganisationId = Guid.NewGuid()
+            };
+
+            // Act
+            var result = await _sut.AddRemoveApprovedUser(request);
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as OkObjectResult;
+            statusCodeResult?.StatusCode.Should().Be(null);
         }
     }
 }

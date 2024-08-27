@@ -96,7 +96,50 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Regulator
             result!.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         }
 
-        private CreateRegulatorAccountRequest CreateRegulatorAccountRequest()
+        [TestMethod]
+        public async Task GetRegulatorAccountByNation_Should_return_ServerError_When_UserId_Is_Empty()
+        {
+            // Arrange
+            var response = new CheckRegulatorOrganisationExistResponseModel
+            {
+                CreatedOn = DateTime.Now,
+                ExternalId = Guid.NewGuid(),
+            };
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.GetRegulatorOrganisationByNation(It.IsAny<string>())).ReturnsAsync(response);
+
+            // Act
+            var result = await _sut.GetRegulatorAccountByNation(It.IsAny<string>());
+
+            // Assert
+            result.Should().NotBeNull();
+            var statusCodeResult = result as StatusCodeResult;
+            statusCodeResult?.StatusCode.Should().Be(500);
+        }
+
+        [TestMethod]
+        public async Task CreateRegulatorOrganisation_Should_return_ServerError_When_UserId_Is_Empty()
+        {
+            // Arrange
+            var request = CreateRegulatorAccountRequest();
+
+            _sut.AddDefaultContextWithOid(Guid.Empty, "TestAuth");
+
+            _mockRegulatorOrganisationService.Setup(x =>
+                x.CreateRegulatorOrganisation(It.IsAny<CreateRegulatorAccountRequest>()))
+                .ReturnsAsync(Result<CreateRegulatorOrganisationResponseModel>.FailedResult(string.Empty, HttpStatusCode.BadRequest));
+
+            // Act
+            var result = await _sut.CreateRegulatorOrganisation(request) as BadRequestResult;
+
+            // Assert
+            result!.Should().BeNull();
+        }
+
+        private static CreateRegulatorAccountRequest CreateRegulatorAccountRequest()
         {
             return new CreateRegulatorAccountRequest
             {

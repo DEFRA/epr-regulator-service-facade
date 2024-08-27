@@ -3,6 +3,7 @@ using System.Web;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
@@ -25,6 +26,7 @@ public class OrganisationsSearchController : ControllerBase
     private readonly IRegulatorOrganisationService _regulatorOrganisationService;
     private readonly MessagingConfig _messagingConfig;
     private readonly IMessagingService _messagingService;
+    private readonly JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
     
     public OrganisationsSearchController(
         ILogger<OrganisationsSearchController> logger,
@@ -48,7 +50,8 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -59,7 +62,7 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<PaginatedResponse<OrganisationSearchResult>>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(result);
             }
             
@@ -68,7 +71,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching {pageSize} organisations by {searchTerm} on page {currentPage}");
+            _logger.LogError(e, "Error fetching {PageSize} organisations by {SearchTerm} on page {CurrentPage}", pageSize, searchTerm, currentPage);
+
             return HandleError.Handle(e);
         }
     }
@@ -80,7 +84,8 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -90,17 +95,19 @@ public class OrganisationsSearchController : ControllerBase
             if (response.IsSuccessStatusCode)
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
+                
                 var organisationDetails = JsonSerializer.Deserialize<OrganisationDetailResults>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(organisationDetails);
             }
 
-            _logger.LogError("Fetching organisation details for {externalId} resulted in unsuccessful request: {statusCode}", externalId, response.StatusCode);
+            _logger.LogError("Fetching organisation details for {ExternalId} resulted in unsuccessful request: {StatusCode}", externalId, response.StatusCode);
+
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"Error fetching organisation details for {externalId}", externalId);
+            _logger.LogError(e, "Error fetching organisation details for {ExternalId}", externalId);
             return HandleError.Handle(e);
         }
     }
@@ -112,7 +119,8 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             var userId = User.UserId();
-            if (userId == default)
+            
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -123,16 +131,17 @@ public class OrganisationsSearchController : ControllerBase
             {
                 var stringContent = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<List<OrganisationUserOverviewResponseModel>>(stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
                 return Ok(result);
             }
-            
+
             _logger.LogError("Failed to fetch organisations");
             return HandleError.HandleErrorWithStatusCode(response.StatusCode);
         }
         catch (Exception e)
         {
-            _logger.LogError(e,$"Error fetching producer organisations by external organisation id {externalId}");
+            _logger.LogError(e, "Error fetching producer organisations by external organisation id {ExternalId}", externalId);
+
             return HandleError.Handle(e);
         }
     }
@@ -146,8 +155,10 @@ public class OrganisationsSearchController : ControllerBase
         try
         {
             request.UserId = User.UserId();
-           
-            if (request.UserId == default)
+
+            var userId = User.UserId();
+
+            if (!userId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -160,7 +171,7 @@ public class OrganisationsSearchController : ControllerBase
                 var stringContent = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<AssociatedPersonResults[]>(
                     stringContent,
-                    new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
+                    options);
 
                 if (result.Length > 0)
                 {
@@ -174,7 +185,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"Error deleting approved user for organisation {organisationId}", request.OrganisationId);
+            _logger.LogError(e, "Error deleting approved user for organisation {OrganisationId}", request.OrganisationId);
             return HandleError.Handle(e);
         }
     }
@@ -195,7 +206,7 @@ public class OrganisationsSearchController : ControllerBase
         var invitedByUserEmail = User.Email();
         try
         {
-            if (invitedByUserId == default)
+            if (!invitedByUserId.IsValidGuid())
             {
                 _logger.LogError("UserId not available");
                 return Problem("UserId not available", statusCode: StatusCodes.Status500InternalServerError);
@@ -225,9 +236,7 @@ public class OrganisationsSearchController : ControllerBase
             };
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
-            _logger.LogInformation($@"Email sent to Invited new approved person. 
-                                   Organisation external Id: {request.OrganisationId}
-                                   User: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}");
+            _logger.LogInformation(@"Email sent to Invited new approved person. Organisation external Id: {OrganisationId} User: {InvitedPersonFirstName} {InvitedPersonLastName}", request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
@@ -236,11 +245,8 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, @$"Error inviting new approved person. 
-                                Organisation external Id: {request.OrganisationId}
-                                Invited user: {request.InvitedPersonFirstName} {request.InvitedPersonLastName}
-                                Invited by user email: {invitedByUserEmail}");
-            
+            _logger.LogError(e, @"Error inviting new approved person. Organisation external Id: {OrganisationId} Invited user: {InvitedPersonFirstName} {InvitedPersonLastName} Invited by user email: {InvitedByUserEmail}", request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName, invitedByUserEmail);
+
             return BadRequest("Failed to add / remove user");
         }
     }
@@ -262,9 +268,7 @@ public class OrganisationsSearchController : ControllerBase
             var emailSent = SendNotificationEmailToDeletedPerson(email, email.EmailNotificationType);
             if (!emailSent)
             {
-                var errorMessage = $"Error sending the notification email to user {email.FirstName } {email.LastName} " +
-                                   $" for company {email.CompanyName}";
-                _logger.LogError(errorMessage);
+                _logger.LogError("Error sending the notification email to user {FirstName} {LastName} for company {CompanyName}", email.FirstName, email.LastName, email.CompanyName);
             }
          
         }
