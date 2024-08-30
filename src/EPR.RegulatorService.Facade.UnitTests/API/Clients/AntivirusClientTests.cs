@@ -1,14 +1,14 @@
-﻿using AutoFixture.AutoMoq;
+﻿using System.Net;
 using AutoFixture;
+using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
-using EPR.RegulatorService.Facade.Tests.API.Support.Extensions;
+using EPR.RegulatorService.Facade.UnitTests.API.Support.Extensions;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Net;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Clients
+namespace EPR.RegulatorService.Facade.UnitTests.API.Clients
 {
     [TestClass]
     public class AntivirusClientTests

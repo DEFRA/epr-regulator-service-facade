@@ -10,11 +10,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Core\Services\BlobStorage\**" />
       <Compile Remove="Helpers\**" />
-      <EmbeddedResource Remove="Core\Services\BlobStorage\**" />
       <EmbeddedResource Remove="Helpers\**" />
-      <None Remove="Core\Services\BlobStorage\**" />
       <None Remove="Helpers\**" />
     </ItemGroup>
 
@@ -53,7 +50,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Core\Services\TradeAntiVirus\" />
+      <Folder Include="API\NewFolder\" />
+      <Folder Include="Core\Services\BlobStorage\" />
     </ItemGroup>
 
 

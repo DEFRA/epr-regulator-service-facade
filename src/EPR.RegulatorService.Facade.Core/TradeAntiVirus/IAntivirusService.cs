@@ -1,6 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
 
-namespace EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus
+namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
 {
     public interface IAntivirusService
     {

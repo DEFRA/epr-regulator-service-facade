@@ -1,10 +1,10 @@
-﻿using Azure.Core;
+﻿using System.Net.Http.Headers;
+using Azure.Core;
 using Azure.Identity;
 using EPR.RegulatorService.Facade.Core.Configs;
 using Microsoft.Extensions.Options;
-using System.Net.Http.Headers;
 
-namespace EPR.RegulatorService.Facade.API.Handler
+namespace EPR.RegulatorService.Facade.API.Handlers
 {
     public class AccountServiceAuthorisationHandler : DelegatingHandler
     {

@@ -4,7 +4,7 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
-using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
+using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
 using Notify.Interfaces;
 

@@ -1,9 +1,9 @@
-﻿using Moq.Protected;
-using Moq;
+﻿using System.Net;
 using System.Net.Http.Headers;
-using System.Net;
+using Moq;
+using Moq.Protected;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Support.Extensions
+namespace EPR.RegulatorService.Facade.UnitTests.API.Support.Extensions
 {
     public static class HttpMessageHandlerMockExtensions
     {

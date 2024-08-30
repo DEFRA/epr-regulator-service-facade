@@ -1,19 +1,19 @@
-﻿using EPR.RegulatorService.Facade.API.Controllers;
+﻿using System.Net;
+using System.Security.Claims;
+using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Exceptions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
+using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System.Net;
-using System.Security.Claims;
 
-namespace EPR.RegulatorService.Facade.Tests.API.Controllers.FileDownload
+namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
 {
     [TestClass]
     public class FileDownloadControllerTests : Controller
