@@ -1,5 +1,8 @@
-﻿namespace EPR.RegulatorService.Facade.Core.Models.Requests
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EPR.RegulatorService.Facade.Core.Models.Requests
 {
+    [ExcludeFromCodeCoverage]
     public class InviteEnrollmentRequest
     {
         public string Email { get; set; } = null!;

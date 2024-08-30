@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using Azure.Core;
 using Azure.Identity;
 using EPR.RegulatorService.Facade.Core.Configs;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.API.Handlers
 {
+    [ExcludeFromCodeCoverage]
     public class AccountServiceAuthorisationHandler : DelegatingHandler
     {
         private readonly TokenRequestContext _tokenRequestContext;

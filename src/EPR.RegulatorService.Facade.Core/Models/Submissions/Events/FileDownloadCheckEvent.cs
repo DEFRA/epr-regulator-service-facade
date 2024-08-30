@@ -1,7 +1,9 @@
-﻿using EPR.RegulatorService.Facade.Core.Enums;
+﻿using System.Diagnostics.CodeAnalysis;
+using EPR.RegulatorService.Facade.Core.Enums;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
 
+[ExcludeFromCodeCoverage]
 public class FileDownloadCheckEvent : AbstractEvent
 {
     public override EventType Type => EventType.FileDownloadCheck;

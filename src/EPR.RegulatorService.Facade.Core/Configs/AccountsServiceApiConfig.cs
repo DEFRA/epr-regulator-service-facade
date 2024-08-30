@@ -1,5 +1,8 @@
-﻿namespace EPR.RegulatorService.Facade.Core.Configs
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace EPR.RegulatorService.Facade.Core.Configs
 {
+    [ExcludeFromCodeCoverage]
     public class AccountsServiceApiConfig
     {
         public const string SectionName = "AccountsServiceApiConfig";
@@ -13,6 +16,7 @@
         public AccountsServiceEndpoints Endpoints { get; set; } = null!;
     }
 
+    [ExcludeFromCodeCoverage]
     public class AccountsServiceEndpoints
     {
         public string PendingApplications { get; set; } = null!;

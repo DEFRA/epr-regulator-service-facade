@@ -1,4 +1,5 @@
-﻿using EPR.RegulatorService.Facade.API.Handlers;
+﻿using System.Diagnostics.CodeAnalysis;
+using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
@@ -10,6 +11,7 @@ using Notify.Interfaces;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtension
 {
     public static void RegisterComponents(this IServiceCollection services, IConfiguration configuration)
