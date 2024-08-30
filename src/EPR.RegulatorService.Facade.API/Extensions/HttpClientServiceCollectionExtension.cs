@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using EPR.RegulatorService.Facade.API.Handler;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.Application;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;

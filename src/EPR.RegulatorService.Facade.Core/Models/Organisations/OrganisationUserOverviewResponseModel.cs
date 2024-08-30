@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EPR.RegulatorService.Facade.Core.Models.Organisations;
 
+[ExcludeFromCodeCoverage]
 public class OrganisationUserOverviewResponseModel
 {
     public Guid PersonExternalId { get; set; }

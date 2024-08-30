@@ -5,7 +5,7 @@ using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using Microsoft.Extensions.Options;
 
-namespace EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus
+namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
 {
     public class AntivirusService : IAntivirusService
     {

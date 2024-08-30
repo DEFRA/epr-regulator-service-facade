@@ -6,7 +6,7 @@ using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
+using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;

@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Organisations;
 
+[ExcludeFromCodeCoverage]
 public class OrganisationDetails
 {
     public string OrganisationName { get; set; }

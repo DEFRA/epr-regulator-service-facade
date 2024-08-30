@@ -10,6 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Helpers\**" />
+      <EmbeddedResource Remove="Helpers\**" />
+      <None Remove="Helpers\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="AutoFixture.AutoMoq" Version="4.18.1" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="ILogger.Moq" Version="1.1.10" />
@@ -42,6 +48,12 @@
       <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
       <PackageReference Update="SonarAnalyzer.CSharp" Version="9.30.0.95878" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="API\NewFolder\" />
+      <Folder Include="Core\Services\BlobStorage\" />
+    </ItemGroup>
+
 
 </Project>
 

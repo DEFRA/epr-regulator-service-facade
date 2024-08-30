@@ -1,15 +1,17 @@
-﻿using EPR.RegulatorService.Facade.API.Handlers;
+﻿using System.Diagnostics.CodeAnalysis;
+using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
-using EPR.RegulatorService.Facade.Core.Services.TradeAntiVirus;
+using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
 using Notify.Interfaces;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtension
 {
     public static void RegisterComponents(this IServiceCollection services, IConfiguration configuration)
