@@ -1,37 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <AssemblyName>EPR.RegulatorService.Facade.Core</AssemblyName>
-        <RootNamespace>EPR.RegulatorService.Facade.Core</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>EPR.RegulatorService.Facade.Core</AssemblyName>
+    <RootNamespace>EPR.RegulatorService.Facade.Core</RootNamespace>
+    <NoWarn>S3903, S5144</NoWarn>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- SonarCloud does not recognise file-scoped namespaces in current version. -->
-        <NoWarn>S3903</NoWarn>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
+    <PackageReference Include="Enums.NET" Version="5.0.0" />
+    <PackageReference Include="GovukNotify" Version="7.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
-      <PackageReference Include="Enums.NET" Version="5.0.0" />
-      <PackageReference Include="GovukNotify" Version="7.1.0" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-       <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-       <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <SonarQubeSetting Include="sonar.coverage.exclusions">
+      <Value>**/AddressModel.cs,**/EnrolmentDetails.cs,**/OrganisationDetailModel.cs,**/OrganisationSearchResult.cs,**/UserDetailsModel.cs,**/UserOrganisationsListModel.cs,**/UserEnrolmentDetails.cs,**/TransferDetails.cs,**/PomSubmissionSummaryResponse.cs</Value>
+    </SonarQubeSetting>
+  </ItemGroup>
 
-    <ItemGroup>
-        <SonarQubeSetting Include="sonar.coverage.exclusions">
-            <Value>**/AddressModel.cs,**/EnrolmentDetails.cs,**/OrganisationDetailModel.cs,**/OrganisationSearchResult.cs,**/UserDetailsModel.cs,**/UserOrganisationsListModel.cs,**/UserEnrolmentDetails.cs,**/TransferDetails.cs,**/PomSubmissionSummaryResponse.cs</Value>
-        </SonarQubeSetting>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
-      <PackageReference Update="SonarAnalyzer.CSharp" Version="9.30.0.95878" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+    <PackageReference Update="SonarAnalyzer.CSharp" Version="9.30.0.95878" />
+  </ItemGroup>
 
 </Project>

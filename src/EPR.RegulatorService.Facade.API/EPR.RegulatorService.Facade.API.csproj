@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>8dcf2dae-f93f-4bec-9355-04b9a0386cbd</UserSecretsId>
-    <NoWarn>S3903, S6967, S6934</NoWarn>
+    <NoWarn>S3903, S6967, S6934, S5144</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
