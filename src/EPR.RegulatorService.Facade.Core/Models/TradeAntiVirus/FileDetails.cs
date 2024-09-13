@@ -5,7 +5,9 @@ namespace EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus
     [ExcludeFromCodeCoverage]
     public class FileDetails
     {
-        public static string Service => "epr";
+        #pragma warning disable CA1822 // Mark members as static
+        public string Service => "epr";
+        #pragma warning restore CA1822 // Mark members as static
 
         public Guid Key { get; set; }
 
