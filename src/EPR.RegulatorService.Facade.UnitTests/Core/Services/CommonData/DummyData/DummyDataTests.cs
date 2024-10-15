@@ -2,6 +2,7 @@
 using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
+using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
 using Moq;
 using System;
@@ -23,16 +24,27 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.CommonData.DummyDa
 public class DummyDataTests
 {
     private Guid _userId = Guid.NewGuid();
-    private readonly string testDataFilePath = "./Core/Services/CommonData/DummyData/dummydata.json";
+    private readonly string testDataFilePath = ".\\Core\\Services\\CommonData\\DummyData\\dummydata.json";
 
-    
+    OrganisationRegistrationDataCollection? _testData = null;
+
+    public TestContext TestContext
+    {
+        get; set;
+    }
+
+    [TestInitialize]
+    public void Setup()
+    {
+        _testData = TestRunDataHelper.LoadDataFile<OrganisationRegistrationDataCollection>(testDataFilePath, TestContext);
+    }
+
     [TestMethod]
     public void OrganisationDummDataLoader_LoadsDummyDataFromFile()
     {
         IDummyDataLoader<OrganisationRegistrationDataCollection> dataLoader = new OrganisationDummyDataLoader();
 
-        var jsonData = File.ReadAllText(testDataFilePath);
-        var expectedData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(jsonData);
+        var expectedData = _testData;
 
         var orgDataCollection = dataLoader.LoadData(testDataFilePath);
         Assert.IsNotNull(orgDataCollection);
@@ -48,7 +60,7 @@ public class DummyDataTests
     [TestMethod]
     public void DataCache_LoadsDataWhenTheValueIsRequested()
     {
-        var expectedData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(File.ReadAllText(testDataFilePath));
+        var expectedData = _testData;
 
         Mock<OrganisationDummyDataLoader> mockLoader = new Mock<OrganisationDummyDataLoader>();
         mockLoader.Setup(m=> m.LoadData(testDataFilePath)).Returns(expectedData);
@@ -63,7 +75,7 @@ public class DummyDataTests
     [TestMethod]
     public void DataCache_DoesntLoadsDataWhenTheValueIsNotRequired()
     {
-        var expectedData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(File.ReadAllText(testDataFilePath));
+        var expectedData = _testData;
 
         var mockLoader = new Mock<OrganisationDummyDataLoader>();
         mockLoader.Setup(m => m.LoadData(testDataFilePath)).Returns(expectedData);
@@ -77,7 +89,8 @@ public class DummyDataTests
     [TestMethod]
     public async Task FilterRegistrations_Will_Not_Filter_Data_When_No_Filter_Params_Supplied()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
+
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId
@@ -90,7 +103,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task FilterRegistrations_Will_Filter_OrganisationName()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
@@ -104,7 +117,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task FilterRegistrations_Will_Filter_OrganisationType()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
@@ -118,7 +131,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task FilterRegistrations_Will_Filter_OrganisationReference()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
@@ -138,7 +151,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task FilterRegistrations_Will_Filter_OnMultipleClauses()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
@@ -154,7 +167,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task FilterRegistrations_Will_Filter_OnRegistrationYears()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
@@ -170,7 +183,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task Filter_Will_Remove_All_But_Small_And_Pagination_Will_Return_3_Items()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
 
         var request = new GetOrganisationRegistrationRequest
         {
@@ -190,7 +203,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task JsonOrganisationRegistrationHandler_Will_Return_StatusOK_When_Successful()
     {
-        var expectedData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var expectedData = _testData;
         var mockLoader = new Mock<IDummyDataLoader<OrganisationRegistrationDataCollection>>();
         mockLoader.Setup(m => m.LoadData(testDataFilePath)).Returns(expectedData);
         var request = new GetOrganisationRegistrationRequest
@@ -207,7 +220,7 @@ public class DummyDataTests
     [TestMethod]
     public async Task JsonOrganisationRegistrationHandler_Will_Load_Data_As_Expected()
     {
-        var testData = JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(await File.ReadAllTextAsync(testDataFilePath));
+        var testData = _testData;
         var mockLoader = new Mock<IDummyDataLoader<OrganisationRegistrationDataCollection>>();
         mockLoader.Setup(m => m.LoadData(testDataFilePath)).Returns(testData);
 

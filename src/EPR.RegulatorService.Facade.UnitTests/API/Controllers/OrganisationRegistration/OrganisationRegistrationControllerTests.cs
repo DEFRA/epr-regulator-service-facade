@@ -30,6 +30,11 @@ public class OrganisationRegistrationControllerTests : Controller
     private readonly Guid _oid = Guid.NewGuid();
     private readonly string testDataFilePath = ".\\API\\Controllers\\OrganisationRegistration\\paginateddummydata.json";
 
+    public TestContext TestContext
+    {
+        get; set;
+    }
+
     [TestInitialize]
     public void Setup()
     {
@@ -42,7 +47,6 @@ public class OrganisationRegistrationControllerTests : Controller
             _mockCommonDataService.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
-
     }
 
     private void setupNoDataForCommonData()
@@ -60,7 +64,7 @@ public class OrganisationRegistrationControllerTests : Controller
 
     private void setupAllDataForCommonDataAsync()
     {
-         var testJson = System.IO.File.ReadAllText(testDataFilePath);
+         var testJson = TestRunDataHelper.LoadDataFile(testDataFilePath, TestContext);
 
         var handlerResponse =
         _fixture
