@@ -1,12 +1,15 @@
+using System.Dynamic;
 using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
+using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;

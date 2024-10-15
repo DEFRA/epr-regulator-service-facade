@@ -7,6 +7,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData
     {
         private static readonly Dictionary<string, Lazy<OrganisationRegistrationDataCollection>> _cache = new();
 
+        public static void Reset() { _cache.Clear(); }
+
         public static Lazy<OrganisationRegistrationDataCollection> GetOrAdd(string filePath, Func<string, OrganisationRegistrationDataCollection> valueFactory)
         {
             if (!_cache.TryGetValue(filePath, out var lazyData))

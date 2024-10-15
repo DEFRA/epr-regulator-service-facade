@@ -2,6 +2,7 @@
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
 using EPR.RegulatorService.Facade.Core.Services;
@@ -25,10 +26,11 @@ public class JsonOrganisationRegistrationHandler(string filePath, IDummyDataLoad
         {
             var registrations = OrganisationRegistrationDummyDataCache.GetOrAdd(_filePath, _loader.LoadData).Value;
             var filteredRegistrations = FilterRegistrations(registrations, request).Select(data => (OrganisationRegistrationSummaryResponse)data).ToList();
+            var paginatedRegistrations = Paginate<OrganisationRegistrationSummaryResponse>(filteredRegistrations, request.PageNumber.Value, request.PageSize.Value);
             
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(JsonSerializer.Serialize(filteredRegistrations), Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
+                Content = new StringContent(paginatedRegistrations, Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
             };
 
             return response;
@@ -45,35 +47,71 @@ public class JsonOrganisationRegistrationHandler(string filePath, IDummyDataLoad
         }
     }
 
-    private static List<OrganisationRegistrationData> FilterRegistrations(OrganisationRegistrationDataCollection data, GetOrganisationRegistrationRequest request)
+    public static List<OrganisationRegistrationData> FilterRegistrations(OrganisationRegistrationDataCollection data, GetOrganisationRegistrationRequest request)
     {
-        var filteredData = data.Items.AsQueryable();
+        // Start with the entire collection
+        var filteredData = data.Items.AsEnumerable();  // Using AsEnumerable() since we are working with an in-memory collection
 
+        // Filter by OrganisationName if it's provided
         if (!string.IsNullOrWhiteSpace(request.OrganisationName))
         {
-            filteredData = filteredData.Where(r => r.OrganisationName.Contains(request.OrganisationName, StringComparison.OrdinalIgnoreCase));
+            filteredData = filteredData.Where(r => r.OrganisationName != null &&
+                                                   r.OrganisationName.ToLower().Contains(request.OrganisationName.ToLower()));
         }
 
+        // Filter by OrganisationReference if it's provided
         if (!string.IsNullOrWhiteSpace(request.OrganisationReference))
         {
-            filteredData = filteredData.Where(r => r.OrganisationId.Equals(request.OrganisationReference, StringComparison.OrdinalIgnoreCase));
+            filteredData = filteredData.Where(r => r.OrganisationReference != null &&
+                                                   r.OrganisationReference.ToLower().Contains(request.OrganisationReference.ToLower()));
         }
 
+        // Filter by OrganisationType if it's provided
         if (!string.IsNullOrWhiteSpace(request.OrganisationType))
         {
-            filteredData = filteredData.Where(r => request.OrganisationType.Contains(r.OrganisationType.ToString(), StringComparison.OrdinalIgnoreCase));
+            filteredData = filteredData.Where(r => r.OrganisationType != null &&
+                                                   request.OrganisationType.ToLower().Contains(r.OrganisationType.ToString().ToLower()));
         }
 
+        // Filter by Statuses if provided
         if (!string.IsNullOrWhiteSpace(request.Statuses))
         {
-            filteredData = filteredData.Where(r => request.Statuses.Contains(r.RegistrationStatus.ToString(), StringComparison.OrdinalIgnoreCase));
+            filteredData = filteredData.Where(r => r.RegistrationStatus != null &&
+                                                   request.Statuses.ToLower().Contains(r.RegistrationStatus.ToString().ToLower()));
         }
 
-        if(!string.IsNullOrEmpty(request.SubmissionYears))
+        // Filter by SubmissionYears if provided
+        if (!string.IsNullOrEmpty(request.RegistrationYears))
         {
-            filteredData = filteredData.Where(r => request.SubmissionYears.Contains(r.RegistrationYear.ToString(), StringComparison.OrdinalIgnoreCase));
+            filteredData = filteredData.Where(r => request.RegistrationYears.ToLower().Contains(r.RegistrationYear.ToString()));
         }
 
-        return [.. filteredData];
+        // Convert to a list and return
+        return filteredData.ToList();
+    }
+
+    public static string Paginate<T>(List<T>? items, int currentPage, int pageSize)
+    {
+        currentPage = currentPage < 1 ? 1 : currentPage;
+        object retObj = null;
+
+        if ( items.Count == 0)
+        {
+            retObj = new PaginatedResponse<T> { Items = [], CurrentPage = currentPage, PageSize = pageSize, TotalItems = 0 };
+        } else
+        {
+            var paginatedItems = items.Skip((currentPage - 1) * pageSize)
+                                      .Take(pageSize)
+                                      .ToList();
+            retObj = new PaginatedResponse<T>
+            {
+                Items = paginatedItems,
+                CurrentPage = currentPage,
+                TotalItems = items.Count,
+                PageSize = pageSize
+            };
+        }
+
+        return JsonSerializer.Serialize(retObj);
     }
 }

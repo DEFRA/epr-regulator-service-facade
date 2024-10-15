@@ -10,6 +10,20 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="API\Controllers\OrganisationRegistration\paginateddummydata.json" />
+      <None Remove="Core\Services\CommonData\DummyData\dummydata.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="API\Controllers\OrganisationRegistration\paginateddummydata.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="Core\Services\CommonData\DummyData\dummydata.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="AutoFixture.AutoMoq" Version="4.18.1" />
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
         <PackageReference Include="ILogger.Moq" Version="1.1.10" />

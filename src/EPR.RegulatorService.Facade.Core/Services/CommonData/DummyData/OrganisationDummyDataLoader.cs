@@ -5,7 +5,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData
 {
     public class OrganisationDummyDataLoader : IDummyDataLoader<OrganisationRegistrationDataCollection>
     {
-        public OrganisationRegistrationDataCollection LoadData(string filePath)
+        public virtual OrganisationRegistrationDataCollection LoadData(string filePath)
         {
             try
             {

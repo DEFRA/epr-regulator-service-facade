@@ -48,7 +48,7 @@ public class CommonDataService : ICommonDataService
                 new CommonDataOrganisationRegistrationHandler(_httpClient, _config),
 
             var type when type == typeof(JsonOrganisationRegistrationHandler) =>
-                new JsonOrganisationRegistrationHandler("path/to/the/file.json", new OrganisationDummyDataLoader()),
+                new JsonOrganisationRegistrationHandler(".\\Services\\CommonData\\DummyData\\dummyregistrationdata.json", new OrganisationDummyDataLoader()),
 
             _ => throw new InvalidOperationException($"Unknown handler type ${nameof(T)})")
         };

@@ -1,5 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
+using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
@@ -9,6 +10,8 @@ using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -17,34 +20,43 @@ namespace EPR.RegulatorService.Facade.API.Controllers
     public class OrganisationRegistrationController : ControllerBase
     {
         private readonly ILogger<OrganisationRegistrationController> _logger;
-        private readonly RegulatorUsers<OrganisationRegistrationController> _regulatorUsers;
         private readonly ICommonDataService _commonDataService;
 
         public OrganisationRegistrationController(
            ILogger<OrganisationRegistrationController> logger,
-           IRegulatorOrganisationService regulatorOrganisationService,
-           IOptions<OrganisationRegistrationController> messagingConfig,
+           IOptions<MessagingConfig> messagingConfig,
            IMessagingService messagingService,
            ICommonDataService commonDataService)
         {
             _logger = logger;
-            _regulatorUsers = new RegulatorUsers<OrganisationRegistrationController>(regulatorOrganisationService, _logger);
             _commonDataService = commonDataService;
         }
 
 
+
+        /// <summary>
+        /// To do: Implement the real connection in _commonDataService
+        /// JsonOrganisationRegistrationHandler handles the load and filtering of the dummy data
+        /// CommonDataOrganisationRegistrationHandler will handle the request to Synapse when the endpoint is declared
+        /// </summary>
+        /// <param name="request">Filter parameters</param>
+        /// <returns>BadRequest or OK</returns>
         [HttpGet]
         [Route("registrations/get-organisations")]
-        public async Task<IActionResult> GetOrganisationRegistrations([FromQuery] OrganisationRegistrationFilter request)
+        public async Task<IActionResult> GetOrganisationRegistrations([FromQuery, Required] OrganisationRegistrationFilter request)
         {
-            // TODO: Test all the enum values for model validation correctness
+            JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+
             if (!ModelState.IsValid)
             {
-                return ValidationProblem();
+                var validationProblem = new ValidationProblemDetails(ModelState)
+                {
+                    Title = "Validation Error",
+                    Status = 400, // Ensure the status is explicitly set
+                    Detail = "One or more validation errors occurred.",
+                };
+                return BadRequest(validationProblem);
             }
-
-            // TODO: GetLastSyncTime from CommonDataService ?
-            // TODO: GetLastRegistrationSyncTime from SubmissionService ?
 
             var registrationSubmissionsRequest = new GetOrganisationRegistrationRequest
             {
@@ -54,23 +66,21 @@ namespace EPR.RegulatorService.Facade.API.Controllers
                 OrganisationReference = request.OrganisationReference,
                 OrganisationType = request.OrganisationType.ToString(),
                 Statuses = request.Statuses.ToString(),
-                SubmissionYears = request.SubmissionYears,
-                SubmissionPeriods = request.SubmissionPeriods,
+                RegistrationYears = request.RegistrationYear,
                 PageSize = request.PageSize,
                 PageNumber = request.PageNumber
             };
 
-            // TODO: Implement the real connection in _commonDataService
-            // JsonOrganisationRegistrationHandler handles the load and filtering of the dummy data
-            // CommonDataOrganisationRegistrationHandler will handle the request to Synapse when the endpoint is declared
             var registrations = await _commonDataService.GetOrganisationRegistrations<JsonOrganisationRegistrationHandler>(registrationSubmissionsRequest);
             if (!registrations.IsSuccessStatusCode)
             {
+                _logger.LogWarning("Didn't fetch Dummy data successfully");
                 return HandleError.HandleErrorWithStatusCode(registrations.StatusCode);
             }
 
-            var paginatedResponse = await registrations.Content
-                .ReadFromJsonAsync<PaginatedResponse<OrganisationRegistrationSummaryResponse>>();
+            var stringContent = await registrations.Content.ReadAsStringAsync();
+            var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationRegistrationSummaryResponse>>(stringContent,
+                     options);
             return Ok(paginatedResponse);
         }
     }
