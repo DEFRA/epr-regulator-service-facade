@@ -33,7 +33,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Handlers
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<ICommonDataService> _mockCommonDataService = new();
         private readonly NullLogger<OrganisationRegistrationController> _nullLogger = new();
-        private readonly string testDataFilePath = ".\\API\\Controllers\\OrganisationRegistration\\paginateddummydata.json";
+        private readonly string testDataFilePath = "API/Controllers/OrganisationRegistration/paginateddummydata.json";
 
         public TestContext TestContext { get; set; }
 

@@ -66,6 +66,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
             var reportingMessage = $"  AppContext.BaseDirectory = {baseDirectory}.\r\n  GetCurrentDirectory = {currentDirectory}. \r\n  TestRunDirectory = {testrunFolder}\r\n  DeploymentDirectory = {testExecuteFolder}\r\n";
 
             testContext.WriteLine($"=======================\nExecuting Folder Information:\r\n{reportingMessage}\r\n=======================");
+
+            baseDirectory = baseDirectory.Replace("$(buildConfiguration)", "Debug");
             string testPath = Path.Combine(baseDirectory, relativeFilePath);
             if (!File.Exists(testPath)) testContext.WriteLine($"File not found from AppContext: '{testPath}'");
             if (File.Exists(testPath))
@@ -75,6 +77,17 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
                 return;
             }
 
+            baseDirectory = baseDirectory.Replace("Debug", "Release");
+            testPath = Path.Combine(baseDirectory, relativeFilePath);
+            if (!File.Exists(testPath)) testContext.WriteLine($"File not found from AppContext: '{testPath}'");
+            if (File.Exists(testPath))
+            {
+                testFolderRoot = baseDirectory;
+                testContext.WriteLine($"Found file in AppContext: {testPath}");
+                return;
+            }
+
+            currentDirectory = currentDirectory.Replace("$(buildConfiguration)", "Debug");
             testPath = Path.Combine(currentDirectory, relativeFilePath);
             if (!File.Exists(testPath)) testContext.WriteLine($"File not found from GetCurrentDirectory '{testPath}'");
             if (File.Exists(testPath))
@@ -84,21 +97,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
                 return;
             }
 
-            testPath = Path.Combine(testrunFolder, relativeFilePath);
-            if (!File.Exists(testPath)) testContext.WriteLine($"File not found from TestRunDirectory '{testPath}'");
+            currentDirectory = currentDirectory.Replace("Debug", "Release");
+            if (!File.Exists(testPath)) testContext.WriteLine($"File not found from GetCurrentDirectory '{testPath}'");
             if (File.Exists(testPath))
             {
-                testFolderRoot = testrunFolder;
-                testContext.WriteLine($"Found file in TestRunDirectory {testPath}");
+                testFolderRoot = currentDirectory;
+                testContext.WriteLine($"Found file in GetCurrentDirectory {testPath}");
                 return;
-            }
-
-            testPath = Path.Combine(testExecuteFolder, relativeFilePath);
-            if (!File.Exists(testPath)) testContext.WriteLine($"File not found from DeploymentDirectory '{testPath}'");
-            if (File.Exists(testPath))
-            {
-                testFolderRoot = testExecuteFolder;
-                testContext.WriteLine($"Found file in DeploymentDirectory {testPath}");
             }
         }
     }

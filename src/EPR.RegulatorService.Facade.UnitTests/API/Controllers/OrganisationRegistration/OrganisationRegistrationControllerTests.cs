@@ -24,7 +24,7 @@ public class OrganisationRegistrationControllerTests : Controller
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationController _sut;
     private readonly Guid _oid = Guid.NewGuid();
-    private readonly string testDataFilePath = ".\\API\\Controllers\\OrganisationRegistration\\paginateddummydata.json";
+    private readonly string testDataFilePath = "API/Controllers/OrganisationRegistration/paginateddummydata.json";
 
     public TestContext TestContext
     {

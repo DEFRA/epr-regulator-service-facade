@@ -24,7 +24,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.CommonData.DummyDa
 public class DummyDataTests
 {
     private Guid _userId = Guid.NewGuid();
-    private readonly string testDataFilePath = ".\\Core\\Services\\CommonData\\DummyData\\dummydata.json";
+    private readonly string testDataFilePath = "Core/Services/CommonData/DummyData/dummydata.json";
 
     OrganisationRegistrationDataCollection? _testData = null;
 
