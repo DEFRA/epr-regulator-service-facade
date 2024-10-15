@@ -3,18 +3,15 @@ using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.API.Controllers;
-using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
-using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.OrganisationRegistration;
@@ -24,7 +21,6 @@ public class OrganisationRegistrationControllerTests : Controller
 {
     private readonly NullLogger<OrganisationRegistrationController> _nullLogger = new();
     private readonly Mock<ICommonDataService> _mockCommonDataService = new();
-    private readonly Mock<IMessagingService> _messagingServiceMock = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationController _sut;
     private readonly Guid _oid = Guid.NewGuid();
@@ -38,12 +34,8 @@ public class OrganisationRegistrationControllerTests : Controller
     [TestInitialize]
     public void Setup()
     {
-        var messagingConfig = Options.Create(new MessagingConfig());
-
         _sut = new OrganisationRegistrationController(
             _nullLogger,
-            messagingConfig,
-            _messagingServiceMock.Object,
             _mockCommonDataService.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
@@ -96,7 +88,7 @@ public class OrganisationRegistrationControllerTests : Controller
     }
 
     [TestMethod]
-    public async Task When_calling_getorganisationregistrations_that_throws_exception_returns_400_bad_response()
+    public async Task When_calling_getorganisationregistrations_that_throws_any_internal_exception_returns_400_bad_response()
     {
         //Arrange
         OrganisationRegistrationFilter request = new() { PageNumber = 1, PageSize = 2};

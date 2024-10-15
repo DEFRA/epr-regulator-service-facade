@@ -208,7 +208,9 @@ public class DummyDataTests
         mockLoader.Setup(m => m.LoadData(testDataFilePath)).Returns(expectedData);
         var request = new GetOrganisationRegistrationRequest
         {
-            UserId = _userId
+            UserId = _userId,
+            PageNumber = 1,
+            PageSize = 20
         };
 
         var subject = new JsonOrganisationRegistrationHandler(testDataFilePath, mockLoader.Object);
@@ -227,6 +229,8 @@ public class DummyDataTests
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
+            PageNumber = 1,
+            PageSize = 20,
             RegistrationYears = "2024"
         };
 
@@ -250,6 +254,8 @@ public class DummyDataTests
         var request = new GetOrganisationRegistrationRequest
         {
             UserId = _userId,
+            PageNumber = 1,
+            PageSize = 20,
             RegistrationYears = "2024"
         };
 

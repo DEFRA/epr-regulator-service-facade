@@ -1,38 +1,17 @@
-﻿using EPR.RegulatorService.Facade.API.Extensions;
+﻿using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.API.Shared;
-using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
-using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
-using EPR.RegulatorService.Facade.Core.Services.Messaging;
-using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
-    public class OrganisationRegistrationController : ControllerBase
+    public class OrganisationRegistrationController( ILogger<OrganisationRegistrationController> logger, ICommonDataService commonDataService) : ControllerBase
     {
-        private readonly ILogger<OrganisationRegistrationController> _logger;
-        private readonly ICommonDataService _commonDataService;
-
-        public OrganisationRegistrationController(
-           ILogger<OrganisationRegistrationController> logger,
-           IOptions<MessagingConfig> messagingConfig,
-           IMessagingService messagingService,
-           ICommonDataService commonDataService)
-        {
-            _logger = logger;
-            _commonDataService = commonDataService;
-        }
-
-
+        private readonly OrganisationRegistrationHandlers _handler = new (commonDataService, logger);
 
         /// <summary>
         /// To do: Implement the real connection in _commonDataService
@@ -45,43 +24,15 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         [Route("registrations/get-organisations")]
         public async Task<IActionResult> GetOrganisationRegistrations([FromQuery, Required] OrganisationRegistrationFilter request)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-
-            if (!ModelState.IsValid)
+            try
             {
-                var validationProblem = new ValidationProblemDetails(ModelState)
-                {
-                    Title = "Validation Error",
-                    Status = 400, // Ensure the status is explicitly set
-                    Detail = "One or more validation errors occurred.",
-                };
-                return BadRequest(validationProblem);
+                return _handler.ManageModelState(ModelState) ?? await _handler.HandleGetOrganisationRegistrations((GetOrganisationRegistrationRequest)request);
             }
-
-            var registrationSubmissionsRequest = new GetOrganisationRegistrationRequest
+            catch (Exception ex)
             {
-                UserId = User.UserId(),
-
-                OrganisationName = request.OrganisationName,
-                OrganisationReference = request.OrganisationReference,
-                OrganisationType = request.OrganisationType.ToString(),
-                Statuses = request.Statuses.ToString(),
-                RegistrationYears = request.RegistrationYear,
-                PageSize = request.PageSize,
-                PageNumber = request.PageNumber
-            };
-
-            var registrations = await _commonDataService.GetOrganisationRegistrations<JsonOrganisationRegistrationHandler>(registrationSubmissionsRequest);
-            if (!registrations.IsSuccessStatusCode)
-            {
-                _logger.LogWarning("Didn't fetch Dummy data successfully");
-                return HandleError.HandleErrorWithStatusCode(registrations.StatusCode);
+                logger.LogCritical(ex, "An error was received processing registrations/get-organisations.");
+                return HandleError.HandleErrorWithStatusCode(System.Net.HttpStatusCode.InternalServerError);
             }
-
-            var stringContent = await registrations.Content.ReadAsStringAsync();
-            var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationRegistrationSummaryResponse>>(stringContent,
-                     options);
-            return Ok(paginatedResponse);
         }
     }
 }

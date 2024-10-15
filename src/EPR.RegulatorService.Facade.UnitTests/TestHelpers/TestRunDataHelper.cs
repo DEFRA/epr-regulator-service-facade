@@ -1,12 +1,5 @@
-﻿using AutoFixture;
-using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
-using Microsoft.ApplicationInsights.WindowsServer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
 {
@@ -29,13 +22,10 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
             else
             {
                 DetermineTestFolderRoot(relativeTestDataFilePath, testContext);
-                if (!string.IsNullOrEmpty(testFolderRoot))
+                if (!string.IsNullOrEmpty(testFolderRoot) && File.Exists(Path.Combine(testFolderRoot, relativeTestDataFilePath)))
                 {
-                    if (File.Exists(Path.Combine(testFolderRoot, relativeTestDataFilePath)))
-                    {
-                        var jsonData = File.ReadAllText(relativeTestDataFilePath);
-                        return jsonData;
-                    }
+                    var jsonData = File.ReadAllText(relativeTestDataFilePath);
+                    return jsonData;
                 }
             }
             throw new FileNotFoundException($"Cannot locate {relativeTestDataFilePath} from any of '{baseDirectory}', '{currentDirectory}', '{testrunFolder}' or '{testExecuteFolder}'");
@@ -57,13 +47,10 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
             {
                 DetermineTestFolderRoot(relativeTestDataFilePath, testContext);
 
-                if (!string.IsNullOrEmpty(testFolderRoot))
+                if (!string.IsNullOrEmpty(testFolderRoot) && File.Exists(Path.Combine(testFolderRoot, relativeTestDataFilePath)))
                 {
-                    if (File.Exists(Path.Combine(testFolderRoot, relativeTestDataFilePath)))
-                    {
-                        var jsonData = File.ReadAllText(relativeTestDataFilePath);
-                        return JsonSerializer.Deserialize<T>(jsonData);
-                    }
+                    var jsonData = File.ReadAllText(relativeTestDataFilePath);
+                    return JsonSerializer.Deserialize<T>(jsonData);
                 }
             }
 

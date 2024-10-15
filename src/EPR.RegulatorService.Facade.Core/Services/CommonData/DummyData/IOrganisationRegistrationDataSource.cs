@@ -8,7 +8,6 @@ using EPR.RegulatorService.Facade.Core.Services.CommonData;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
 
-
 public interface IOrganisationRegistrationDataSource
 {
     Task<HttpResponseMessage> GetOrganisationRegistrations(GetOrganisationRegistrationRequest request);
