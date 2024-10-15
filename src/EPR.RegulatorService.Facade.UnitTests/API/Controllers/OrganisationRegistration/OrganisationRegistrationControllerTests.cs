@@ -3,6 +3,7 @@ using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.API.Controllers;
+using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
@@ -11,6 +12,7 @@ using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -122,6 +124,26 @@ public class OrganisationRegistrationControllerTests : Controller
         okObjectResult.Value.Should().BeOfType<PaginatedResponse<OrganisationRegistrationSummaryResponse>>();
     }
 
+    [TestMethod]
+    public async Task When_calling_getorganisationregistrations_and_exception_occurs_then_we_expect_an_internalservererror()
+    {
+        //Arrange
+        OrganisationRegistrationFilter request = new();
+        ValidateModel(_sut, request);
+
+        Mock<IOrganisationRegistrationHandlers> mockHandler = new();
+
+        mockHandler.Setup(x => x.ManageModelState(It.IsAny<ModelStateDictionary>())).Throws(new InvalidDataException());
+
+        _sut.RegistrationHandler = mockHandler.Object;
+        
+        //Act
+        var response = await _sut.GetOrganisationRegistrations(request);
+
+        // Assert
+        response.Should().BeOfType<StatusCodeResult>();
+        ((StatusCodeResult)response).StatusCode.Should().Be(500);
+    }
 
     private void ValidateModel(ControllerBase controller, object model)
     {

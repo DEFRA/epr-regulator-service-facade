@@ -11,7 +11,7 @@ using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.API.Handlers;
 
-public class OrganisationRegistrationHandlers(ICommonDataService commonDataService, ILogger logger)
+public class OrganisationRegistrationHandlers(ICommonDataService commonDataService, ILogger logger) : IOrganisationRegistrationHandlers
 {
     private readonly JsonSerializerOptions outputSerialisationOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
 

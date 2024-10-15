@@ -101,6 +101,32 @@ public class DummyDataTests
     }
 
     [TestMethod]
+    public void LocateRequiredFile_Returns_OriginalPath_When_NoFileExists()
+    {
+        // Arrange
+        var filePath = "nonexistentfile.txt";
+        var sut = new OrganisationDummyDataLoader.FileFinderHelper();
+        // Act
+        var result = sut.LocateRequiredFile(AppContext.BaseDirectory, filePath);
+
+        // Assert
+        Assert.AreEqual(filePath, result);  // It should return the original file path if no file exists
+    }
+
+    [TestMethod]
+    public void LocateRequiredFile_Returns_OriginalPath_When_DebugBuildConfigurationPresent()
+    {
+        // Arrange
+        var filePath = "nonexistentfile.txt";
+        var sut = new OrganisationDummyDataLoader.FileFinderHelper();
+        // Act
+        var result = sut.LocateRequiredFile("here/we/$(buildConfiguration)/", filePath);
+
+        // Assert
+        Assert.AreEqual(filePath, result);  // It should return the original file path if no file exists
+    }
+
+    [TestMethod]
     public async Task FilterRegistrations_Will_Filter_OrganisationName()
     {
         var testData = _testData;

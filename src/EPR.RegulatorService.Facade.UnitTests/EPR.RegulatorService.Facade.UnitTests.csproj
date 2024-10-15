@@ -34,6 +34,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="ReportGenerator" Version="5.3.11" />
         <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
         <PackageReference Include="Enums.NET" Version="5.0.0" />
         <PackageReference Include="GovukNotify" Version="7.1.0" />

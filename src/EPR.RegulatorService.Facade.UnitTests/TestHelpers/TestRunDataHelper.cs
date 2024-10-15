@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
 {
+    [ExcludeFromCodeCoverage]
     public static class TestRunDataHelper
     {
         private static string testFolderRoot = string.Empty;
@@ -103,7 +105,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.TestHelpers
             {
                 testFolderRoot = currentDirectory;
                 testContext.WriteLine($"Found file in GetCurrentDirectory {testPath}");
-                return;
             }
         }
     }

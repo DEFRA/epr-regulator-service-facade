@@ -11,7 +11,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
     [ApiController]
     public class OrganisationRegistrationController( ILogger<OrganisationRegistrationController> logger, ICommonDataService commonDataService) : ControllerBase
     {
-        private readonly OrganisationRegistrationHandlers _handler = new (commonDataService, logger);
+        public IOrganisationRegistrationHandlers RegistrationHandler { get; set; } = new OrganisationRegistrationHandlers(commonDataService, logger);
 
         /// <summary>
         /// To do: Implement the real connection in _commonDataService
@@ -26,7 +26,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         {
             try
             {
-                return _handler.ManageModelState(ModelState) ?? await _handler.HandleGetOrganisationRegistrations((GetOrganisationRegistrationRequest)request);
+                return RegistrationHandler.ManageModelState(ModelState) ?? await RegistrationHandler.HandleGetOrganisationRegistrations((GetOrganisationRegistrationRequest)request);
             }
             catch (Exception ex)
             {

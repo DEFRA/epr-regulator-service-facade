@@ -1,51 +1,46 @@
 ﻿using System;
 using System.Text.Json;
+using System.Linq;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData
 {
     public class OrganisationDummyDataLoader : IDummyDataLoader<OrganisationRegistrationDataCollection>
     {
+        public FileFinderHelper FileFinder { get; set; } = new FileFinderHelper();
+
         public virtual OrganisationRegistrationDataCollection LoadData(string filePath)
         {
-            try
-            {
-                var fileName = locateRequiredFile(filePath);
-                var jsonData = File.ReadAllText(fileName);
-                return JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(jsonData);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Error loading data from file: {ex.Message}", ex);
-            }
+            var fileName = FileFinder.LocateRequiredFile(AppContext.BaseDirectory, filePath);
+            var jsonData = File.ReadAllText(fileName);
+            return JsonSerializer.Deserialize<OrganisationRegistrationDataCollection>(jsonData);
         }
 
-        private string locateRequiredFile(string filePath)
+        public class FileFinderHelper
         {
-            string currentWorkingDirectory = AppContext.BaseDirectory;
-            string currentWorkingPath = Path.Combine(currentWorkingDirectory, filePath);
-            string testPath = currentWorkingPath;
-            
-            if (currentWorkingDirectory.Contains("$(buildConfiguration", StringComparison.OrdinalIgnoreCase))
+            public string LocateRequiredFile(string baseDirectory, string filePath)
             {
-                testPath = currentWorkingPath.Replace("$(buildConfiguration)", "Debug", StringComparison.OrdinalIgnoreCase);
+                return GetPossiblePaths(baseDirectory, filePath)
+                       .FirstOrDefault(path => File.Exists(path)) ?? filePath;
+            }
 
-                if (File.Exists(testPath))
+            private IEnumerable<string> GetPossiblePaths(string baseDirectory, string filePath)
+            {
+                // Default path
+                yield return Path.Combine(baseDirectory, filePath);
+
+                // If build configuration placeholder is present, return paths for Debug and Release
+                if (baseDirectory.Contains("$(buildConfiguration)", StringComparison.OrdinalIgnoreCase))
                 {
-                    return testPath;
-                }
-                testPath = Path.Combine(currentWorkingDirectory.Replace("$(buildConfiguration)", "Release", StringComparison.OrdinalIgnoreCase), filePath);
-                if (File.Exists(testPath))
-                {
-                    return testPath;
+                    yield return ReplaceBuildConfiguration(baseDirectory, filePath, "Debug");
+                    yield return ReplaceBuildConfiguration(baseDirectory, filePath, "Release");
                 }
             }
 
-            if (File.Exists(testPath))
+            private string ReplaceBuildConfiguration(string baseDirectory, string filePath, string buildConfiguration)
             {
-                return testPath;
+                string updatedDirectory = baseDirectory.Replace("$(buildConfiguration)", buildConfiguration, StringComparison.OrdinalIgnoreCase);
+                return Path.Combine(updatedDirectory, filePath);
             }
-
-            return filePath;
         }
     }
 }
