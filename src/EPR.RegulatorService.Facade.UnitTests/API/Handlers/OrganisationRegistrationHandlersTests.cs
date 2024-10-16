@@ -88,7 +88,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Handlers
         }
 
         [TestMethod]
-        public async Task When_calling_HandleGetOrganisationRegistrations_WithOutData_returns_200_ok_response()
+        public async Task When_calling_HandleGetOrganisationRegistrations_WithOutData_returns_500_internalservererror()
         {
             //Arrange
             OrganisationRegistrationFilter request = new() { PageNumber = 1, PageSize = 2 };
