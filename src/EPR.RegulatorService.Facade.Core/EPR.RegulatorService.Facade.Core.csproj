@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Services\CommonData\DummyData\dummyregistrationdata.json" />
+    <None Remove="Services\CommonData\DummyData\dummyregistrationdata.json~RF158661e5.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Services\CommonData\DummyData\dummyregistrationdata.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
     <PackageReference Include="Enums.NET" Version="5.0.0" />
     <PackageReference Include="GovukNotify" Version="7.1.0" />

@@ -2,11 +2,14 @@ using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Models.Requests.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
+using EPR.RegulatorService.Facade.Core.Services.CommonData.ConcreteData;
+using EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -23,6 +26,7 @@ public class CommonDataServiceTests
     private IOptions<CommonDataApiConfig> _configuration = default!;
     private const string BaseAddress = "http://localhost";
     private const string GetPoMSubmissions = "GetPoMSubmissions";
+    private const string GetOrganisationRegistrations = "GetOrganisationRegistrations";
     private HttpClient _httpClient;
     private string _expectedUrl;
     private Guid _userId = Guid.NewGuid();
@@ -37,7 +41,8 @@ public class CommonDataServiceTests
             ServiceRetryCount = 0,
             Endpoints = new()
             {
-                GetPoMSubmissions = GetPoMSubmissions
+                GetPoMSubmissions = GetPoMSubmissions,
+                GetOrganisationRegistrations = GetOrganisationRegistrations
             }
         });
         _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
@@ -225,6 +230,44 @@ public class CommonDataServiceTests
         response.IsSuccessStatusCode.Should().BeFalse();
     }
 
+    [TestMethod]
+    public async Task GetOrganisationRegistrations_Uses_CommonDataOrganisationRegistrationHandler()
+    {
+        // Arrange
+        var request = new GetOrganisationRegistrationRequest() { PageNumber = 1, PageSize = 1};
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrations}";
+
+        SetupApiSuccessCall();
+
+        var result = await _sut.GetOrganisationRegistrations<CommonDataOrganisationRegistrationHandler>(request);
+
+        // Assert
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationRegistrations_Uses_JsonOrganisationRegistrationHandler()
+    {
+        var request = new GetOrganisationRegistrationRequest() { PageNumber = 1, PageSize = 1 };
+        var service = new CommonDataService(_httpClient, _configuration);
+
+        var result = await service.GetOrganisationRegistrations<JsonOrganisationRegistrationHandler>(request);
+
+        Assert.IsNotNull(result); // Ensure the response is valid
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationRegistrations_ThrowsException_For_UnknownHandler()
+    {
+        var request = new GetOrganisationRegistrationRequest() { PageNumber = 1, PageSize = 1 };
+        var service = new CommonDataService(_httpClient, _configuration);
+        
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () =>
+        {
+            await service.GetOrganisationRegistrations<FakeHandler>(request);
+        });
+    }
+
     private void SetupApiSuccessCall()
     {
         var apiResponse = _fixture
@@ -263,3 +306,11 @@ public class CommonDataServiceTests
             ItExpr.IsAny<CancellationToken>());
     }
 }
+public class FakeHandler : IOrganisationRegistrationDataSource
+{
+    public Task<HttpResponseMessage> GetOrganisationRegistrations(GetOrganisationRegistrationRequest request)
+    {
+        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK));
+    }
+}
+

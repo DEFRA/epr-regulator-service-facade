@@ -1,1 +1,5 @@
 dbb111ea04c5d8d5993b87f44e4f7d684e906a74:src/EPR.RegulatorService.Facade.API/appsettings.Development.json:generic-api-key:10
+src/EPR.RegulatorService.Facade.Core/Services/CommonData/DummyData/dummyregistrationdata.json
+src/EPR.RegulatorService.Facade.UnitTests/Core/Services/CommonData/DummyData/dummydata.json
+src/EPR.RegulatorService.Facade.UnitTests/Core/Services/CommonData/DummyData/dummydata.json
+src/EPR.RegulatorService.Facade.UnitTests/API/Controllers/OrganisationRegistration/paginateddummydata.json
