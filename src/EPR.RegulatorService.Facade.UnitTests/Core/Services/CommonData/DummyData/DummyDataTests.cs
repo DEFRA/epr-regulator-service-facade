@@ -42,7 +42,7 @@ public class DummyDataTests
     [TestMethod]
     public void OrganisationDummDataLoader_LoadsDummyDataFromFile()
     {
-        IDummyDataLoader<OrganisationRegistrationDataCollection> dataLoader = new OrganisationDummyDataLoader();
+        var dataLoader = new OrganisationDummyDataLoader();
 
         var expectedData = _testData;
 

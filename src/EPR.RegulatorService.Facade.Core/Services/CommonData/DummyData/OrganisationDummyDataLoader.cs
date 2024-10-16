@@ -23,7 +23,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData
                        .FirstOrDefault(path => File.Exists(path)) ?? filePath;
             }
 
-            private IEnumerable<string> GetPossiblePaths(string baseDirectory, string filePath)
+            private static IEnumerable<string> GetPossiblePaths(string baseDirectory, string filePath)
             {
                 // Default path
                 yield return Path.Combine(baseDirectory, filePath);

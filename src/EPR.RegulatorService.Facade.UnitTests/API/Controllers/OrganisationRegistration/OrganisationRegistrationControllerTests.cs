@@ -145,7 +145,7 @@ public class OrganisationRegistrationControllerTests : Controller
         ((StatusCodeResult)response).StatusCode.Should().Be(500);
     }
 
-    private void ValidateModel(ControllerBase controller, object model)
+    private static void ValidateModel(ControllerBase controller, object model)
     {
         var validationResults = new List<ValidationResult>();
         var validationContext = new ValidationContext(model);

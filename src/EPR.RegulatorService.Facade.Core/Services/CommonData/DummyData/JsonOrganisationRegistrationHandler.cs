@@ -56,34 +56,34 @@ public class JsonOrganisationRegistrationHandler(string filePath, IDummyDataLoad
         if (!string.IsNullOrWhiteSpace(request.OrganisationName))
         {
             filteredData = filteredData.Where(r => r.OrganisationName != null &&
-                                                   r.OrganisationName.ToLower().Contains(request.OrganisationName.ToLower()));
+                                                   r.OrganisationName.Contains(request.OrganisationName, StringComparison.InvariantCultureIgnoreCase));
         }
 
         // Filter by OrganisationReference if it's provided
         if (!string.IsNullOrWhiteSpace(request.OrganisationReference))
         {
             filteredData = filteredData.Where(r => r.OrganisationReference != null &&
-                                                   r.OrganisationReference.ToLower().Contains(request.OrganisationReference.ToLower()));
+                                                   r.OrganisationReference.Contains(request.OrganisationReference, StringComparison.InvariantCultureIgnoreCase));
         }
 
         // Filter by OrganisationType if it's provided
         if (!string.IsNullOrWhiteSpace(request.OrganisationType))
         {
             filteredData = filteredData.Where(r => r.OrganisationType != null &&
-                                                   request.OrganisationType.ToLower().Contains(r.OrganisationType.ToString().ToLower()));
+                                                   request.OrganisationType.Contains(r.OrganisationType.ToString(), StringComparison.InvariantCultureIgnoreCase));
         }
 
         // Filter by Statuses if provided
         if (!string.IsNullOrWhiteSpace(request.Statuses))
         {
             filteredData = filteredData.Where(r => r.RegistrationStatus != null &&
-                                                   request.Statuses.ToLower().Contains(r.RegistrationStatus.ToString().ToLower()));
+                                                   request.Statuses.Contains(r.RegistrationStatus.ToString(), StringComparison.InvariantCultureIgnoreCase));
         }
 
         // Filter by SubmissionYears if provided
         if (!string.IsNullOrEmpty(request.RegistrationYears))
         {
-            filteredData = filteredData.Where(r => request.RegistrationYears.ToLower().Contains(r.RegistrationYear.ToString()));
+            filteredData = filteredData.Where(r => request.RegistrationYears.Contains(r.RegistrationYear.ToString(), StringComparison.InvariantCultureIgnoreCase));
         }
 
         // Convert to a list and return

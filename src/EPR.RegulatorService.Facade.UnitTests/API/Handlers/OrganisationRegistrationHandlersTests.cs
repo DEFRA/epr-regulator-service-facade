@@ -210,7 +210,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Handlers
             ApplyModelState(validationResults, _badModelStateDictionary);
         }
 
-        private void ApplyModelState(List<ValidationResult> validationResults, ModelStateDictionary modelStateDictionary)
+        private static void ApplyModelState(List<ValidationResult> validationResults, ModelStateDictionary modelStateDictionary)
         {
             foreach (var validationResult in validationResults)
             {
