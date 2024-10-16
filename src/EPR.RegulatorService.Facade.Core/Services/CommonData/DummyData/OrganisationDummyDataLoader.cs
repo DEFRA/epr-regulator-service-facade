@@ -36,9 +36,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.CommonData.DummyData
                 }
             }
 
-            private string ReplaceBuildConfiguration(string baseDirectory, string filePath, string buildConfiguration)
+            private static string ReplaceBuildConfiguration(string baseDirectory, string filePath, string buildConfiguration)
             {
-                string updatedDirectory = baseDirectory.Replace("$(buildConfiguration)", buildConfiguration, StringComparison.OrdinalIgnoreCase);
+                var updatedDirectory = baseDirectory.Replace("$(buildConfiguration)", buildConfiguration, StringComparison.OrdinalIgnoreCase);
                 return Path.Combine(updatedDirectory, filePath);
             }
         }
