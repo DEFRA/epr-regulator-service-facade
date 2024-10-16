@@ -26,7 +26,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         {
             try
             {
-                return RegistrationHandler.ManageModelState(ModelState) ?? await RegistrationHandler.HandleGetOrganisationRegistrations((GetOrganisationRegistrationRequest)request);
+                return RegistrationHandler.ValidateIncomingModels(ModelState) ?? await RegistrationHandler.HandleGetOrganisationRegistrations((GetOrganisationRegistrationRequest)request);
             }
             catch (Exception ex)
             {

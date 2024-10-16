@@ -133,7 +133,7 @@ public class OrganisationRegistrationControllerTests : Controller
 
         Mock<IOrganisationRegistrationHandlers> mockHandler = new();
 
-        mockHandler.Setup(x => x.ManageModelState(It.IsAny<ModelStateDictionary>())).Throws(new InvalidDataException());
+        mockHandler.Setup(x => x.ValidateIncomingModels(It.IsAny<ModelStateDictionary>())).Throws(new InvalidDataException());
 
         _sut.RegistrationHandler = mockHandler.Object;
         

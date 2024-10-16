@@ -58,7 +58,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Handlers
         [TestMethod]
         public void ManageModelState_Returns_BadRequest_When_Supplying_An_Invalid_Model_Object()
         {
-            var result = _sut.ManageModelState(_badModelStateDictionary);
+            var result = _sut.ValidateIncomingModels(_badModelStateDictionary);
             result.Should().BeOfType<BadRequestObjectResult>();
         }
 
@@ -66,7 +66,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Handlers
         [TestMethod]
         public void ManageModelState_Returns_Null_When_Supplying_An_Valid_Model_Object()
         {
-            var result = _sut.ManageModelState(_goodModelStateDictionary);
+            var result = _sut.ValidateIncomingModels(_goodModelStateDictionary);
             result.Should().BeNull();
         }
 

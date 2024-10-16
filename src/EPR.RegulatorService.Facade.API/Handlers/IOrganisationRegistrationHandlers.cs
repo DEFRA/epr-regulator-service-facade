@@ -8,6 +8,6 @@ namespace EPR.RegulatorService.Facade.API.Handlers
     public interface IOrganisationRegistrationHandlers
     {
         Task<ActionResult> HandleGetOrganisationRegistrations(GetOrganisationRegistrationRequest filterRequest);
-        ActionResult? ManageModelState(ModelStateDictionary modelState);
+        ActionResult? ValidateIncomingModels(ModelStateDictionary modelState);
     }
 }

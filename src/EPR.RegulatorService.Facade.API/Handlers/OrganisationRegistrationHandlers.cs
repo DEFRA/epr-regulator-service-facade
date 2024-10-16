@@ -30,7 +30,7 @@ public class OrganisationRegistrationHandlers(ICommonDataService commonDataServi
         return HandleError.HandleErrorWithStatusCode(registrations.StatusCode);
     }
 
-    public ActionResult? ManageModelState(ModelStateDictionary modelState)
+    public ActionResult? ValidateIncomingModels(ModelStateDictionary modelState)
     {
         if (!modelState.IsValid)
         {
