@@ -19,7 +19,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmis
         {
             //Arrange  
             string year = "99";
-            string orgId = "12345678";
+            string orgId = "123456";
             var service = new RegistrationSubmissionService();
 
             // Act 
@@ -27,6 +27,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmis
 
             // Assert  
             Assert.IsNotNull(result);
+            Assert.IsTrue(result.Length == 15);
             Assert.IsTrue(result.StartsWith("R"));
             Assert.IsTrue(result.StartsWith($"R{year}"));
             Assert.IsTrue(result.StartsWith($"R{year}EP"));
@@ -37,7 +38,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmis
         {
             //Arrange  
             string year = (DateTime.Now.Year % 100).ToString("D2");
-            string orgId = "12345678";
+            string orgId = "123456";
             var service = new RegistrationSubmissionService();
 
             // Act 
@@ -45,6 +46,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmis
 
             // Assert  
             Assert.IsNotNull(result);
+            Assert.IsTrue(result.Length == 15);
             Assert.IsTrue(result.StartsWith("R"));
             Assert.IsTrue(result.StartsWith($"R{year}"));
             Assert.IsTrue(result.StartsWith($"R{year}EP"));
