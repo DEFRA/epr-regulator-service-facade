@@ -63,6 +63,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmis
             // Act 
             Assert.ThrowsException<ArgumentNullException>(() => service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, string.Empty, null) );
              
-        }
-    }
+        } 
+    } 
 }

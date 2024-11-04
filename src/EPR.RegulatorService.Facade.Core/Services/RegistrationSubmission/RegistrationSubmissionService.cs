@@ -1,6 +1,7 @@
 ﻿
 
 using EPR.RegulatorService.Facade.Core.Enums;
+using System.Security.Cryptography;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
@@ -26,9 +27,11 @@ public class RegistrationSubmissionService : IRegistrationSubmissionService
     }
 
     private string GenerateRandomNumber()
-    {
-        Random random = new Random();
-        int randomNumber = random.Next(1000, 10000);
+    { 
+        var min = 1000;
+        var max = 10000;
+
+        var randomNumber = RandomNumberGenerator.GetInt32(min, max);
         return randomNumber.ToString();
     }
 }
