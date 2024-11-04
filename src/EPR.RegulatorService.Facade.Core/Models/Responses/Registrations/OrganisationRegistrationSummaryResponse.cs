@@ -4,6 +4,7 @@ using System;
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.Registrations;
 public class OrganisationRegistrationSummaryResponse
 {
+    public string SubmissionId { get; set; }
     public string OrganisationName { get; set; }
     public string OrganisationId { get; set; }
     public string OrganisationReference { get; set; }

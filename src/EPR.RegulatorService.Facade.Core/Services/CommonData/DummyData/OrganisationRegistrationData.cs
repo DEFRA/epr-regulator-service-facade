@@ -15,6 +15,7 @@ public class OrganisationRegistrationDataCollection
 /// </summary>
 public class OrganisationRegistrationData
 {
+    public Guid SubmissionID { get; set; }
     public Guid OrganisationID { get; set; }
     public string OrganisationReference { get; set; }
     public string OrganisationName { get; set; }
@@ -46,6 +47,7 @@ public class OrganisationRegistrationData
 
         return new OrganisationRegistrationSummaryResponse
         {
+            SubmissionId = data.SubmissionID,
             NationId = data.NationID,
             CompaniesHouseNumber = data.CompaniesHouseNumber,
             OrganisationName = data.OrganisationName,
