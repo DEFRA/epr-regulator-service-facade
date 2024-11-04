@@ -1,6 +1,7 @@
 ﻿
 
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -18,24 +19,23 @@ public class RegistrationSubmissionService : IRegistrationSubmissionService
 
         if (string.IsNullOrEmpty(organisationId))
         {
-            throw new ArgumentNullException("organisationId");
+            throw new ArgumentNullException(nameof(organisationId));
         }
 
         var countryCode = ((char)countryName).ToString();
         var regType = ((char)registrationSubmissionType).ToString();
 
-        string refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{GenerateRandomNumber()}";
+        string refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
 
         if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor || registrationSubmissionType == RegistrationSubmissionType.Exporter)
-        {
-            var stringEnumeratedValue = materialType.GetType().GetMember(materialType.ToString())[0].GetCustomAttribute<DisplayAttribute>()?.GetName();
-            refNumber = $"{refNumber}{stringEnumeratedValue}";
+        {  
+            refNumber = $"{refNumber}{materialType.GetDisplayName<MaterialType>()}";
         }
 
         return refNumber;
     }
 
-    private string GenerateRandomNumber()
+    private string Generate4DigitNumber()
     { 
         var min = 1000;
         var max = 10000;

@@ -6,6 +6,7 @@ namespace EPR.RegulatorService.Facade.Core.Enums;
 
 public enum MaterialType
 {
+    [Display(Name = "")]
     None,
     [Display(Name = "GL")]
     Glass,
