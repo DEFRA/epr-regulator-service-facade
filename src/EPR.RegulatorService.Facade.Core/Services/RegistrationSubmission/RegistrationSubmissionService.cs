@@ -1,13 +1,15 @@
 ﻿
 
 using EPR.RegulatorService.Facade.Core.Enums;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using System.Security.Cryptography;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 public class RegistrationSubmissionService : IRegistrationSubmissionService
 {
-    public  string GenerateReferenceNumber(CountryName countryName, RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null )
+    public  string GenerateReferenceNumber(CountryName countryName, RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null, MaterialType materialType = MaterialType.None)
     {
         if (string.IsNullOrEmpty(twoDigitYear))
         {
@@ -23,6 +25,13 @@ public class RegistrationSubmissionService : IRegistrationSubmissionService
         var regType = ((char)registrationSubmissionType).ToString();
 
         string refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{GenerateRandomNumber()}";
+
+        if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor || registrationSubmissionType == RegistrationSubmissionType.Exporter)
+        {
+            var stringEnumeratedValue = materialType.GetType().GetMember(materialType.ToString())[0].GetCustomAttribute<DisplayAttribute>()?.GetName();
+            refNumber = $"{refNumber}{stringEnumeratedValue}";
+        }
+
         return refNumber;
     }
 

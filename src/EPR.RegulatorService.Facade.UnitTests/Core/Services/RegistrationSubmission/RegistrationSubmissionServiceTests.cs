@@ -8,61 +8,80 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission
+namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
+
+[TestClass]
+public class RegistrationSubmissionServiceTests
 {
-    [TestClass]
-    public class RegistrationSubmissionServiceTests
+
+    [TestMethod]
+    public async Task Should_return_valid_referencenumber()
     {
+        //Arrange  
+        string year = "99";
+        string orgId = "123456";
+        var service = new RegistrationSubmissionService();
 
-        [TestMethod]
-        public async Task Should_return_valid_referencenumber()
-        {
-            //Arrange  
-            string year = "99";
-            string orgId = "123456";
-            var service = new RegistrationSubmissionService();
+        // Act 
+        var result = service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, orgId, year);
 
-            // Act 
-            var result = service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, orgId, year);
+        // Assert  
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length == 15);
+        Assert.IsTrue(result.StartsWith("R"));
+        Assert.IsTrue(result.StartsWith($"R{year}"));
+        Assert.IsTrue(result.StartsWith($"R{year}EP"));
+    }
 
-            // Assert  
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.Length == 15);
-            Assert.IsTrue(result.StartsWith("R"));
-            Assert.IsTrue(result.StartsWith($"R{year}"));
-            Assert.IsTrue(result.StartsWith($"R{year}EP"));
-        }
+    [TestMethod]
+    public async Task Should_return_valid_referencenumber_with_null_year()
+    {
+        //Arrange  
+        string year = (DateTime.Now.Year % 100).ToString("D2");
+        string orgId = "123456";
+        var service = new RegistrationSubmissionService();
 
-        [TestMethod]
-        public async Task Should_return_valid_referencenumber_with_null_year()
-        {
-            //Arrange  
-            string year = (DateTime.Now.Year % 100).ToString("D2");
-            string orgId = "123456";
-            var service = new RegistrationSubmissionService();
+        // Act 
+        var result = service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, orgId, null);
 
-            // Act 
-            var result = service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, orgId, null);
+        // Assert  
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length == 15);
+        Assert.IsTrue(result.StartsWith("R"));
+        Assert.IsTrue(result.StartsWith($"R{year}"));
+        Assert.IsTrue(result.StartsWith($"R{year}EP"));
+    }
 
-            // Assert  
-            Assert.IsNotNull(result);
-            Assert.IsTrue(result.Length == 15);
-            Assert.IsTrue(result.StartsWith("R"));
-            Assert.IsTrue(result.StartsWith($"R{year}"));
-            Assert.IsTrue(result.StartsWith($"R{year}EP"));
-        }
+    [TestMethod]
+    public async Task Should_return_valid_referencenumber_For_Exporter_With_Steel()
+    {
+        //Arrange  
+        string year = (DateTime.Now.Year % 100).ToString("D2");
+        string orgId = "123456";
+        var service = new RegistrationSubmissionService();
 
-        [TestMethod]
-        public async Task Should_throw_exception_if_orgid_isnull()
-        {
-            //Arrange  
-            string year = (DateTime.Now.Year % 100).ToString("D2");
-            string orgId = "12345678";
-            var service = new RegistrationSubmissionService();
+        // Act 
+        var result = service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Exporter, orgId, null, Facade.Core.Enums.MaterialType.Steel);
 
-            // Act 
-            Assert.ThrowsException<ArgumentNullException>(() => service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, string.Empty, null) );
-             
-        } 
+        // Assert  
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length == 17);
+        Assert.IsTrue(result.StartsWith("R"));
+        Assert.IsTrue(result.StartsWith($"R{year}"));
+        Assert.IsTrue(result.StartsWith($"R{year}EE"));
+        Assert.IsTrue(result.EndsWith($"ST"));
+    }
+
+    [TestMethod]
+    public async Task Should_throw_exception_if_orgid_isnull()
+    {
+        //Arrange  
+        string year = (DateTime.Now.Year % 100).ToString("D2");
+        string orgId = "12345678";
+        var service = new RegistrationSubmissionService();
+
+        // Act 
+        Assert.ThrowsException<ArgumentNullException>(() => service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Producer, string.Empty, null) );
+         
     } 
-}
+} 
