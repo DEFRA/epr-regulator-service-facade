@@ -73,6 +73,26 @@ public class RegistrationSubmissionServiceTests
     }
 
     [TestMethod]
+    public async Task Should_return_valid_referencenumber_For_Reprocessor_With_Plastic()
+    {
+        //Arrange  
+        string year = (DateTime.Now.Year % 100).ToString("D2");
+        string orgId = "123456";
+        var service = new RegistrationSubmissionService();
+
+        // Act 
+        var result = service.GenerateReferenceNumber(Facade.Core.Enums.CountryName.Eng, Facade.Core.Enums.RegistrationSubmissionType.Reprocessor, orgId, null, Facade.Core.Enums.MaterialType.Plastic);
+
+        // Assert  
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length == 17);
+        Assert.IsTrue(result.StartsWith("R"));
+        Assert.IsTrue(result.StartsWith($"R{year}"));
+        Assert.IsTrue(result.StartsWith($"R{year}ER"));
+        Assert.IsTrue(result.EndsWith($"PL"));
+    }
+
+    [TestMethod]
     public async Task Should_throw_exception_if_orgid_isnull()
     {
         //Arrange  
