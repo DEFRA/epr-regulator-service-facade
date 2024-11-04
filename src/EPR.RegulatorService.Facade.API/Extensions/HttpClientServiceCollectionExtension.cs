@@ -1,17 +1,18 @@
-using System.Diagnostics.CodeAnalysis;
+using EPR.RegulatorService.Facade.API.Handlers;
+using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.Application;
+using EPR.RegulatorService.Facade.Core.Services.CommonData;
+using EPR.RegulatorService.Facade.Core.Services.Producer;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
+using EPR.RegulatorService.Facade.Core.Services.Submissions;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
-using EPR.RegulatorService.Facade.Core.Services.CommonData;
-using EPR.RegulatorService.Facade.Core.Services.Producer;
-using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using EPR.RegulatorService.Facade.API.Handlers;
-using EPR.RegulatorService.Facade.Core.Clients;
-using Microsoft.Extensions.Azure;
 
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
@@ -59,6 +60,13 @@ public static class HttpClientServiceCollectionExtension
             });
 
         services.AddHttpClient<ISubmissionService, SubmissionsService>((sp, client) =>
+        {
+            client.BaseAddress = new Uri(submissionSettings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(submissionSettings.Timeout);
+        })
+            .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
+
+        services.AddHttpClient<IRegistrationSubmissionService, RegistrationSubmissionService>((sp, client) =>
             {
                 client.BaseAddress = new Uri(submissionSettings.BaseUrl);
                 client.Timeout = TimeSpan.FromSeconds(submissionSettings.Timeout);
