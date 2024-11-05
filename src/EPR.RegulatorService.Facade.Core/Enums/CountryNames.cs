@@ -1,6 +1,4 @@
-﻿ 
-
-namespace EPR.RegulatorService.Facade.Core.Enums;
+﻿namespace EPR.RegulatorService.Facade.Core.Enums;
 
 public enum CountryName
 {
