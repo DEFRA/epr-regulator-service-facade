@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
-public class OrganisationRegistrationController(IRegistrationSubmissionService registrationSubmissionService) : Controller
+public class OrganisationRegistrationSubmissionsController(IRegistrationSubmissionsService registrationSubmissionService) : Controller
 {
-    private readonly IRegistrationSubmissionService _registrationSubmissionService = registrationSubmissionService;
+    private readonly IRegistrationSubmissionsService _registrationSubmissionsService = registrationSubmissionService;
 
     [HttpPost]
-    [Route("registration/registration-submission-decision")]
+    [Route("organisation-registration-submission-decision")]
     public async Task<IActionResult> CreateRegistrationSubmissionDecisionEvent([FromBody] RegistrationSubmissionDecisionCreateRequest request)
     {
         if (!ModelState.IsValid)
@@ -20,20 +20,20 @@ public class OrganisationRegistrationController(IRegistrationSubmissionService r
             return ValidationProblem();
         }
 
-        var registrationSubmissionEvent = await _registrationSubmissionService.CreateAsync(
+        var registrationSubmissionEvent = await _registrationSubmissionsService.CreateRegulatorDecisionEventAsync(
+            request.SubmissionId,
+            User.UserId(),
             new RegistrationSubmissionDecisionEvent
             {
                 OrganisationId = request.OrganisationId,
                 SubmissionId = request.SubmissionId,
                 Decision = request.Decision,
                 RegulatorComment = request.RegulatorComment
-            },
-            User.UserId(),
-            request.SubmissionId);
+            });
 
         registrationSubmissionEvent.EnsureSuccessStatusCode();
 
-        //TODO:: what to do with registrationSubmissionEvent and the exception/error scenario?
+        //TODO: what to do with registrationSubmissionEvent and the exception/error scenario?
 
         return Ok();
     }

@@ -4,20 +4,20 @@ using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmissions;
 
-public class RegistrationSubmissionService(
+public class RegistrationSubmissionsService(
     HttpClient httpClient,
-    IOptions<SubmissionsApiConfig> options) : IRegistrationSubmissionService
+    IOptions<SubmissionsApiConfig> options) : IRegistrationSubmissionsService
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly SubmissionsApiConfig _config = options.Value;
 
-    public async Task<HttpResponseMessage> CreateAsync<T>(T request, Guid userId, Guid submissionId)
-    { 
-       ConfigureHttpClient(userId); 
-       
-       var url = string.Format($"{_config.Endpoints.CreateSubmissionEvent}", _config.ApiVersion, submissionId);
-        
-       return await _httpClient.PostAsJsonAsync(url, request);
+    public async Task<HttpResponseMessage> CreateRegulatorDecisionEventAsync<T>(Guid submissionId, Guid userId, T request)
+    {
+        ConfigureHttpClient(userId);
+
+        var url = string.Format($"{_config.Endpoints.CreateSubmissionEvent}", _config.ApiVersion, submissionId);
+
+        return await _httpClient.PostAsJsonAsync(url, request);
     }
 
     private void ConfigureHttpClient(Guid userId)

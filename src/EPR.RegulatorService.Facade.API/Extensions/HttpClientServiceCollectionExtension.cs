@@ -66,13 +66,13 @@ public static class HttpClientServiceCollectionExtension
         })
             .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
 
-        services.AddHttpClient<IRegistrationSubmissionService, RegistrationSubmissionService>((sp, client) =>
+        services.AddHttpClient<IRegistrationSubmissionsService, RegistrationSubmissionsService>((sp, client) =>
             {
                 client.BaseAddress = new Uri(submissionSettings.BaseUrl);
                 client.Timeout = TimeSpan.FromSeconds(submissionSettings.Timeout);
             })
             .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
-        
+
         services.AddHttpClient<ICommonDataService, CommonDataService>((sp, client) =>
             {
                 client.BaseAddress = new Uri(commonDataSettings.BaseUrl);
@@ -120,6 +120,6 @@ public static class HttpClientServiceCollectionExtension
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
-            .WaitAndRetryAsync(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,retryAttempt)));
+            .WaitAndRetryAsync(retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 }
