@@ -1,9 +1,5 @@
-﻿
-
-using EPR.RegulatorService.Facade.Core.Enums;
+﻿using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using System.Security.Cryptography;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;

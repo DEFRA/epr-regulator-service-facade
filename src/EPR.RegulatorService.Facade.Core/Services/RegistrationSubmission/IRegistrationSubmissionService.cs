@@ -1,6 +1,4 @@
-﻿
-
-using EPR.RegulatorService.Facade.Core.Enums;
+﻿using EPR.RegulatorService.Facade.Core.Enums;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
