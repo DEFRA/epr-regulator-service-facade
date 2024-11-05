@@ -368,3 +368,8 @@ FodyWeavers.xsd
 **/.idea/
 src/certs/kainos-chain.pem
 src/certs/kainos-chain.p7b
+
+**/.vshistory/
+**/appsettings.Development.json
+**/appsettings.development.json
+src/EPR.RegulatorService.Facade.API/appsettings.Development.json
