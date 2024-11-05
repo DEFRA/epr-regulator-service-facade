@@ -4,7 +4,6 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.Application;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
-using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.Extensions.Azure;
@@ -64,13 +63,6 @@ public static class HttpClientServiceCollectionExtension
             client.BaseAddress = new Uri(submissionSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(submissionSettings.Timeout);
         })
-            .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
-
-        services.AddHttpClient<IRegistrationSubmissionsService, RegistrationSubmissionsService>((sp, client) =>
-            {
-                client.BaseAddress = new Uri(submissionSettings.BaseUrl);
-                client.Timeout = TimeSpan.FromSeconds(submissionSettings.Timeout);
-            })
             .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
 
         services.AddHttpClient<ICommonDataService, CommonDataService>((sp, client) =>
