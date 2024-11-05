@@ -12,6 +12,7 @@ using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using Microsoft.Extensions.Azure;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
@@ -22,6 +23,7 @@ public static class HttpClientServiceCollectionExtension
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)
     {
         services.AddTransient<AccountServiceAuthorisationHandler>();
+        services.AddScoped<IRegistrationSubmissionService, RegistrationSubmissionService>();
 
         var settings = services.BuildServiceProvider().GetRequiredService<IOptions<AccountsServiceApiConfig>>().Value;
         var submissionSettings =
