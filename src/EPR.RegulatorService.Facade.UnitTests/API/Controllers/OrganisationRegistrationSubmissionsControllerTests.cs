@@ -59,19 +59,18 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    [DataRow(RegistrationStatus.Granted, null)]
-    [DataRow(RegistrationStatus.Cancelled, "cancelled")]
-    [DataRow(RegistrationStatus.Refused, "refused")]
-    [DataRow(RegistrationStatus.Queried, "queried")]
-    public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode(RegistrationStatus registrationStatus, string comments)
+    [DataRow(RegistrationStatus.Granted)]
+    [DataRow(RegistrationStatus.Cancelled)]
+    [DataRow(RegistrationStatus.Refused)]
+    [DataRow(RegistrationStatus.Queried)]
+    public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode(RegistrationStatus registrationStatus)
     {
         // Arrange
         var request = new RegistrationSubmissionDecisionCreateRequest { 
             OrganisationId = Guid.NewGuid(),
             Status = registrationStatus,
             SubmissionId = Guid.NewGuid(),
-            UserId = Guid.NewGuid(),
-            Comments = comments
+            UserId = Guid.NewGuid()
         };
 
         var handlerResponse =
