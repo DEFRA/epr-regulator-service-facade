@@ -1,7 +1,4 @@
-using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Helpers.TestData;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;

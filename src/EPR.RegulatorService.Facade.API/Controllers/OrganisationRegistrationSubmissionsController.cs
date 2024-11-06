@@ -55,23 +55,15 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return ValidationProblem();
         }
 
-        try
-        {
-            var registrationSubmissionDetailsResponse = await commonDataService.GetRegistrationSubmissionDetails(request);
+        var registrationSubmissionDetailsResponse = await commonDataService.GetRegistrationSubmissionDetails(request);
 
-            if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
-            {
-                var stringContent = await registrationSubmissionDetailsResponse.Content.ReadAsStringAsync();
-                var response = JsonSerializer.Deserialize<RegistrationSubmissionDetailsResponse>(stringContent, jsonSerializerOptions);
-                return Ok(response);
-            }
-        }
-        catch (Exception ex)
+        if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
         {
-            logger.LogCritical(ex, "An error was received processing registrations/get-organisations.");
-            return HandleError.HandleErrorWithStatusCode(System.Net.HttpStatusCode.InternalServerError);
+            var stringContent = await registrationSubmissionDetailsResponse.Content.ReadAsStringAsync();
+            var response = JsonSerializer.Deserialize<RegistrationSubmissionDetailsResponse>(stringContent, jsonSerializerOptions);
+            return Ok(response);
         }
 
-        return new BadRequestResult();
+        return HandleError.HandleErrorWithStatusCode(registrationSubmissionDetailsResponse.StatusCode);
     }
 }
