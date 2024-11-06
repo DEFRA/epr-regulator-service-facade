@@ -26,7 +26,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
                 OrganisationId = request.OrganisationId,
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
-                RegulatorComment = request.Comments
+                Comments = request.Comments
             },
             User.UserId()
         );

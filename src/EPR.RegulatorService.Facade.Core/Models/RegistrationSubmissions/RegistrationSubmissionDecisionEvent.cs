@@ -15,5 +15,5 @@ public class RegistrationSubmissionDecisionEvent
 
     public RegulatorDecision Decision { get; set; }
 
-    public string? RegulatorComment { get; set; }
+    public string? Comments { get; set; }
 }
