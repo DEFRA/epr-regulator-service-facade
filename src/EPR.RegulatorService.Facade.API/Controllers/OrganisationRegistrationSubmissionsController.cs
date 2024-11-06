@@ -3,15 +3,13 @@ using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
 public class OrganisationRegistrationSubmissionsController(ISubmissionService submissionsService, ILogger<OrganisationRegistrationSubmissionsController> logger) : Controller
 {
-    private readonly ISubmissionService _submissionsService = submissionsService;
-    private readonly ILogger<OrganisationRegistrationSubmissionsController> _logger = logger;
-
     [HttpPost]
     [Route("organisation-registration-submission-decision")]
     public async Task<IActionResult> CreateRegistrationSubmissionDecisionEvent([FromBody] RegistrationSubmissionDecisionCreateRequest request)
@@ -21,7 +19,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return ValidationProblem();
         }
 
-        var registrationSubmissionEvent = await _submissionsService.CreateSubmissionEvent(
+        var registrationSubmissionEvent = await submissionsService.CreateSubmissionEvent(
             request.SubmissionId,
             new RegistrationSubmissionDecisionEvent
             {
@@ -37,7 +35,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return Created();
         }
 
-        _logger.LogWarning("Cannot create submission event");
+        logger.LogWarning("Cannot create submission event");
         return Problem();
     }
 }
