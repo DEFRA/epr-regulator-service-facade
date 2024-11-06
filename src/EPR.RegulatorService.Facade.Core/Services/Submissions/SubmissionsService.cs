@@ -4,19 +4,13 @@ using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Submissions;
 
-public class SubmissionsService : ISubmissionService
+public class SubmissionsService(
+    HttpClient httpClient,
+    IOptions<SubmissionsApiConfig> options) : ISubmissionService
 {
-    private readonly HttpClient _httpClient;
-    private readonly SubmissionsApiConfig _config;
+    private readonly HttpClient _httpClient = httpClient;
+    private readonly SubmissionsApiConfig _config = options.Value;
 
-    public SubmissionsService(
-        HttpClient httpClient,
-        IOptions<SubmissionsApiConfig> options)
-    {
-        _httpClient = httpClient;
-        _config = options.Value;
-    }
-    
     public async Task<HttpResponseMessage> CreateSubmissionEvent<T>(Guid submissionId, T request, Guid userId)
     { 
        ConfigureHttpClient(userId); 
