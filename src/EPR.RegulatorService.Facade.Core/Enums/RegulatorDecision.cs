@@ -7,8 +7,14 @@ public enum RegulatorDecision
     Accepted = 1,
     
     Rejected = 2,
-    
-    Cancelled = 4, //ToDo:: Need to add this and below in submission api enum as well - in the submission API, the Cancelled value is taken
-    
+
+    /// <summary>
+    /// Need to add this in submission api enum as well - in the submission API, the Cancelled value is taken
+    /// </summary>
+    Cancelled = 4,
+
+    /// <summary>
+    /// Need to add this in submission api enum as well
+    /// </summary>
     Queried = 5
 }
