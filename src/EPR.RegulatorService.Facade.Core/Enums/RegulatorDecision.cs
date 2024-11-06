@@ -8,7 +8,7 @@ public enum RegulatorDecision
     
     Rejected = 2,
     
-    Cancelled = 3, //ToDo:: Need to add this and below in submission api enum as well
+    Cancelled = 4, //ToDo:: Need to add this and below in submission api enum as well - in the submission API, the Cancelled value is taken
     
-    Queried = 4
+    Queried = 5
 }
