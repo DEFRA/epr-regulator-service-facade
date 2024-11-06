@@ -1,25 +1,17 @@
 ﻿using AutoFixture.AutoMoq;
 using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers;
-using EPR.RegulatorService.Facade.API.Shared;
-using EPR.RegulatorService.Facade.Core.Services.CommonData;
-using EPR.RegulatorService.Facade.Core.Services.Messaging;
-using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Net;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
-using System.Xml.Linq;
+using EPR.RegulatorService.Facade.Core.Services.CommonData;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers;
 
@@ -28,6 +20,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 {
     private readonly Mock<ILogger<OrganisationRegistrationSubmissionsController>> _loggerMock = new();
     private readonly Mock<ISubmissionService> _submissionsServiceMock = new();
+    private readonly Mock<ICommonDataService> _commonDataServiceMock = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationSubmissionsController _sut;
     private readonly Guid _oid = Guid.NewGuid();
@@ -36,7 +29,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public void Setup()
     {
         _sut = new OrganisationRegistrationSubmissionsController(
-            _submissionsServiceMock.Object,null,
+            _submissionsServiceMock.Object,_commonDataServiceMock.Object,
             _loggerMock.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
@@ -133,5 +126,22 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.AtMostOnce);
+    }
+
+
+    [TestMethod]
+    [DataRow("SubmissionId", "SubmissionId Error")]
+    [DataRow("OrganisationID", "OrganisationId Error")]
+    public async Task Should_Return_ValidationProblem_When_Call_GetRegistrationSubmissionDetails_With_ModelState_Is_Invalid(string keyName, string errorMessage)
+    {
+        // Arrange
+        _sut.ModelState.AddModelError(keyName, errorMessage);
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(new GetRegistrationSubmissionDetailsRequest()) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType(typeof(ValidationProblemDetails));
     }
 }
