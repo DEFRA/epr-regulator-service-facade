@@ -12,6 +12,7 @@ using Polly;
 using Polly.Extensions.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
@@ -22,6 +23,7 @@ public static class HttpClientServiceCollectionExtension
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)
     {
         services.AddTransient<AccountServiceAuthorisationHandler>();
+        services.AddScoped<IRegistrationSubmissionService, RegistrationSubmissionService>();
 
         var settings = services.BuildServiceProvider().GetRequiredService<IOptions<AccountsServiceApiConfig>>().Value;
         var submissionSettings =
