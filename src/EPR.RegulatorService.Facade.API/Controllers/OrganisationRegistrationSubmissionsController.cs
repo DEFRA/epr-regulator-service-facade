@@ -7,6 +7,7 @@ using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -31,7 +32,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
                 OrganisationId = request.OrganisationId,
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
-                RegulatorComment = request.Comments
+                Comments = request.Comments
             },
             User.UserId()
         );

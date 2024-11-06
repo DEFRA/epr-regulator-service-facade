@@ -14,7 +14,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Enums
             var submissionType = SubmissionType.Registration;
 
             // Act
-            var result = EnumExtensions.GetDisplayName(submissionType);
+            var result = EnumExtensions.GetDisplayName<SubmissionType>(submissionType);
                         
             // Assert
             result.ToLower().Should().Be(SubmissionType.Registration.ToString().ToLower());
@@ -27,7 +27,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Enums
             SubmissionType submissionType = new();
 
             // Act
-            var result = EnumExtensions.GetDisplayName(submissionType);
+            var result = EnumExtensions.GetDisplayName<SubmissionType>(submissionType);
 
             // Assert
             result.Should().Be(string.Empty);

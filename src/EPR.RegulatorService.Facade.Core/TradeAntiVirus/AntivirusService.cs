@@ -25,7 +25,7 @@ namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
                 Key = fileId,
                 Extension = Path.GetExtension(fileName),
                 FileName = Path.GetFileNameWithoutExtension(fileName),
-                Collection = GetCollectionName(submissionType.GetDisplayName()),
+                Collection = GetCollectionName(submissionType.GetDisplayName<SubmissionType>()),
                 UserId = userId,
                 UserEmail = email,
                 PersistFile = _antivirusApiConfig.PersistFile
