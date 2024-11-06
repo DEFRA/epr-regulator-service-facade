@@ -36,7 +36,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public void Setup()
     {
         _sut = new OrganisationRegistrationSubmissionsController(
-            _submissionsServiceMock.Object,
+            _submissionsServiceMock.Object,null,
             _loggerMock.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");

@@ -1,16 +1,19 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
-public class OrganisationRegistrationSubmissionsController(ISubmissionService submissionsService, ILogger<OrganisationRegistrationSubmissionsController> logger) : Controller
+public class OrganisationRegistrationSubmissionsController(ISubmissionService submissionsService, ICommonDataService commonDataService, ILogger<OrganisationRegistrationSubmissionsController> logger) : Controller
 {
-    private readonly ISubmissionService _submissionsService = submissionsService;
-    private readonly ILogger<OrganisationRegistrationSubmissionsController> _logger = logger;
+    private readonly JsonSerializerOptions jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
 
     [HttpPost]
     [Route("organisation-registration-submission-decision")]
@@ -21,7 +24,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return ValidationProblem();
         }
 
-        var registrationSubmissionEvent = await _submissionsService.CreateSubmissionEvent(
+        var registrationSubmissionEvent = await submissionsService.CreateSubmissionEvent(
             request.SubmissionId,
             new RegistrationSubmissionDecisionEvent
             {
@@ -37,7 +40,37 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return Created();
         }
 
-        _logger.LogWarning("Cannot create submission event");
+        logger.LogWarning("Cannot create submission event");
         return Problem();
+    }
+
+
+    [HttpGet]
+    [Route("registrations-submission-details")]
+    public async Task<IActionResult> GetRegistrationSubmissionDetails([FromQuery, Required] GetRegistrationSubmissionDetailsRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem();
+        }
+
+        try
+        {
+            var registrationSubmissionDetailsResponse = await commonDataService.GetRegistrationSubmissionDetails(request);
+
+            if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
+            {
+                var stringContent = await registrationSubmissionDetailsResponse.Content.ReadAsStringAsync();
+                var response = JsonSerializer.Deserialize<RegistrationSubmissionDetailsResponse>(stringContent, jsonSerializerOptions);
+                return Ok(response);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "An error was received processing registrations/get-organisations.");
+            return HandleError.HandleErrorWithStatusCode(System.Net.HttpStatusCode.InternalServerError);
+        }
+
+        return new BadRequestResult();
     }
 }
