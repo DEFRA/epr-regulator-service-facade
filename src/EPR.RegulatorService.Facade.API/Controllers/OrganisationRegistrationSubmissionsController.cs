@@ -1,6 +1,8 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -19,6 +21,8 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return ValidationProblem();
         }
 
+        var srv = new RegistrationSubmissionService();
+
         var registrationSubmissionEvent = await submissionsService.CreateSubmissionEvent(
             request.SubmissionId,
             new RegistrationSubmissionDecisionEvent
@@ -26,7 +30,10 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
                 OrganisationId = request.OrganisationId,
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
-                Comments = request.Comments
+                Comments = request.Comments,
+                RegistrationReferenceNumber = request.Status == RegistrationStatus.Granted ? 
+                                                srv.GenerateReferenceNumber(request.CountryName,request.RegistrationSubmissionType,request.OrganisationAccountManagementId.ToString(),request.TwoDigitYear)
+                                                : string.Empty
             },
             User.UserId()
         );

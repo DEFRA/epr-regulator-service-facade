@@ -70,7 +70,11 @@ public class OrganisationRegistrationSubmissionsControllerTests
             OrganisationId = Guid.NewGuid(),
             Status = registrationStatus,
             SubmissionId = Guid.NewGuid(),
-            UserId = Guid.NewGuid()
+            UserId = Guid.NewGuid(),
+            CountryName = CountryName.Eng,
+            RegistrationSubmissionType= RegistrationSubmissionType.Producer,
+            TwoDigitYear = "99",
+            OrganisationAccountManagementId = "123456"
         };
 
         var handlerResponse =
