@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
+using System.Xml.Linq;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using System.Text.Json;
 
@@ -22,6 +24,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 {
     private readonly Mock<ILogger<OrganisationRegistrationSubmissionsController>> _loggerMock = new();
     private readonly Mock<ISubmissionService> _submissionsServiceMock = new();
+    private readonly Mock<IRegistrationSubmissionService> _registrationSubmissionService = new();
     private readonly Mock<ICommonDataService> _commonDataServiceMock = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationSubmissionsController _sut;
@@ -30,9 +33,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     [TestInitialize]
     public void Setup()
     {
-        _sut = new OrganisationRegistrationSubmissionsController(
-            _submissionsServiceMock.Object, _commonDataServiceMock.Object,
-            _loggerMock.Object);
+        _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object, _registrationSubmissionService.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
     }
@@ -66,7 +67,11 @@ public class OrganisationRegistrationSubmissionsControllerTests
             OrganisationId = Guid.NewGuid(),
             Status = registrationStatus,
             SubmissionId = Guid.NewGuid(),
-            UserId = Guid.NewGuid()
+            UserId = Guid.NewGuid(),
+            CountryName = CountryName.Eng,
+            RegistrationSubmissionType= RegistrationSubmissionType.Producer,
+            TwoDigitYear = "99",
+            OrganisationAccountManagementId = "123456"
         };
 
         var handlerResponse =
@@ -78,6 +83,9 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        _registrationSubmissionService.Setup(s =>
+        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
 
         // Act
         var result = await _sut.CreateRegistrationSubmissionDecisionEvent(request) as CreatedResult;
@@ -176,7 +184,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(submissionId))
             .ReturnsAsync(new HttpResponseMessage() { Content = new StringContent(JsonSerializer.Serialize(new RegistrationSubmissionOrganisationDetails())) }).Verifiable();
 
-        _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object);
+        _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object, _registrationSubmissionService.Object);
 
 
         // Act
