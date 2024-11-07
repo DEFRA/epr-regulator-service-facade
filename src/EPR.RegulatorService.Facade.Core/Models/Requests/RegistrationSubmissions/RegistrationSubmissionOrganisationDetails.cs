@@ -1,6 +1,9 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+
 namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 
+[ExcludeFromCodeCoverage]
 public class RegistrationSubmissionOrganisationDetails
 {
     public Guid SubmissionId { get; set; }

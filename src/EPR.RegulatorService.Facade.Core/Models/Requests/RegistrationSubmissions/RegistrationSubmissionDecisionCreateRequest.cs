@@ -1,9 +1,11 @@
 using EPR.RegulatorService.Facade.Core.Attributes;
 using EPR.RegulatorService.Facade.Core.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 
+[ExcludeFromCodeCoverage]
 public class RegistrationSubmissionDecisionCreateRequest
 {
     [NotDefault]
