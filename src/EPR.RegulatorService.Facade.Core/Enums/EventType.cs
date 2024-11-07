@@ -4,5 +4,6 @@ public enum EventType
 {
     RegulatorPoMDecision = 7,
     RegulatorRegistrationDecision = 10,
-    FileDownloadCheck = 11
+    FileDownloadCheck = 11,
+    RegulatorOrganisationRegistrationDecision = 12
 }
