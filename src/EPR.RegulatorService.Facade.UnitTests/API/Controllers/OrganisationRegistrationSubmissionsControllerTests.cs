@@ -20,6 +20,7 @@ using System.Net;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using System.Xml.Linq;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers;
 
@@ -28,6 +29,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 {
     private readonly Mock<ILogger<OrganisationRegistrationSubmissionsController>> _loggerMock = new();
     private readonly Mock<ISubmissionService> _submissionsServiceMock = new();
+    private readonly Mock<IRegistrationSubmissionService> _submissionServiceMock = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationSubmissionsController _sut;
     private readonly Guid _oid = Guid.NewGuid();
@@ -37,7 +39,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         _sut = new OrganisationRegistrationSubmissionsController(
             _submissionsServiceMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            _submissionServiceMock.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
     }
@@ -86,6 +89,9 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        _submissionServiceMock.Setup(s =>
+        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
 
         // Act
         var result = await _sut.CreateRegistrationSubmissionDecisionEvent(request) as CreatedResult;
