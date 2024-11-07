@@ -17,4 +17,14 @@ public class RegistrationSubmissionDecisionCreateRequest
     public Guid OrganisationId { get; set; }
 
     public Guid? UserId { get; set; }
+     
+    public CountryName CountryName { get; set; }
+
+    public RegistrationSubmissionType RegistrationSubmissionType { get; set; }
+
+    public string? TwoDigitYear { get; set; } = null;
+
+
+    // This is the 6 digit Org ID taken from Acct Management
+    public string? OrganisationAccountManagementId { get; set; }
 }
