@@ -232,7 +232,7 @@ public class CommonDataServiceTests
         //Arrange
         _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetRegistrationSubmissionDetails}";
         // Act
-        var response = await _sut.GetRegistrationSubmissionDetails(new GetRegistrationSubmissionDetailsRequest());
+        var response = await _sut.GetRegistrationSubmissionDetails(Guid.NewGuid());
 
         // Assert
         response.IsSuccessStatusCode.Should().BeFalse();

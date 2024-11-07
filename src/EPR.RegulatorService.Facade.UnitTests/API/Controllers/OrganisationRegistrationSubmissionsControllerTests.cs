@@ -141,7 +141,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _sut.ModelState.AddModelError(keyName, errorMessage);
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(new GetRegistrationSubmissionDetailsRequest()) as ObjectResult;
+        var result = await _sut.GetRegistrationSubmissionDetails(Guid.Empty) as ObjectResult;
 
         // Assert
         Assert.IsNotNull(result);
@@ -152,17 +152,13 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataServiice_Fails_Then_Should_Returns_500_Internal_Server_Error()
     {
         // Arrange 
-        var request = new GetRegistrationSubmissionDetailsRequest
-        {
-            SubmissionId = Guid.NewGuid(),
-            OrganisationId = Guid.NewGuid(),
-            OrganisationReference = "Test OrganisationReference"
-        };
 
-        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(request)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
+        var submissionId = Guid.NewGuid();
+
+        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(submissionId)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(request);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
 
         // Assert
         result.Should().BeOfType<StatusCodeResult>();
@@ -174,26 +170,21 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public async Task When_Fetching_GetRegistrationSubmissionDetails_With_Valid_Data_Should_Return_Success()
     {
         // Arrange
-        var request = new GetRegistrationSubmissionDetailsRequest
-        {
-            SubmissionId = Guid.NewGuid(),
-            OrganisationId = Guid.NewGuid(),
-            OrganisationReference = "Test OrganisationReference"
-        };
+        var submissionId = Guid.NewGuid();
 
 
-        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(It.IsAny<GetRegistrationSubmissionDetailsRequest>()))
-            .ReturnsAsync(new HttpResponseMessage() { Content = new StringContent(JsonSerializer.Serialize(new RegistrationSubmissionDetailsResponse())) }).Verifiable();
+        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(submissionId))
+            .ReturnsAsync(new HttpResponseMessage() { Content = new StringContent(JsonSerializer.Serialize(new RegistrationSubmissionOrganisationDetails())) }).Verifiable();
 
         _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object);
 
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(request);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
 
         // Assert
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
-        _commonDataServiceMock.Verify(r => r.GetRegistrationSubmissionDetails(It.IsAny<GetRegistrationSubmissionDetailsRequest>()), Times.AtMostOnce);
+        _commonDataServiceMock.Verify(r => r.GetRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
     }
 }

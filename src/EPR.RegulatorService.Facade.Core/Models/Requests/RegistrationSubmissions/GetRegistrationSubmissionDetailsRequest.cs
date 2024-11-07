@@ -5,10 +5,5 @@ namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissio
 public class GetRegistrationSubmissionDetailsRequest
 {
     [Required]
-    public Guid SubmissionId { get; set; }
-
-    [Required]
-    public Guid OrganisationId { get; set; }
-
-    public string OrganisationReference { get; set; }
+    public string SubmissionId { get; set; }
 }

@@ -11,33 +11,23 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
     [ExcludeFromCodeCoverage]
     public static class RegistrationSubmissionTestData
     {
-        public static async Task<HttpResponseMessage>? GetRegistrationSubmissionDetailsResponse(GetRegistrationSubmissionDetailsRequest request, string url)
+        public static async Task<HttpResponseMessage>? GetRegistrationSubmissionDetails(Guid submissionId, string url)
         {
-            var result =  GenerateRegistrationSubmissionDataCollection().Where(x => x.OrganisationID == request.OrganisationId && x.SubmissionId == request.SubmissionId)
-             .Select(regSubData => new RegistrationSubmissionDetailsResponse
-             {
-                 BuildingName = regSubData?.BuildingName,
-                 BuildingNumber = regSubData?.BuildingNumber,
-                 CompaniesHouseNumber = regSubData?.CompaniesHouseNumber,
-                 Country = regSubData?.Country,
-                 DependantLocality = regSubData?.DependentLocality,
-                 County = regSubData?.County,
-                 Locality = regSubData?.Locality,
-                 OrganisationRef = regSubData?.OrganisationReference,
-                 PostCode = regSubData?.Postcode,
-                 ProducerComments = regSubData?.ProducerComments,
-                 Street = regSubData?.Street,
-                 RegulatorComments = regSubData?.RegulatorComments,
-                 SubBuildingName = regSubData?.SubBuildingName,
-                 Town = regSubData?.Town
-             }).FirstOrDefault();
+            try
+            {
+                var result = GenerateRegistrationSubmissionDataCollection().Find(x => x.SubmissionId == submissionId);
+                result.SubmissionDetails = GenerateRandomSubmissionData(result.RegistrationStatus);
+                result.PaymentDetails = GeneratePaymentDetails();
 
-            return result == null
-                ? new HttpResponseMessage(HttpStatusCode.NotFound)
-                : new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
-                };
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
+                    };
+            }
+            catch (Exception ex)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
         }
 
         public static List<RegistrationSubmissionOrganisationDetails> GenerateRegistrationSubmissionDataCollection()
@@ -53,8 +43,8 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
                 {
                     OrganisationReference = fields[0][..10],
                     OrganisationName = fields[1],
-                    OrganisationType = fields[2],
-                    RegistrationStatus = fields[3],
+                    OrganisationType = Enum.Parse<RegistrationSubmissionOrganisationType>(fields[2]),
+                    RegistrationStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3]),
                     ApplicationReferenceNumber = fields[4],
                     RegistrationReferenceNumber = fields[5],
                     RegistrationDateTime = dateTime,
@@ -74,11 +64,75 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
                     SubmissionId = Guid.Parse(fields[23]),
                     NationID = int.Parse(fields[24], CultureInfo.InvariantCulture),
                     RegulatorComments = fields[20],
-                    ProducerComments = fields[21],
+                    ProducerComments = fields[21]
                 });
             }
 
             return objRet;
+        }
+
+        public static RegistrationSubmissionOrganisationSubmissionSummaryDetails GenerateRandomSubmissionData(RegistrationSubmissionStatus registrationStatus)
+        {
+            var random = new Random(); // NOSONAR - this is dummy disposable data
+
+            string[] sampleNames = ["Alice", "Bob", "Charlie", "Diana", "Edward"];
+            var sampleRoles = Enum.GetValues(typeof(ServiceRole));
+            var generateRandomPhoneNumber = (Random random) => $"{random.Next(100, 999)}-{random.Next(100, 999)}-{random.Next(1000, 9999)}";
+
+
+            return new RegistrationSubmissionOrganisationSubmissionSummaryDetails
+            {
+                Status = registrationStatus,
+                DecisionDate = DateTime.Now.AddDays(-random.Next(1, 100)),
+                TimeAndDateOfSubmission = DateTime.Now.AddDays(-random.Next(1, 100)),
+                SubmittedOnTime = random.Next(2) == 0,
+                SubmittedBy = sampleNames[random.Next(sampleNames.Length)],
+                AccountRole = ((ServiceRole)sampleRoles.GetValue(random.Next(sampleRoles.Length))).ToString(),
+                Telephone = generateRandomPhoneNumber(random),
+                Email = $"{sampleNames[random.Next(sampleNames.Length)].ToLower(CultureInfo.CurrentCulture)}@example.com",
+                DeclaredBy = sampleNames[random.Next(sampleNames.Length)],
+                Files = GenerateRandomFiles()
+            };
+        }
+
+        private static RegistrationSubmissionsOrganisationPaymentDetails GeneratePaymentDetails()
+        {
+            var random = new Random(); // NOSONAR - this is dummy disposable data
+
+            var generateRandomDecimal = (int min, int max) => Math.Round((decimal)(random.NextDouble() * (max - min) + min), 2);
+
+            return new RegistrationSubmissionsOrganisationPaymentDetails()
+            {
+                ApplicationProcessingFee = generateRandomDecimal(1000, 6000),
+                OnlineMarketplaceFee = generateRandomDecimal(1000, 5000),
+                PreviousPaymentsReceived = generateRandomDecimal(1000, 10000000),
+                SubsidiaryFee = generateRandomDecimal(1000, 10000)
+            };
+        }
+
+        private static List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails> GenerateRandomFiles()
+        {
+            var files = new List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails>();
+
+            files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
+            {
+                DownloadUrl = "#",
+                FileName = "org.details.acme.csv",
+                Label = "SubmissionDetails.OrganisationDetails"
+            });
+            files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
+            {
+                DownloadUrl = "#",
+                FileName = "brand.details.acme.csv",
+                Label = "SubmissionDetails.BrandDetails"
+            });
+            files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
+            {
+                DownloadUrl = "#",
+                FileName = "partner.details.acme.csv",
+                Label = "SubmissionDetails.PartnerDetails"
+            });
+            return files;
         }
 
         private static readonly string[] TSVData = {

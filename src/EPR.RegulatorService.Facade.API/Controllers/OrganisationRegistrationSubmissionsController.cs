@@ -46,20 +46,20 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
     }
 
     [HttpGet]
-    [Route("registrations-submission-details")]
-    public async Task<IActionResult> GetRegistrationSubmissionDetails([FromQuery, Required] GetRegistrationSubmissionDetailsRequest request)
+    [Route("registrations-submission-details/submissionId/{submissionId:GUID}")]
+    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid  submissionId)
     {
         if (!ModelState.IsValid)
         {
             return ValidationProblem();
         }
 
-        var registrationSubmissionDetailsResponse = await commonDataService.GetRegistrationSubmissionDetails(request);
+        var registrationSubmissionDetailsResponse = await commonDataService.GetRegistrationSubmissionDetails(submissionId);
 
         if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
         {
             var stringContent = await registrationSubmissionDetailsResponse.Content.ReadAsStringAsync();
-            var response = JsonSerializer.Deserialize<RegistrationSubmissionDetailsResponse>(stringContent, jsonSerializerOptions);
+            var response = JsonSerializer.Deserialize<RegistrationSubmissionOrganisationDetails>(stringContent, jsonSerializerOptions);
             return Ok(response);
         }
 
