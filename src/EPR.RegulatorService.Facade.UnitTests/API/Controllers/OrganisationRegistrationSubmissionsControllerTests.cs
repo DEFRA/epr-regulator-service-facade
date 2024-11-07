@@ -1,6 +1,7 @@
 ﻿using AutoFixture.AutoMoq;
 using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers;
+using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Moq;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
@@ -39,7 +40,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     [TestMethod]
     [DataRow("SubmissionId", "error")]
     [DataRow("RegistrationStatus", "error")]
-    public async Task Should_Return_ValidationProblem_When_ModelState_Is_Invalid(string keyName, string errorMessage)
+    public async Task Should_Return_ValidationProblem_When_ModelState_Is_Invalid(string keyName,string errorMessage)
     {
         // Arrange
         _sut.ModelState.AddModelError(keyName, errorMessage);
@@ -60,8 +61,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode(RegistrationStatus registrationStatus)
     {
         // Arrange
-        var request = new RegistrationSubmissionDecisionCreateRequest
-        {
+        var request = new RegistrationSubmissionDecisionCreateRequest { 
             OrganisationId = Guid.NewGuid(),
             Status = registrationStatus,
             SubmissionId = Guid.NewGuid(),
