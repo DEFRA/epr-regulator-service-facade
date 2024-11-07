@@ -1,25 +1,19 @@
 ﻿using AutoFixture.AutoMoq;
 using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers;
-using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
-using EPR.RegulatorService.Facade.Core.Services.Messaging;
-using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Net;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
-using System.Xml.Linq;
+using EPR.RegulatorService.Facade.Core.Services.CommonData;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers;
 
@@ -28,6 +22,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 {
     private readonly Mock<ILogger<OrganisationRegistrationSubmissionsController>> _loggerMock = new();
     private readonly Mock<ISubmissionService> _submissionsServiceMock = new();
+    private readonly Mock<ICommonDataService> _commonDataServiceMock = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationSubmissionsController _sut;
     private readonly Guid _oid = Guid.NewGuid();
@@ -36,7 +31,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public void Setup()
     {
         _sut = new OrganisationRegistrationSubmissionsController(
-            _submissionsServiceMock.Object,
+            _submissionsServiceMock.Object, _commonDataServiceMock.Object,
             _loggerMock.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
@@ -45,7 +40,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     [TestMethod]
     [DataRow("SubmissionId", "error")]
     [DataRow("RegistrationStatus", "error")]
-    public async Task Should_Return_ValidationProblem_When_ModelState_Is_Invalid(string keyName,string errorMessage)
+    public async Task Should_Return_ValidationProblem_When_ModelState_Is_Invalid(string keyName, string errorMessage)
     {
         // Arrange
         _sut.ModelState.AddModelError(keyName, errorMessage);
@@ -66,7 +61,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode(RegistrationStatus registrationStatus)
     {
         // Arrange
-        var request = new RegistrationSubmissionDecisionCreateRequest { 
+        var request = new RegistrationSubmissionDecisionCreateRequest
+        {
             OrganisationId = Guid.NewGuid(),
             Status = registrationStatus,
             SubmissionId = Guid.NewGuid(),
@@ -133,5 +129,71 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.AtMostOnce);
+    }
+
+
+    [TestMethod]
+    [DataRow("SubmissionId", "SubmissionId Error")]
+    [DataRow("OrganisationID", "OrganisationId Error")]
+    public async Task Should_Return_ValidationProblem_When_Call_GetRegistrationSubmissionDetails_With_ModelState_Is_Invalid(string keyName, string errorMessage)
+    {
+        // Arrange
+        _sut.ModelState.AddModelError(keyName, errorMessage);
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(new GetRegistrationSubmissionDetailsRequest()) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType(typeof(ValidationProblemDetails));
+    }
+
+    [TestMethod]
+    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataServiice_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    {
+        // Arrange 
+        var request = new GetRegistrationSubmissionDetailsRequest
+        {
+            SubmissionId = Guid.NewGuid(),
+            OrganisationId = Guid.NewGuid(),
+            OrganisationReference = "Test OrganisationReference"
+        };
+
+        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(request)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(request);
+
+        // Assert
+        result.Should().BeOfType<StatusCodeResult>();
+        var statusCodeResult = result as BadRequestResult;
+        statusCodeResult?.StatusCode.Should().Be(500);
+    }
+
+    [TestMethod]
+    public async Task When_Fetching_GetRegistrationSubmissionDetails_With_Valid_Data_Should_Return_Success()
+    {
+        // Arrange
+        var request = new GetRegistrationSubmissionDetailsRequest
+        {
+            SubmissionId = Guid.NewGuid(),
+            OrganisationId = Guid.NewGuid(),
+            OrganisationReference = "Test OrganisationReference"
+        };
+
+
+        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(It.IsAny<GetRegistrationSubmissionDetailsRequest>()))
+            .ReturnsAsync(new HttpResponseMessage() { Content = new StringContent(JsonSerializer.Serialize(new RegistrationSubmissionDetailsResponse())) }).Verifiable();
+
+        _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object);
+
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(request);
+
+        // Assert
+        var statusCodeResult = result as OkObjectResult;
+        statusCodeResult?.StatusCode.Should().Be(200);
+        _commonDataServiceMock.Verify(r => r.GetRegistrationSubmissionDetails(It.IsAny<GetRegistrationSubmissionDetailsRequest>()), Times.AtMostOnce);
     }
 }
