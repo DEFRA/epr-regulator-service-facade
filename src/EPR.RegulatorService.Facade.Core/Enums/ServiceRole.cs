@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 
+namespace EPR.RegulatorService.Facade.Core.Enums;
+
 public enum ServiceRole
 {
     [Description("ServiceRole.ApprovedPerson")]
