@@ -21,7 +21,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public DateTime SubmissionDate { get; set; }
 
-        public int RegistrationYear { get; set; }
+        public string RegistrationYear { get; set; }
 
         public RegistrationSubmissionStatus RegistrationStatus { get; set; }
 

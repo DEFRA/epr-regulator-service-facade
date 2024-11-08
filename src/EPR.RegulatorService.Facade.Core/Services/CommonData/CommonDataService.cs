@@ -58,7 +58,7 @@ public class CommonDataService : ICommonDataService
         var paginatedRegistrations = LocalPaginationHelper.Paginate<RegistrationSubmissionOrganisationDetails>(
             filteredRegistrations.Item2,
             filter.PageNumber.Value,
-            filter.PageSize.Value);
+            filter.PageSize.Value, filteredRegistrations.Item1);
 
         return new HttpResponseMessage(System.Net.HttpStatusCode.Created)
         {

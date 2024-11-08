@@ -38,7 +38,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
 
             return Tuple.Create(totalItems, sortedItems);
         }
-        public static string Paginate<T>(List<T>? items, int currentPage, int pageSize)
+        public static string Paginate<T>(List<T>? items, int currentPage, int pageSize, int totalItems)
         {
             currentPage = currentPage < 1 ? 1 : currentPage;
 
@@ -59,7 +59,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
                 {
                     Items = items,
                     CurrentPage = currentPage,
-                    TotalItems = items.Count,
+                    TotalItems = totalItems,
                     PageSize = pageSize
                 };
             }
