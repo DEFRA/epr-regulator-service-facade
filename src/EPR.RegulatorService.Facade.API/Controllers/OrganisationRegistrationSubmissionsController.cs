@@ -3,7 +3,6 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
-using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -62,7 +62,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return ValidationProblem();
         }
 
-        var registrationSubmissionDetailsResponse = await commonDataService.GetRegistrationSubmissionDetails(submissionId);
+        var registrationSubmissionDetailsResponse = await commonDataService.GetOrganisationRegistrationSubmissions(submissionId);
 
         if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
         {

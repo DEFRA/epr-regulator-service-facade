@@ -1,7 +1,16 @@
 ﻿
 using System.Diagnostics.CodeAnalysis;
+using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.Core;
+using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models;
+using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
-namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+namespace EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 [ExcludeFromCodeCoverage]
 public class RegistrationSubmissionOrganisationDetails
@@ -17,8 +26,8 @@ public class RegistrationSubmissionOrganisationDetails
     public RegistrationSubmissionStatus RegistrationStatus { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
     public string? ProducerComments { get; set; } = string.Empty;
-    public string ApplicationReferenceNumber { get; set; } = String.Empty;
-    public string? RegistrationReferenceNumber { get; set; } = String.Empty;
+    public string ApplicationReferenceNumber { get; set; } = string.Empty;
+    public string? RegistrationReferenceNumber { get; set; } = string.Empty;
     public string CompaniesHouseNumber { get; set; }
     public string? BuildingName { get; set; }
     public string? SubBuildingName { get; set; }

@@ -1,4 +1,3 @@
-using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using System.Threading.Tasks;
@@ -13,5 +12,5 @@ public interface ICommonDataService
     
     Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest);
 
-    Task<HttpResponseMessage> GetRegistrationSubmissionDetails(Guid submissionId);
+    Task<HttpResponseMessage> GetOrganisationRegistrationSubmissions(Guid submissionId);
 }

@@ -1,7 +1,11 @@
 ﻿
 using System.ComponentModel;
+using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.Core;
 
-namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+namespace EPR.RegulatorService.Facade.Core.Enums;
 
 public enum RegistrationSubmissionStatus
 {

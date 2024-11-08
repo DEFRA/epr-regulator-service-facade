@@ -1,4 +1,6 @@
-﻿using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;

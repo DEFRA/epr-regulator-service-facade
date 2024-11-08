@@ -1,8 +1,12 @@
 ﻿
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.Core;
 
-namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+
+namespace EPR.RegulatorService.Facade.Core.Enums;
 
 public enum RegistrationSubmissionOrganisationType
 {

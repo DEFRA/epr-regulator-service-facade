@@ -12,10 +12,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
-using System.Xml.Linq;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using System.Text.Json;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers;
 
@@ -163,7 +163,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         var submissionId = Guid.NewGuid();
 
-        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(submissionId)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissions(submissionId)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
@@ -181,7 +181,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var submissionId = Guid.NewGuid();
 
 
-        _commonDataServiceMock.Setup(x => x.GetRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissions(submissionId))
             .ReturnsAsync(new HttpResponseMessage() { Content = new StringContent(JsonSerializer.Serialize(new RegistrationSubmissionOrganisationDetails())) }).Verifiable();
 
         _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object, _registrationSubmissionService.Object);
@@ -193,6 +193,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
         // Assert
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
-        _commonDataServiceMock.Verify(r => r.GetRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissions(submissionId), Times.AtMostOnce);
     }
 }
