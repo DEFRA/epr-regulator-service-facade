@@ -62,7 +62,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             return ValidationProblem();
         }
 
-        var registrationSubmissionDetailsResponse = await commonDataService.GetOrganisationRegistrationSubmissions(submissionId);
+        var registrationSubmissionDetailsResponse = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
 
         if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
         {

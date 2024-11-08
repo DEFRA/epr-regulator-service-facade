@@ -163,7 +163,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         var submissionId = Guid.NewGuid();
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissions(submissionId)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError)).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
@@ -181,7 +181,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var submissionId = Guid.NewGuid();
 
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissions(submissionId))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
             .ReturnsAsync(new HttpResponseMessage() { Content = new StringContent(JsonSerializer.Serialize(new RegistrationSubmissionOrganisationDetails())) }).Verifiable();
 
         _sut = new OrganisationRegistrationSubmissionsController(_submissionsServiceMock.Object, _commonDataServiceMock.Object, _loggerMock.Object, _registrationSubmissionService.Object);
@@ -193,6 +193,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
         // Assert
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissions(submissionId), Times.AtMostOnce);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
     }
 }

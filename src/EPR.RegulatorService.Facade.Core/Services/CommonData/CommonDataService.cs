@@ -38,7 +38,7 @@ public class CommonDataService : ICommonDataService
         return await _httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 
-    public async Task<HttpResponseMessage> GetOrganisationRegistrationSubmissions(Guid submissionId)
+    public async Task<HttpResponseMessage> GetOrganisationRegistrationSubmissionDetails(Guid submissionId)
     {
         var url = string.Format($"{_config.Endpoints.GetRegistrationSubmissionDetails}");
 

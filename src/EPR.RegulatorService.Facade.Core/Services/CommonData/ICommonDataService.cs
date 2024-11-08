@@ -12,5 +12,5 @@ public interface ICommonDataService
     
     Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest);
 
-    Task<HttpResponseMessage> GetOrganisationRegistrationSubmissions(Guid submissionId);
+    Task<HttpResponseMessage> GetOrganisationRegistrationSubmissionDetails(Guid submissionId);
 }
