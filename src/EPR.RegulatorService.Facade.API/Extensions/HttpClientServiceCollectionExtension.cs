@@ -22,6 +22,7 @@ public static class HttpClientServiceCollectionExtension
 {
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)
     {
+        services.AddTransient<IOrganisationRegistrationSubmissionService, OrganisationRegistrationSubmissionService>();
         services.AddTransient<AccountServiceAuthorisationHandler>();
         services.AddScoped<IRegistrationSubmissionService, RegistrationSubmissionService>();
 

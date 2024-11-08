@@ -15,8 +15,13 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
-public class OrganisationRegistrationSubmissionsController(ISubmissionService submissionsService, ICommonDataService commonDataService, ILogger<OrganisationRegistrationSubmissionsController> logger, IRegistrationSubmissionService submissionService) : Controller
-{  
+public class OrganisationRegistrationSubmissionsController(
+    IOrganisationRegistrationSubmissionService orgService,
+    ISubmissionService submissionsService,
+    ICommonDataService commonDataService,
+    ILogger<OrganisationRegistrationSubmissionsController> logger,
+    IRegistrationSubmissionService submissionService) : Controller
+{
     private readonly JsonSerializerOptions jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
 
     [HttpPost]
@@ -26,7 +31,7 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
         if (!ModelState.IsValid)
         {
             return ValidationProblem();
-        } 
+        }
 
         var regRefNumber = request.Status == RegistrationStatus.Granted ?
                                                 submissionService.GenerateReferenceNumber(request.CountryName, request.RegistrationSubmissionType, request.OrganisationAccountManagementId.ToString(), request.TwoDigitYear)
@@ -45,7 +50,8 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
             User.UserId()
         );
 
-        if (registrationSubmissionEvent.IsSuccessStatusCode) {
+        if (registrationSubmissionEvent.IsSuccessStatusCode)
+        {
             return Created();
         }
 
@@ -54,8 +60,8 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
     }
 
     [HttpGet]
-    [Route("registrations-submission-details/submissionId/{submissionId:GUID}")]
-    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid  submissionId)
+    [Route("organisation-registration-submission-details/submissionId/{submissionId:GUID}")]
+    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
     {
         if (!ModelState.IsValid)
         {
@@ -72,5 +78,17 @@ public class OrganisationRegistrationSubmissionsController(ISubmissionService su
         }
 
         return HandleError.HandleErrorWithStatusCode(registrationSubmissionDetailsResponse.StatusCode);
+    }
+
+    [HttpPost]
+    [Route("organisation-registration-submissions-list")]
+    public async Task<IActionResult> GetRegistrationSubmissionList([FromQuery, Required] GetOrganisationRegistrationSubmissionsFilter filter)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem();
+        }
+
+        return await orgService.GetOrganisationRegistrations(filter);
     }
 }

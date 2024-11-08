@@ -1,3 +1,4 @@
+using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using System.Threading.Tasks;
@@ -9,8 +10,10 @@ public interface ICommonDataService
     Task<HttpResponseMessage> GetSubmissionLastSyncTime();
 
     Task<HttpResponseMessage> GetPoMSubmissions(GetPomSubmissionsRequest pomSubmissionsRequest);
-    
+
     Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest);
 
     Task<HttpResponseMessage> GetOrganisationRegistrationSubmissionDetails(Guid submissionId);
+
+    Task<HttpResponseMessage> GetOrganisationRegistrationSubmissionlist(GetOrganisationRegistrationSubmissionsFilter filter);
 }
