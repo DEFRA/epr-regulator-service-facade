@@ -13,18 +13,20 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
     [ExcludeFromCodeCoverage]
     public static class RegistrationSubmissionTestData
     {
+        public static List<RegistrationSubmissionOrganisationDetails> DummyData { get; } = GenerateRegistrationSubmissionDataCollection();
+
         public static async Task<HttpResponseMessage>? GetRegistrationSubmissionDetails(Guid submissionId, string url)
         {
             try
             {
-                var result = GenerateRegistrationSubmissionDataCollection().Find(x => x.SubmissionId == submissionId);
-                result.SubmissionDetails = GenerateRandomSubmissionData(result.RegistrationStatus);
+                var result = DummyData.Find(x => x.SubmissionId == submissionId);
+                result.SubmissionDetails = GenerateRandomSubmissionData(result.SubmissionStatus);
                 result.PaymentDetails = GeneratePaymentDetails();
 
                 return new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
-                    };
+                {
+                    Content = new StringContent(JsonSerializer.Serialize(result), Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"))
+                };
             }
             catch (Exception ex)
             {
@@ -36,7 +38,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
         {
             List<RegistrationSubmissionOrganisationDetails> objRet = [];
 
-            foreach (string line in TSVData)
+            foreach (string line in RegistrationSubmissionTestData.TSVData)
             {
                 string[] fields = line.Split('\t');
 
@@ -46,7 +48,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
                     OrganisationReference = fields[0][..10],
                     OrganisationName = fields[1],
                     OrganisationType = Enum.Parse<RegistrationSubmissionOrganisationType>(fields[2]),
-                    RegistrationStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3]),
+                    SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3]),
                     ApplicationReferenceNumber = fields[4],
                     RegistrationReferenceNumber = fields[5],
                     RegistrationDateTime = dateTime,
@@ -101,7 +103,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData
         {
             var random = new Random(); // NOSONAR - this is dummy disposable data
 
-            var generateRandomDecimal = (int min, int max) => Math.Round((decimal)(random.NextDouble() * (max - min) + min), 2);
+            var generateRandomDecimal = (int min, int max) => Math.Round((decimal)((random.NextDouble() * (max - min)) + min), 2);
 
             return new RegistrationSubmissionsOrganisationPaymentDetails()
             {

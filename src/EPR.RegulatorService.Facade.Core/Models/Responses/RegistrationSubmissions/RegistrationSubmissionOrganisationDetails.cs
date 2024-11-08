@@ -23,7 +23,7 @@ public class RegistrationSubmissionOrganisationDetails
     public int NationID { get; set; }
     public string RegistrationYear { get; set; }
     public DateTime RegistrationDateTime { get; set; }
-    public RegistrationSubmissionStatus RegistrationStatus { get; set; }
+    public RegistrationSubmissionStatus SubmissionStatus { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
     public string? ProducerComments { get; set; } = string.Empty;
     public string ApplicationReferenceNumber { get; set; } = string.Empty;

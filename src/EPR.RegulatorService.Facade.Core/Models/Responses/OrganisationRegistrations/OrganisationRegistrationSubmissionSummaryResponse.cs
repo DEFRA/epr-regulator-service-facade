@@ -23,7 +23,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public int RegistrationYear { get; set; }
 
-        public RegistrationStatus RegistrationStatus { get; set; }
+        public RegistrationSubmissionStatus RegistrationStatus { get; set; }
 
         public int NationId { get; set; }
     }

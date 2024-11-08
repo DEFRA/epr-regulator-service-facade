@@ -154,7 +154,7 @@ public class CommonDataServiceTests
         VerifyApiCall(_expectedUrl, HttpMethod.Post);
         response.IsSuccessStatusCode.Should().BeFalse();
     }
-    
+
     [TestMethod]
     public async Task Should_return_success_when_getting_regulator_registration_summary()
     {
@@ -230,7 +230,7 @@ public class CommonDataServiceTests
     public async Task Should_return_success_when_fetching_registration_submission_details()
     {
         //Arrange
-        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetRegistrationSubmissionDetails}";
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}";
         // Act
         var response = await _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid());
 

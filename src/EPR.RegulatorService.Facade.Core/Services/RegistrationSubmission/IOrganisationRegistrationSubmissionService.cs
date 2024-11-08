@@ -7,7 +7,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 public interface IOrganisationRegistrationSubmissionService
 {
-    Task<IActionResult> GetOrganisationRegistrations(GetOrganisationRegistrationSubmissionsFilter filterRequest);
+    Task<IActionResult> HandleGetOrganisationRegistrations(GetOrganisationRegistrationSubmissionsFilter filterRequest);
 
     ActionResult? ValidateIncomingModels(ModelStateDictionary modelState);
 

@@ -33,9 +33,14 @@ public class OrganisationRegistrationSubmissionsController(
             return ValidationProblem();
         }
 
-        var regRefNumber = request.Status == RegistrationStatus.Granted ?
-                                                submissionService.GenerateReferenceNumber(request.CountryName, request.RegistrationSubmissionType, request.OrganisationAccountManagementId.ToString(), request.TwoDigitYear)
-                                                : string.Empty;
+        var regRefNumber =
+            request.Status == RegistrationSubmissionStatus.Granted ?
+            submissionService.GenerateReferenceNumber(
+                request.CountryName,
+                request.RegistrationSubmissionType,
+                request.OrganisationAccountManagementId.ToString(),
+                request.TwoDigitYear)
+            : string.Empty;
 
         var registrationSubmissionEvent = await submissionsService.CreateSubmissionEvent(
             request.SubmissionId,
@@ -89,6 +94,6 @@ public class OrganisationRegistrationSubmissionsController(
             return ValidationProblem();
         }
 
-        return await orgService.GetOrganisationRegistrations(filter);
+        return await orgService.HandleGetOrganisationRegistrations(filter);
     }
 }

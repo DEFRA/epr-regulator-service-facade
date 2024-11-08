@@ -55,11 +55,11 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    [DataRow(RegistrationStatus.Granted)]
-    [DataRow(RegistrationStatus.Cancelled)]
-    [DataRow(RegistrationStatus.Refused)]
-    [DataRow(RegistrationStatus.Queried)]
-    public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode(RegistrationStatus registrationStatus)
+    [DataRow(RegistrationSubmissionStatus.Granted)]
+    [DataRow(RegistrationSubmissionStatus.Cancelled)]
+    [DataRow(RegistrationSubmissionStatus.Refused)]
+    [DataRow(RegistrationSubmissionStatus.Queried)]
+    public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode(RegistrationSubmissionStatus registrationStatus)
     {
         // Arrange
         var request = new RegistrationSubmissionDecisionCreateRequest
@@ -69,7 +69,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             SubmissionId = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
             CountryName = CountryName.Eng,
-            RegistrationSubmissionType= RegistrationSubmissionType.Producer,
+            RegistrationSubmissionType = RegistrationSubmissionType.Producer,
             TwoDigitYear = "99",
             OrganisationAccountManagementId = "123456"
         };
@@ -106,7 +106,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var request = new RegistrationSubmissionDecisionCreateRequest
         {
             OrganisationId = Guid.NewGuid(),
-            Status = RegistrationStatus.Refused,
+            Status = RegistrationSubmissionStatus.Refused,
             SubmissionId = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
             Comments = "comments"

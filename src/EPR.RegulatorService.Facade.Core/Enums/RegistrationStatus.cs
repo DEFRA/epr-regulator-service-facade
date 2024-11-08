@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace EPR.RegulatorService.Facade.Core.Enums;
 
-public enum RegistrationStatus
+public enum RegistrationStatusX
 {
     [Description("Not specified")]
     None = 0,
@@ -18,7 +18,7 @@ public enum RegistrationStatus
 
     [Description("Queried")]
     Queried = 30,
-    
+
     [Description("Cancelled")]
     Cancelled = 40
 }

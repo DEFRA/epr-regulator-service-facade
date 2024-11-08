@@ -8,9 +8,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API;
 public class RegistrationStatusExtentionsTests
 {
     [TestMethod]
-    [DataRow(RegistrationStatus.None, RegulatorDecision.None)]
-    [DataRow(RegistrationStatus.Pending, RegulatorDecision.None)]
-    public void Should_Return_Correct_RegulatorDesision(RegistrationStatus registrationStatus, RegulatorDecision regulatorDecision)
+    [DataRow(RegistrationSubmissionStatus.None, RegulatorDecision.None)]
+    [DataRow(RegistrationSubmissionStatus.Pending, RegulatorDecision.None)]
+    public void Should_Return_Correct_RegulatorDesision(RegistrationSubmissionStatus registrationStatus, RegulatorDecision regulatorDecision)
     {
         // Arrange
 

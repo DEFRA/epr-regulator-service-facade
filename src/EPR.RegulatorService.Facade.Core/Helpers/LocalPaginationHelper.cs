@@ -26,11 +26,11 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
             }
 
             var sortedItems = filteredItems
-                    .OrderBy(x => x.SubmissionStatus == RegistrationStatus.Cancelled)
-                    .ThenBy(x => x.SubmissionStatus == RegistrationStatus.Refused)
-                    .ThenBy(x => x.SubmissionStatus == RegistrationStatus.Granted)
-                    .ThenBy(x => x.SubmissionStatus == RegistrationStatus.Queried)
-                    .ThenBy(x => x.SubmissionStatus == RegistrationStatus.Pending)
+                    .OrderBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Cancelled)
+                    .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Refused)
+                    .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted)
+                    .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Queried)
+                    .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Pending)
                     .ThenBy(x => x.RegistrationDateTime)
                     .Skip((filter.PageNumber.Value - 1) * filter.PageSize.Value)
                     .Take(filter.PageSize.Value)

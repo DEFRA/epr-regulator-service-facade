@@ -4,15 +4,15 @@ namespace EPR.RegulatorService.Facade.API.Extensions;
 
 internal static class RegistrationStatusExtension
 {
-    internal static RegulatorDecision GetRegulatorDecision(this RegistrationStatus registrationStatus)
+    internal static RegulatorDecision GetRegulatorDecision(this RegistrationSubmissionStatus registrationStatus)
     {
         return registrationStatus switch
         {
-            RegistrationStatus.Pending => RegulatorDecision.None,
-            RegistrationStatus.Granted => RegulatorDecision.Accepted,
-            RegistrationStatus.Refused => RegulatorDecision.Rejected,
-            RegistrationStatus.Queried => RegulatorDecision.Queried,
-            RegistrationStatus.Cancelled => RegulatorDecision.Cancelled,
+            RegistrationSubmissionStatus.Pending => RegulatorDecision.None,
+            RegistrationSubmissionStatus.Granted => RegulatorDecision.Accepted,
+            RegistrationSubmissionStatus.Refused => RegulatorDecision.Rejected,
+            RegistrationSubmissionStatus.Queried => RegulatorDecision.Queried,
+            RegistrationSubmissionStatus.Cancelled => RegulatorDecision.Cancelled,
             _ => RegulatorDecision.None,
         };
     }

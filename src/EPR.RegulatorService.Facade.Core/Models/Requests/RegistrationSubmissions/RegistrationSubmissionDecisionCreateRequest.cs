@@ -12,14 +12,14 @@ public class RegistrationSubmissionDecisionCreateRequest
     public Guid SubmissionId { get; set; }
 
     [Required]
-    public RegistrationStatus Status { get; set; }
+    public RegistrationSubmissionStatus Status { get; set; }
 
     public string? Comments { get; set; }
 
     public Guid OrganisationId { get; set; }
 
     public Guid? UserId { get; set; }
-     
+
     public CountryName CountryName { get; set; }
 
     public RegistrationSubmissionType RegistrationSubmissionType { get; set; }

@@ -22,7 +22,7 @@ public class OrganisationRegistrationSubmissionService(
 {
     private readonly JsonSerializerOptions outputSerialisationOptions = new() { PropertyNameCaseInsensitive = true };
 
-    public async Task<IActionResult> GetOrganisationRegistrations(GetOrganisationRegistrationSubmissionsFilter filterRequest)
+    public async Task<IActionResult> HandleGetOrganisationRegistrations(GetOrganisationRegistrationSubmissionsFilter filterRequest)
     {
         var registrations = await commonDataService.GetOrganisationRegistrationSubmissionlist(filterRequest);
 
