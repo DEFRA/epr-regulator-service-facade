@@ -55,9 +55,9 @@ public class OrganisationRegistrationSubmissionsController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Route("organisation-registration-submissions-list")]
+    [Route("organisation-registration-submissions")]
     public async Task<IActionResult> GetRegistrationSubmissionList(
-        [FromQuery, Required] GetOrganisationRegistrationSubmissionsFilter filter)
+        [FromBody, Required] GetOrganisationRegistrationSubmissionsFilter filter)
     {
         try
         {
