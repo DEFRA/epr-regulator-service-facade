@@ -2,7 +2,6 @@ using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
@@ -231,11 +230,12 @@ public class CommonDataServiceTests
     {
         //Arrange
         _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}";
+        
         // Act
         var response = await _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid());
 
         // Assert
-        response.IsSuccessStatusCode.Should().BeFalse();
+        response.Should().BeNull();
     }
 
     private void SetupApiSuccessCall()

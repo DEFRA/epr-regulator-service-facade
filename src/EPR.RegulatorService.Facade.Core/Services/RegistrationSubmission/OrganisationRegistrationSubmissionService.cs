@@ -1,44 +1,60 @@
-﻿using EPR.RegulatorService.Facade.API.Shared;
+﻿using System.Security.Cryptography;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
+using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Security.Cryptography;
-using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 public class OrganisationRegistrationSubmissionService(
-             ICommonDataService commonDataService,
-             ISubmissionService submissionService,
-             ILogger<OrganisationRegistrationSubmissionService> logger) : IOrganisationRegistrationSubmissionService
+    ICommonDataService commonDataService,
+    ISubmissionService submissionService) : IOrganisationRegistrationSubmissionService
 {
-    private readonly JsonSerializerOptions outputSerialisationOptions = new() { PropertyNameCaseInsensitive = true };
-
-    public async Task<IActionResult> HandleGetOrganisationRegistrations(GetOrganisationRegistrationSubmissionsFilter filterRequest)
+    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
+        GetOrganisationRegistrationSubmissionsFilter filter)
     {
-        var registrations = await commonDataService.GetOrganisationRegistrationSubmissionlist(filterRequest);
-
-        if (registrations.IsSuccessStatusCode)
-        {
-            var stringContent = await registrations.Content.ReadAsStringAsync();
-            var paginatedResponse = JsonSerializer.Deserialize<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>>(stringContent, outputSerialisationOptions);
-            return new OkObjectResult(paginatedResponse);
-        }
-
-        logger.LogError("Didn't fetch Dummy data successfully");
-
-        return HandleError.HandleErrorWithStatusCode(registrations.StatusCode);
+        return await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
     }
 
-    public string GenerateReferenceNumber(CountryName countryName, RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null, MaterialType materialType = MaterialType.None)
+    public async Task<RegistrationSubmissionOrganisationDetails?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId)
+    {
+        return await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
+    }
+
+    public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
+        RegulatorDecisionCreateRequest request, Guid userId)
+    {
+        var regRefNumber =
+            request.Status == RegistrationSubmissionStatus.Granted
+                ? GenerateReferenceNumber(
+                    request.CountryName,
+                    request.RegistrationSubmissionType,
+                    request.OrganisationAccountManagementId.ToString(),
+                    request.TwoDigitYear)
+                : string.Empty;
+
+        return await submissionService.CreateSubmissionEvent(
+            request.SubmissionId,
+            new RegistrationSubmissionDecisionEvent
+            {
+                OrganisationId = request.OrganisationId,
+                SubmissionId = request.SubmissionId,
+                Decision = request.Status.GetRegulatorDecision(),
+                Comments = request.Comments,
+                RegistrationReferenceNumber = regRefNumber
+            },
+            userId
+        );
+    }
+
+    public string GenerateReferenceNumber(CountryName countryName,
+        RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null,
+        MaterialType materialType = MaterialType.None)
     {
         if (string.IsNullOrEmpty(twoDigitYear))
         {
@@ -54,30 +70,15 @@ public class OrganisationRegistrationSubmissionService(
 
         var regType = ((char)registrationSubmissionType).ToString();
 
-        string refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
+        var refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
 
-        if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor || registrationSubmissionType == RegistrationSubmissionType.Exporter)
+        if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor ||
+            registrationSubmissionType == RegistrationSubmissionType.Exporter)
         {
             refNumber = $"{refNumber}{materialType.GetDisplayName<MaterialType>()}";
         }
 
         return refNumber;
-    }
-    public ActionResult? ValidateIncomingModels(ModelStateDictionary modelState)
-    {
-        if (!modelState.IsValid)
-        {
-            var validationProblem = new ValidationProblemDetails(modelState)
-            {
-                Title = "Validation Error",
-                Status = 400, // Ensure the status is explicitly set
-                Detail = "One or more validation errors occurred.",
-            };
-
-            return new BadRequestObjectResult(validationProblem);
-        }
-
-        return null;
     }
 
     private static string Generate4DigitNumber()

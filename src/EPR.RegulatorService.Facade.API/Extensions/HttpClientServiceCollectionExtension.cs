@@ -22,9 +22,8 @@ public static class HttpClientServiceCollectionExtension
 {
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)
     {
-        services.AddTransient<IOrganisationRegistrationSubmissionService, OrganisationRegistrationSubmissionService>();
+        services.AddScoped<IOrganisationRegistrationSubmissionService, OrganisationRegistrationSubmissionService>();
         services.AddTransient<AccountServiceAuthorisationHandler>();
-        services.AddScoped<IRegistrationSubmissionService, RegistrationSubmissionService>();
 
         var settings = services.BuildServiceProvider().GetRequiredService<IOptions<AccountsServiceApiConfig>>().Value;
         var submissionSettings =

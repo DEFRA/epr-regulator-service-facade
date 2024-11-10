@@ -1,21 +1,20 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 public interface IOrganisationRegistrationSubmissionService
 {
-    Task<IActionResult> HandleGetOrganisationRegistrations(GetOrganisationRegistrationSubmissionsFilter filterRequest);
+    Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter);
 
-    ActionResult? ValidateIncomingModels(ModelStateDictionary modelState);
+    Task<RegistrationSubmissionOrganisationDetails?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId);
 
-    string GenerateReferenceNumber(
-        CountryName countryName,
-        RegistrationSubmissionType
-        registrationSubmissionType,
-        string organisationId,
-        string twoDigitYear = null,
-        MaterialType materialType = MaterialType.None);
+    Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(RegulatorDecisionCreateRequest request, Guid userId);
+    
+    string GenerateReferenceNumber( CountryName countryName, RegistrationSubmissionType registrationSubmissionType,
+                                    string organisationId, string twoDigitYear = null, 
+                                    MaterialType materialType = MaterialType.None);
 }

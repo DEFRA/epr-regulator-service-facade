@@ -1,10 +1,10 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
 
-namespace EPR.RegulatorService.Facade.API.Extensions;
+namespace EPR.RegulatorService.Facade.Core.Extensions;
 
 internal static class RegistrationStatusExtension
 {
-    internal static RegulatorDecision GetRegulatorDecision(this RegistrationSubmissionStatus registrationStatus)
+    public static RegulatorDecision GetRegulatorDecision(this RegistrationSubmissionStatus registrationStatus)
     {
         return registrationStatus switch
         {
