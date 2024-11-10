@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using EPR.RegulatorService.Facade.Core.Helpers.Validators;
-using JetBrains.Annotations;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Helpers.Validators;
 
 [TestClass]
-[TestSubject(typeof(NotNoneAttribute))]
 public class NotNoneAttributeTest
 {
     private readonly NotNoneAttribute _attribute = new NotNoneAttribute();
