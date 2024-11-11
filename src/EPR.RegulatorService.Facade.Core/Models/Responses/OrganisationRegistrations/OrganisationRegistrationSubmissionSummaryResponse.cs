@@ -1,7 +1,9 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 
+[ExcludeFromCodeCoverage]
 public class OrganisationRegistrationSubmissionSummaryResponse
 {
     public Guid SubmissionId { get; set; }
@@ -25,6 +27,6 @@ public class OrganisationRegistrationSubmissionSummaryResponse
     public RegistrationSubmissionStatus SubmissionStatus { get; set; }
 
     public DateTime? StatusPendingDate { get; set; }
-        
+
     public int NationId { get; set; }
 }
