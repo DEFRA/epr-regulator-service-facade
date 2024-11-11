@@ -160,8 +160,30 @@ public class OrganisationRegistrationSubmissionsControllerTests
         result.Value.Should().BeOfType(typeof(ValidationProblemDetails));
     }
 
+
     [TestMethod]
     public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataServiice_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    {
+        // Arrange 
+
+        var submissionId = Guid.NewGuid();
+
+        var exception = new Exception("Test exception");
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ThrowsAsync(exception).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+
+        // Assert
+        result.Should().BeOfType<ObjectResult>();
+        var objectResult = (ObjectResult)result;
+        objectResult?.StatusCode.Should().Be(500);
+    }
+
+    [TestMethod]
+    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataServiice_Fails_Then_Should_Returns_NotFoundResult()
     {
         // Arrange 
 
@@ -175,8 +197,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
-        var statusCodeResult = result as BadRequestResult;
-        statusCodeResult?.StatusCode.Should().Be(500);
+        var statusCodeResult = result as NotFoundResult;
+        statusCodeResult?.StatusCode.Should().Be(404);
     }
 
     [TestMethod]
