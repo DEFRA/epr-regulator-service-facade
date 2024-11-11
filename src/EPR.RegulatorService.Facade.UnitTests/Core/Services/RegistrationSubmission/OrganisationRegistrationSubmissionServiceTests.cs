@@ -1,13 +1,17 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
+using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Moq;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
 [TestClass]
-public class RegistrationSubmissionServiceTests
+public class OrganisationRegistrationSubmissionServiceTests
 {
     private readonly Mock<ISubmissionService> _submissionsServiceMock = new();
     private readonly Mock<ICommonDataService> _commonDataServiceMock = new();
@@ -16,7 +20,7 @@ public class RegistrationSubmissionServiceTests
     [TestInitialize]
     public void Setup()
     {
-        _sut = new OrganisationRegistrationSubmissionService(_commonDataServiceMock.Object, 
+        _sut = new OrganisationRegistrationSubmissionService(_commonDataServiceMock.Object,
                                                              _submissionsServiceMock.Object);
     }
     
@@ -36,6 +40,63 @@ public class RegistrationSubmissionServiceTests
         Assert.IsTrue(result.StartsWith('R'));
         Assert.IsTrue(result.StartsWith($"R{year}"));
         Assert.IsTrue(result.StartsWith($"R{year}EP"));
+    }
+
+    [TestMethod]
+    public async Task Should_Return_GetRegistrationSubmissionList()
+    {
+        // Arrage
+
+        var filterRequest = new GetOrganisationRegistrationSubmissionsFilter
+        {
+
+            OrganisationReference = "ORGREF1234567890",
+            OrganisationName = "Test Organisation",
+            ApplicationReferenceNumber = "APPREF123",
+            RegistrationReferenceNumber = "REGREF456",
+            OrganisationType = "LARGE",
+
+        };
+
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(filterRequest))
+            .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()).Verifiable();
+
+        //Act
+        var result = _sut.HandleGetRegistrationSubmissionList(filterRequest);
+
+        //Assert
+        Assert.IsNotNull(result);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filterRequest), Times.AtMostOnce);
+    }
+
+
+    [TestMethod]
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails()
+    {
+        // Arrage
+
+        var submissionId = Guid.NewGuid();
+
+        var response = new RegistrationSubmissionOrganisationDetails
+        {
+
+            OrganisationReference = "ORGREF1234567890",
+            OrganisationName = "Test Organisation",
+            ApplicationReferenceNumber = "APPREF123",
+            RegistrationReferenceNumber = "REGREF456",
+            OrganisationType = RegistrationSubmissionOrganisationType.small
+
+        };
+
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+            .ReturnsAsync(response).Verifiable();
+
+        //Act
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+
+        //Assert
+        Assert.IsNotNull(result);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
     }
 
     [TestMethod]

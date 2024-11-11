@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+
+[ExcludeFromCodeCoverage]
 public class GetOrganisationRegistrationSubmissionsFilter
 {
     public string? OrganisationName { get; set; }
