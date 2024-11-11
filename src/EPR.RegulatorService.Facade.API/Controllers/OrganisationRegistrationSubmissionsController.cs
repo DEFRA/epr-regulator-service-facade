@@ -29,7 +29,7 @@ public class OrganisationRegistrationSubmissionsController(
 
             var serviceResult =
                 await organisationRegistrationHelper.HandleCreateRegulatorDecisionSubmissionEvent(request,
-                    GetUserId(request.UserId.Value));
+                    GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
             {
@@ -113,16 +113,13 @@ public class OrganisationRegistrationSubmissionsController(
         }
     }
 
-    private Guid GetUserId(Guid defaultId)
+    private Guid GetUserId(Guid? defaultId)
     {
-        try
+        if (defaultId is null)
         {
             return User.UserId();
         }
-        catch (Exception ex)
-        {
-            if (Guid.Empty == defaultId) throw;
-            return defaultId;
-        }
+
+        return (Guid)defaultId;
     }
 }

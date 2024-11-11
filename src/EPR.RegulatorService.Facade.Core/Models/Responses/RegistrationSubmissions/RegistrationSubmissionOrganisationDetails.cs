@@ -45,7 +45,7 @@ public class RegistrationSubmissionOrganisationDetails
         OrganisationType = details.OrganisationType,
         OrganisationReference = details.OrganisationReference,
         RegistrationYear = details.RegistrationYear,
-        RegistrationStatus = details.SubmissionStatus,
+        SubmissionStatus = details.SubmissionStatus,
         StatusPendingDate = details.SubmissionStatusPendingDate,
         ApplicationReferenceNumber = details.ApplicationReferenceNumber,
         RegistrationReferenceNumber = details.RegistrationReferenceNumber,
