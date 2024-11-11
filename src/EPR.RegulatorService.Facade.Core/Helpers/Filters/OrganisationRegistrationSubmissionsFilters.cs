@@ -23,7 +23,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterByOrganisationName(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? organisationName)
     {
-        if (string.IsNullOrEmpty(organisationName)) return queryable;
+        if (string.IsNullOrWhiteSpace(organisationName)) return queryable;
         var nameParts = organisationName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var completeQueryable = from q in queryable
             where Array.TrueForAll(nameParts,
@@ -40,7 +40,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterByOrganisationRef(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? organisationRef)
     {
-        if (string.IsNullOrEmpty(organisationRef)) return queryable;
+        if (string.IsNullOrWhiteSpace(organisationRef)) return queryable;
         var nameParts = organisationRef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         queryable = from q in queryable
             where nameParts.Any(part => q.OrganisationReference.Contains(part, StringComparison.OrdinalIgnoreCase))
@@ -51,7 +51,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterByApplicationRef(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? applicationRef)
     {
-        if (string.IsNullOrEmpty(applicationRef)) return queryable;
+        if (string.IsNullOrWhiteSpace(applicationRef)) return queryable;
         var nameParts = applicationRef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         queryable = from q in queryable
             where nameParts.Any(part => q.ApplicationReferenceNumber.Contains(part, StringComparison.OrdinalIgnoreCase))
@@ -62,7 +62,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterByRegistrationRef(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? registrationRef)
     {
-        if (string.IsNullOrEmpty(registrationRef)) return queryable;
+        if (string.IsNullOrWhiteSpace(registrationRef)) return queryable;
         var nameParts = registrationRef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         queryable = from q in queryable
             where nameParts.Any(part => q.RegistrationReferenceNumber.Contains(part, StringComparison.OrdinalIgnoreCase))
@@ -73,7 +73,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterByOrganisationType(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? organisationType)
     {
-        if (string.IsNullOrEmpty(organisationType) || organisationType == "none") return queryable;
+        if (string.IsNullOrWhiteSpace(organisationType) || organisationType == "none") return queryable;
         queryable = from q in queryable
             where organisationType.Contains(q.OrganisationType.ToString())
             select q;
@@ -84,7 +84,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterBySubmissionStatus(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? submissionStatus)
     {
-        if (string.IsNullOrEmpty(submissionStatus) || submissionStatus == "none") return queryable;
+        if (string.IsNullOrWhiteSpace(submissionStatus) || submissionStatus == "none") return queryable;
         queryable = from q in queryable
             where submissionStatus.Contains(q.SubmissionStatus.ToString())
             select q;
@@ -95,7 +95,7 @@ public static class OrganisationRegistrationSubmissionsFilters
     public static IQueryable<RegistrationSubmissionOrganisationDetails> FilterByRelevantYear(
         this IQueryable<RegistrationSubmissionOrganisationDetails> queryable, string? relevantYear)
     {
-        if (string.IsNullOrEmpty(relevantYear)) return queryable;
+        if (string.IsNullOrWhiteSpace(relevantYear)) return queryable;
         queryable = from q in queryable
             where relevantYear.Contains(q.RegistrationYear)
             select q;
