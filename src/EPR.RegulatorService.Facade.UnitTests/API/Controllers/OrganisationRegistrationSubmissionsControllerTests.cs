@@ -1,16 +1,21 @@
-﻿using System.Net;
+using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using Azure;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -217,6 +222,66 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+    }
+
+    [TestMethod()]
+    public async Task GetRegistrationSubmissionListTest_Should_Return_Problem_WhenModelIsInvalid()
+    {
+        // Arrange
+        _sut.ModelState.AddModelError("PageNumber", "PageNumber is required");
+
+        var filter = new GetOrganisationRegistrationSubmissionsFilter();
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
+                    .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>());
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionList(filter);
+        Assert.IsInstanceOfType(result, typeof(ObjectResult));
+
+        var objectResult = result as ObjectResult;
+        Assert.IsNotNull(objectResult);
+        
+        var problemDetails = objectResult.Value as ValidationProblemDetails;
+        Assert.IsNotNull(problemDetails);
+        Assert.IsTrue(problemDetails.Errors.ContainsKey("PageNumber"), "PageNumber is required");
+
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
+    }
+
+    [TestMethod()]
+    public async Task GetRegistrationSubmissionListTest_Should_Return_Problem_WhenCommonDataThrowsException()
+    {
+        // Arrange
+        var filter = new GetOrganisationRegistrationSubmissionsFilter();
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
+                    .Throws(new InvalidDataException("Invalid"));
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionList(filter);
+
+        // Assert
+        var statusCodeResult = result as ObjectResult;
+        statusCodeResult?.StatusCode.Should().Be(500);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
+    }
+
+    [TestMethod()]
+    public async Task GetRegistrationSubmissionListTest_Should_Return_OK_WithInitialPagination_Page1()
+    {
+        var expectedResult = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>();
+        var filter = new GetOrganisationRegistrationSubmissionsFilter();
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
+                    .ReturnsAsync(expectedResult);
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionList(filter);
+
+        // Assert
+        var statusCodeResult = result as OkObjectResult;
+        statusCodeResult?.StatusCode.Should().Be(200);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
+
+        statusCodeResult.Value.Should().Be(expectedResult);
     }
 
     [TestMethod]
