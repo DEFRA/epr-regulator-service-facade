@@ -11,7 +11,7 @@ using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -36,7 +36,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _registrationSubmissionServiceFake = new OrganisationRegistrationSubmissionService(
             _commonDataServiceMock.Object,
             _submissionsServiceMock.Object);
-        
+
         _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceFake, _ctlLoggerMock.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
@@ -167,7 +167,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         var submissionId = Guid.NewGuid();
 
-        _commonDataServiceMock.Setup(x => 
+        _commonDataServiceMock.Setup(x =>
             x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetails).Verifiable();
 
         // Act
@@ -184,7 +184,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         // Arrange
         var submissionId = Guid.NewGuid();
-        
+
         _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
             .ReturnsAsync(new RegistrationSubmissionOrganisationDetails()).Verifiable();
 
@@ -195,5 +195,52 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    [DataRow(HttpStatusCode.InternalServerError)]
+    [DataRow(HttpStatusCode.BadRequest)]
+    public async Task Should_Log_And_Return_Problem_When_Service_Returns_Non_Success_StatusCode(HttpStatusCode httpStatusCode)
+    {
+        // Arrange
+        var request = _fixture.Create<RegulatorDecisionCreateRequest>();
+        var handlerResponse = new HttpResponseMessage(httpStatusCode) { Content = new StringContent("Service error") };
+
+
+        _registrationSubmissionServiceMock
+            .Setup(r => r.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(handlerResponse);
+
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType<ProblemDetails>();
+        result.StatusCode.Should().Be(500);
+    }
+
+    [TestMethod]
+    public async Task Should_Return_Problem_And_Log_Exception_When_Exception_Thrown()
+    {
+        // Arrange
+        var request = _fixture.Create<RegulatorDecisionCreateRequest>();
+        var exception = new Exception("Test exception");
+
+        _registrationSubmissionServiceMock
+            .Setup(r => r.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ThrowsAsync(exception);
+
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType<ProblemDetails>();
+        result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
     }
 }

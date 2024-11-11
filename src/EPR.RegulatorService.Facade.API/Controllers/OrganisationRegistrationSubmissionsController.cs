@@ -42,9 +42,7 @@ public class OrganisationRegistrationSubmissionsController(
         catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
-            return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}",
-                HttpContext.Request.Path,
-                StatusCodes.Status500InternalServerError);
+            return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
         }
 
         return Problem();
@@ -96,12 +94,12 @@ public class OrganisationRegistrationSubmissionsController(
 
             var result =
                 await organisationRegistrationHelper.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
-            
+
             if (null == result)
             {
                 return NotFound();
             }
-            
+
             return Ok(result);
         }
         catch (Exception ex)
