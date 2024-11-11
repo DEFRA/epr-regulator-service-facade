@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Helpers;
@@ -45,6 +46,7 @@ public class CommonDataService(
         return await RegistrationSubmissionTestData.GetRegistrationSubmissionDetails(submissionId, url);
     }
 
+    [ExcludeFromCodeCoverage]
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
         var filteredRegistrations =

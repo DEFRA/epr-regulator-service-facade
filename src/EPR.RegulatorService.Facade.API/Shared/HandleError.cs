@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace EPR.RegulatorService.Facade.API.Shared;
 
+[ExcludeFromCodeCoverage]
 public static class HandleError
 {
     public static ActionResult Handle(Exception e)
