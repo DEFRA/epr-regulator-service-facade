@@ -6,21 +6,21 @@ namespace EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrat
 [ExcludeFromCodeCoverage]
 public class RegistrationSubmissionsFilters
 {
-    public string? OrganisationName { get; set; }
+    public string? OrganisationName { get; init; }
     
-    public string? OrganisationReference { get; set; }
+    public string? OrganisationReference { get; init; }
     
-    public string? OrganisationType { get; set; }
+    public string? OrganisationType { get; init; }
     
-    public string? Statuses { get; set; }
+    public string? Statuses { get; init; }
 
-    public string? SubmissionYears { get; set; }
+    public string? SubmissionYears { get; init; }
 
-    public string? SubmissionPeriods { get; set; }
+    public string? SubmissionPeriods { get; init; }
 
     [Required]
-    public int? PageNumber { get; set; }
+    public int? PageNumber { get; init; }
 
     [Required]
-    public int? PageSize { get; set; }
+    public int? PageSize { get; init; }
 }

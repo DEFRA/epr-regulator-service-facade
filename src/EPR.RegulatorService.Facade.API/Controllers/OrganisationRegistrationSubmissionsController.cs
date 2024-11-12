@@ -1,76 +1,123 @@
-﻿using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.API.Shared;
-using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
+﻿using System.ComponentModel.DataAnnotations;
+using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
-using EPR.RegulatorService.Facade.Core.Services.CommonData;
-using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
-public class OrganisationRegistrationSubmissionsController(ISubmissionService submissionsService, ICommonDataService commonDataService, ILogger<OrganisationRegistrationSubmissionsController> logger, IRegistrationSubmissionService submissionService) : Controller
-{  
-    private readonly JsonSerializerOptions jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
-
+public class OrganisationRegistrationSubmissionsController(
+    IOrganisationRegistrationSubmissionService organisationRegistrationHelper,
+    ILogger<OrganisationRegistrationSubmissionsController> logger) : Controller
+{
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Route("organisation-registration-submission-decision")]
-    public async Task<IActionResult> CreateRegistrationSubmissionDecisionEvent([FromBody] RegistrationSubmissionDecisionCreateRequest request)
+    public async Task<IActionResult> CreateRegulatorSubmissionDecisionEvent(
+        [FromBody] RegulatorDecisionCreateRequest request)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return ValidationProblem();
-        } 
-
-        var regRefNumber = request.Status == RegistrationStatus.Granted ?
-                                                submissionService.GenerateReferenceNumber(request.CountryName, request.RegistrationSubmissionType, request.OrganisationAccountManagementId.ToString(), request.TwoDigitYear)
-                                                : string.Empty;
-
-        var registrationSubmissionEvent = await submissionsService.CreateSubmissionEvent(
-            request.SubmissionId,
-            new RegistrationSubmissionDecisionEvent
+            if (!ModelState.IsValid)
             {
-                OrganisationId = request.OrganisationId,
-                SubmissionId = request.SubmissionId,
-                Decision = request.Status.GetRegulatorDecision(),
-                Comments = request.Comments,
-                RegistrationReferenceNumber = regRefNumber
-            },
-            User.UserId()
-        );
+                return ValidationProblem();
+            }
 
-        if (registrationSubmissionEvent.IsSuccessStatusCode) {
-            return Created();
+            var serviceResult =
+                await organisationRegistrationHelper.HandleCreateRegulatorDecisionSubmissionEvent(request,
+                    GetUserId(request.UserId));
+
+            if (serviceResult.IsSuccessStatusCode)
+            {
+                return Created();
+            }
+
+            logger.LogError("Cannot create submission event: {StatusCode} with message {Message}",
+                serviceResult.StatusCode, serviceResult.Content);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
+            return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
         }
 
-        logger.LogWarning("Cannot create submission event");
         return Problem();
     }
 
-    [HttpGet]
-    [Route("registrations-submission-details/submissionId/{submissionId:GUID}")]
-    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid  submissionId)
+    [HttpPost]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Route("organisation-registration-submissions")]
+    public async Task<IActionResult> GetRegistrationSubmissionList(
+        [FromBody, Required] GetOrganisationRegistrationSubmissionsFilter filter)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return ValidationProblem();
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem();
+            }
+
+            var result = await organisationRegistrationHelper.HandleGetRegistrationSubmissionList(filter);
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionList)}");
+            return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionList)}",
+                HttpContext.Request.Path,
+                StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Route("organisation-registration-submission-details/{submissionId:Guid}")]
+    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem();
+            }
+
+            var result =
+                await organisationRegistrationHelper.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+
+            if (null == result)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionDetails)}");
+            return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
+                HttpContext.Request.Path,
+                StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    private Guid GetUserId(Guid? defaultId)
+    {
+        if (defaultId is null)
+        {
+            return User.UserId();
         }
 
-        var registrationSubmissionDetailsResponse = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
-
-        if (registrationSubmissionDetailsResponse.IsSuccessStatusCode)
-        {
-            var stringContent = await registrationSubmissionDetailsResponse.Content.ReadAsStringAsync();
-            var response = JsonSerializer.Deserialize<RegistrationSubmissionOrganisationDetails>(stringContent, jsonSerializerOptions);
-            return Ok(response);
-        }
-
-        return HandleError.HandleErrorWithStatusCode(registrationSubmissionDetailsResponse.StatusCode);
+        return (Guid)defaultId;
     }
 }

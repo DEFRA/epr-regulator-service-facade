@@ -13,6 +13,7 @@
     <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
     <PackageReference Include="Enums.NET" Version="5.0.0" />
     <PackageReference Include="GovukNotify" Version="7.1.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
