@@ -225,18 +225,18 @@ public class CommonDataServiceTests
         response.IsSuccessStatusCode.Should().BeFalse();
     }
 
-    ////[TestMethod]
-    ////public async Task Should_return_success_when_fetching_registration_submission_details()
-    ////{
-    ////    //Arrange
-    ////    _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}";
+    [TestMethod]
+    public async Task Should_return_success_when_fetching_registration_submission_details()
+    {
+        //Arrange
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}";
         
-    ////    // Act
-    ////    var response = await _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid());
+        // Act
+        var response = await _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid());
 
-    ////    // Assert
-    ////    response.Should().BeNull();
-    ////}
+        // Assert
+        response.Should().BeNull();
+    }
 
     private void SetupApiSuccessCall()
     {

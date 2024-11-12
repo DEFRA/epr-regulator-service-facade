@@ -36,7 +36,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
             {
                 var fields = line.Split('\t');
 
-                var dateTime = DateTime.Parse(fields[8], CultureInfo.CurrentCulture);
+                var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                 objRet.Add(new RegistrationSubmissionOrganisationDetails
                 {
                     OrganisationReference = fields[0][..10],
