@@ -307,7 +307,16 @@ public class MessagingService : IMessagingService
 
         return response.id;
     }
-    
+
+    public void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model)
+    { }
+    public void OrganisationRegistrationSubmissionRejected(OrganisationRegistrationSubmissionEmailModel model)
+    { }
+    public void OrganisationRegistrationSubmissionCancelled(OrganisationRegistrationSubmissionEmailModel model)
+    { }
+    public void OrganisationRegistrationSubmissionAccepted(OrganisationRegistrationSubmissionEmailModel model)
+    { }
+
     private static void Validate(AddRemoveNewApprovedPersonEmailModel model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
