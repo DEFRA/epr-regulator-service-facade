@@ -9,4 +9,5 @@ public class OrganisationDetailModel
     public string Name { get; set; }
     public string OrganisationRole { get; set; }
     public string OrganisationType { get; set; }
+    public int? NationId { get; set; }
 }
