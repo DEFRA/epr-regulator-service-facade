@@ -39,7 +39,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
                 var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                 objRet.Add(new RegistrationSubmissionOrganisationDetails
                 {
-                    OrganisationReference = fields[0][..10],
+                    OrganisationReference = fields[0],
                     OrganisationName = fields[1],
                     OrganisationType = Enum.Parse<RegistrationSubmissionOrganisationType>(fields[2]),
                     SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3], true),
