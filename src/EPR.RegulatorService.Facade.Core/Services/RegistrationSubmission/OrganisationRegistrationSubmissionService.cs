@@ -82,6 +82,21 @@ public class OrganisationRegistrationSubmissionService(
         return refNumber;
     }
 
+    public async Task<HttpResponseMessage> HandleCreateRegistrationFeePaymentSubmissionEvent(RegistrationFeePaymentCreateRequest request, Guid userId)
+    {
+        return await submissionService.CreateSubmissionEvent(
+            request.SubmissionId,
+            new RegistrationFeePaymentEvent
+            {
+                SubmissionId = request.SubmissionId,
+                PaymentMethod = request.PaymentMethod,
+                PaymentStatus = request.PaymentStatus,
+                PaidAmount = $"£{request.PaidAmount}"
+            },
+            userId
+        );
+    }
+
     private static string Generate4DigitNumber()
     {
         var min = 1000;
