@@ -46,7 +46,8 @@ public class OrganisationRegistrationSubmissionService(
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
                 Comments = request.Comments,
-                RegistrationReferenceNumber = regRefNumber
+                RegistrationReferenceNumber = regRefNumber,
+                DecisionDate = request.DecisionDate
             },
             userId
         );

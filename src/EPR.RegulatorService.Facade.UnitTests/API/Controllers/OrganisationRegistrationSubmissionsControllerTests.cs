@@ -78,7 +78,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
             CountryName = CountryName.Eng,
             RegistrationSubmissionType = RegistrationSubmissionType.Producer,
             TwoDigitYear = "99",
-            OrganisationAccountManagementId = "123456"
+            OrganisationAccountManagementId = "123456",
+            DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc)
         };
 
         var handlerResponse =
@@ -238,7 +239,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         var objectResult = result as ObjectResult;
         Assert.IsNotNull(objectResult);
-        
+
         var problemDetails = objectResult.Value as ValidationProblemDetails;
         Assert.IsNotNull(problemDetails);
         Assert.IsTrue(problemDetails.Errors.ContainsKey("PageNumber"), "PageNumber is required");

@@ -8,7 +8,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissio
 
 [ExcludeFromCodeCoverage]
 public class RegulatorDecisionCreateRequest
-{   
+{
     [NotDefault]
     public Guid SubmissionId { get; init; }
 
@@ -27,7 +27,9 @@ public class RegulatorDecisionCreateRequest
     public RegistrationSubmissionType RegistrationSubmissionType { get; init; }
 
     public string? TwoDigitYear { get; init; }
-    
+
     // This is the 6 digit Org ID taken from Acct Management
     public string? OrganisationAccountManagementId { get; init; }
+
+    public DateTime? DecisionDate { get; set; }
 }
