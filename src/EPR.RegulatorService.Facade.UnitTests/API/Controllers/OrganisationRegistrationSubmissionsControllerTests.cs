@@ -1,7 +1,5 @@
-using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
-using Azure;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
@@ -15,11 +13,11 @@ using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers;
 
@@ -80,7 +78,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
             CountryName = CountryName.Eng,
             RegistrationSubmissionType = RegistrationSubmissionType.Producer,
             TwoDigitYear = "99",
-            OrganisationAccountManagementId = "123456"
+            OrganisationAccountManagementId = "123456",
+            DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc)
         };
 
         var handlerResponse =
@@ -240,7 +239,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         var objectResult = result as ObjectResult;
         Assert.IsNotNull(objectResult);
-        
+
         var problemDetails = objectResult.Value as ValidationProblemDetails;
         Assert.IsNotNull(problemDetails);
         Assert.IsTrue(problemDetails.Errors.ContainsKey("PageNumber"), "PageNumber is required");
@@ -329,5 +328,105 @@ public class OrganisationRegistrationSubmissionsControllerTests
         Assert.IsNotNull(result);
         result.Value.Should().BeOfType<ProblemDetails>();
         result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+    }
+
+    [TestMethod]
+    [DataRow("SubmissionId", "error")]
+    [DataRow("PaymentMethod", "error")]
+    [DataRow("PaymentStatus", "error")]
+    [DataRow("PaidAmount", "error")]
+    public async Task CreateRegistrationFeePaymentEvent_Should_Return_ValidationProblem_When_ModelState_Is_Invalid(string keyName, string errorMessage)
+    {
+        // Arrange
+        _sut.ModelState.AddModelError(keyName, errorMessage);
+
+        // Act
+        var result = await _sut.CreateRegistrationFeePaymentEvent(new RegistrationFeePaymentCreateRequest()) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType(typeof(ValidationProblemDetails));
+    }
+
+    [TestMethod]
+    public async Task CreateRegistrationFeePaymentEvent_Should_Return_Created_When_SubmissionService_Returns_Success()
+    {
+        // Arrange
+        var request = _fixture.Create<RegistrationFeePaymentCreateRequest>();
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationFeePaymentEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreateRegistrationFeePaymentEvent(request) as CreatedResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationFeePaymentEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    [DataRow(HttpStatusCode.InternalServerError)]
+    [DataRow(HttpStatusCode.BadGateway)]
+    [DataRow(HttpStatusCode.ServiceUnavailable)]
+    public async Task CreateRegistrationFeePaymentEvent_Should_Log_And_Return_Problem_When_SubmissionService_Returns_Non_Success(HttpStatusCode statusCode)
+    {
+        // Arrange
+        var request = _fixture.Create<RegistrationFeePaymentCreateRequest>();
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, statusCode)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationFeePaymentEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreateRegistrationFeePaymentEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType(typeof(ProblemDetails));
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationFeePaymentEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
+        _ctlLoggerMock.Verify(r => r.Log(
+            It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception, string>>()
+            ), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    public async Task CreateRegistrationFeePaymentEvent_Log_And_Should_Return_When_Exception_Thrown()
+    {
+        // Arrange
+        var request = _fixture.Create<RegistrationFeePaymentCreateRequest>();
+        _submissionsServiceMock
+            .Setup(r => r.CreateSubmissionEvent(request.SubmissionId, request, (Guid)request.UserId))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _sut.CreateRegistrationFeePaymentEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType<ProblemDetails>();
+        result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        _ctlLoggerMock.Verify(r => r.Log(
+            It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception, string>>()
+            ), Times.AtMostOnce);
     }
 }

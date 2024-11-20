@@ -36,10 +36,10 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
             {
                 var fields = line.Split('\t');
 
-                var dateTime = DateTime.Parse(fields[8], new CultureInfo("en-GB"));
+                var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                 objRet.Add(new RegistrationSubmissionOrganisationDetails
                 {
-                    OrganisationReference = fields[0][..10],
+                    OrganisationReference = fields[0],
                     OrganisationName = fields[1],
                     OrganisationType = Enum.Parse<RegistrationSubmissionOrganisationType>(fields[2]),
                     SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3], true),

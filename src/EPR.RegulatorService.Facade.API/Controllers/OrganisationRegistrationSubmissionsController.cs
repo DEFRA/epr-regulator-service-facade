@@ -49,6 +49,43 @@ public class OrganisationRegistrationSubmissionsController(
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Route("organisation-registration-fee-payment")]
+    public async Task<IActionResult> CreateRegistrationFeePaymentEvent(
+        [FromBody] RegistrationFeePaymentCreateRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem();
+            }
+
+            var serviceResult =
+                await organisationRegistrationHelper.HandleCreateRegistrationFeePaymentSubmissionEvent(request,
+                    GetUserId(request.UserId));
+
+            if (serviceResult.IsSuccessStatusCode)
+            {
+                return Created();
+            }
+
+            logger.LogError("Cannot create submission event: {StatusCode} with message {Message}",
+                serviceResult.StatusCode, serviceResult.Content);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
+            return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
+        }
+
+        return Problem();
+    }
+
+    [HttpPost]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

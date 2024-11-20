@@ -46,7 +46,8 @@ public class OrganisationRegistrationSubmissionService(
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
                 Comments = request.Comments,
-                RegistrationReferenceNumber = regRefNumber
+                RegistrationReferenceNumber = regRefNumber,
+                DecisionDate = request.DecisionDate
             },
             userId
         );
@@ -79,6 +80,21 @@ public class OrganisationRegistrationSubmissionService(
         }
 
         return refNumber;
+    }
+
+    public async Task<HttpResponseMessage> HandleCreateRegistrationFeePaymentSubmissionEvent(RegistrationFeePaymentCreateRequest request, Guid userId)
+    {
+        return await submissionService.CreateSubmissionEvent(
+            request.SubmissionId,
+            new RegistrationFeePaymentEvent
+            {
+                SubmissionId = request.SubmissionId,
+                PaymentMethod = request.PaymentMethod,
+                PaymentStatus = request.PaymentStatus,
+                PaidAmount = $"£{request.PaidAmount}"
+            },
+            userId
+        );
     }
 
     private static string Generate4DigitNumber()
