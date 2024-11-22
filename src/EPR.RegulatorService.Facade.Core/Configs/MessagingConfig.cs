@@ -24,4 +24,13 @@ public class MessagingConfig
     public string PromotedApprovedUserTemplateId { get; set; } = string.Empty;
     public string InviteNewApprovedPersonTemplateId { get; set; } = string.Empty;
     public string AccountCreationUrl { get; set; } = string.Empty;
+
+    public string OrganisationRegistrationSubmissionQueriedId { get; set; } = string.Empty;
+    public string OrganisationRegistrationSubmissionRejectedId { get; set; } = string.Empty;
+    public string OrganisationRegistrationSubmissionCancelledId { get; set; } = string.Empty;
+    public string OrganisationRegistrationSubmissionAcceptedId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationSubmissionQueriedId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationSubmissionRejectedId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationSubmissionCancelledId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationSubmissionAcceptedId { get; set; } = string.Empty;
 }

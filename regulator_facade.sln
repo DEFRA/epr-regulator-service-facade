@@ -10,6 +10,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPR.RegulatorService.Facade.UnitTests", "src\EPR.RegulatorService.Facade.UnitTests\EPR.RegulatorService.Facade.UnitTests.csproj", "{2BC324C5-D5E9-48AA-945F-18F232611380}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B93F1BA-6D4D-4C3E-9533-EEEAB86979F6}"
+	ProjectSection(SolutionItems) = preProject
+		RegistrationAcceptEmailTemplate.md = RegistrationAcceptEmailTemplate.md
+		RegistrationCancelledEmailTemplate.md = RegistrationCancelledEmailTemplate.md
+		RegistrationQueriedEmailTemplate.md = RegistrationQueriedEmailTemplate.md
+		RegistrationRejectedEmailTemplate.md = RegistrationRejectedEmailTemplate.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

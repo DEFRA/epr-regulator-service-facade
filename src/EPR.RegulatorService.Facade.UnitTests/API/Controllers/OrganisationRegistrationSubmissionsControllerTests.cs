@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
+using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.UnitTests.TestHelpers;
@@ -29,6 +30,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     private IOrganisationRegistrationSubmissionService _registrationSubmissionServiceFake;
     private readonly Mock<IOrganisationRegistrationSubmissionService> _registrationSubmissionServiceMock = new();
     private readonly Mock<ICommonDataService> _commonDataServiceMock = new();
+    private readonly Mock<IMessagingService> _messageServiceMock = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationSubmissionsController _sut;
     private readonly Guid _oid = Guid.NewGuid();
@@ -40,7 +42,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             _commonDataServiceMock.Object,
             _submissionsServiceMock.Object);
 
-        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceFake, _ctlLoggerMock.Object);
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceFake, _ctlLoggerMock.Object, _messageServiceMock.Object);
 
         _sut.AddDefaultContextWithOid(_oid, "TestAuth");
     }
@@ -79,7 +81,12 @@ public class OrganisationRegistrationSubmissionsControllerTests
             RegistrationSubmissionType = RegistrationSubmissionType.Producer,
             TwoDigitYear = "99",
             OrganisationAccountManagementId = "123456",
-            DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc)
+            DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc),
+            AgencyName = "Agency Name",
+            Comments="Comment text",
+            OrganisationEmail="Organisation email address",
+            OrganisationName = "Organisation name",
+            OrganisationReference ="Organisation reference"
         };
 
         var handlerResponse =
@@ -297,7 +304,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .Setup(r => r.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
             .ReturnsAsync(handlerResponse);
 
-        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object);
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object, _messageServiceMock.Object);
 
         // Act
         var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
@@ -319,7 +326,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .Setup(r => r.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
             .ThrowsAsync(exception);
 
-        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object);
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object, _messageServiceMock.Object);
 
         // Act
         var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
