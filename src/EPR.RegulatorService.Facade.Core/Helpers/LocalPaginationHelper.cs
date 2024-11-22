@@ -45,7 +45,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
 
             if (items.Count == 0)
                 return new PaginatedResponse<T>
-                    { Items = [], CurrentPage = currentPage, PageSize = pageSize, TotalItems = 0 };
+                    { items = [], currentPage = currentPage, pageSize = pageSize, totalItems = 0 };
             if (currentPage > (int)Math.Ceiling(totalItems / (double)pageSize))
             {
                 currentPage = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -53,10 +53,10 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
 
             return new PaginatedResponse<T>
             {
-                Items = items,
-                CurrentPage = currentPage,
-                TotalItems = totalItems,
-                PageSize = pageSize
+                items = items,
+                currentPage = currentPage,
+                totalItems = totalItems,
+                pageSize = pageSize
             };
         }
     }

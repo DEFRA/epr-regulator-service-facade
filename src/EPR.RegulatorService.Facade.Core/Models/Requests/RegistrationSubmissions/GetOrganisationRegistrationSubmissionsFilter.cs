@@ -13,7 +13,9 @@ public class GetOrganisationRegistrationSubmissionsFilter
     public string? RelevantYears { get; set; }
     public string? ApplicationReferenceNumber { get; set; }
     public string? RegistrationReferenceNumber { get; set; }
-    
+
+    [Required]
+    public int NationId { get; set; }
     [Required]
     public int? PageNumber { get; set; } = 1;
     

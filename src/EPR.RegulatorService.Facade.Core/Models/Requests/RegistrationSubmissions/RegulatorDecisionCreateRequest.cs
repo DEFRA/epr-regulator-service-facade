@@ -9,8 +9,13 @@ namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissio
 [ExcludeFromCodeCoverage]
 public class RegulatorDecisionCreateRequest
 {
+    [Required]
     [NotDefault]
     public Guid SubmissionId { get; init; }
+
+    [Required]
+    [NotDefault]
+    public string ApplicationReferenceNumber { get; set; }
 
     [Required]
     [NotNone]
