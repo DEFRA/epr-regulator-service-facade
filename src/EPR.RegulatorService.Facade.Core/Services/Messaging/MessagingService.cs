@@ -92,8 +92,33 @@ public class MessagingService : IMessagingService
         ValidateUserEmailParameters(delegatedPerson);
 
         var emailIds = new List<string>();
+        var approvedPersonParameters = GetApprovedPerson(model, delegatedPerson);
 
-        var approvedPersonParameters = new Dictionary<string, object>
+        var emailId = SendEmail(model.ApprovedPerson.Email, _messagingConfig.ToApprovedPersonDelegatedPersonAccepted, approvedPersonParameters);
+        emailIds.Add(emailId);
+        var delegatedPersonParameters = GetDelegatedPerson(model, delegatedPerson);
+
+        emailId = SendEmail(delegatedPerson.Email, _messagingConfig.ToDelegatedPersonDelegatedPersonAccepted, delegatedPersonParameters);
+        emailIds.Add(emailId);
+
+        return emailIds;
+    }
+
+    private static Dictionary<string, object> GetDelegatedPerson(ApplicationEmailModel model, UserEmailModel delegatedPerson)
+    {
+        return new Dictionary<string, object>
+        {
+            { "firstName", delegatedPerson.FirstName },
+            { "lastName", delegatedPerson.LastName },
+            { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
+            { "organisationName", model.OrganisationName },
+            { "accountLoginUrl", model.AccountLoginUrl }
+        };
+    }
+
+    private static Dictionary<string, object> GetApprovedPerson(ApplicationEmailModel model, UserEmailModel delegatedPerson)
+    {
+        return new Dictionary<string, object>
         {
             { "delegatedPerson", $"{delegatedPerson.FirstName} {delegatedPerson.LastName}" },
             { "firstName", model.ApprovedPerson.FirstName },
@@ -102,24 +127,7 @@ public class MessagingService : IMessagingService
             { "organisationName", model.OrganisationName },
             { "reasonForRejection", model.RejectionComments },
             { "accountLoginUrl", model.AccountLoginUrl }
-        };
-
-        var emailId = SendEmail(model.ApprovedPerson.Email, _messagingConfig.ToApprovedPersonDelegatedPersonAccepted, approvedPersonParameters);
-        emailIds.Add(emailId);
-
-        var delegatedPersonParameters = new Dictionary<string, object>
-        {
-            { "firstName", delegatedPerson.FirstName },
-            { "lastName", delegatedPerson.LastName },
-            { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
-            { "organisationName", model.OrganisationName },
-            { "accountLoginUrl", model.AccountLoginUrl }
-        };
-
-        emailId = SendEmail(delegatedPerson.Email, _messagingConfig.ToDelegatedPersonDelegatedPersonAccepted, delegatedPersonParameters);
-        emailIds.Add(emailId);
-
-        return emailIds;
+        }; 
     }
 
     public List<string> DelegatedPersonRejected(ApplicationEmailModel model)
@@ -132,29 +140,12 @@ public class MessagingService : IMessagingService
 
         var emailIds = new List<string>();
 
-        var approvedPersonParameters = new Dictionary<string, object>
-        {
-            { "delegatedPerson", $"{delegatedPerson.FirstName} {delegatedPerson.LastName}" },
-            { "firstName", model.ApprovedPerson.FirstName },
-            { "lastName", model.ApprovedPerson.LastName },
-            { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
-            { "organisationName", model.OrganisationName },
-            { "reasonForRejection", model.RejectionComments },
-            { "accountLoginUrl", model.AccountLoginUrl }
-        };
+        var approvedPersonParameters = GetApprovedPerson(model, delegatedPerson); 
 
         var emailId = SendEmail(model.ApprovedPerson.Email, _messagingConfig.ToApprovedPersonDelegatedPersonRejected, approvedPersonParameters);
         emailIds.Add(emailId);
 
-        var delegatedPersonParameters = new Dictionary<string, object>
-        {
-            { "firstName", delegatedPerson.FirstName },
-            { "lastName", delegatedPerson.LastName },
-            { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
-            { "organisationName", model.OrganisationName },
-            { "reasonForRejection", model.RejectionComments },
-            { "accountLoginUrl", model.AccountLoginUrl },
-        };
+        var delegatedPersonParameters = GetDelegatedPerson(model, delegatedPerson); 
 
         emailId = SendEmail(delegatedPerson.Email, _messagingConfig.ToDelegatedPersonDelegatedPersonRejected, delegatedPersonParameters);
         emailIds.Add(emailId);
