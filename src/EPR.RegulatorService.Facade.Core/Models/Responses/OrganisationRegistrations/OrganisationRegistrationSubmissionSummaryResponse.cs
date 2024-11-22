@@ -29,4 +29,7 @@ public class OrganisationRegistrationSubmissionSummaryResponse
     public DateTime? StatusPendingDate { get; set; }
 
     public int NationId { get; set; }
+    public DateTime? RegulatorCommentDate { get; internal set; }
+    public DateTime? ProducerCommentDate { get; internal set; }
+    public Guid? RegulatorUserId { get; internal set; }
 }

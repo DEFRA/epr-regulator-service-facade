@@ -1,11 +1,7 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData
 {
@@ -73,26 +69,31 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public static implicit operator RegistrationSubmissionOrganisationDetails(OrganisationRegistrationDetailsDto dto)
         {
+            if (dto is null) return null;
+
             return new RegistrationSubmissionOrganisationDetails
             {
                 SubmissionId = dto.SubmissionId,
                 OrganisationId = dto.OrganisationId,
                 OrganisationReference = dto.OrganisationReference,
                 OrganisationName = dto.OrganisationName,
+                OrganisationSize = dto.OrganisationSize,
+                IsComplianceScheme = dto.IsComplianceScheme,
                 OrganisationType = Enum.TryParse<RegistrationSubmissionOrganisationType>(
-                    dto.OrganisationType, true, out var organisationType)
-                    ? organisationType
-                    : throw new InvalidCastException($"Invalid OrganisationType: {dto.OrganisationType}"),
+                        dto.OrganisationType, true, out var organisationType)
+                        ? organisationType
+                        : throw new InvalidCastException($"Invalid OrganisationType: {dto.OrganisationType}"),
                 NationId = dto.NationId,
+                SubmissionPeriod = dto.SubmissionPeriod,
                 RegistrationYear = dto.RelevantYear.ToString(),
-                RegistrationDateTime = DateTime.ParseExact(dto.SubmittedDateTime, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture), // TODO: Ensure the format is valid for DateTime.Parse
+                RegistrationDateTime = DateTime.ParseExact(dto.SubmittedDateTime, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture),
                 SubmissionStatus = Enum.TryParse<RegistrationSubmissionStatus>(
-                    dto.SubmissionStatus, true, out var submissionStatus)
-                    ? submissionStatus
-                    : throw new InvalidCastException($"Invalid SubmissionStatus: {dto.SubmissionStatus}"),
+                        dto.SubmissionStatus, true, out var submissionStatus)
+                        ? submissionStatus
+                        : throw new InvalidCastException($"Invalid SubmissionStatus: {dto.SubmissionStatus}"),
                 SubmissionStatusPendingDate = !string.IsNullOrWhiteSpace(dto.StatusPendingDate)
-                    ? DateTime.ParseExact(dto.StatusPendingDate, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)
-                    : null,
+                        ? DateTime.ParseExact(dto.StatusPendingDate, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)
+                        : null,
                 RegulatorComments = dto.RegulatorComment ?? string.Empty,
                 ProducerComments = dto.ProducerComment ?? string.Empty,
                 ApplicationReferenceNumber = dto.ApplicationReferenceNumber,
@@ -101,13 +102,35 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 BuildingName = dto.BuildingName,
                 SubBuildingName = dto.SubBuildingName,
                 BuildingNumber = dto.BuildingNumber,
-                Street = dto.Street ?? string.Empty, // TODO: Ensure a non-null default
-                Locality = dto.Locality ?? string.Empty, // TODO: Ensure a non-null default
+                Street = dto.Street ?? string.Empty,
+                Locality = dto.Locality ?? string.Empty,
                 DependentLocality = dto.DependentLocality,
-                Town = dto.Town ?? string.Empty, // TODO: Ensure a non-null default
-                County = dto.County ?? string.Empty, // TODO: Ensure a non-null default
-                Country = dto.Country ?? string.Empty, // TODO: Ensure a non-null default
-                Postcode = dto.Postcode ?? string.Empty // TODO: Ensure a non-null default
+                Town = dto.Town ?? string.Empty,
+                County = dto.County ?? string.Empty,
+                Country = dto.Country ?? string.Empty,
+                Postcode = dto.Postcode ?? string.Empty,
+                SubmittedUserId = dto.SubmittedUserId,
+                FirstName = dto.FirstName ?? string.Empty,
+                LastName = dto.LastName ?? string.Empty,
+                Email = dto.Email ?? string.Empty,
+                Telephone = dto.Telephone ?? string.Empty,
+                ServiceRole = dto.ServiceRole ?? string.Empty,
+                RegulatorDecisionDate = dto.RegulatorDecisionDate,
+                ProducerCommentDate = dto.ProducerCommentDate,
+                RegulatorUserId = dto.RegulatorUserId,
+                CompanyDetailsFileId = dto.CompanyDetailsFileId,
+                CompanyDetailsFileName = dto.CompanyDetailsFileName,
+                CompanyDetailsBlobName = dto.CompanyDetailsBlobName,
+                PartnershipFileId = dto.PartnershipFileId,
+                PartnershipFileName = dto.PartnershipFileName,
+                PartnershipBlobName = dto.PartnershipBlobName,
+                BrandsFileId = dto.BrandsFileId,
+                BrandsFileName = dto.BrandsFileName,
+                BrandsBlobName = dto.BrandsBlobName,
+                IsOnlineMarketPlace = dto.IsOnlineMarketPlace,
+                NumberOfSubsidiaries = dto.NumberOfSubsidiaries,
+                NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries,
+                IsLateSubmission = dto.IsLateSubmission
             };
         }
     }

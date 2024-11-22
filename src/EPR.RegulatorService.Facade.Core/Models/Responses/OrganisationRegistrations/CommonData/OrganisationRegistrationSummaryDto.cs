@@ -1,5 +1,4 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Globalization;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
@@ -24,28 +23,70 @@ public class OrganisationRegistrationSummaryDto
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse(OrganisationRegistrationSummaryDto dto)
     {
-        return new OrganisationRegistrationSubmissionSummaryResponse
+        var response = new OrganisationRegistrationSubmissionSummaryResponse
         {
             SubmissionId = dto.SubmissionId,
+
             OrganisationId = dto.OrganisationId,
+
             OrganisationName = dto.OrganisationName,
-            OrganisationReference = dto.OrganisationReference,
-            OrganisationType = Enum.TryParse<RegistrationSubmissionOrganisationType>(
-                dto.OrganisationType, true, out var organisationType)
-                ? organisationType
-                : throw new InvalidCastException($"Invalid OrganisationType: {dto.OrganisationType}"),
-            ApplicationReferenceNumber = dto.ApplicationReferenceNumber,
-            RegistrationReferenceNumber = dto.RegistrationReferenceNumber ?? string.Empty, // Handle null
-            SubmissionDate = DateTime.Parse(dto.SubmittedDateTime, CultureInfo.InvariantCulture), // Convert string to DateTime
-            RegistrationYear = dto.RelevantYear.ToString(), 
-            SubmissionStatus = Enum.TryParse<RegistrationSubmissionStatus>(
-                dto.SubmissionStatus, true, out var submissionStatus)
-                ? submissionStatus
-                : throw new InvalidCastException($"Invalid SubmissionStatus: {dto.SubmissionStatus}"),
-            StatusPendingDate = !string.IsNullOrWhiteSpace(dto.StatusPendingDate)
-                ? DateTime.ParseExact(dto.StatusPendingDate, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)
-                : null, // Handle null or empty values
-            NationId = dto.NationId
+
+            OrganisationReference = dto.OrganisationReference
         };
+
+        if (!Enum.TryParse<RegistrationSubmissionOrganisationType>(dto.OrganisationType, true, out var organisationType))
+        {
+#pragma warning disable S3877 // Exceptions should not be thrown from unexpected methods
+            throw new InvalidCastException($"Invalid OrganisationType: {dto.OrganisationType}");
+#pragma warning restore S3877 // Exceptions should not be thrown from unexpected methods
+        }
+        response.OrganisationType = organisationType;
+
+        response.ApplicationReferenceNumber = dto.ApplicationReferenceNumber;
+
+        response.RegistrationReferenceNumber = dto.RegistrationReferenceNumber ?? string.Empty;
+
+        response.SubmissionDate = DateTime.Parse(dto.SubmittedDateTime, CultureInfo.InvariantCulture);
+
+        response.RegistrationYear = dto.RelevantYear.ToString();
+
+        if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.SubmissionStatus, true, out var submissionStatus))
+        {
+            throw new InvalidCastException($"Invalid SubmissionStatus: {dto.SubmissionStatus}");
+        }
+        response.SubmissionStatus = submissionStatus;
+
+        if (!string.IsNullOrWhiteSpace(dto.StatusPendingDate))
+        {
+            response.StatusPendingDate = DateTime.Parse(dto.StatusPendingDate, CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            response.StatusPendingDate = null;
+        }
+
+        response.NationId = dto.NationId;
+
+        if (!string.IsNullOrWhiteSpace(dto.RegulatorCommentDate))
+        {
+            response.RegulatorCommentDate = DateTime.Parse(dto.RegulatorCommentDate, CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            response.RegulatorCommentDate = null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.ProducerCommentDate))
+        {
+            response.ProducerCommentDate = DateTime.Parse(dto.ProducerCommentDate, CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            response.ProducerCommentDate = null;
+        }
+
+        response.RegulatorUserId = dto.RegulatorUserId;
+
+        return response;
     }
 }

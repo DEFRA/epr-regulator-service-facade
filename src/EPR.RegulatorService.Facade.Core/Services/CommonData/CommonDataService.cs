@@ -65,11 +65,9 @@ public class CommonDataService(
     [ExcludeFromCodeCoverage]
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
-        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}{filter.NationId}";
+        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}{filter.NationId}?{GenerateQueryString(filter)}";
 
-        url = $"{url}?{GenerateQueryString(filter)}";
-
-        httpClient.Timeout = TimeSpan.FromSeconds(300);
+        //httpClient.Timeout = TimeSpan.FromSeconds(300);
         var response = await httpClient.GetAsync(url);
 
         response.EnsureSuccessStatusCode();

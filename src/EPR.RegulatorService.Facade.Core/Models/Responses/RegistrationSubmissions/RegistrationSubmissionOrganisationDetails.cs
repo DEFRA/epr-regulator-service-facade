@@ -35,6 +35,31 @@ public class RegistrationSubmissionOrganisationDetails
 
     public RegistrationSubmissionOrganisationSubmissionSummaryDetails SubmissionDetails { get; set; }
     public RegistrationSubmissionsOrganisationPaymentDetails PaymentDetails { get; set; }
+    public Guid? SubmittedUserId { get; internal set; }
+    public string FirstName { get; internal set; }
+    public string LastName { get; internal set; }
+    public string Email { get; internal set; }
+    public string Telephone { get; internal set; }
+    public string ServiceRole { get; internal set; }
+    public string? RegulatorDecisionDate { get; internal set; }
+    public string? ProducerCommentDate { get; internal set; }
+    public Guid? RegulatorUserId { get; internal set; }
+    public string CompanyDetailsFileId { get; internal set; }
+    public string CompanyDetailsFileName { get; internal set; }
+    public string CompanyDetailsBlobName { get; internal set; }
+    public string? PartnershipFileId { get; internal set; }
+    public string? PartnershipFileName { get; internal set; }
+    public string? PartnershipBlobName { get; internal set; }
+    public string? BrandsFileId { get; internal set; }
+    public string? BrandsFileName { get; internal set; }
+    public string? BrandsBlobName { get; internal set; }
+    public bool IsOnlineMarketPlace { get; internal set; }
+    public int NumberOfSubsidiaries { get; internal set; }
+    public int NumberOfOnlineSubsidiaries { get; internal set; }
+    public bool IsLateSubmission { get; internal set; }
+    public string OrganisationSize { get; internal set; }
+    public bool IsComplianceScheme { get; internal set; }
+    public string SubmissionPeriod { get; internal set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
         (RegistrationSubmissionOrganisationDetails details) => new ()
