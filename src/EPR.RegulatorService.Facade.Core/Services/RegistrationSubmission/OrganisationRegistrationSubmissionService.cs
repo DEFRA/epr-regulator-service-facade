@@ -42,12 +42,13 @@ public class OrganisationRegistrationSubmissionService(
             request.SubmissionId,
             new RegistrationSubmissionDecisionEvent
             {
+                ApplicationReferenceNumber = request.ApplicationReferenceNumber,
                 OrganisationId = request.OrganisationId,
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
                 Comments = request.Comments,
                 RegistrationReferenceNumber = regRefNumber,
-                DecisionDate = request.DecisionDate
+                DecisionDate = request.DecisionDate                
             },
             userId
         );
