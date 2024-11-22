@@ -274,9 +274,7 @@ public class MessagingService : IMessagingService
 
         return response.id;
     }
-    
-    
-
+     
     public string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model)
     {
         Dictionary<string, object> parameters = null;
@@ -298,7 +296,7 @@ public class MessagingService : IMessagingService
 
         return response.id;
     }
-
+     
     public void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model)
     {
         ValidateOrganisationRegistrationSubmissionModel(model);
