@@ -26,6 +26,8 @@ public class RegulatorDecisionCreateRequest
 
     public RegistrationSubmissionType RegistrationSubmissionType { get; init; }
 
+    public string ApplicationReferenceNumber { get; init; }
+
     public string? TwoDigitYear { get; init; }
 
     // This is the 6 digit Org ID taken from Acct Management
