@@ -34,9 +34,7 @@ public class RegulatorDecisionCreateRequest
     public string? OrganisationAccountManagementId { get; init; }
 
     public DateTime? DecisionDate { get; set; }
-
-    // add Application Number here from FE
-    public string? ApplicationNumber { get; init; }
+     
     // add agency name here from FE
     public string?  AgencyName { get; init; }
     public string? AgencyEmail { get; init; }

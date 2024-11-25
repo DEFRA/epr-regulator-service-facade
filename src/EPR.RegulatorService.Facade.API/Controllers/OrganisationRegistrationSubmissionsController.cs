@@ -59,7 +59,7 @@ public class OrganisationRegistrationSubmissionsController(
         var model = new OrganisationRegistrationSubmissionEmailModel
         { 
             ToEmail = request.OrganisationEmail,
-            ApplicationNumber = request.ApplicationNumber,
+            ApplicationNumber = request.ApplicationReferenceNumber,
             OrganisationNumber = request.OrganisationId.ToString(),
             OrganisationName = request.OrganisationName,
             Period = $"20{request.TwoDigitYear}",
@@ -77,8 +77,7 @@ public class OrganisationRegistrationSubmissionsController(
             case Core.Enums.RegistrationSubmissionStatus.Queried: 
                 messagingService.OrganisationRegistrationSubmissionQueried(model);
                 break; 
-            case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails 
-                break;
+            case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails  
             default: // dont need to send emails
                 break;
         }
