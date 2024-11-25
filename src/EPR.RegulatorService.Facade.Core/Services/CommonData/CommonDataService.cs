@@ -1,11 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Web;
-using Azure;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Helpers;
-using EPR.RegulatorService.Facade.Core.Helpers.TestData;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
@@ -46,8 +43,8 @@ public class CommonDataService(
 
     public async Task<RegistrationSubmissionOrganisationDetails> GetOrganisationRegistrationSubmissionDetails(Guid submissionId)
     {
-        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}{submissionId}";
-
+        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+     
         httpClient.Timeout = TimeSpan.FromSeconds(300);
         var response = await httpClient.GetAsync(url);
 
@@ -65,9 +62,9 @@ public class CommonDataService(
     [ExcludeFromCodeCoverage]
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
-        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}{filter.NationId}?{GenerateQueryString(filter)}";
+        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{filter.GenerateQueryString()}";
 
-        //httpClient.Timeout = TimeSpan.FromSeconds(300);
+        httpClient.Timeout = TimeSpan.FromSeconds(300);
         var response = await httpClient.GetAsync(url);
 
         response.EnsureSuccessStatusCode();
@@ -103,32 +100,5 @@ public class CommonDataService(
     private RegistrationSubmissionOrganisationDetails ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
     {
         return jsonObject == null ? null : (RegistrationSubmissionOrganisationDetails)jsonObject;
-    }
-
-    private static string GenerateQueryString(GetOrganisationRegistrationSubmissionsFilter source)
-    {
-        Func<string?, string?> convertSpaceToComma = input =>
-           string.IsNullOrWhiteSpace(input)
-               ? null
-               : string.Join(",", input.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-
-        var queryParams = new Dictionary<string, string?>
-        {
-            { "OrganisationNameCommaSeparated", convertSpaceToComma(source.OrganisationName) },
-            { "OrganisationIDCommaSeparated", convertSpaceToComma(source.OrganisationReference) },
-            { "RelevantYearCommaSeparated", convertSpaceToComma(source.RelevantYears) },
-            { "SubmissionStatusCommaSeparated", convertSpaceToComma(source.Statuses) },
-            { "OrganisationTypesCommaSeparated", convertSpaceToComma(source.OrganisationType) },
-            { "PageNumber", source.PageNumber?.ToString() },
-            { "PageSize", source.PageSize?.ToString() }
-        };
-
-        // Filter out null or empty values and encode the parameters
-        var queryString = string.Join("&",
-            queryParams
-                .Where(kv => !string.IsNullOrEmpty(kv.Value))
-                .Select(kv => $"{HttpUtility.UrlEncode(kv.Key)}={HttpUtility.UrlEncode(kv.Value)}"));
-
-        return queryString;
     }
 }
