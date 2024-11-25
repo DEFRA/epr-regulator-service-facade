@@ -14,4 +14,7 @@ public interface IMessagingService
     List<string> SubmissionRejected(SubmissionEmailModel model, bool? resubmissionRequired);
     string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model);
     string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, string notificationType);
+
+    void OrganisationRegistrationSubmissionDecision(OrganisationRegistrationSubmissionEmailModel model);
+    void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model);  
 }

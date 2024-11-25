@@ -1,15 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
 public class OrganisationRegistrationSubmissionsController(
     IOrganisationRegistrationSubmissionService organisationRegistrationHelper,
-    ILogger<OrganisationRegistrationSubmissionsController> logger) : Controller
+    ILogger<OrganisationRegistrationSubmissionsController> logger, 
+    IMessagingService messagingService) : Controller
 {
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -32,7 +37,8 @@ public class OrganisationRegistrationSubmissionsController(
                     GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
-            {
+            { 
+                SendEventEmail(request);
                 return Created();
             }
 
@@ -42,10 +48,39 @@ public class OrganisationRegistrationSubmissionsController(
         catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
-            return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
+            return Problem($"Exception occurred processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
         }
 
         return Problem();
+    }
+
+    private void SendEventEmail(RegulatorDecisionCreateRequest request)
+    {
+        var model = new OrganisationRegistrationSubmissionEmailModel
+        { 
+            ToEmail = request.OrganisationEmail,
+            ApplicationNumber = request.ApplicationReferenceNumber,
+            OrganisationNumber = request.OrganisationId.ToString(),
+            OrganisationName = request.OrganisationName,
+            Period = $"20{request.TwoDigitYear}",
+            Agency = request.AgencyName,
+            AgencyEmail = request.AgencyEmail,
+            IsWelsh = request.IsWelsh,
+        };
+
+        switch (request.Status)
+        {
+            case Core.Enums.RegistrationSubmissionStatus.Refused: 
+            case Core.Enums.RegistrationSubmissionStatus.Granted: 
+                messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
+                break;
+            case Core.Enums.RegistrationSubmissionStatus.Queried: 
+                messagingService.OrganisationRegistrationSubmissionQueried(model);
+                break; 
+            case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails  
+            default: // dont need to send emails
+                break;
+        }
     }
 
     [HttpPost]
