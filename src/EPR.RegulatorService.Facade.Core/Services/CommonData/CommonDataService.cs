@@ -55,8 +55,6 @@ public class CommonDataService(
         var jsonObject = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(content, _deserialisationOptions);
 
         return ConvertCommonDataDetailToFEData(jsonObject);
-
-        //return await RegistrationSubmissionTestData.GetRegistrationSubmissionDetails(submissionId, url);
     }
 
     [ExcludeFromCodeCoverage]
@@ -74,16 +72,6 @@ public class CommonDataService(
         var jsonObject = JsonSerializer.Deserialize<PaginatedResponse<OrganisationRegistrationSummaryDto>>(content, _deserialisationOptions);
 
         return ConvertCommonDataCollectionToFEData(jsonObject);
-
-        //GetFromJsonAsync<PaginatedResponse<OrganisationRegistrationSummaryDto>>(url);
-
-        //var filteredRegistrations =
-        //    LocalPaginationHelper.FilterAndOrder(RegistrationSubmissionTestData.DummyData, filter);
-        
-        //return LocalPaginationHelper.Paginate<OrganisationRegistrationSubmissionSummaryResponse>(
-        //    filteredRegistrations.Item2,
-        //    filter.PageNumber.Value,
-        //    filter.PageSize.Value, filteredRegistrations.Item1);
     }
 
     private PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection)
