@@ -33,7 +33,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
                     { "organisation_number", this.OrganisationNumber },
                     { "organisation_name", this.OrganisationName },
                     { "agency", this.Agency },
-                    { "agency_email", this.Agency },
+                    { "agency_email", this.AgencyEmail },
                     { "year", this.Period }
                 };
 
