@@ -22,9 +22,11 @@ public class RegulatorDecisionCreateRequest
 
     public Guid? UserId { get; init; }
 
-    public CountryName CountryName { get; init; }
+    public CountryName? CountryName { get; init; }
 
-    public RegistrationSubmissionType RegistrationSubmissionType { get; init; }
+    public RegistrationSubmissionType? RegistrationSubmissionType { get; init; }
+
+    public string ApplicationReferenceNumber { get; init; }
 
     public string? TwoDigitYear { get; init; }
 

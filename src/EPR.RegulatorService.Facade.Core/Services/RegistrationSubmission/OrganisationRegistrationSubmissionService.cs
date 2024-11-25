@@ -30,10 +30,12 @@ public class OrganisationRegistrationSubmissionService(
         RegulatorDecisionCreateRequest request, Guid userId)
     {
         var regRefNumber =
-            request.Status == RegistrationSubmissionStatus.Granted
+            request.Status == RegistrationSubmissionStatus.Granted &&
+            request.CountryName.HasValue &&
+            request.RegistrationSubmissionType.HasValue
                 ? GenerateReferenceNumber(
-                    request.CountryName,
-                    request.RegistrationSubmissionType,
+                    request.CountryName.Value,
+                    request.RegistrationSubmissionType.Value,
                     request.OrganisationAccountManagementId.ToString(),
                     request.TwoDigitYear)
                 : string.Empty;
@@ -42,6 +44,7 @@ public class OrganisationRegistrationSubmissionService(
             request.SubmissionId,
             new RegistrationSubmissionDecisionEvent
             {
+                ApplicationReferenceNumber = request.ApplicationReferenceNumber,
                 OrganisationId = request.OrganisationId,
                 SubmissionId = request.SubmissionId,
                 Decision = request.Status.GetRegulatorDecision(),
