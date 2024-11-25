@@ -1,11 +1,12 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
 
-    [ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage]
     public static partial class RegistrationSubmissionTestData
     {
         static RegistrationSubmissionTestData()
@@ -13,9 +14,9 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
             DummyData = GenerateRegistrationSubmissionDataCollection();
         }
 
-        public static List<RegistrationSubmissionOrganisationDetails> DummyData { get; }
+        public static List<RegistrationSubmissionOrganisationDetailsResponse> DummyData { get; }
 
-        public static async Task<RegistrationSubmissionOrganisationDetails?>    GetRegistrationSubmissionDetails(Guid submissionId, string url)
+        public static async Task<RegistrationSubmissionOrganisationDetailsResponse?>    GetRegistrationSubmissionDetails(Guid submissionId, string url)
         {
             var result = DummyData.Find(x => x.SubmissionId == submissionId);
             if ( null == result) return null;
@@ -28,16 +29,16 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
             return result;
         }
 
-        private static List<RegistrationSubmissionOrganisationDetails> GenerateRegistrationSubmissionDataCollection()
+        private static List<RegistrationSubmissionOrganisationDetailsResponse> GenerateRegistrationSubmissionDataCollection()
         {
-            List<RegistrationSubmissionOrganisationDetails> objRet = [];
+            List<RegistrationSubmissionOrganisationDetailsResponse> objRet = [];
 
             foreach (var line in RegistrationSubmissionTestData.TSVData)
             {
                 var fields = line.Split('\t');
 
                 var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-                objRet.Add(new RegistrationSubmissionOrganisationDetails
+                objRet.Add(new RegistrationSubmissionOrganisationDetailsResponse
                 {
                     OrganisationReference = fields[0],
                     OrganisationName = fields[1],
@@ -84,7 +85,6 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
                 DecisionDate = DateTime.Now.AddDays(-random.Next(1, 100)),
                 TimeAndDateOfSubmission = DateTime.Now.AddDays(-random.Next(1, 100)),
                 SubmittedOnTime = random.Next(2) == 0,
-                SubmittedBy = sampleNames[random.Next(sampleNames.Length)],
                 AccountRole = ((ServiceRole)sampleRoles.GetValue(random.Next(sampleRoles.Length))).ToString(),
                 Telephone = generateRandomPhoneNumber(random),
                 Email = $"{sampleNames[random.Next(sampleNames.Length)].ToLower(CultureInfo.CurrentCulture)}@example.com",
@@ -112,24 +112,27 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
         {
             var files = new List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails>();
 
-            files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
-            {
-                DownloadUrl = "#",
-                FileName = "org.details.acme.csv",
-                Label = "SubmissionDetails.OrganisationDetails"
-            });
-            files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
-            {
-                DownloadUrl = "#",
-                FileName = "brand.details.acme.csv",
-                Label = "SubmissionDetails.BrandDetails"
-            });
-            files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
-            {
-                DownloadUrl = "#",
-                FileName = "partner.details.acme.csv",
-                Label = "SubmissionDetails.PartnerDetails"
-            });
-            return files;
+        files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
+        {
+            Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.company,
+            FileId = "1",
+            FileName = "org.details.acme.csv",
+            BlobName = "SubmissionDetails.OrganisationDetails"
+        });
+        files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
+        {
+            Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.brands,
+            FileId = "2",
+            FileName = "brand.details.acme.csv",
+            BlobName = "SubmissionDetails.BrandDetails"
+        });
+        files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
+        {
+            Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.partnership,
+            FileId = "3",
+            FileName = "partner.details.acme.csv",
+            BlobName = "SubmissionDetails.PartnerDetails"
+        });
+        return files;
         }
     }

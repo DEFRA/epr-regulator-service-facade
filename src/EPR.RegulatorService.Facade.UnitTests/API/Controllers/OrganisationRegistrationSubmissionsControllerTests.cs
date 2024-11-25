@@ -194,7 +194,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetails).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsResponse).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
@@ -212,7 +212,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
-            .ReturnsAsync(new RegistrationSubmissionOrganisationDetails()).Verifiable();
+            .ReturnsAsync(new RegistrationSubmissionOrganisationDetailsResponse()).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);

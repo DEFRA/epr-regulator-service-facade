@@ -1,6 +1,9 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
+using Microsoft.Extensions.DependencyModel.Resolution;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData
@@ -67,11 +70,11 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
         public int NumberOfSubsidiaries { get; set; }
         public int NumberOfOnlineSubsidiaries { get; set; }
 
-        public static implicit operator RegistrationSubmissionOrganisationDetails(OrganisationRegistrationDetailsDto dto)
+        public static implicit operator RegistrationSubmissionOrganisationDetailsResponse(OrganisationRegistrationDetailsDto dto)
         {
             if (dto is null) return null;
 
-            return new RegistrationSubmissionOrganisationDetails
+            return new RegistrationSubmissionOrganisationDetailsResponse
             {
                 SubmissionId = dto.SubmissionId,
                 OrganisationId = dto.OrganisationId,
@@ -109,29 +112,53 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 County = dto.County ?? string.Empty,
                 Country = dto.Country ?? string.Empty,
                 Postcode = dto.Postcode ?? string.Empty,
-                SubmittedUserId = dto.SubmittedUserId,
-                FirstName = dto.FirstName ?? string.Empty,
-                LastName = dto.LastName ?? string.Empty,
-                Email = dto.Email ?? string.Empty,
-                Telephone = dto.Telephone ?? string.Empty,
-                ServiceRole = dto.ServiceRole ?? string.Empty,
+                SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails
+                {
+                    AccountRole = dto.ServiceRole,
+                    SubmittedOnTime = dto.IsLateSubmission,
+                    DecisionDate = DateTime.Parse(dto.StatusPendingDate, CultureInfo.InvariantCulture),
+                    Email = dto.Email,
+                    TimeAndDateOfSubmission = DateTime.Parse(dto.SubmittedDateTime, CultureInfo.InvariantCulture),
+                    Telephone = dto.Telephone,
+                    DeclaredBy = $"{dto.FirstName} {dto.LastName}",
+                    Status = Enum.Parse<RegistrationSubmissionStatus>(dto.SubmissionStatus),
+                    Files = GetSubmissionFileDetails(dto),
+                    SubmittedByUserId = dto.SubmittedUserId,
+                    SubmissionPeriod = dto.SubmissionPeriod
+                },
                 RegulatorDecisionDate = dto.RegulatorDecisionDate,
                 ProducerCommentDate = dto.ProducerCommentDate,
                 RegulatorUserId = dto.RegulatorUserId,
-                CompanyDetailsFileId = dto.CompanyDetailsFileId,
-                CompanyDetailsFileName = dto.CompanyDetailsFileName,
-                CompanyDetailsBlobName = dto.CompanyDetailsBlobName,
-                PartnershipFileId = dto.PartnershipFileId,
-                PartnershipFileName = dto.PartnershipFileName,
-                PartnershipBlobName = dto.PartnershipBlobName,
-                BrandsFileId = dto.BrandsFileId,
-                BrandsFileName = dto.BrandsFileName,
-                BrandsBlobName = dto.BrandsBlobName,
                 IsOnlineMarketPlace = dto.IsOnlineMarketPlace,
                 NumberOfSubsidiaries = dto.NumberOfSubsidiaries,
                 NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries,
                 IsLateSubmission = dto.IsLateSubmission
             };
+        }
+
+        private static List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails> GetSubmissionFileDetails(OrganisationRegistrationDetailsDto dto)
+        {
+            List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails> objRet =
+            [
+                new()
+                {
+                    Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.company,
+                    FileId = dto.CompanyDetailsFileId,
+                    FileName = dto.CompanyDetailsFileName,
+                    BlobName = dto.CompanyDetailsBlobName
+                }
+            ];
+
+            if (dto.BrandsFileId != null)
+            {
+                objRet.Add(new() { FileId = dto.BrandsFileId, FileName = dto.BrandsFileName, BlobName = dto.BrandsBlobName });
+            }
+            if (dto.PartnershipFileId != null)
+            {
+                objRet.Add(new() { FileId = dto.PartnershipFileId, FileName = dto.PartnershipFileName, BlobName = dto.PartnershipBlobName });
+            }
+
+            return objRet;
         }
     }
 }

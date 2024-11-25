@@ -1,11 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.Core;
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models;
+using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
-namespace EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
+namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 
 [ExcludeFromCodeCoverage]
-public class RegistrationSubmissionOrganisationDetails
+public class RegistrationSubmissionOrganisationDetailsResponse
 {
     public Guid SubmissionId { get; init; }
     public Guid OrganisationId { get; init; }
@@ -35,24 +42,9 @@ public class RegistrationSubmissionOrganisationDetails
 
     public RegistrationSubmissionOrganisationSubmissionSummaryDetails SubmissionDetails { get; set; }
     public RegistrationSubmissionsOrganisationPaymentDetails PaymentDetails { get; set; }
-    public Guid? SubmittedUserId { get; internal set; }
-    public string FirstName { get; internal set; }
-    public string LastName { get; internal set; }
-    public string Email { get; internal set; }
-    public string Telephone { get; internal set; }
-    public string ServiceRole { get; internal set; }
     public string? RegulatorDecisionDate { get; internal set; }
     public string? ProducerCommentDate { get; internal set; }
     public Guid? RegulatorUserId { get; internal set; }
-    public string CompanyDetailsFileId { get; internal set; }
-    public string CompanyDetailsFileName { get; internal set; }
-    public string CompanyDetailsBlobName { get; internal set; }
-    public string? PartnershipFileId { get; internal set; }
-    public string? PartnershipFileName { get; internal set; }
-    public string? PartnershipBlobName { get; internal set; }
-    public string? BrandsFileId { get; internal set; }
-    public string? BrandsFileName { get; internal set; }
-    public string? BrandsBlobName { get; internal set; }
     public bool IsOnlineMarketPlace { get; internal set; }
     public int NumberOfSubsidiaries { get; internal set; }
     public int NumberOfOnlineSubsidiaries { get; internal set; }
@@ -62,19 +54,19 @@ public class RegistrationSubmissionOrganisationDetails
     public string SubmissionPeriod { get; internal set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
-        (RegistrationSubmissionOrganisationDetails details) => new ()
-    {
-        SubmissionId = details.SubmissionId,
-        OrganisationId = details.OrganisationId,
-        OrganisationName = details.OrganisationName,
-        OrganisationType = details.OrganisationType,
-        OrganisationReference = details.OrganisationReference,
-        RegistrationYear = details.RegistrationYear,
-        SubmissionStatus = details.SubmissionStatus,
-        StatusPendingDate = details.SubmissionStatusPendingDate,
-        ApplicationReferenceNumber = details.ApplicationReferenceNumber,
-        RegistrationReferenceNumber = details.RegistrationReferenceNumber,
-        NationId = details.NationId,
-        SubmissionDate = details.RegistrationDateTime
-    };
+        (RegistrationSubmissionOrganisationDetailsResponse details) => new()
+        {
+            SubmissionId = details.SubmissionId,
+            OrganisationId = details.OrganisationId,
+            OrganisationName = details.OrganisationName,
+            OrganisationType = details.OrganisationType,
+            OrganisationReference = details.OrganisationReference,
+            RegistrationYear = details.RegistrationYear,
+            SubmissionStatus = details.SubmissionStatus,
+            StatusPendingDate = details.SubmissionStatusPendingDate,
+            ApplicationReferenceNumber = details.ApplicationReferenceNumber,
+            RegistrationReferenceNumber = details.RegistrationReferenceNumber,
+            NationId = details.NationId,
+            SubmissionDate = details.RegistrationDateTime
+        };
 }
