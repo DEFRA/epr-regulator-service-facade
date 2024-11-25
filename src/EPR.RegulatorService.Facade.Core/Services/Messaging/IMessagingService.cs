@@ -15,8 +15,6 @@ public interface IMessagingService
     string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model);
     string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, string notificationType);
 
-    void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model);
-    void OrganisationRegistrationSubmissionRejected(OrganisationRegistrationSubmissionEmailModel model);
-    void OrganisationRegistrationSubmissionCancelled(OrganisationRegistrationSubmissionEmailModel model);
-    void OrganisationRegistrationSubmissionAccepted(OrganisationRegistrationSubmissionEmailModel model);
+    void OrganisationRegistrationSubmissionDecision(OrganisationRegistrationSubmissionEmailModel model);
+    void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model);  
 }

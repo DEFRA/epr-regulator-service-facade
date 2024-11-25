@@ -33,8 +33,11 @@ public class RegulatorDecisionCreateRequest
 
     public DateTime? DecisionDate { get; set; }
 
+    // add Application Number here from FE
+    public string? ApplicationNumber { get; init; }
     // add agency name here from FE
     public string?  AgencyName { get; init; }
+    public string? AgencyEmail { get; init; }
     // org name   here from FE
     public string? OrganisationName { get; init; }
     // org ref  here from FE

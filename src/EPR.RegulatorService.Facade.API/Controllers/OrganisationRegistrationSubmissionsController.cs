@@ -58,31 +58,26 @@ public class OrganisationRegistrationSubmissionsController(
     {
         var model = new OrganisationRegistrationSubmissionEmailModel
         { 
-            Email = request.OrganisationEmail,
+            ToEmail = request.OrganisationEmail,
+            ApplicationNumber = request.ApplicationNumber,
             OrganisationNumber = request.OrganisationId.ToString(),
             OrganisationName = request.OrganisationName,
             Period = $"20{request.TwoDigitYear}",
             Agency = request.AgencyName,
+            AgencyEmail = request.AgencyEmail,
             IsWelsh = request.IsWelsh,
         };
 
         switch (request.Status)
         {
-            case Core.Enums.RegistrationSubmissionStatus.Granted:
-                model.Accepted_Comment= request.Comments;
-                messagingService.OrganisationRegistrationSubmissionAccepted(model);
+            case Core.Enums.RegistrationSubmissionStatus.Refused: 
+            case Core.Enums.RegistrationSubmissionStatus.Granted: 
+                messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
                 break;
-            case Core.Enums.RegistrationSubmissionStatus.Queried:
-                model.Query_Comment = request.Comments;
+            case Core.Enums.RegistrationSubmissionStatus.Queried: 
                 messagingService.OrganisationRegistrationSubmissionQueried(model);
-                break;
-            case Core.Enums.RegistrationSubmissionStatus.Refused:
-                model.Reject_Comment = request.Comments;
-                messagingService.OrganisationRegistrationSubmissionRejected(model);
-                break;
-            case Core.Enums.RegistrationSubmissionStatus.Cancelled:
-                model.Cancelled_Comment = request.Comments;
-                messagingService.OrganisationRegistrationSubmissionCancelled(model);
+                break; 
+            case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails 
                 break;
             default: // dont need to send emails
                 break;

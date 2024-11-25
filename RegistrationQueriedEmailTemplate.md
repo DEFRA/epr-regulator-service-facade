@@ -1,9 +1,21 @@
+ 
+# Your application has been queried [Subject line]
 
-# Your EPR registration has been queried 
+
+Application reference number: [application no.]
+
+Organisation: [Organisation name]
+
+Organisation ID: [Org ID]
+
+[Regulator] has queried your application (application number [application no.]) for registration under the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024.
+
  
-The ((agency)) has queried your registration for the ((year)) period.
- 
-((query_comment))
- 
-Regards,
-The Department for Environment, Food and Rural Affairs
+
+We will contact you by email with further details about the query.
+
+If you have not received an email within 7 days, check your junk folder. If you have still not received it, email us [mailto: regulator email address – Thomas to provide] with your organisation ID and application reference number.
+
+This is an automated email. We will not be able to read or respond to any emails you send to this address.
+
+((agency))

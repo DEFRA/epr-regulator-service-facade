@@ -299,44 +299,24 @@ public class MessagingService : IMessagingService
      
     public void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-        ValidateStringParameter(model.Query_Comment, nameof(model.Query_Comment));
+        ValidateOrganisationRegistrationSubmissionModel(model); 
 
         var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId : _messagingConfig.OrganisationRegistrationSubmissionQueriedId;
 
-        _notificationClient.SendEmail(model.Email, templateId, model.GetParameters);
+        _notificationClient.SendEmail(model.ToEmail, templateId, model.GetParameters);
     }
 
-    public void OrganisationRegistrationSubmissionRejected(OrganisationRegistrationSubmissionEmailModel model)
+    public void OrganisationRegistrationSubmissionDecision(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-        ValidateStringParameter(model.Reject_Comment, nameof(model.Reject_Comment));
+        ValidateOrganisationRegistrationSubmissionModel(model); 
 
-        var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionRejectedId : _messagingConfig.OrganisationRegistrationSubmissionRejectedId;
+        var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId : _messagingConfig.OrganisationRegistrationSubmissionDecisionId;
 
-        _notificationClient.SendEmail(model.Email, templateId, model.GetParameters);
-    }
-    public void OrganisationRegistrationSubmissionCancelled(OrganisationRegistrationSubmissionEmailModel model)
-    {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-        ValidateStringParameter(model.Cancelled_Comment, nameof(model.Cancelled_Comment));
-
-        var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionCancelledId : _messagingConfig.OrganisationRegistrationSubmissionCancelledId;
-
-        _notificationClient.SendEmail(model.Email, templateId, model.GetParameters);
-    }
-    public void OrganisationRegistrationSubmissionAccepted(OrganisationRegistrationSubmissionEmailModel model)
-    {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-        ValidateStringParameter(model.Accepted_Comment, nameof(model.Accepted_Comment));
-
-        var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionAcceptedId : _messagingConfig.OrganisationRegistrationSubmissionAcceptedId;
-
-        _notificationClient.SendEmail(model.Email, templateId, model.GetParameters);
-    } 
+        _notificationClient.SendEmail(model.ToEmail, templateId, model.GetParameters);
+    }  
     private static void ValidateOrganisationRegistrationSubmissionModel(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateStringParameter(model.Email, nameof(model.Email)); 
+        ValidateStringParameter(model.ToEmail, nameof(model.ToEmail)); 
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
         ValidateStringParameter(model.OrganisationName, nameof(model.OrganisationName));
         ValidateStringParameter(model.Agency, nameof(model.Agency));
