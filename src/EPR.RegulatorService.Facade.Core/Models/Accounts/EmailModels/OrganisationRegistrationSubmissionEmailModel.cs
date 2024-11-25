@@ -29,7 +29,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
                 var parameters = new Dictionary<string, object>
                 { 
                     { "to_email", this.ToEmail },
-                    { "application_numner", this.ApplicationNumber },
+                    { "application_number", this.ApplicationNumber },
                     { "organisation_number", this.OrganisationNumber },
                     { "organisation_name", this.OrganisationName },
                     { "agency", this.Agency },
