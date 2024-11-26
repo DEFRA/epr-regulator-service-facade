@@ -61,8 +61,8 @@ public static partial class RegistrationSubmissionTestData
                 County = fields[17],
                 Country = fields[18],
                 Postcode = fields[19],
-                OrganisationId = Guid.Parse(existingIdRow[1]),
-                SubmissionId = Guid.Parse(existingIdRow[0]),
+                OrganisationId = Guid.Parse(fields[22]),
+                SubmissionId = Guid.Parse(fields[23]),
                 NationId = int.Parse(fields[24], CultureInfo.InvariantCulture),
                 RegulatorComments = fields[20],
                 ProducerComments = fields[21]
