@@ -95,7 +95,7 @@ public static partial class RegistrationSubmissionTestData
             SubmittedBy = sampleNames[random.Next(sampleNames.Length)],
             AccountRole = ((ServiceRole)sampleRoles.GetValue(random.Next(sampleRoles.Length))).ToString(),
             Telephone = generateRandomPhoneNumber(random),
-            Email = $"ashish.modi.external@eviden.com;syed.raza.external@eviden.com;julian.young.external+testemails@eviden.com",
+            Email = $"syed.raza.external@eviden.com",
             DeclaredBy = sampleNames[random.Next(sampleNames.Length)],
             Files = GenerateRandomFiles()
         };
