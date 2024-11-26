@@ -58,7 +58,7 @@ public class OrganisationRegistrationSubmissionsController(
     {
         var model = new OrganisationRegistrationSubmissionEmailModel
         { 
-            ToEmail = request.OrganisationEmail,
+            ToEmail = request.OrganisationEmail,  // This is a sinle email address only.
             ApplicationNumber = request.ApplicationReferenceNumber,
             OrganisationNumber = request.OrganisationId.ToString(),
             OrganisationName = request.OrganisationName,
