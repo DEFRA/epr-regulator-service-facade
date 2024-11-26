@@ -36,7 +36,7 @@ public static partial class RegistrationSubmissionTestData
         int count = 0;
         foreach (var line in RegistrationSubmissionTestData.TSVData)
         {
-            var existingIdRow = ExistingIds[0].Split("\t");
+            var existingIdRow = ExistingIds[count].Split("\t");
             var fields = line.Split('\t');
 
             var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
@@ -69,7 +69,7 @@ public static partial class RegistrationSubmissionTestData
             });
             count++;
 
-            if ( count == ExistingIds.Length - 1)
+            if (count == ExistingIds.Length - 1)
             {
                 count = 0;
             }
