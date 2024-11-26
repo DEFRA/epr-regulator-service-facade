@@ -6,7 +6,7 @@ Application reference number: ((application_number))
 
 Organisation: ((organisation_name))
 
-Organisation ID: ((organisation_name))
+Organisation ID: ((organisation_number))
 
 ((agency)) has queried your application ((application_number)) for registration under the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024.
  
