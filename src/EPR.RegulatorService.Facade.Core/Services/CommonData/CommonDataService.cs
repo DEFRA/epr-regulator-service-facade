@@ -9,7 +9,6 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData;

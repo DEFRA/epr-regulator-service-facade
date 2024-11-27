@@ -1,7 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
-using Microsoft.Extensions.DependencyModel.Resolution;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,6 +24,8 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
         public string OrganisationSize { get; set; }
         public string OrganisationType { get; set; }
         public int NationId { get; set; }
+
+        public string NationCode { get; set; }
 
         // organisation details
         public string? CompaniesHouseNumber { get; set; }
@@ -87,6 +87,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                         ? organisationType
                         : throw new InvalidCastException($"Invalid OrganisationType: {dto.OrganisationType}"),
                 NationId = dto.NationId,
+                NationCode = dto.NationCode,
                 SubmissionPeriod = dto.SubmissionPeriod,
                 RegistrationYear = dto.RelevantYear.ToString(),
                 RegistrationDateTime = DateTime.ParseExact(dto.SubmittedDateTime, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture),
