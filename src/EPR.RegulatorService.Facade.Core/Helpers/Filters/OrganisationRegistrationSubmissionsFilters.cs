@@ -3,6 +3,7 @@
 namespace EPR.RegulatorService.Facade.Core.Helpers.Filters;
 
 using System;
+using System.Linq;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
@@ -94,12 +95,17 @@ public static class OrganisationRegistrationSubmissionsFilters
     }
 
     public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByRelevantYear(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? relevantYear)
+        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, int? relevantYear)
     {
-        if (string.IsNullOrWhiteSpace(relevantYear)) return queryable;
+        if (relevantYear is null) return queryable;
         queryable = from q in queryable
-            where relevantYear.Contains(q.RegistrationYear)
-            select q;
+                    where relevantYear == q.RegistrationYear
+                    select q;
+
+        //if (string.IsNullOrWhiteSpace(relevantYear)) return queryable;
+        //queryable = from q in queryable
+        //    where relevantYear.Contains(q.RegistrationYear)
+        //    select q;
 
         return queryable;
     }

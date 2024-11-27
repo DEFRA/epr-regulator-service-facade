@@ -47,7 +47,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
                     ApplicationReferenceNumber = fields[4],
                     RegistrationReferenceNumber = fields[5],
                     RegistrationDateTime = dateTime,
-                    RegistrationYear = dateTime.Year.ToString(CultureInfo.InvariantCulture),
+                    RegistrationYear = dateTime.Year,
                     CompaniesHouseNumber = fields[9],
                     BuildingName = fields[10],
                     SubBuildingName = fields[11],

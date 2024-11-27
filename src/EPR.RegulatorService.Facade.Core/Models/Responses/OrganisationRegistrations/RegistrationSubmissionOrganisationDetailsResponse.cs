@@ -22,7 +22,7 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public int NationId { get; init; }
 
     public string NationCode { get; set; }
-    public string RegistrationYear { get; init; }
+    public int RegistrationYear { get; init; }
     public DateTime RegistrationDateTime { get; init; }
     public RegistrationSubmissionStatus SubmissionStatus { get; init; }
     public DateTime? SubmissionStatusPendingDate { get; set; }

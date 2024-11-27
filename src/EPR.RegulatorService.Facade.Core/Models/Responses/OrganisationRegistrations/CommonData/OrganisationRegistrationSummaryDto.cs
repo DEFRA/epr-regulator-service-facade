@@ -48,7 +48,7 @@ public class OrganisationRegistrationSummaryDto
 
         response.SubmissionDate = DateTime.Parse(dto.SubmittedDateTime, CultureInfo.InvariantCulture);
 
-        response.RegistrationYear = dto.RelevantYear.ToString();
+        response.RegistrationYear = dto.RelevantYear;
 
         if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.SubmissionStatus, true, out var submissionStatus))
         {

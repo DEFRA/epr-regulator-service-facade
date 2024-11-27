@@ -22,7 +22,7 @@ public class OrganisationRegistrationSubmissionSummaryResponse
 
     public DateTime SubmissionDate { get; set; }
 
-    public string RegistrationYear { get; set; }
+    public int RegistrationYear { get; set; }
 
     public RegistrationSubmissionStatus SubmissionStatus { get; set; }
 

@@ -89,7 +89,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 NationId = dto.NationId,
                 NationCode = dto.NationCode,
                 SubmissionPeriod = dto.SubmissionPeriod,
-                RegistrationYear = dto.RelevantYear.ToString(),
+                RegistrationYear = dto.RelevantYear,
                 RegistrationDateTime = DateTime.ParseExact(dto.SubmittedDateTime, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture),
                 SubmissionStatus = Enum.TryParse<RegistrationSubmissionStatus>(
                         dto.SubmissionStatus, true, out var submissionStatus)
