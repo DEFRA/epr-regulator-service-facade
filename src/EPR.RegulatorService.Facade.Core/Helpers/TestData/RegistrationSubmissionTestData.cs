@@ -21,7 +21,7 @@ public static partial class RegistrationSubmissionTestData
         var result = DummyData.Find(x => x.SubmissionId == submissionId);
         if (null == result) return null;
         result.SubmissionDetails = GenerateRandomSubmissionData(result.SubmissionStatus);
-        result.RegistrationDateTime = result.SubmissionDetails.TimeAndDateOfSubmission;
+        result.SubmissionDate = result.RegistrationDateTime = result.SubmissionDetails.TimeAndDateOfSubmission;
         result.PaymentDetails = GeneratePaymentDetails();
         result.SubmissionStatusPendingDate = (result.SubmissionStatus == RegistrationSubmissionStatus.Cancelled)
                                             ? DateTime.Now + TimeSpan.FromDays(2)

@@ -15,6 +15,8 @@ public class RegistrationSubmissionOrganisationDetails
     public int NationId { get; init; }
     public string RegistrationYear { get; init; }
     public DateTime RegistrationDateTime { get; set; }
+    public DateTime SubmissionDate { get; set; }
+
     public RegistrationSubmissionStatus SubmissionStatus { get; init; }
     public DateTime? SubmissionStatusPendingDate { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
