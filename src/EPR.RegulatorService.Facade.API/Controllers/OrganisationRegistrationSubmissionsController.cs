@@ -58,9 +58,9 @@ public class OrganisationRegistrationSubmissionsController(
     {
         var model = new OrganisationRegistrationSubmissionEmailModel
         { 
-            ToEmail = request.OrganisationEmail,  // This is a sinle email address only.
+            ToEmail = request.OrganisationEmail,  // This is a single email address only.
             ApplicationNumber = request.ApplicationReferenceNumber,
-            OrganisationNumber = request.OrganisationId.ToString(),
+            OrganisationNumber = request.OrganisationAccountManagementId.ToString(),
             OrganisationName = request.OrganisationName,
             Period = $"20{request.TwoDigitYear}",
             Agency = request.AgencyName,

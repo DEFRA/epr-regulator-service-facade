@@ -18,6 +18,8 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
         public string Agency { get; set; }
 
         public string AgencyEmail { get; set; }
+        public string? AgencyNameWelsh { get; init; }
+        public string? AgencyEmailWelsh { get; init; }
 
         public string Period { get; set; }
 
@@ -33,9 +35,20 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
                     { "organisation_number", this.OrganisationNumber },
                     { "organisation_name", this.OrganisationName },
                     { "agency", this.Agency },
-                    { "agency_email", this.AgencyEmail },
                     { "year", this.Period }
                 };
+
+                if (IsWelsh.Value)
+                {
+                    var emails = this.AgencyEmail.Split(';');
+                    parameters.Add("agency_welsh", "Cyfoeth Naturiol Cymru (CNC)");
+                    parameters.Add("agency_email_welsh", emails[0]);
+                    parameters.Add("agency_email", emails[1]);
+                }
+                else
+                {
+                    parameters.Add("agency_email", this.AgencyEmail); 
+                }
 
                 return parameters; 
             } 

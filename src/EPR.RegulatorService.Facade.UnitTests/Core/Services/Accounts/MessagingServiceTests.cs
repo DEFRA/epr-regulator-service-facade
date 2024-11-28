@@ -843,6 +843,27 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         }
 
         [TestMethod]
+        public void OrganisationRegistrationSubmissionEmailModel_GetParameters()
+        {
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "test@test.com;test2@test.com",
+                Period = "2025",
+                IsWelsh = true,
+            };
+
+            var data = model.GetParameters;
+
+            Assert.AreEqual(data["agency_email_welsh"], "test@test.com");
+            Assert.AreEqual(data["agency_email"], "test2@test.com");
+            Assert.AreEqual(data["agency_welsh"], "Cyfoeth Naturiol Cymru (CNC)"); 
+        }
+
+        [TestMethod]
         public void OrganisationRegistrationSubmissionRejected_SendsEmail()
         {
             var model = new OrganisationRegistrationSubmissionEmailModel
