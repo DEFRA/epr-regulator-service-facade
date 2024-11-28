@@ -115,21 +115,21 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
         files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
         {
             Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.company,
-            FileId = "1",
+            FileId = Guid.NewGuid(),
             FileName = "org.details.acme.csv",
             BlobName = "SubmissionDetails.OrganisationDetails"
         });
         files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
         {
             Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.brands,
-            FileId = "2",
+            FileId = Guid.NewGuid(),
             FileName = "brand.details.acme.csv",
             BlobName = "SubmissionDetails.BrandDetails"
         });
         files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
         {
             Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.partnership,
-            FileId = "3",
+            FileId = Guid.NewGuid(),
             FileName = "partner.details.acme.csv",
             BlobName = "SubmissionDetails.PartnerDetails"
         });

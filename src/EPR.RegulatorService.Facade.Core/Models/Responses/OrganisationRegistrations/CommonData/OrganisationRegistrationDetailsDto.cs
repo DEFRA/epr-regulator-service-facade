@@ -62,13 +62,13 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
         public int NumberOfSubsidiaries { get; set; }
         public int NumberOfOnlineSubsidiaries { get; set; }
 
-        public string CompanyDetailsFileId { get; set; }
-        public string CompanyDetailsFileName { get; set; }
-        public string CompanyDetailsBlobName { get; set; }
-        public string? PartnershipFileId { get; set; }
+        public Guid? CompanyDetailsFileId { get; set; }
+        public string? CompanyDetailsFileName { get; set; }
+        public string? CompanyDetailsBlobName { get; set; }
+        public Guid? PartnershipFileId { get; set; }
         public string? PartnershipFileName { get; set; }
         public string? PartnershipBlobName { get; set; }
-        public string? BrandsFileId { get; set; }
+        public Guid? BrandsFileId { get; set; }
         public string? BrandsFileName { get; set; }
         public string? BrandsBlobName { get; set; }
 
@@ -184,11 +184,11 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
             if (dto.BrandsFileId != null)
             {
-                objRet.Add(new() { FileId = dto.BrandsFileId, FileName = dto.BrandsFileName, BlobName = dto.BrandsBlobName });
+                objRet.Add(new() { Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.brands, FileId = dto.BrandsFileId, FileName = dto.BrandsFileName, BlobName = dto.BrandsBlobName });
             }
             if (dto.PartnershipFileId != null)
             {
-                objRet.Add(new() { FileId = dto.PartnershipFileId, FileName = dto.PartnershipFileName, BlobName = dto.PartnershipBlobName });
+                objRet.Add(new() { Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.partnership, FileId = dto.PartnershipFileId, FileName = dto.PartnershipFileName, BlobName = dto.PartnershipBlobName });
             }
 
             return objRet;

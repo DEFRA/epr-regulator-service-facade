@@ -10,9 +10,9 @@ public class RegistrationSubmissionOrganisationSubmissionSummaryDetails
     public class FileDetails
     {
         public FileType Type { get; set; }
-        public string FileId { get; set; }
+        public Guid? FileId { get; set; }
         public string FileName { get; set; }
-        public string BlobName { get; set; }
+        public string? BlobName { get; set; }
     }
 
     public RegistrationSubmissionStatus Status { get; set; }
