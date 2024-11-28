@@ -23,7 +23,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
             
             result.SubmissionDetails = GenerateRandomSubmissionData(result.SubmissionStatus);
             result.PaymentDetails = GeneratePaymentDetails();
-            result.SubmissionStatusPendingDate = (result.SubmissionStatus == RegistrationSubmissionStatus.Cancelled) 
+            result.StatusPendingDate = (result.SubmissionStatus == RegistrationSubmissionStatus.Cancelled) 
                                                 ? DateTime.Now + TimeSpan.FromDays(2)
                                                 : null;
             return result;
@@ -46,8 +46,8 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
                     SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3], true),
                     ApplicationReferenceNumber = fields[4],
                     RegistrationReferenceNumber = fields[5],
-                    RegistrationDateTime = dateTime,
-                    RegistrationYear = dateTime.Year,
+                    SubmissionDate = dateTime,
+                    RelevantYear = dateTime.Year,
                     CompaniesHouseNumber = fields[9],
                     BuildingName = fields[10],
                     SubBuildingName = fields[11],

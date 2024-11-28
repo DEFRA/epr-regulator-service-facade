@@ -16,7 +16,7 @@ public static class GetOrganisationRegistrationSubmissionsFilterExtensions
         {
             { "OrganisationNameCommaSeparated", convertSpaceToComma(source.OrganisationName) },
             { "OrganisationIDCommaSeparated", convertSpaceToComma(source.OrganisationReference) },
-            { "RelevantYearCommaSeparated", convertSpaceToComma(source.RelevantYears.ToString()) },
+            { "RelevantYearCommaSeparated", convertSpaceToComma(source.RelevantYears) },
             { "SubmissionStatusCommaSeparated", convertSpaceToComma(source.Statuses) },
             { "OrganisationTypesCommaSeparated", convertSpaceToComma(source.OrganisationType) },
             { "PageNumber", source.PageNumber?.ToString() },

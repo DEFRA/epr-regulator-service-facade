@@ -30,7 +30,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
                 .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted)
                 .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Queried)
                 .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Pending)
-                .ThenBy(x => x.RegistrationDateTime)
+                .ThenBy(x => x.SubmissionDate)
                 .Skip((filter.PageNumber.Value - 1) * filter.PageSize.Value)
                 .Take(filter.PageSize.Value)
                 .Select(x => (OrganisationRegistrationSubmissionSummaryResponse)x)

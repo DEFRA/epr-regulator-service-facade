@@ -14,22 +14,22 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 [ExcludeFromCodeCoverage]
 public class RegistrationSubmissionOrganisationDetailsResponse
 {
-    public Guid SubmissionId { get; init; }
-    public Guid OrganisationId { get; init; }
-    public string OrganisationReference { get; init; }
-    public string OrganisationName { get; init; }
-    public RegistrationSubmissionOrganisationType OrganisationType { get; init; }
-    public int NationId { get; init; }
-
+    public Guid SubmissionId { get; set; }
+    public Guid OrganisationId { get; set; }
+    public string OrganisationReference { get; set; }
+    public string OrganisationName { get; set; }
+    public RegistrationSubmissionOrganisationType OrganisationType { get; set; }
+    public int NationId { get; set; }
     public string NationCode { get; set; }
-    public int RegistrationYear { get; init; }
-    public DateTime RegistrationDateTime { get; init; }
-    public RegistrationSubmissionStatus SubmissionStatus { get; init; }
-    public DateTime? SubmissionStatusPendingDate { get; set; }
+
+    public int RelevantYear { get; set; }
+    public DateTime SubmissionDate { get; set; }
+    public RegistrationSubmissionStatus SubmissionStatus { get; set; }
+    public DateTime? StatusPendingDate { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
     public string? ProducerComments { get; set; } = string.Empty;
-    public string ApplicationReferenceNumber { get; init; } = string.Empty;
-    public string? RegistrationReferenceNumber { get; init; } = string.Empty;
+    public string ApplicationReferenceNumber { get; set; } = string.Empty;
+    public string? RegistrationReferenceNumber { get; set; } = string.Empty;
     public string CompaniesHouseNumber { get; set; }
     public string? BuildingName { get; set; }
     public string? SubBuildingName { get; set; }
@@ -44,8 +44,8 @@ public class RegistrationSubmissionOrganisationDetailsResponse
 
     public RegistrationSubmissionOrganisationSubmissionSummaryDetails SubmissionDetails { get; set; }
     public RegistrationSubmissionsOrganisationPaymentDetails PaymentDetails { get; set; }
-    public string? RegulatorDecisionDate { get; internal set; }
-    public string? ProducerCommentDate { get; internal set; }
+    public DateTime? RegulatorDecisionDate { get; internal set; }
+    public DateTime? ProducerCommentDate { get; internal set; }
     public Guid? RegulatorUserId { get; internal set; }
     public bool IsOnlineMarketPlace { get; internal set; }
     public int NumberOfSubsidiaries { get; internal set; }
@@ -63,12 +63,12 @@ public class RegistrationSubmissionOrganisationDetailsResponse
             OrganisationName = details.OrganisationName,
             OrganisationType = details.OrganisationType,
             OrganisationReference = details.OrganisationReference,
-            RegistrationYear = details.RegistrationYear,
+            RegistrationYear = details.RelevantYear,
             SubmissionStatus = details.SubmissionStatus,
-            StatusPendingDate = details.SubmissionStatusPendingDate,
+            StatusPendingDate = details.StatusPendingDate,
             ApplicationReferenceNumber = details.ApplicationReferenceNumber,
             RegistrationReferenceNumber = details.RegistrationReferenceNumber,
             NationId = details.NationId,
-            SubmissionDate = details.RegistrationDateTime
+            SubmissionDate = details.SubmissionDate
         };
 }

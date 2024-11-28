@@ -73,19 +73,13 @@ public class CommonDataService(
         return ConvertCommonDataCollectionToFEData(jsonObject);
     }
 
-    private PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection)
+    private static PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection) => new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()
     {
-        return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()
-        {
-            items = commonDataPaginatedCollection.items.Select(x => (OrganisationRegistrationSubmissionSummaryResponse)x).ToList(),
-            totalItems = commonDataPaginatedCollection.totalItems,
-            currentPage = commonDataPaginatedCollection.currentPage,
-            pageSize = commonDataPaginatedCollection.pageSize
-        };
-    }
+        items = commonDataPaginatedCollection.items.Select(x => (OrganisationRegistrationSubmissionSummaryResponse)x).ToList(),
+        totalItems = commonDataPaginatedCollection.totalItems,
+        currentPage = commonDataPaginatedCollection.currentPage,
+        pageSize = commonDataPaginatedCollection.pageSize
+    };
 
-    private RegistrationSubmissionOrganisationDetailsResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
-    {
-        return jsonObject == null ? null : (RegistrationSubmissionOrganisationDetailsResponse)jsonObject;
-    }
+    private static RegistrationSubmissionOrganisationDetailsResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject) => jsonObject == null ? null : (RegistrationSubmissionOrganisationDetailsResponse)jsonObject;
 }
