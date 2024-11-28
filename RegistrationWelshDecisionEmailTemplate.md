@@ -16,7 +16,7 @@ Os na fyddwch chi wedi cael neges ebost o fewn 21 diwrnod, gwiriwch eich ffolder
 
 Neges ebost awtomataidd yw hon. Fyddwn ni ddim yn gallu darllen unrhyw negeseuon ebost y byddwch chi’n eu hanfon i'r cyfeiriad yma nac ymateb iddyn nhw.
 
-agency_welsh
+((agency_welsh))
 
  
 Application reference number: ((application_number))
