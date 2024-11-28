@@ -17,9 +17,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
 
         public string Agency { get; set; }
 
-        public string AgencyEmail { get; set; }
-        //public string? AgencyNameWelsh { get; init; }
-        //public string? AgencyEmailWelsh { get; init; }
+        public string AgencyEmail { get; set; } 
 
         public string Period { get; set; }
 

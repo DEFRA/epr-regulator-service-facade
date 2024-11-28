@@ -858,9 +858,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 
             var data = model.GetParameters;
 
-            Assert.AreEqual(data["agency_email_welsh"], "test@test.com");
-            Assert.AreEqual(data["agency_email"], "test2@test.com");
-            Assert.AreEqual(data["agency_welsh"], "Cyfoeth Naturiol Cymru (CNC)"); 
+            Assert.AreEqual( "test@test.com", data["agency_email_welsh"]);
+            Assert.AreEqual( "test2@test.com", data["agency_email"]);
+            Assert.AreEqual( "Cyfoeth Naturiol Cymru (CNC)", data["agency_welsh"]); 
         }
 
         [TestMethod]
