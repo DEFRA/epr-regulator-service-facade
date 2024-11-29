@@ -1,11 +1,11 @@
  
 # Mae eich cais wedi�i gwestiynu / Your application has been queried [Subject line]
 
-**Rhif cyfeirnod y cais**: ((application_number))
+Rhif cyfeirnod y cais: ((application_number))
 
-**Sefydliad**: ((organisation_name))
+Sefydliad: ((organisation_name))
 
-**ID y sefydliad**: ((organisation_number))
+ID y sefydliad: ((organisation_number))
 
 Mae ((agency_welsh)) wedi cwestiynau�ch cais (cais rhif [application no.]) am gofrestru o dan Reoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024.
 
@@ -19,11 +19,11 @@ Neges ebost awtomataidd yw hon. Fyddwn ni ddim yn gallu darllen unrhyw negeseuon
 
 ---
  
-**Application reference number**: ((application_number))
+Application reference number: ((application_number))
 
-**Organisation**: ((organisation_name))
+Organisation: ((organisation_name))
 
-**Organisation ID**: ((organisation_number))
+Organisation ID: ((organisation_number))
 
 ((agency)) has queried your application ((application_number)) for registration under the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024.
  
