@@ -2,11 +2,11 @@
 # A decision has been made on your application [Subject line]
 
  
-Application reference number: ((application_number))
+**Application reference number**: ((application_number))
 
-Organisation: ((organisation_name))
+**Organisation**: ((organisation_name))
 
-Organisation ID: ((organisation_number))
+**Organisation ID**: ((organisation_number))
 
 The ((agency)) has made a decision on your application (application number ((application_number))) for registration under the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024.
 

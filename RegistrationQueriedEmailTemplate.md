@@ -2,11 +2,11 @@
 # Your application has been queried [Subject line]
 
 
-Application reference number: ((application_number))
+**Application reference number**: ((application_number))
 
-Organisation: ((organisation_name))
+**Organisation**: ((organisation_name))
 
-Organisation ID: ((organisation_number))
+**Organisation ID**: ((organisation_number))
 
 The ((agency)) has queried your application ((application_number)) for registration under the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024.
  

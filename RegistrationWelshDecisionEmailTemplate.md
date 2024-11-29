@@ -1,29 +1,30 @@
 
 # Mae penderfyniad wedi'i wneud ar eich cais / A decision has been made on your application [Subject line]
 
-Rhif cyfeirnod y cais: ((application_number))
+**Rhif cyfeirnod y cais**: ((application_number))
 
-Sefydliad: ((organisation_name))
+**Sefydliad**: ((organisation_name))
 
-ID y sefydliad: ((organisation_number))
+**ID y sefydliad**: ((organisation_number))
 
 	
 Mae ((agency_welsh)) wedi gwneud penderfyniad ar eich cais (cais rhif ((application_number))) am gofrestru o dan Reoliadau Rhwymedigaethau Cyfrifoldeb Cynhyrchwyr (Pecynwaith a Gwastraff Pecynwaith) 2024.
 
-Byddwn yn cysylltu â chi drwy’r ebost gyda manylion pellach am y penderfyniad.
+Byddwn yn cysylltu ï¿½ chi drwyï¿½r ebost gyda manylion pellach am y penderfyniad.
 
 Os na fyddwch chi wedi cael neges ebost o fewn 21 diwrnod, gwiriwch eich ffolder sothach. Os byddwch yn dal heb ei chael, [anfonwch neges ebost aton ni](mailto:((agency_email_welsh)) ) gydag ID eich sefydliad a rhif cyfeirnod eich cais.
 
-Neges ebost awtomataidd yw hon. Fyddwn ni ddim yn gallu darllen unrhyw negeseuon ebost y byddwch chi’n eu hanfon i'r cyfeiriad yma nac ymateb iddyn nhw.
+Neges ebost awtomataidd yw hon. Fyddwn ni ddim yn gallu darllen unrhyw negeseuon ebost y byddwch chiï¿½n eu hanfon i'r cyfeiriad yma nac ymateb iddyn nhw.
 
 ((agency_welsh))
 
+---
  
-Application reference number: ((application_number))
+**Application reference number**: ((application_number))
 
-Organisation: ((organisation_name))
+**Organisation**: ((organisation_name))
 
-Organisation ID: ((organisation_number))
+**Organisation ID**: ((organisation_number))
 
 ((agency)) has made a decision on your application (application number ((application_number))) for registration under the Producer Responsibility Obligations (Packaging and Packaging Waste) Regulations 2024.
 
