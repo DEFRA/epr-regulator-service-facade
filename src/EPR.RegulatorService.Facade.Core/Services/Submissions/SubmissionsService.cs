@@ -11,12 +11,14 @@ public class SubmissionsService(
     private readonly SubmissionsApiConfig _config = options.Value;
 
     public async Task<HttpResponseMessage> CreateSubmissionEvent<T>(Guid submissionId, T request, Guid userId)
-    { 
-       ConfigureHttpClient(userId); 
-       
-       var url = string.Format($"{_config.Endpoints.CreateSubmissionEvent}", _config.ApiVersion, submissionId);
-        
-       return await httpClient.PostAsJsonAsync(url, request);
+    {
+        ConfigureHttpClient(userId);
+
+        var url = string.Format($"{_config.Endpoints.CreateSubmissionEvent}", _config.ApiVersion, submissionId);
+
+        var response = await httpClient.PostAsJsonAsync(url, request);
+
+        return response;
     }
 
     public async Task<HttpResponseMessage> GetDeltaPoMSubmissions(DateTime lastSyncTime, Guid userId)
@@ -27,7 +29,7 @@ public class SubmissionsService(
 
         return await httpClient.GetAsync(url);
     }
-    
+
     public async Task<HttpResponseMessage> GetDeltaRegistrationSubmissions(DateTime lastSyncTime, Guid userId)
     {
         ConfigureHttpClient(userId);
