@@ -71,10 +71,10 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
         public Guid? BrandsFileId { get; set; }
         public string? BrandsFileName { get; set; }
         public string? BrandsBlobName { get; set; }
+        public string? CSOJson { get; set; }
 
         public static implicit operator RegistrationSubmissionOrganisationDetailsResponse(OrganisationRegistrationDetailsDto dto)
         {
-            DateTime tempDate;
 
             if (dto is null) return null;
 
@@ -95,6 +95,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             {
                 response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
             }
+
             response.StatusPendingDate = !string.IsNullOrWhiteSpace(dto.StatusPendingDate)
                 ? DateTime.ParseExact(dto.StatusPendingDate, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)
                 : null;
@@ -105,6 +106,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
             response.IsComplianceScheme = dto.IsComplianceScheme;
             response.OrganisationSize = dto.OrganisationSize;
+            
             if (Enum.TryParse<RegistrationSubmissionOrganisationType>(dto.OrganisationType, true, out var organisationType))
             {
                 response.OrganisationType = organisationType;
@@ -113,12 +115,13 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             {
                 response.OrganisationType = RegistrationSubmissionOrganisationType.none;
             }
+            
             response.NationId = dto.NationId;
             response.NationCode = dto.NationCode;
 
             response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
             response.ProducerComments = dto.ProducerComment ?? string.Empty;
-            response.RegulatorDecisionDate = (DateTime.TryParse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture, out tempDate)
+            response.RegulatorDecisionDate = (DateTime.TryParse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture, out DateTime tempDate)
                                                                         ? tempDate
                                                                         : (DateTime?)null);
             response.ProducerCommentDate = (DateTime.TryParse(dto.ProducerCommentDate, CultureInfo.InvariantCulture, out tempDate)
@@ -142,6 +145,8 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             response.NumberOfSubsidiaries = dto.NumberOfSubsidiaries;
             response.NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries;
             response.IsLateSubmission = dto.IsLateSubmission;
+
+            response.CSOJson = dto.CSOJson;
 
             // Creating and assigning SubmissionDetails
             var submissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails

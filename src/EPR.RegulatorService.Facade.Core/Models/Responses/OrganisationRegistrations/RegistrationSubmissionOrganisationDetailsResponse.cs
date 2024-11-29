@@ -54,6 +54,7 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public string OrganisationSize { get; internal set; }
     public bool IsComplianceScheme { get; internal set; }
     public string SubmissionPeriod { get; internal set; }
+    public string? CSOJson { get; internal set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
         (RegistrationSubmissionOrganisationDetailsResponse details) => new()
