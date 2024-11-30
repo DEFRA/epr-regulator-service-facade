@@ -32,10 +32,10 @@ public class OrganisationRegistrationSubmissionsController(
 
             var serviceResult =
                 await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
-                    GetUserId(request.UserId)); 
+                    GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
-            { 
+            {
                 SendEventEmail(request);
                 return Created();
             }
@@ -150,30 +150,37 @@ public class OrganisationRegistrationSubmissionsController(
 
     private void SendEventEmail(RegulatorDecisionCreateRequest request)
     {
-        var model = new OrganisationRegistrationSubmissionEmailModel
+        try
         {
-            ToEmail = request.OrganisationEmail,
-            ApplicationNumber = request.ApplicationReferenceNumber,
-            OrganisationNumber = request.OrganisationId.ToString(),
-            OrganisationName = request.OrganisationName,
-            Period = $"20{request.TwoDigitYear}",
-            Agency = request.AgencyName,
-            AgencyEmail = request.AgencyEmail,
-            IsWelsh = request.IsWelsh,
-        };
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = request.OrganisationEmail,
+                ApplicationNumber = request.ApplicationReferenceNumber,
+                OrganisationNumber = request.OrganisationId.ToString(),
+                OrganisationName = request.OrganisationName,
+                Period = $"20{request.TwoDigitYear}",
+                Agency = request.AgencyName,
+                AgencyEmail = request.AgencyEmail,
+                IsWelsh = request.IsWelsh,
+            };
 
-        switch (request.Status)
+            switch (request.Status)
+            {
+                case Core.Enums.RegistrationSubmissionStatus.Refused:
+                case Core.Enums.RegistrationSubmissionStatus.Granted:
+                    messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
+                    break;
+                case Core.Enums.RegistrationSubmissionStatus.Queried:
+                    messagingService.OrganisationRegistrationSubmissionQueried(model);
+                    break;
+                case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails  
+                default: // dont need to send emails
+                    break;
+            }
+        }
+        catch(Exception ex)
         {
-            case Core.Enums.RegistrationSubmissionStatus.Refused:
-            case Core.Enums.RegistrationSubmissionStatus.Granted:
-                messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
-                break;
-            case Core.Enums.RegistrationSubmissionStatus.Queried:
-                messagingService.OrganisationRegistrationSubmissionQueried(model);
-                break;
-            case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails  
-            default: // dont need to send emails
-                break;
+            logger.LogError(ex, $"Exception during {nameof(SendEventEmail)}");
         }
     }
 
