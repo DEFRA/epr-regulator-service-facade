@@ -24,4 +24,9 @@ public class MessagingConfig
     public string PromotedApprovedUserTemplateId { get; set; } = string.Empty;
     public string InviteNewApprovedPersonTemplateId { get; set; } = string.Empty;
     public string AccountCreationUrl { get; set; } = string.Empty;
+
+    public string OrganisationRegistrationSubmissionQueriedId { get; set; } = string.Empty;
+    public string OrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty; 
+    public string WelshOrganisationRegistrationSubmissionQueriedId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty; 
 }

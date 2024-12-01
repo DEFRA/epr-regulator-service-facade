@@ -27,9 +27,11 @@ public class RegulatorDecisionCreateRequest
 
     public Guid? UserId { get; init; }
 
-    public CountryName CountryName { get; init; }
+    public CountryName? CountryName { get; init; }
 
-    public RegistrationSubmissionType RegistrationSubmissionType { get; init; }
+    public RegistrationSubmissionType? RegistrationSubmissionType { get; init; }
+
+    public string ApplicationReferenceNumber { get; init; }
 
     public string? TwoDigitYear { get; init; }
 
@@ -37,4 +39,17 @@ public class RegulatorDecisionCreateRequest
     public string? OrganisationAccountManagementId { get; init; }
 
     public DateTime? DecisionDate { get; set; }
+     
+    // add agency name here from FE
+    public string?  AgencyName { get; init; }
+    public string? AgencyEmail { get; init; }
+    // org name   here from FE
+    public string? OrganisationName { get; init; }
+    // org ref  here from FE
+    public string? OrganisationReference { get; init; }
+    // org email here from FE
+    public string? OrganisationEmail { get; init; }
+    // required for the welsh email templates
+    public bool? IsWelsh { get; init; } = false;
+
 }

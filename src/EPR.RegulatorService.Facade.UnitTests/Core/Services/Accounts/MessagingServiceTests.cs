@@ -803,7 +803,145 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null), Times.Exactly(1));
          }
 
-         [TestMethod]
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionQueried_SendsEmail()
+        {
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                Period = "2025" 
+            };
+
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null)) ;
+
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    OrganisationRegistrationSubmissionQueriedId = "SomeInviteNewApprovedPersonTemplateId"
+                });
+
+             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            _sut.OrganisationRegistrationSubmissionQueried(model);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.Is<string>(x => x == model.ToEmail),
+               It.Is<string>(x => x == messagingConfig.Value.OrganisationRegistrationSubmissionQueriedId),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionEmailModel_GetParameters()
+        {
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "test@test.com;test2@test.com",
+                Period = "2025",
+                IsWelsh = true,
+            };
+
+            var data = model.GetParameters;
+
+            Assert.AreEqual( "test@test.com", data["agency_email_welsh"]);
+            Assert.AreEqual( "test2@test.com", data["agency_email"]);
+            Assert.AreEqual( "Cyfoeth Naturiol Cymru (CNC)", data["agency_welsh"]); 
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionRejected_SendsEmail()
+        {
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                Period = "2025" 
+            };
+
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
+
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    OrganisationRegistrationSubmissionDecisionId = "SomeInviteNewApprovedPersonTemplateId"
+                });
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            _sut.OrganisationRegistrationSubmissionDecision(model);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.Is<string>(x => x == model.ToEmail),
+               It.Is<string>(x => x == messagingConfig.Value.OrganisationRegistrationSubmissionDecisionId),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
+         
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionAccepted_SendsEmail()
+        {
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                Period = "2025" 
+            };
+
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
+
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    OrganisationRegistrationSubmissionDecisionId = "SomeInviteNewApprovedPersonTemplateId"
+                });
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            _sut.OrganisationRegistrationSubmissionDecision(model);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.Is<string>(x => x == model.ToEmail),
+               It.Is<string>(x => x == messagingConfig.Value.OrganisationRegistrationSubmissionDecisionId),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
+
+        [TestMethod]
          [DataRow("", "InvitedUserFirstName",
              "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
          [DataRow("test@test.com", "",
