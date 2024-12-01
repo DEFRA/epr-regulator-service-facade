@@ -7,6 +7,7 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
@@ -43,7 +44,6 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public string Postcode { get; set; }
 
     public RegistrationSubmissionOrganisationSubmissionSummaryDetails SubmissionDetails { get; set; }
-    public RegistrationSubmissionsOrganisationPaymentDetails PaymentDetails { get; set; }
     public DateTime? RegulatorDecisionDate { get; internal set; }
     public DateTime? ProducerCommentDate { get; internal set; }
     public Guid? RegulatorUserId { get; internal set; }
@@ -54,7 +54,7 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public string OrganisationSize { get; internal set; }
     public bool IsComplianceScheme { get; internal set; }
     public string SubmissionPeriod { get; internal set; }
-    public string? CSOJson { get; internal set; }
+    public List<CsoMembershipDetailsDto> CsoMembershipDetails { get; set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
         (RegistrationSubmissionOrganisationDetailsResponse details) => new()

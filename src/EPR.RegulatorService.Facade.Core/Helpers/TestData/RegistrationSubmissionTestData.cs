@@ -22,7 +22,6 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
             if ( null == result) return null;
             
             result.SubmissionDetails = GenerateRandomSubmissionData(result.SubmissionStatus);
-            result.PaymentDetails = GeneratePaymentDetails();
             result.StatusPendingDate = (result.SubmissionStatus == RegistrationSubmissionStatus.Cancelled) 
                                                 ? DateTime.Now + TimeSpan.FromDays(2)
                                                 : null;

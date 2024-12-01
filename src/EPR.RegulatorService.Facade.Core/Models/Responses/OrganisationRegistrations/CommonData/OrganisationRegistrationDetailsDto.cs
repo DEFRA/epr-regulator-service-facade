@@ -146,8 +146,6 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             response.NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries;
             response.IsLateSubmission = dto.IsLateSubmission;
 
-            response.CSOJson = dto.CSOJson;
-
             // Creating and assigning SubmissionDetails
             var submissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails
             {

@@ -9,13 +9,15 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData;
 
 public class CommonDataService(
     HttpClient httpClient,
-    IOptions<CommonDataApiConfig> options)
+    IOptions<CommonDataApiConfig> options,
+    ILogger<CommonDataService> logger)
     : ICommonDataService
 {
     private readonly CommonDataApiConfig _config = options.Value;
@@ -51,6 +53,11 @@ public class CommonDataService(
 
         string content = await response.Content.ReadAsStringAsync();
 
+        if ( string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
         var jsonObject = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(content, _deserialisationOptions);
 
         return ConvertCommonDataDetailToFEData(jsonObject);
@@ -81,5 +88,25 @@ public class CommonDataService(
         pageSize = commonDataPaginatedCollection.pageSize
     };
 
-    private static RegistrationSubmissionOrganisationDetailsResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject) => jsonObject == null ? null : (RegistrationSubmissionOrganisationDetailsResponse)jsonObject;
+    private RegistrationSubmissionOrganisationDetailsResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
+    {
+        if ( jsonObject == null) return null;
+
+        var objRet = (RegistrationSubmissionOrganisationDetailsResponse)jsonObject;
+
+        if (!string.IsNullOrWhiteSpace(jsonObject.CSOJson))
+        {
+            try
+            {
+                List<CsoMembershipDetailsDto> csoDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(jsonObject.CSOJson);
+                objRet.CsoMembershipDetails = csoDetails;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Cannot parse the CSO Membership details JSON object");
+            }
+        }
+
+        return objRet;
+    }
 }
