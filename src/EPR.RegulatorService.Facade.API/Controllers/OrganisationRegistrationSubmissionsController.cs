@@ -81,8 +81,6 @@ public class OrganisationRegistrationSubmissionsController(
             logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
             return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
         }
-
-        return Problem();
     }
 
     [HttpPost]
