@@ -74,6 +74,17 @@ public class CommonDataService(
 
         string content = await response.Content.ReadAsStringAsync();
 
+        if ( string.IsNullOrWhiteSpace(content))
+        {
+            return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
+            {
+                currentPage = 1,
+                pageSize = filter.PageSize ?? 20,
+                totalItems = 0,
+                items = []
+            };
+        }
+
         var jsonObject = JsonSerializer.Deserialize<PaginatedResponse<OrganisationRegistrationSummaryDto>>(content, _deserialisationOptions);
 
         return ConvertCommonDataCollectionToFEData(jsonObject);

@@ -15,8 +15,6 @@ public static class OrganisationRegistrationSubmissionsFilters
         GetOrganisationRegistrationSubmissionsFilter filters) => queryable
         .FilterByOrganisationName(filters.OrganisationName)
         .FilterByOrganisationRef(filters.OrganisationReference)
-        .FilterByApplicationRef(filters.ApplicationReferenceNumber)
-        .FilterByRegistrationRef(filters.RegistrationReferenceNumber)
         .FilterByOrganisationType(filters.OrganisationType)
         .FilterBySubmissionStatus(filters.Statuses)
         .FilterByRelevantYear(filters.RelevantYears);

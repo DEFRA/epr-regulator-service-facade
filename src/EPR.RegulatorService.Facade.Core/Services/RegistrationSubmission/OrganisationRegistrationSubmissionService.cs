@@ -18,7 +18,20 @@ public class OrganisationRegistrationSubmissionService(
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
         GetOrganisationRegistrationSubmissionsFilter filter)
     {
-        return await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
+        try
+        {
+            return await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
+        }
+        catch (HttpIOException ex)
+        {
+            return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
+            {
+                currentPage = 1,
+                pageSize = filter.PageSize ?? 20,
+                totalItems = 0,
+                items = []
+            };
+        }
     }
 
     public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId)
