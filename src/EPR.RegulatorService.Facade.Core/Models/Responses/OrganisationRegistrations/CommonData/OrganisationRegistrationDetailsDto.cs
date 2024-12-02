@@ -95,7 +95,6 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             {
                 response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
             }
-
             response.StatusPendingDate = !string.IsNullOrWhiteSpace(dto.StatusPendingDate)
                 ? DateTime.ParseExact(dto.StatusPendingDate, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)
                 : null;
@@ -152,7 +151,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 AccountRoleId = dto.ServiceRoleId,
                 AccountRole = dto.ServiceRole,
                 SubmittedOnTime = dto.IsLateSubmission,
-                DecisionDate = (DateTime.TryParse(dto.StatusPendingDate, CultureInfo.InvariantCulture, out tempDate)
+                DecisionDate = (DateTime.TryParse(dto.StatusPendingDate ?? dto.RegulatorDecisionDate, CultureInfo.InvariantCulture, out tempDate)
                                                                         ? tempDate
                                                                         : (DateTime?)null),
                 Email = dto.Email,
