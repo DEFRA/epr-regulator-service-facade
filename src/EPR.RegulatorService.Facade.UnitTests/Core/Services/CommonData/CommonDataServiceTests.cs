@@ -269,6 +269,22 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
+    public async Task Should_Return_Null_When_HTTP_Results_AreEmpty()
+    {
+        var submissionId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
+        object expectedResult = null;
+
+        SetupNullApiSuccessCall(JsonSerializer.Serialize(expectedResult));
+
+        // Act
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+
+        results.Should().BeNull();
+    }
+
+    [TestMethod]
     public async Task Should_Return_Success_When_Fetching_Summary_List()
     {
         GetOrganisationRegistrationSubmissionsFilter filter = new()
@@ -329,6 +345,21 @@ public class CommonDataServiceTests
             .Build<HttpResponseMessage>()
             .With(x => x.StatusCode, HttpStatusCode.OK)
             .With(x => x.Content, new StringContent(content))
+            .Create();
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == _expectedUrl),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(apiResponse).Verifiable();
+    }
+
+    private void SetupNullApiSuccessCall(string content)
+    {
+        var apiResponse = _fixture
+            .Build<HttpResponseMessage>()
+            .With(x => x.StatusCode, HttpStatusCode.OK)
+            .With(x => x.Content, new StringContent(string.Empty))
             .Create();
 
         _httpMessageHandlerMock.Protected()

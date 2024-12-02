@@ -63,7 +63,6 @@ public class CommonDataService(
         return ConvertCommonDataDetailToFEData(jsonObject);
     }
 
-    [ExcludeFromCodeCoverage]
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{filter.GenerateQueryString()}";
@@ -80,6 +79,7 @@ public class CommonDataService(
         return ConvertCommonDataCollectionToFEData(jsonObject);
     }
 
+    [ExcludeFromCodeCoverage]
     private static PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection) => new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()
     {
         items = commonDataPaginatedCollection.items.Select(x => (OrganisationRegistrationSubmissionSummaryResponse)x).ToList(),
@@ -88,6 +88,7 @@ public class CommonDataService(
         pageSize = commonDataPaginatedCollection.pageSize
     };
 
+    [ExcludeFromCodeCoverage]
     private RegistrationSubmissionOrganisationDetailsResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
     {
         if ( jsonObject == null) return null;
