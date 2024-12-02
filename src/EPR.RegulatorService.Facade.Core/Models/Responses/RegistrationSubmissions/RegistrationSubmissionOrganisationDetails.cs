@@ -5,7 +5,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistration
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 [ExcludeFromCodeCoverage]
-public class RegistrationSubmissionOrganisationDetails
+public class OLDRegistrationSubmissionOrganisationDetails
 {
     public Guid SubmissionId { get; init; }
     public Guid OrganisationId { get; init; }
@@ -39,14 +39,14 @@ public class RegistrationSubmissionOrganisationDetails
     public RegistrationSubmissionsOrganisationPaymentDetails PaymentDetails { get; set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
-        (RegistrationSubmissionOrganisationDetails details) => new ()
+        (OLDRegistrationSubmissionOrganisationDetails details) => new ()
     {
         SubmissionId = details.SubmissionId,
         OrganisationId = details.OrganisationId,
         OrganisationName = details.OrganisationName,
         OrganisationType = details.OrganisationType,
         OrganisationReference = details.OrganisationReference,
-        RegistrationYear = details.RegistrationYear,
+        //RegistrationYear = details.RegistrationYear,
         SubmissionStatus = details.SubmissionStatus,
         StatusPendingDate = details.SubmissionStatusPendingDate,
         ApplicationReferenceNumber = details.ApplicationReferenceNumber,

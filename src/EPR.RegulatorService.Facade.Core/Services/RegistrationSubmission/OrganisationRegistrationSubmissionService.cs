@@ -21,7 +21,7 @@ public class OrganisationRegistrationSubmissionService(
         return await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetails?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId)
+    public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId)
     {
         return await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
     }

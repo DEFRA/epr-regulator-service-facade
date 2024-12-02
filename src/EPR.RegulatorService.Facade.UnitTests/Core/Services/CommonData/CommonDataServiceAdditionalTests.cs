@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
@@ -21,6 +22,7 @@ public class CommonDataServiceAdditionalTests
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock = new();
     private IOptions<CommonDataApiConfig> _configuration = default!;
+    private readonly ILogger<CommonDataService> _logger = new Mock<ILogger<CommonDataService>>().Object;
     private const string BaseAddress = "http://localhost";
     private const string GetPoMSubmissions = "GetPoMSubmissions";
     private HttpClient _httpClient;
@@ -45,7 +47,7 @@ public class CommonDataServiceAdditionalTests
             BaseAddress = new Uri(BaseAddress)
         };
 
-        _sut = new CommonDataService(_httpClient, _configuration);
+        _sut = new CommonDataService(_httpClient, _configuration, _logger);
     }
 
     [TestMethod]

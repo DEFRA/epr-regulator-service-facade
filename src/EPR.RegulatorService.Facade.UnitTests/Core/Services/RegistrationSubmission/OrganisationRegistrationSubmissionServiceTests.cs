@@ -77,7 +77,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetails
+        var response = new RegistrationSubmissionOrganisationDetailsResponse
         {
 
             OrganisationReference = "ORGREF1234567890",

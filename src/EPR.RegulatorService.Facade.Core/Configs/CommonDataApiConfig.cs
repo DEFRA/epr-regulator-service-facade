@@ -20,5 +20,5 @@ public class CommonDataServiceEndpoints
 
     public string GetOrganisationRegistrationSubmissionDetails { get; set; } = null!;
 
-    public string GetOrganisationRegistrationSubmissions { get; set; } = null!;
+    public string GetOrganisationRegistrationSubmissionsSummaries { get; set; } = null!;
 }

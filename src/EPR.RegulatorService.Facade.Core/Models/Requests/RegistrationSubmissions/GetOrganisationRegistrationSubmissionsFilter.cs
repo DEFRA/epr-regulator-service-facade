@@ -13,7 +13,10 @@ public class GetOrganisationRegistrationSubmissionsFilter
     public string? RelevantYears { get; set; }
     public string? ApplicationReferenceNumber { get; set; }
     public string? RegistrationReferenceNumber { get; set; }
-    
+
+    [Required]
+    [Range(1, 4, ErrorMessage = "The nationId must be valid")]
+    public int NationId { get; set; }
     [Required]
     public int? PageNumber { get; set; } = 1;
     
