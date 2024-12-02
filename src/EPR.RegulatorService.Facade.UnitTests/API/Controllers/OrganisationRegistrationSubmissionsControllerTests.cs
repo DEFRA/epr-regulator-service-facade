@@ -2,6 +2,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
@@ -18,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
+using System.Text;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers;
 
@@ -111,6 +114,47 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Should_Fetach_UserId_from_HttpContext_When_Input_Reuqest_UserId_Is_Null()
+    {
+        // Arrange
+        var request = new RegulatorDecisionCreateRequest
+        {
+            OrganisationId = Guid.NewGuid(),
+            Status = RegistrationSubmissionStatus.None,
+            SubmissionId = Guid.NewGuid(),
+            CountryName = CountryName.Eng,
+            RegistrationSubmissionType = RegistrationSubmissionType.Producer,
+            TwoDigitYear = "99",
+            OrganisationAccountManagementId = "123456",
+            DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc),
+            AgencyName = "Agency Name",
+            Comments = "Comment text",
+            OrganisationEmail = "Organisation email address",
+            OrganisationName = "Organisation name",
+            OrganisationReference = "Organisation reference"
+        };
+
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        _registrationSubmissionServiceMock.Setup(s =>
+        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as CreatedResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+    }
+
+    [TestMethod]
     [DataRow(HttpStatusCode.InternalServerError)]
     [DataRow(HttpStatusCode.BadGateway)]
     [DataRow(HttpStatusCode.ServiceUnavailable)]
@@ -151,6 +195,85 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    public async Task When_InputRequest_InValid_Then_CreateRegulatorSubmissionDecisionEvent_Should_Returns_ValidationProblemDetails()
+    {
+        // Arrange
+        var request = new RegulatorDecisionCreateRequest
+        {
+            OrganisationId = Guid.NewGuid(),
+            Status = RegistrationSubmissionStatus.Refused,
+            SubmissionId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Comments = "comments"
+        };
+
+        string jsonRequest = JsonSerializer.Serialize(new ValidationProblemDetails { Status = 400 });
+        var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.BadRequest)
+                    .With(x => x.Content, stringContent)
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Value.Should().BeOfType(typeof(ValidationProblemDetails));
+        ((ProblemDetails)result.Value).Status.Should().Be(400);
+
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    [DataRow(HttpStatusCode.InternalServerError)]
+    [DataRow(HttpStatusCode.BadGateway)]
+    [DataRow(HttpStatusCode.ServiceUnavailable)]
+    public async Task Should_CreateRegulatorSubmissionDecisionEvent_Returns_ResonsCodes_What_OrganisationRegistrationSubmissionService_Returns(HttpStatusCode httpStatusCode)
+    {
+        // Arrange
+        var request = new RegulatorDecisionCreateRequest
+        {
+            OrganisationId = Guid.NewGuid(),
+            Status = RegistrationSubmissionStatus.Refused,
+            SubmissionId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Comments = "comments"
+        };
+
+        string jsonRequest = JsonSerializer.Serialize(new ProblemDetails { Status = (int)httpStatusCode });
+        var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, httpStatusCode)
+                    .With(x => x.Content, stringContent)
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Value.Should().BeOfType(typeof(ProblemDetails));
+        ((ProblemDetails)result.Value).Status.Should().Be((int)httpStatusCode);
+
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
     }
 
 
@@ -434,5 +557,52 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception, string>>()
             ), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+
+    public async Task Should_Return_Created_When_SubmissionService_Returns_Success_StatusCode_And_SendEventEmail_Fail()
+    {
+        // Arrange
+        var request = new RegulatorDecisionCreateRequest
+        {
+            OrganisationId = Guid.NewGuid(),
+            Status = RegistrationSubmissionStatus.Granted,
+            SubmissionId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            CountryName = CountryName.Eng,
+            RegistrationSubmissionType = RegistrationSubmissionType.Producer,
+            TwoDigitYear = "99",
+            OrganisationAccountManagementId = "123456",
+            DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc),
+            AgencyName = "Agency Name",
+            Comments = "Comment text",
+            OrganisationEmail = "Organisation email address",
+            OrganisationName = "Organisation name",
+            OrganisationReference = "Organisation reference"
+        };
+
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        _registrationSubmissionServiceMock.Setup(s =>
+        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
+
+        _messageServiceMock.Setup(x => x.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>())).Throws(new Exception("Test Exception"));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as CreatedResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
     }
 }

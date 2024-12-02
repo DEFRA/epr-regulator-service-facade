@@ -1,18 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
 public class OrganisationRegistrationSubmissionsController(
-    IOrganisationRegistrationSubmissionService organisationRegistrationHelper,
+    IOrganisationRegistrationSubmissionService organisationRegistrationSubmissionService,
     ILogger<OrganisationRegistrationSubmissionsController> logger, 
     IMessagingService messagingService) : Controller
 {
@@ -33,53 +31,21 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var serviceResult =
-                await organisationRegistrationHelper.HandleCreateRegulatorDecisionSubmissionEvent(request,
+                await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
                     GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
-            { 
+            {
                 SendEventEmail(request);
                 return Created();
             }
 
-            logger.LogError("Cannot create submission event: {StatusCode} with message {Message}",
-                serviceResult.StatusCode, serviceResult.Content);
+            return await Problem(serviceResult);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
             return Problem($"Exception occurred processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
-        }
-
-        return Problem();
-    }
-
-    private void SendEventEmail(RegulatorDecisionCreateRequest request)
-    {
-        var model = new OrganisationRegistrationSubmissionEmailModel
-        { 
-            ToEmail = request.OrganisationEmail,  // This is a single email address only.
-            ApplicationNumber = request.ApplicationReferenceNumber,
-            OrganisationNumber = request.OrganisationAccountManagementId.ToString(),
-            OrganisationName = request.OrganisationName,
-            Period = $"20{request.TwoDigitYear}",
-            Agency = request.AgencyName,
-            AgencyEmail = request.AgencyEmail,
-            IsWelsh = request.IsWelsh,
-        };
-
-        switch (request.Status)
-        {
-            case Core.Enums.RegistrationSubmissionStatus.Refused: 
-            case Core.Enums.RegistrationSubmissionStatus.Granted: 
-                messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
-                break;
-            case Core.Enums.RegistrationSubmissionStatus.Queried: 
-                messagingService.OrganisationRegistrationSubmissionQueried(model);
-                break; 
-            case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails  
-            default: // dont need to send emails
-                break;
         }
     }
 
@@ -100,7 +66,7 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var serviceResult =
-                await organisationRegistrationHelper.HandleCreateRegistrationFeePaymentSubmissionEvent(request,
+                await organisationRegistrationSubmissionService.HandleCreateRegistrationFeePaymentSubmissionEvent(request,
                     GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
@@ -108,16 +74,13 @@ public class OrganisationRegistrationSubmissionsController(
                 return Created();
             }
 
-            logger.LogError("Cannot create submission event: {StatusCode} with message {Message}",
-                serviceResult.StatusCode, serviceResult.Content);
+            return await Problem(serviceResult);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
             return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
         }
-
-        return Problem();
     }
 
     [HttpPost]
@@ -136,7 +99,7 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
-            var result = await organisationRegistrationHelper.HandleGetRegistrationSubmissionList(filter);
+            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter);
 
             return Ok(result);
         }
@@ -165,7 +128,7 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationHelper.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
 
             if (null == result)
             {
@@ -183,6 +146,42 @@ public class OrganisationRegistrationSubmissionsController(
         }
     }
 
+    private void SendEventEmail(RegulatorDecisionCreateRequest request)
+    {
+        try
+        {
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = request.OrganisationEmail,
+                ApplicationNumber = request.ApplicationReferenceNumber,
+                OrganisationNumber = request.OrganisationId.ToString(),
+                OrganisationName = request.OrganisationName,
+                Period = $"20{request.TwoDigitYear}",
+                Agency = request.AgencyName,
+                AgencyEmail = request.AgencyEmail,
+                IsWelsh = request.IsWelsh,
+            };
+
+            switch (request.Status)
+            {
+                case Core.Enums.RegistrationSubmissionStatus.Refused:
+                case Core.Enums.RegistrationSubmissionStatus.Granted:
+                    messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
+                    break;
+                case Core.Enums.RegistrationSubmissionStatus.Queried:
+                    messagingService.OrganisationRegistrationSubmissionQueried(model);
+                    break;
+                case Core.Enums.RegistrationSubmissionStatus.Cancelled:  // dont need to send emails  
+                default: // dont need to send emails
+                    break;
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(SendEventEmail)}");
+        }
+    }
+
     private Guid GetUserId(Guid? defaultId)
     {
         if (defaultId is null)
@@ -191,5 +190,16 @@ public class OrganisationRegistrationSubmissionsController(
         }
 
         return (Guid)defaultId;
+    }
+    private async Task<IActionResult> Problem(HttpResponseMessage serviceResult)
+    {
+        if (serviceResult.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            var validationProblemDetails = await serviceResult.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+            return ValidationProblem(validationProblemDetails);
+        }
+
+        var problemDetails = await serviceResult.Content.ReadFromJsonAsync<ProblemDetails>();
+        return Problem(statusCode: problemDetails.Status, detail: problemDetails.Detail);
     }
 }
