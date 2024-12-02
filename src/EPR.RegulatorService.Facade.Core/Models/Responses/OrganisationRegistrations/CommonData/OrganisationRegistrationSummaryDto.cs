@@ -1,8 +1,10 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 
+[ExcludeFromCodeCoverage]
 public class OrganisationRegistrationSummaryDto
 {
     public Guid SubmissionId { get; set; }
