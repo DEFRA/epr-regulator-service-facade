@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using Microsoft.Extensions.Options;
@@ -35,6 +36,20 @@ public class SubmissionsService(
         ConfigureHttpClient(userId);
 
         var url = string.Format($"{_config.Endpoints.GetRegistrationSubmissions}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss")}", _config.ApiVersion);
+
+        return await httpClient.GetAsync(url);
+    }
+
+    public async Task<HttpResponseMessage> GetDeltaOrganisationRegistrationEvents(DateTime lastSyncTime, Guid userId, Guid? SubmissionId)
+    {
+        ConfigureHttpClient(userId);
+
+        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationEvents}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)}", _config.ApiVersion);
+
+        if ( SubmissionId.HasValue )
+        {
+            url += "&SubmissionId={SubmissionId}";
+        }
 
         return await httpClient.GetAsync(url);
     }

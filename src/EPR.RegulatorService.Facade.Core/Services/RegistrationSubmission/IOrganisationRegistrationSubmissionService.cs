@@ -8,9 +8,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 public interface IOrganisationRegistrationSubmissionService
 {
-    Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter);
+    Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter, Guid userId);
 
-    Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId);
+    Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId);
 
     Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(RegulatorDecisionCreateRequest request, Guid userId);
 

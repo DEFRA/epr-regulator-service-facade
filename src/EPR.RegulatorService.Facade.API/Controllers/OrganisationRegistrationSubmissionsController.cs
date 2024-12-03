@@ -99,7 +99,7 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
-            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter);
+            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter, User.UserId());
 
             return Ok(result);
         }
@@ -128,7 +128,7 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
 
             if (null == result)
             {

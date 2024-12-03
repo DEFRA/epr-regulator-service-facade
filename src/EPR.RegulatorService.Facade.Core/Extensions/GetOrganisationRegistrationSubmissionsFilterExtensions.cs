@@ -19,6 +19,7 @@ public static class GetOrganisationRegistrationSubmissionsFilterExtensions
             { "RelevantYearCommaSeparated", convertSpaceToComma(source.RelevantYears) },
             { "SubmissionStatusCommaSeparated", convertSpaceToComma(source.Statuses) },
             { "OrganisationTypesCommaSeparated", convertSpaceToComma(source.OrganisationType) },
+            { "ApplicationReferenceNumbers", convertSpaceToComma(source.ApplicationReferenceNumbers) },
             { "PageNumber", source.PageNumber?.ToString() },
             { "PageSize", source.PageSize?.ToString() }
         };

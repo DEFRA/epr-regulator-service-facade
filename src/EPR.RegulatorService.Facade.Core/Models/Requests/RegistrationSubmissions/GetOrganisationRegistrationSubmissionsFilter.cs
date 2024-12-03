@@ -20,4 +20,6 @@ public class GetOrganisationRegistrationSubmissionsFilter
     
     [Required]
     public int? PageSize { get; set; } = 20;
+
+    public string? ApplicationReferenceNumbers { get; set; }
 }
