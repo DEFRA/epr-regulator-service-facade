@@ -107,10 +107,6 @@ public class OrganisationRegistrationSubmissionService(
                     {
                         item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
                     }
-                    else
-                    {
-                        item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    }
                 }
             }
         }
@@ -122,16 +118,16 @@ public class OrganisationRegistrationSubmissionService(
 
         if (cosmosItems.Any())
         {
-            foreach ( var cosmosItem in cosmosItems)
+            foreach (var cosmosItem in cosmosItems)
             {
-                if ( cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
+                if (cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
                 {
                     item.RegulatorComments = cosmosItem.Comments;
                     item.RegulatorDecisionDate = cosmosItem.Created;
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                     item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
-                } 
+                }
                 else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
                 {
                     item.ProducerComments = cosmosItem.Comments;
