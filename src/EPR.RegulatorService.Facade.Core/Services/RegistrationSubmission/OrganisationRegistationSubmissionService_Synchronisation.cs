@@ -5,6 +5,7 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -155,6 +156,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             );
         }
 
+        [DebuggerDisplay("{Type},{AppReferenceNumber},{Created},{Decision},{DecisionDate}")]
         public class AbstractCosmosSubmissionEvent
         {
             public string AppReferenceNumber { get; set; }

@@ -77,6 +77,15 @@ public class OrganisationRegistrationDetailsDto
 
     public static implicit operator RegistrationSubmissionOrganisationDetailsResponse(OrganisationRegistrationDetailsDto dto)
     {
+        static DateTime? convertDateTime(string dateTimeString)
+        {
+            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime tempDate)
+            || !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, out tempDate))
+            {
+                return null;
+            }
+            return tempDate;
+        }
 
         if (dto is null) return null;
 
@@ -97,10 +106,9 @@ public class OrganisationRegistrationDetailsDto
         {
             response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
         }
-        response.StatusPendingDate = !string.IsNullOrWhiteSpace(dto.StatusPendingDate)
-            ? DateTime.ParseExact(dto.StatusPendingDate, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture)
-            : null;
-        response.SubmissionDate = DateTime.ParseExact( dto.SubmittedDateTime, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture);
+        
+        response.StatusPendingDate = convertDateTime(dto.StatusPendingDate);
+        response.SubmissionDate = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow;
         response.IsLateSubmission = dto.IsLateSubmission;
         response.SubmissionPeriod = dto.SubmissionPeriod;
         response.RelevantYear = dto.RelevantYear;
@@ -122,12 +130,8 @@ public class OrganisationRegistrationDetailsDto
 
         response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
         response.ProducerComments = dto.ProducerComment ?? string.Empty;
-        response.RegulatorDecisionDate = (DateTime.TryParse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture, out DateTime tempDate)
-                                                                    ? tempDate
-                                                                    : (DateTime?)null);
-        response.ProducerCommentDate = (DateTime.TryParse(dto.ProducerCommentDate, CultureInfo.InvariantCulture, out tempDate)
-                                                                    ? tempDate
-                                                                    : (DateTime?)null);
+        response.RegulatorDecisionDate = convertDateTime(dto.RegulatorDecisionDate);
+        response.ProducerCommentDate = convertDateTime(dto.ProducerCommentDate);
         response.RegulatorUserId = dto.RegulatorUserId;
 
         response.CompaniesHouseNumber = dto.CompaniesHouseNumber ?? string.Empty;
@@ -153,11 +157,9 @@ public class OrganisationRegistrationDetailsDto
             AccountRoleId = dto.ServiceRoleId,
             AccountRole = dto.ServiceRole,
             SubmittedOnTime = dto.IsLateSubmission,
-            DecisionDate = (DateTime.TryParse(dto.StatusPendingDate ?? dto.RegulatorDecisionDate, CultureInfo.InvariantCulture, out tempDate)
-                                                                    ? tempDate
-                                                                    : (DateTime?)null),
+            DecisionDate = convertDateTime(dto.StatusPendingDate ?? dto.RegulatorDecisionDate),
             Email = dto.Email,
-            TimeAndDateOfSubmission = DateTime.Parse(dto.SubmittedDateTime, CultureInfo.InvariantCulture),
+            TimeAndDateOfSubmission = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow,
             Telephone = dto.Telephone,
             SubmittedBy = $"{dto.FirstName} {dto.LastName}",
             DeclaredBy = response.OrganisationType == RegistrationSubmissionOrganisationType.compliance
