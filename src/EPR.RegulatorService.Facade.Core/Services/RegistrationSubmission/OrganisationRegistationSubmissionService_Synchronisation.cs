@@ -58,8 +58,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             {
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
                                   && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
+                var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).ToList();
+                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created );
 
-                foreach (var cosmosItem in cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)))
+                foreach (var cosmosItem in regulatorDecisions)
                 {
                     if (item.RegulatorCommentDate is null || cosmosItem.Created > item.RegulatorCommentDate)
                     {
@@ -69,10 +71,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                         item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                     }
                 }
-                foreach (var cosmosItem in cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)))
+                foreach (var cosmosDate in producerComments)
                 {
-                    item.ProducerCommentDate = cosmosItem.Created;
-                    if (item.RegulatorCommentDate is null || cosmosItem.Created > item.RegulatorCommentDate)
+                    item.ProducerCommentDate = cosmosDate;
+                    if (item.RegulatorCommentDate is null || cosmosDate > item.RegulatorCommentDate)
                     {
                         item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
                     }
@@ -84,25 +86,28 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
         {
             var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
 
-            if (cosmosItems.Any())
+            foreach (var cosmosItem in cosmosItems)
             {
-                foreach (var cosmosItem in cosmosItems)
+                if (cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
-                    {
-                        AssignRegulatorDetails(item, cosmosItem);
-                    }
-                    else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
-                    {
-                        AssignProducerDetails(item, cosmosItem);
-                    }
+                    AssignRegulatorDetails(item, cosmosItem);
                 }
+                else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
+                {
+                    AssignProducerDetails(item, cosmosItem);
+                }
+            }
+
+            if ( item.ProducerCommentDate is not null && item.RegulatorDecisionDate is not null && item.ProducerCommentDate > item.RegulatorDecisionDate)
+            {
+                item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
+                item.SubmissionDetails.Status = item.SubmissionStatus;
             }
         }
 
         private static void AssignProducerDetails(RegistrationSubmissionOrganisationDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
         {
-            if (cosmosItem.Created > item.ProducerCommentDate)
+            if (item.ProducerCommentDate is null || cosmosItem.Created >= item.ProducerCommentDate)
             {
                 item.ProducerComments = cosmosItem.Comments;
                 item.ProducerCommentDate = cosmosItem.Created;
@@ -112,7 +117,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 item.ProducerComments += $"<br/>{cosmosItem.Comments}";
             }
 
-            if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
+            if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
             {
                 item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
                 item.SubmissionDetails.Status = item.SubmissionStatus;
@@ -121,7 +126,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
         private static void AssignRegulatorDetails(RegistrationSubmissionOrganisationDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
         {
-            if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
+            if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
             {
                 item.RegulatorComments = cosmosItem.Comments;
                 item.RegulatorDecisionDate = cosmosItem.Created;
