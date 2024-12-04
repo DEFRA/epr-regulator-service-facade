@@ -126,6 +126,7 @@ public class OrganisationRegistrationSubmissionService(
                     item.RegulatorDecisionDate = cosmosItem.Created;
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    item.SubmissionDetails.Status = item.SubmissionStatus;
                     item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
                 }
                 else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
@@ -135,6 +136,7 @@ public class OrganisationRegistrationSubmissionService(
                     if (cosmosItem.Created > item.RegulatorDecisionDate)
                     {
                         item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
+                        item.SubmissionDetails.Status = item.SubmissionStatus;
                     }
                 }
             }
