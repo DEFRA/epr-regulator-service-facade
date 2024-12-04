@@ -8,7 +8,6 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
@@ -36,7 +35,6 @@ public class OrganisationRegistrationSubmissionService(
         try
         {
             lastSyncTime = await GetLastSyncTime();
-
         }
         catch (Exception ex)
         {
@@ -167,7 +165,7 @@ public class OrganisationRegistrationSubmissionService(
     private async Task<DateTime?> GetLastSyncTime()
     {
         var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
-        if (!lastSyncResponse.IsSuccessStatusCode)
+        if (lastSyncResponse is null || !lastSyncResponse.IsSuccessStatusCode)
         {
             return null;
         }
@@ -196,7 +194,7 @@ public class OrganisationRegistrationSubmissionService(
 
         if (deltaRegistrationDecisionsResponse.IsSuccessStatusCode)
         {
-            var jsonString = deltaRegistrationDecisionsResponse.Content.ReadAsStringAsync().Result;
+            var jsonString = await deltaRegistrationDecisionsResponse.Content.ReadAsStringAsync();
             var serverCollection = JsonSerializer.Deserialize<AbstractCosmosSubmissionEvent[]>(jsonString, _jsonOptions);
             if (serverCollection.Length > 0)
             {

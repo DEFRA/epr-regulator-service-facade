@@ -5,8 +5,8 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistration
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
+using Microsoft.Extensions.Logging;
 using Moq;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -21,7 +21,8 @@ public class OrganisationRegistrationSubmissionServiceTests
     public void Setup()
     {
         _sut = new OrganisationRegistrationSubmissionService(_commonDataServiceMock.Object,
-                                                             _submissionsServiceMock.Object);
+                                                             _submissionsServiceMock.Object,
+                                                             new Mock<ILogger<OrganisationRegistrationSubmissionService>>().Object);
     }
     
     [TestMethod]
@@ -52,8 +53,6 @@ public class OrganisationRegistrationSubmissionServiceTests
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
-            ApplicationReferenceNumber = "APPREF123",
-            RegistrationReferenceNumber = "REGREF456",
             OrganisationType = "LARGE",
 
         };
@@ -62,7 +61,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()).Verifiable();
 
         //Act
-        var result = _sut.HandleGetRegistrationSubmissionList(filterRequest);
+        var result = _sut.HandleGetRegistrationSubmissionList(filterRequest, Guid.NewGuid());
 
         //Assert
         Assert.IsNotNull(result);
@@ -92,7 +91,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             .ReturnsAsync(response).Verifiable();
 
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
 
         //Assert
         Assert.IsNotNull(result);

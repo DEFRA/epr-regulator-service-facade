@@ -1,5 +1,4 @@
-﻿using EPR.RegulatorService.Facade.Core.Attributes;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
@@ -22,11 +21,6 @@ public class GetOrganisationRegistrationSubmissionsFilter
     
     [Required]
     public int? PageSize { get; set; } = 20;
-
-    [Required]
-    [NotNull]
-    [NotDefault]
-    public Guid UserId { get; set; }
 
     public static implicit operator GetOrganisationRegistrationSubmissionsCommonDataFilter(GetOrganisationRegistrationSubmissionsFilter rhs) => new()
     {

@@ -42,7 +42,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         _registrationSubmissionServiceFake = new OrganisationRegistrationSubmissionService(
             _commonDataServiceMock.Object,
-            _submissionsServiceMock.Object);
+            _submissionsServiceMock.Object,
+            new Mock<ILogger<OrganisationRegistrationSubmissionService>>().Object);
 
         _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceFake, _ctlLoggerMock.Object, _messageServiceMock.Object);
 
@@ -295,7 +296,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
 
     [TestMethod]
-    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataServiice_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_500_Internal_Server_Error()
     {
         // Arrange 
 
@@ -316,7 +317,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataServiice_Fails_Then_Should_Returns_NotFoundResult()
+    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
     {
         // Arrange 
 
@@ -359,7 +360,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _sut.ModelState.AddModelError("PageNumber", "PageNumber is required");
 
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
                     .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>());
 
         // Act
@@ -377,11 +378,11 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod()]
-    public async Task GetRegistrationSubmissionListTest_Should_Return_Problem_WhenCommonDataThrowsException()
+    public async Task GetRegistrationSubmissionListTest_Should_Return_OK_With_DefaultList_WhenCommonDataThrowsException()
     {
         // Arrange
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
                     .Throws(new InvalidDataException("Invalid"));
 
         // Act
@@ -389,7 +390,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var statusCodeResult = result as ObjectResult;
-        statusCodeResult?.StatusCode.Should().Be(500);
+        statusCodeResult?.StatusCode.Should().Be(200);
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
     }
 
@@ -398,7 +399,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         var expectedResult = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>();
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
                     .ReturnsAsync(expectedResult);
 
         // Act
