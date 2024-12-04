@@ -46,7 +46,6 @@ public class CommonDataService(
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
      
-        httpClient.Timeout = TimeSpan.FromSeconds(300);
         var response = await httpClient.GetAsync(url);
 
         response.EnsureSuccessStatusCode();
@@ -63,11 +62,10 @@ public class CommonDataService(
         return ConvertCommonDataDetailToFEData(jsonObject);
     }
 
-    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
+    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsCommonDataFilter filter)
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{filter.GenerateQueryString()}";
 
-        httpClient.Timeout = TimeSpan.FromSeconds(300);
         var response = await httpClient.GetAsync(url);
 
         response.EnsureSuccessStatusCode();

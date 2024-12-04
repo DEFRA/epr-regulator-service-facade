@@ -99,7 +99,7 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
-            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter);
+            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter, filter.UserId);
 
             return Ok(result);
         }
@@ -118,7 +118,7 @@ public class OrganisationRegistrationSubmissionsController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Route("organisation-registration-submission-details/{submissionId:Guid}")]
-    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
+    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId, [Required][FromQuery] Guid UserId)
     {
         try
         {
@@ -128,7 +128,7 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, UserId);
 
             if (null == result)
             {
