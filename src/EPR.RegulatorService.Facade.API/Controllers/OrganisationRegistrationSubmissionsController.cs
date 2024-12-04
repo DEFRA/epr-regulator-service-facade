@@ -130,7 +130,7 @@ public class OrganisationRegistrationSubmissionsController(
             var result =
                 await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
 
-            if (null == result)
+            if (result is null)
             {
                 return NotFound();
             }

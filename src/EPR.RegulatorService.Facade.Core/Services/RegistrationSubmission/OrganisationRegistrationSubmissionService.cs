@@ -215,7 +215,7 @@ public class OrganisationRegistrationSubmissionService(
             MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
         }
 
-        return null;
+        return requestedItem;
     }
 
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
