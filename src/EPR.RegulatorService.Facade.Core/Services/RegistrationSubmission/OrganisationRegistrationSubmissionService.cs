@@ -136,10 +136,6 @@ public class OrganisationRegistrationSubmissionService(
                     {
                         item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
                     }
-                    else
-                    {
-                        item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    }
                 }
             }
         }
