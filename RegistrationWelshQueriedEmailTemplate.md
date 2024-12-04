@@ -11,7 +11,7 @@ Mae ((agency_welsh)) wedi cwestiynau�ch cais (cais rhif [application no.]) am 
 
 Byddwn yn cysylltu � chi drwy�r ebost gyda manylion pellach am yr ymholiad.
 
-Os na fyddwch chi wedi cael neges ebost o fewn 21 diwrnod, gwiriwch eich ffolder sothach. Os byddwch yn dal heb ei chael, [anfonwch neges ebost aton ni](mailto:((agency_email_welsh)) ) gydag ID eich sefydliad a rhif cyfeirnod eich cais.
+Os na fyddwch chi wedi cael neges ebost o fewn 21 diwrnod, gwiriwch eich ffolder sothach. Os byddwch yn dal heb ei chael, anfonwch neges ebost aton ni ((agency_email_welsh)) gydag ID eich sefydliad a rhif cyfeirnod eich cais.
 
 Neges ebost awtomataidd yw hon. Fyddwn ni ddim yn gallu darllen unrhyw negeseuon ebost y byddwch chi�n eu hanfon i'r cyfeiriad yma nac ymateb iddyn nhw.
 
@@ -29,7 +29,7 @@ Organisation ID: ((organisation_number))
  
 We will contact you by email with further details about the query.
 
-If you have not received an email within 21 days, check your junk folder. If you have still not received it, [email us](mailto:((agency_email)) ) with your organisation ID and application reference number.
+If you have not received an email within 21 days, check your junk folder. If you have still not received it, send an email to ((agency_email)) with your organisation ID and application reference number.
 
 This is an automated email. We will not be able to read or respond to any emails you send to this address.
 
