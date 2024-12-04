@@ -44,12 +44,7 @@ public class SubmissionsService(
     {
         ConfigureHttpClient(userId);
 
-        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationEvents}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)}", _config.ApiVersion);
-
-        if ( SubmissionId.HasValue )
-        {
-            url += "&SubmissionId={SubmissionId}";
-        }
+        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationEvents}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)}&SubmissionId={SubmissionId}", _config.ApiVersion);
 
         return await httpClient.GetAsync(url);
     }

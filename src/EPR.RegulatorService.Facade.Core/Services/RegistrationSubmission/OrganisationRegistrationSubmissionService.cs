@@ -1,8 +1,5 @@
-﻿using System.ComponentModel;
-using System.Globalization;
-using System.Net;
+﻿using System.Globalization;
 using System.Net.Http.Json;
-using System.Runtime.InteropServices.ObjectiveC;
 using System.Security.Cryptography;
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Enums;
@@ -12,34 +9,55 @@ using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
-using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic.FileIO;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
 public class OrganisationRegistrationSubmissionService(
     ICommonDataService commonDataService,
-    ISubmissionService submissionService) : IOrganisationRegistrationSubmissionService
+    ISubmissionService submissionService,
+    ILogger<OrganisationRegistrationSubmissionService> logger) : IOrganisationRegistrationSubmissionService
 {
+    private static JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
-        GetOrganisationRegistrationSubmissionsFilter filter, Guid userId)
+        GetOrganisationRegistrationSubmissionsCommonDataFilter filter, Guid userId)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
+        DateTime? lastSyncTime = null;
 
         try
         {
-            var lastSyncTime = await GetLastSyncTime();
+            lastSyncTime = await GetLastSyncTime();
 
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred getting the last Sync time in {MethodName}.", nameof(HandleGetRegistrationSubmissionList));
+            throw;
+        }
+
+        try
+        {
             if (lastSyncTime.HasValue)
             {
                 deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId);
             }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred getting the latest submissionsevents {MethodName}.", nameof(HandleGetRegistrationSubmissionList));
+        }
 
+        try
+        {
             if (deltaRegistrationDecisionsResponse.Count > 0 && !string.IsNullOrWhiteSpace(filter.Statuses))
             {
                 ApplyAppRefNumbersForRequiredStatuses(deltaRegistrationDecisionsResponse, filter.Statuses, filter);
@@ -47,16 +65,17 @@ public class OrganisationRegistrationSubmissionService(
 
             PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList =
                     await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
-        
-            if( deltaRegistrationDecisionsResponse.Count > 0)
+
+            if (deltaRegistrationDecisionsResponse.Count > 0)
             {
                 MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
             }
 
             return requestedList;
         }
-        catch
+        catch (Exception ex)
         {
+            logger.LogError(ex, "An error occurred getting the latest submissions {MethodName}.", nameof(HandleGetRegistrationSubmissionList));
             return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
             {
                 currentPage = 1,
@@ -71,22 +90,26 @@ public class OrganisationRegistrationSubmissionService(
     {
         foreach (var item in requestedList.items)
         {
-            var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
+            var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
             if (cosmosItems.Any())
             {
-                foreach (var cosmosItem in cosmosItems.Where(x => x.SubmissionType.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))) {
-                    item.RegulatorCommentDate = cosmosItem.CreatedDate;
+                foreach (var cosmosItem in cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)))
+                {
+                    item.RegulatorCommentDate = cosmosItem.Created;
+                    item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber ?? item.RegistrationReferenceNumber;
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                 }
-                foreach (var cosmosItem in cosmosItems.Where(x => x.SubmissionType.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))) {
-                    item.RegulatorCommentDate = cosmosItem.CreatedDate;
+                foreach (var cosmosItem in cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)))
+                {
+                    item.RegulatorCommentDate = cosmosItem.Created;
                     item.StatusPendingDate = cosmosItem.DecisionDate;
-                    item.ProducerCommentDate = cosmosItem.CreatedDate;
-                    if (cosmosItem.CreatedDate > item.RegulatorCommentDate)
+                    item.ProducerCommentDate = cosmosItem.Created;
+                    if (cosmosItem.Created > item.RegulatorCommentDate)
                     {
                         item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
-                    } else
+                    }
+                    else
                     {
                         item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                     }
@@ -95,45 +118,40 @@ public class OrganisationRegistrationSubmissionService(
         }
     }
 
-    private void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsResponse requestedItem)
+    private static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsResponse item)
     {
-        throw new NotImplementedException();
-    }
+        var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
 
-
-    private static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, OrganisationRegistrationDetailsDto item)
-    {
-        var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
-        
         if (cosmosItems.Any())
         {
-            DateTime? regDecisionDate = null;
-            string? regDecisionDateString = null;
-
-            foreach (var cosmosItem in cosmosItems.Where(x => x.SubmissionType.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))) {
-                regDecisionDate = cosmosItem.CreatedDate;
-                regDecisionDateString = cosmosItem.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
-                item.RegulatorComment = cosmosItem.Comments;
-                item.RegulatorDecisionDate = regDecisionDateString;
-                item.StatusPendingDate = cosmosItem.DecisionDate?.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
-                item.SubmissionStatus = cosmosItem.Decision;
-            }
-            foreach (var cosmosItem in cosmosItems.Where(x => x.SubmissionType.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))) {
-                item.ProducerComment = cosmosItem.Comments;
-                item.ProducerCommentDate = cosmosItem.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
-                if (cosmosItem.CreatedDate > regDecisionDate)
+            foreach ( var cosmosItem in cosmosItems)
+            {
+                if ( cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
                 {
-                    item.SubmissionStatus = RegistrationSubmissionStatus.Updated.ToString(CultureInfo.InvariantCulture);
-                }
-                else
+                    item.RegulatorComments = cosmosItem.Comments;
+                    item.RegulatorDecisionDate = cosmosItem.Created;
+                    item.StatusPendingDate = cosmosItem.DecisionDate;
+                    item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
+                } 
+                else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
                 {
-                    item.SubmissionStatus = cosmosItem.Decision;
+                    item.ProducerComments = cosmosItem.Comments;
+                    item.ProducerCommentDate = cosmosItem.Created;
+                    if (cosmosItem.Created > item.RegulatorDecisionDate)
+                    {
+                        item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
+                    }
+                    else
+                    {
+                        item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    }
                 }
             }
         }
     }
 
-    private static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsFilter filter )
+    private static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsCommonDataFilter filter)
     {
         filter.ApplicationReferenceNumbers = string.Join(" ",
             statuses
@@ -160,13 +178,14 @@ public class OrganisationRegistrationSubmissionService(
 
     public class AbstractCosmosSubmissionEvent
     {
-        public string SubmissionType { get; set; }
-        public string SubmissionId { get; set; }
         public string AppReferenceNumber { get; set; }
+        public DateTime Created { get; set; }
         public string Comments { get; set; }
         public string Decision { get; set; }
         public DateTime? DecisionDate { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string RegistrationReferenceNumber { get; set; }
+        public Guid SubmissionId { get; set; }
+        public string Type { get; set; }
     }
 
     private async Task<List<AbstractCosmosSubmissionEvent>> GetDeltaSubmissionEvents(DateTime? lastSyncTime, Guid userId, Guid? SubmissionId = null)
@@ -178,7 +197,7 @@ public class OrganisationRegistrationSubmissionService(
         if (deltaRegistrationDecisionsResponse.IsSuccessStatusCode)
         {
             var jsonString = deltaRegistrationDecisionsResponse.Content.ReadAsStringAsync().Result;
-            var serverCollection = JsonSerializer.Deserialize<AbstractCosmosSubmissionEvent[]>(jsonString);
+            var serverCollection = JsonSerializer.Deserialize<AbstractCosmosSubmissionEvent[]>(jsonString, _jsonOptions);
             if (serverCollection.Length > 0)
             {
                 results.AddRange(serverCollection);
@@ -191,7 +210,7 @@ public class OrganisationRegistrationSubmissionService(
     public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
-        
+
         var lastSyncTime = await GetLastSyncTime();
 
         if (lastSyncTime.HasValue)
@@ -200,7 +219,7 @@ public class OrganisationRegistrationSubmissionService(
         }
 
         var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
-        
+
         if (deltaRegistrationDecisionsResponse.Count > 0)
         {
             MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
