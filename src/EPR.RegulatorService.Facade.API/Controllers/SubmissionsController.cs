@@ -186,7 +186,7 @@ public class SubmissionsController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return ValidationProblem();
+            return ValidationProblem(ModelState);
         }
 
         var lastSyncResponse = await _commonDataService.GetSubmissionLastSyncTime();

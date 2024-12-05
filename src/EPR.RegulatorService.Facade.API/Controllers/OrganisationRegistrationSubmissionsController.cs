@@ -107,7 +107,7 @@ public class OrganisationRegistrationSubmissionsController(
         {
             logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionList)}");
             return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionList)}",
-                HttpContext.Request.Path,
+                HttpContext?.Request?.Path,
                 StatusCodes.Status500InternalServerError);
         }
     }
