@@ -34,27 +34,12 @@ public partial class OrganisationRegistrationSubmissionService(
         try
         {
             lastSyncTime = await GetLastSyncTime();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred getting the last Sync time in {MethodName}.", nameof(HandleGetRegistrationSubmissionList));
-            throw;
-        }
 
-        try
-        {
             if (lastSyncTime.HasValue)
             {
                 deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId);
             }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred getting the latest submissionsevents {MethodName}.", nameof(HandleGetRegistrationSubmissionList));
-        }
 
-        try
-        {
             if (deltaRegistrationDecisionsResponse.Count > 0 && !string.IsNullOrWhiteSpace(filter.Statuses))
             {
                 ApplyAppRefNumbersForRequiredStatuses(deltaRegistrationDecisionsResponse, filter.Statuses, filter);

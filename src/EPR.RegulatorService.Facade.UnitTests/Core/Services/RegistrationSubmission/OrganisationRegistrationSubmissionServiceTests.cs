@@ -76,6 +76,80 @@ public class OrganisationRegistrationSubmissionServiceTests
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filterRequest), Times.AtMostOnce);
     }
 
+    [TestMethod]
+    public async Task Should_Return_GetRegistrationSubmissionList_With_lastSyncTime_True()
+    {
+        // Arrage
+        var submissionId = Guid.NewGuid();
+
+        var filterRequest = new GetOrganisationRegistrationSubmissionsFilter
+        {
+
+            OrganisationReference = "ORGREF1234567890",
+            OrganisationName = "Test Organisation",
+            OrganisationType = "LARGE",
+
+        };
+
+        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        {
+
+            OrganisationReference = "ORGREF1234567890",
+            OrganisationName = "Test Organisation",
+            ApplicationReferenceNumber = "APPREF123",
+            RegistrationReferenceNumber = "REGREF456",
+            OrganisationType = RegistrationSubmissionOrganisationType.small
+
+        };
+
+        var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
+
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(filterRequest))
+            .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()).Verifiable();
+
+        var submissionLastSyncTimeResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(submissionEventsLastSync))
+        };
+
+        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisions = [];
+
+
+        List<AbstractCosmosSubmissionEvent> updateDeltaRegistrationDecisions = deltaRegistrationDecisions.Select(x => new AbstractCosmosSubmissionEvent
+        {
+            AppReferenceNumber = response.ApplicationReferenceNumber,
+            RegistrationReferenceNumber = response.RegistrationReferenceNumber,
+            Comments = x.Comments,
+            Created = x.Created,
+            Decision = x.Decision,
+            DecisionDate = x.DecisionDate,
+            SubmissionId = submissionId,
+            Type = x.Type
+        }).ToList();
+
+
+        var deltaRegistrationDecisionsResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(updateDeltaRegistrationDecisions))
+
+        };
+
+        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
+        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null))
+            .ReturnsAsync(deltaRegistrationDecisionsResponse);
+
+        //Act
+        var result = _sut.HandleGetRegistrationSubmissionList(filterRequest, Guid.NewGuid());
+
+
+        //Assert
+        Assert.IsNotNull(result);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filterRequest), Times.AtMostOnce);
+        _commonDataServiceMock.Verify(x => x.GetSubmissionLastSyncTime(), Times.AtLeastOnce);
+    }
+
 
     [TestMethod]
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails()
