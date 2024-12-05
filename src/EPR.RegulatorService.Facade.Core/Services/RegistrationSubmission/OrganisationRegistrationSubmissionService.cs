@@ -18,7 +18,8 @@ public partial class OrganisationRegistrationSubmissionService(
     ISubmissionService submissionService,
     ILogger<OrganisationRegistrationSubmissionService> logger) : IOrganisationRegistrationSubmissionService
 {
-    private static JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -81,20 +82,6 @@ public partial class OrganisationRegistrationSubmissionService(
             };
         }
     }
-
-
-    private async Task<DateTime?> GetLastSyncTime()
-    {
-        var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
-        if (lastSyncResponse is null || !lastSyncResponse.IsSuccessStatusCode)
-        {
-            return null;
-        }
-
-        var submissionEventsLastSync = lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>().Result;
-        return submissionEventsLastSync.LastSyncTime;
-    }
-
 
     public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
     {
@@ -161,5 +148,17 @@ public partial class OrganisationRegistrationSubmissionService(
             },
             userId
         );
+    }
+
+    private async Task<DateTime?> GetLastSyncTime()
+    {
+        var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
+        if (lastSyncResponse is null || !lastSyncResponse.IsSuccessStatusCode)
+        {
+            return null;
+        }
+
+        var submissionEventsLastSync = lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>().Result;
+        return submissionEventsLastSync.LastSyncTime;
     }
 }
