@@ -315,6 +315,30 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
+    public async Task Should_Return_Success_With_Deafult_OrganisationRegistrationSubmissionSummary_When_CommonDataApi_Response_Content_IsNull()
+    {
+        GetOrganisationRegistrationSubmissionsFilter filter = new()
+        {
+            NationId = 1,
+            PageNumber = 1,
+            PageSize = 20
+        };
+        var queryString = $"PageNumber=1&PageSize=20";
+
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{queryString}";
+
+        SetupApiSuccessCall();
+
+        // Act
+        var results = await _sut.GetOrganisationRegistrationSubmissionList(filter);
+
+        results.Should().BeOfType<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>>();
+        results.Should().NotBeNull();
+        results.totalItems.Should().Be(0);  
+        results.currentPage.Should().Be(1);
+    }
+
+    [TestMethod]
     public async Task Should_Throw_HttpRequestException_when_fetching_registration_submission_details_And_Api_Fails()
     {
         //Arrange
