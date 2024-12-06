@@ -38,9 +38,7 @@ public class OrganisationRegistrationSummaryDto
 
         if (!Enum.TryParse<RegistrationSubmissionOrganisationType>(dto.OrganisationType, true, out var organisationType))
         {
-#pragma warning disable S3877 // Exceptions should not be thrown from unexpected methods
-            throw new InvalidCastException($"Invalid OrganisationType: {dto.OrganisationType}");
-#pragma warning restore S3877 // Exceptions should not be thrown from unexpected methods
+            // No need to assign here as the enum would already have set to default
         }
         response.OrganisationType = organisationType;
 
@@ -48,7 +46,12 @@ public class OrganisationRegistrationSummaryDto
 
         response.RegistrationReferenceNumber = dto.RegistrationReferenceNumber ?? string.Empty;
 
-        response.SubmissionDate = DateTime.Parse(dto.SubmittedDateTime, CultureInfo.InvariantCulture);
+        if (!DateTime.TryParse(dto.SubmittedDateTime, CultureInfo.InvariantCulture, out DateTime submissionDate))
+        {
+            // No need to assign here as the enum would already have set to default
+        }
+
+        response.SubmissionDate = submissionDate;
 
         response.RegistrationYear = dto.RelevantYear;
 
