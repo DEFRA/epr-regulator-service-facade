@@ -96,6 +96,8 @@ public class OrganisationRegistrationSubmissionsController(
         {
             if (!ModelState.IsValid)
             {
+                logger.LogError("{Logprefix}: OrganisationRegistrationSubmissionsController - GetRegistrationSubmissionList",
+                    ModelState.Values.First().Errors[0].ErrorMessage);
                 return ValidationProblem();
             }
 
