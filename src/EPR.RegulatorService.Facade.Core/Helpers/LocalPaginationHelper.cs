@@ -12,7 +12,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
     public static class LocalPaginationHelper
     {
         public static Tuple<int, List<OrganisationRegistrationSubmissionSummaryResponse>> FilterAndOrder(
-            List<RegistrationSubmissionOrganisationDetails> data,
+            List<RegistrationSubmissionOrganisationDetailsResponse> data,
             GetOrganisationRegistrationSubmissionsFilter filter)
         {
             var rawItems = data.AsQueryable();
@@ -30,7 +30,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
                 .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted)
                 .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Queried)
                 .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Pending)
-                .ThenBy(x => x.RegistrationDateTime)
+                .ThenBy(x => x.SubmissionDate)
                 .Skip((filter.PageNumber.Value - 1) * filter.PageSize.Value)
                 .Take(filter.PageSize.Value)
                 .Select(x => (OrganisationRegistrationSubmissionSummaryResponse)x)
@@ -45,7 +45,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
 
             if (items.Count == 0)
                 return new PaginatedResponse<T>
-                    { Items = [], CurrentPage = currentPage, PageSize = pageSize, TotalItems = 0 };
+                    { items = [], currentPage = currentPage, pageSize = pageSize, totalItems = 0 };
             if (currentPage > (int)Math.Ceiling(totalItems / (double)pageSize))
             {
                 currentPage = (int)Math.Ceiling(totalItems / (double)pageSize);
@@ -53,10 +53,10 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
 
             return new PaginatedResponse<T>
             {
-                Items = items,
-                CurrentPage = currentPage,
-                TotalItems = totalItems,
-                PageSize = pageSize
+                items = items,
+                currentPage = currentPage,
+                totalItems = totalItems,
+                pageSize = pageSize
             };
         }
     }
