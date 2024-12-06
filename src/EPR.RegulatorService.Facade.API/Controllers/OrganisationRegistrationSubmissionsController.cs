@@ -154,7 +154,7 @@ public class OrganisationRegistrationSubmissionsController(
             {
                 ToEmail = request.OrganisationEmail,
                 ApplicationNumber = request.ApplicationReferenceNumber,
-                OrganisationNumber = request.OrganisationId.ToString(),
+                OrganisationNumber = request.OrganisationAccountManagementId.ToString(), // This is not the OrgID value
                 OrganisationName = request.OrganisationName,
                 Period = $"20{request.TwoDigitYear}",
                 Agency = request.AgencyName,
