@@ -58,8 +58,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             foreach (var item in requestedList.items)
             {
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
-                                  && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
-                var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).ToList();
+                                  && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x=>x.Created);
+                var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created).ToList();
                 var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created );
 
                 foreach (var cosmosItem in regulatorDecisions)
@@ -67,7 +67,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                     if (item.RegulatorCommentDate is null || cosmosItem.Created > item.RegulatorCommentDate)
                     {
                         item.RegulatorCommentDate = cosmosItem.Created;
-                        item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber ?? item.RegistrationReferenceNumber;
+                        item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
                         item.StatusPendingDate = cosmosItem.DecisionDate;
                         item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                     }
@@ -85,7 +85,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
         public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsResponse item)
         {
-            var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase));
+            var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
+                                                                .OrderBy(x => x.Created);
 
             foreach (var cosmosItem in cosmosItems)
             {
@@ -135,7 +136,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                 item.SubmissionDetails.Status = item.SubmissionStatus;
                 item.SubmissionDetails.DecisionDate = cosmosItem.DecisionDate ?? cosmosItem.Created;
-                item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
+                item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
             }
             else
             {
