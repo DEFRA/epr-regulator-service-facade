@@ -23,6 +23,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Microsoft.Testing.Platform.Extensions;
 using Moq;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
@@ -307,7 +308,20 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
             var statusCodeResult = result as BadRequestResult;
             statusCodeResult?.StatusCode.Should().Be(500);
         }
-        
+
+        [TestMethod]
+        public async Task When_fetching_registration_submissions_with_invalid_filters_will_return_validation_problem()
+        {
+            var model = new RegistrationSubmissionsFilters();
+
+            _sut.ModelState.AddModelError("PageNumber", "PageNumber is required");
+
+            var result = await _sut.GetRegistrationSubmissions(model);
+            var objectResult = result as ObjectResult;
+
+            objectResult.Value.Should().BeOfType<ValidationProblemDetails>();
+        }
+
         [TestMethod]
         public async Task When_fetching_registration_submission_events_with_valid_data_should_return_success()
         {
