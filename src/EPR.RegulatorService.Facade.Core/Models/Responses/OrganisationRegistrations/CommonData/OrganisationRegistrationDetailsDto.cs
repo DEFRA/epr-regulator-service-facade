@@ -16,14 +16,14 @@ public class OrganisationRegistrationDetailsDto
     public string OrganisationReference { get; set; }
     public string ApplicationReferenceNumber { get; set; }
     public string? RegistrationReferenceNumber { get; set; }
-    
+
     public string SubmissionStatus { get; set; }
     public string? StatusPendingDate { get; set; }
     public string SubmittedDateTime { get; set; }
     public bool IsLateSubmission { get; set; }
     public string SubmissionPeriod { get; set; }
     public int RelevantYear { get; set; }
-    
+
     public bool IsComplianceScheme { get; set; }
     public string OrganisationSize { get; set; }
     public string OrganisationType { get; set; }
@@ -80,10 +80,11 @@ public class OrganisationRegistrationDetailsDto
         static DateTime? convertDateTime(string dateTimeString)
         {
             if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime tempDate)
-            || !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, out tempDate))
+                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, out tempDate))
             {
                 return null;
             }
+
             return tempDate;
         }
 
@@ -106,7 +107,7 @@ public class OrganisationRegistrationDetailsDto
         {
             response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
         }
-        
+
         response.StatusPendingDate = convertDateTime(dto.StatusPendingDate);
         response.SubmissionDate = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow;
         response.IsLateSubmission = dto.IsLateSubmission;
@@ -115,7 +116,7 @@ public class OrganisationRegistrationDetailsDto
 
         response.IsComplianceScheme = dto.IsComplianceScheme;
         response.OrganisationSize = dto.OrganisationSize;
-        
+
         if (Enum.TryParse<RegistrationSubmissionOrganisationType>(dto.OrganisationType, true, out var organisationType))
         {
             response.OrganisationType = organisationType;
@@ -124,7 +125,7 @@ public class OrganisationRegistrationDetailsDto
         {
             response.OrganisationType = RegistrationSubmissionOrganisationType.none;
         }
-        
+
         response.NationId = dto.NationId;
         response.NationCode = dto.NationCode;
 
