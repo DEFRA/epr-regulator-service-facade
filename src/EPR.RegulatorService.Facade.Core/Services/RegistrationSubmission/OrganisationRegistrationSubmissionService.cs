@@ -143,7 +143,7 @@ public partial class OrganisationRegistrationSubmissionService(
             return null;
         }
 
-        var submissionEventsLastSync = lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>().Result;
+        var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
         return submissionEventsLastSync.LastSyncTime;
     }
 }

@@ -48,7 +48,7 @@ public class OrganisationRegistrationSummaryDto
 
         if (!DateTime.TryParse(dto.SubmittedDateTime, CultureInfo.InvariantCulture, out DateTime submissionDate))
         {
-            // No need to assign here as the date would have set to default
+            // No need to assign here as the submissionDate would have set to default
         }
 
         response.SubmissionDate = submissionDate;
@@ -61,33 +61,24 @@ public class OrganisationRegistrationSummaryDto
         }
         response.SubmissionStatus = submissionStatus;
 
+        response.StatusPendingDate = null;
         if (!string.IsNullOrWhiteSpace(dto.StatusPendingDate))
         {
             response.StatusPendingDate = DateTime.Parse(dto.StatusPendingDate, CultureInfo.InvariantCulture);
         }
-        else
-        {
-            response.StatusPendingDate = null;
-        }
 
         response.NationId = dto.NationId;
 
+        response.RegulatorCommentDate = null;
         if (!string.IsNullOrWhiteSpace(dto.RegulatorCommentDate))
         {
             response.RegulatorCommentDate = DateTime.Parse(dto.RegulatorCommentDate, CultureInfo.InvariantCulture);
         }
-        else
-        {
-            response.RegulatorCommentDate = null;
-        }
 
+        response.ProducerCommentDate = null;
         if (!string.IsNullOrWhiteSpace(dto.ProducerCommentDate))
         {
             response.ProducerCommentDate = DateTime.Parse(dto.ProducerCommentDate, CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            response.ProducerCommentDate = null;
         }
 
         response.RegulatorUserId = dto.RegulatorUserId;
