@@ -38,7 +38,7 @@ public class OrganisationRegistrationSummaryDto
 
         if (!Enum.TryParse<RegistrationSubmissionOrganisationType>(dto.OrganisationType, true, out var organisationType))
         {
-            // No need to assign here as the enum would already have set to default
+            // No need to assign here as the organisationType would have set to default
         }
         response.OrganisationType = organisationType;
 
@@ -48,7 +48,7 @@ public class OrganisationRegistrationSummaryDto
 
         if (!DateTime.TryParse(dto.SubmittedDateTime, CultureInfo.InvariantCulture, out DateTime submissionDate))
         {
-            // No need to assign here as the enum would already have set to default
+            // No need to assign here as the date would have set to default
         }
 
         response.SubmissionDate = submissionDate;
