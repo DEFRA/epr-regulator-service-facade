@@ -1,29 +1,92 @@
-﻿using System.Security.Cryptography;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
+using Microsoft.Extensions.Logging;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
-public class OrganisationRegistrationSubmissionService(
+public partial class OrganisationRegistrationSubmissionService(
     ICommonDataService commonDataService,
-    ISubmissionService submissionService) : IOrganisationRegistrationSubmissionService
+    ISubmissionService submissionService,
+    ILogger<OrganisationRegistrationSubmissionService> logger) : IOrganisationRegistrationSubmissionService
 {
-    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
-        GetOrganisationRegistrationSubmissionsFilter filter)
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
-        return await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
+        GetOrganisationRegistrationSubmissionsCommonDataFilter filter, Guid userId)
+    {
+        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
+        DateTime? lastSyncTime = null;
+
+        try
+        {
+            lastSyncTime = await GetLastSyncTime();
+
+            if (lastSyncTime.HasValue)
+            {
+                deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId);
+            }
+
+            if (deltaRegistrationDecisionsResponse.Count > 0 && !string.IsNullOrWhiteSpace(filter.Statuses))
+            {
+                ApplyAppRefNumbersForRequiredStatuses(deltaRegistrationDecisionsResponse, filter.Statuses, filter);
+            }
+
+            PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList =
+                    await commonDataService.GetOrganisationRegistrationSubmissionList(filter);
+
+            if (deltaRegistrationDecisionsResponse.Count > 0)
+            {
+                MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
+            }
+
+            return requestedList;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred getting the latest submissions {MethodName}.", nameof(HandleGetRegistrationSubmissionList));
+            return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
+            {
+                currentPage = 1,
+                pageSize = filter.PageSize ?? 20,
+                totalItems = 0,
+                items = []
+            };
+        }
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetails?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId)
+    public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
     {
-        return await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
+        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
+
+        var lastSyncTime = await GetLastSyncTime();
+
+        if (lastSyncTime.HasValue)
+        {
+            deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
+        }
+
+        var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
+
+        if (deltaRegistrationDecisionsResponse.Count > 0)
+        {
+            MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
+        }
+
+        return requestedItem;
     }
 
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
@@ -56,34 +119,6 @@ public class OrganisationRegistrationSubmissionService(
         );
     }
 
-    public string GenerateReferenceNumber(CountryName countryName,
-        RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null,
-        MaterialType materialType = MaterialType.None)
-    {
-        if (string.IsNullOrEmpty(twoDigitYear))
-        {
-            twoDigitYear = (DateTime.Now.Year % 100).ToString("D2");
-        }
-
-        if (string.IsNullOrEmpty(organisationId))
-        {
-            throw new ArgumentNullException(nameof(organisationId));
-        }
-
-        var countryCode = ((char)countryName).ToString();
-
-        var regType = ((char)registrationSubmissionType).ToString();
-
-        var refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
-
-        if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor ||
-            registrationSubmissionType == RegistrationSubmissionType.Exporter)
-        {
-            refNumber = $"{refNumber}{materialType.GetDisplayName<MaterialType>()}";
-        }
-
-        return refNumber;
-    }
 
     public async Task<HttpResponseMessage> HandleCreateRegistrationFeePaymentSubmissionEvent(RegistrationFeePaymentCreateRequest request, Guid userId)
     {
@@ -100,12 +135,15 @@ public class OrganisationRegistrationSubmissionService(
         );
     }
 
-    private static string Generate4DigitNumber()
+    private async Task<DateTime?> GetLastSyncTime()
     {
-        var min = 1000;
-        var max = 10000;
-        var randomNumber = RandomNumberGenerator.GetInt32(min, max);
+        var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
+        if (lastSyncResponse is null || !lastSyncResponse.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
-        return randomNumber.ToString();
+        var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
+        return submissionEventsLastSync.LastSyncTime;
     }
 }

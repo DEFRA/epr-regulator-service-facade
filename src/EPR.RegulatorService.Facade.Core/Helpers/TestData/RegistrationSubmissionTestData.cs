@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -14,24 +15,23 @@ public static partial class RegistrationSubmissionTestData
         DummyData = GenerateRegistrationSubmissionDataCollection();
     }
 
-    public static List<RegistrationSubmissionOrganisationDetails> DummyData { get; }
+    public static List<RegistrationSubmissionOrganisationDetailsResponse> DummyData { get; }
 
-    public static async Task<RegistrationSubmissionOrganisationDetails?> GetRegistrationSubmissionDetails(Guid submissionId, string url)
+    public static async Task<RegistrationSubmissionOrganisationDetailsResponse?> GetRegistrationSubmissionDetails(Guid submissionId, string url)
     {
         var result = DummyData.Find(x => x.SubmissionId == submissionId);
         if (null == result) return null;
         result.SubmissionDetails = GenerateRandomSubmissionData(result.SubmissionStatus);
-        result.SubmissionDate = result.RegistrationDateTime = result.SubmissionDetails.TimeAndDateOfSubmission;
-        result.PaymentDetails = GeneratePaymentDetails();
-        result.SubmissionStatusPendingDate = (result.SubmissionStatus == RegistrationSubmissionStatus.Cancelled)
+        result.SubmissionDate = result.SubmissionDate = result.SubmissionDetails.TimeAndDateOfSubmission;
+        result.StatusPendingDate = (result.SubmissionStatus == RegistrationSubmissionStatus.Cancelled)
                                             ? DateTime.Now + TimeSpan.FromDays(2)
                                             : null;
         return result;
     }
 
-    private static List<RegistrationSubmissionOrganisationDetails> GenerateRegistrationSubmissionDataCollection()
+    private static List<RegistrationSubmissionOrganisationDetailsResponse> GenerateRegistrationSubmissionDataCollection()
     {
-        List<RegistrationSubmissionOrganisationDetails> objRet = [];
+        List<RegistrationSubmissionOrganisationDetailsResponse> objRet = [];
 
         int count = 0;
         foreach (var line in RegistrationSubmissionTestData.TSVData)
@@ -40,7 +40,7 @@ public static partial class RegistrationSubmissionTestData
             var fields = line.Split('\t');
 
             var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            objRet.Add(new RegistrationSubmissionOrganisationDetails
+            objRet.Add(new RegistrationSubmissionOrganisationDetailsResponse
             {
                 OrganisationReference = fields[0],
                 OrganisationName = fields[1],
@@ -48,8 +48,8 @@ public static partial class RegistrationSubmissionTestData
                 SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(fields[3], true),
                 ApplicationReferenceNumber = fields[4],
                 RegistrationReferenceNumber = fields[5],
-                RegistrationDateTime = dateTime,
-                RegistrationYear = dateTime.Year.ToString(CultureInfo.InvariantCulture),
+                SubmissionDate = dateTime,
+                RelevantYear = dateTime.Year,
                 CompaniesHouseNumber = fields[9],
                 BuildingName = fields[10],
                 SubBuildingName = fields[11],
@@ -101,42 +101,30 @@ public static partial class RegistrationSubmissionTestData
         };
     }
 
-    private static RegistrationSubmissionsOrganisationPaymentDetails GeneratePaymentDetails()
-    {
-        var random = new Random(); // NOSONAR - this is dummy disposable data
-
-        var generateRandomDecimal = (int min, int max) => Math.Round((decimal)((random.NextDouble() * (max - min)) + min), 2);
-
-        return new RegistrationSubmissionsOrganisationPaymentDetails()
-        {
-            ApplicationProcessingFee = generateRandomDecimal(1000, 6000),
-            OnlineMarketplaceFee = generateRandomDecimal(1000, 5000),
-            PreviousPaymentsReceived = generateRandomDecimal(1000, 10000000),
-            SubsidiaryFee = generateRandomDecimal(1000, 10000)
-        };
-    }
-
     private static List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails> GenerateRandomFiles()
     {
         var files = new List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails>();
 
         files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
         {
-            DownloadUrl = "#",
+            FileId = Guid.NewGuid(),
             FileName = "org.details.acme.csv",
-            Label = "SubmissionDetails.OrganisationDetails"
+            BlobName = "SubmissionDetails.OrganisationDetails",
+            Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.company
         });
         files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
         {
-            DownloadUrl = "#",
+            FileId = Guid.NewGuid(),
             FileName = "brand.details.acme.csv",
-            Label = "SubmissionDetails.BrandDetails"
+            BlobName = "SubmissionDetails.BrandDetails",
+            Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.brands
         });
         files.Add(new RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails()
         {
-            DownloadUrl = "#",
+            FileId = Guid.NewGuid(),
             FileName = "partner.details.acme.csv",
-            Label = "SubmissionDetails.PartnerDetails"
+            BlobName = "SubmissionDetails.PartnerDetails",
+            Type = RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileType.partnership
         });
         return files;
     }
