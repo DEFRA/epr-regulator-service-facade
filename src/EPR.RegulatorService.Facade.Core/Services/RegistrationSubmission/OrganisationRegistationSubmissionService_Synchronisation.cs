@@ -75,10 +75,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 foreach (var cosmosDate in producerComments)
                 {
                     item.ProducerCommentDate = cosmosDate;
-                    if (item.RegulatorCommentDate is null || cosmosDate > item.RegulatorCommentDate)
-                    {
-                        item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
-                    }
                 }
             }
         }
@@ -98,12 +94,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 {
                     AssignProducerDetails(item, cosmosItem);
                 }
-            }
-
-            if ( item.ProducerCommentDate is not null && item.RegulatorDecisionDate is not null && item.ProducerCommentDate > item.RegulatorDecisionDate)
-            {
-                item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
-                item.SubmissionDetails.Status = item.SubmissionStatus;
             }
         }
 
