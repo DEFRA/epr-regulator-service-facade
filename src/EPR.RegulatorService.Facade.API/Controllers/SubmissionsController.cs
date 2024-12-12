@@ -186,7 +186,7 @@ public class SubmissionsController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return ValidationProblem();
+            return ValidationProblem(ModelState);
         }
 
         var lastSyncResponse = await _commonDataService.GetSubmissionLastSyncTime();
@@ -195,7 +195,7 @@ public class SubmissionsController : ControllerBase
             return HandleError.HandleErrorWithStatusCode(lastSyncResponse.StatusCode);
         }
 
-        var submissionEventsLastSync = lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>().Result;
+        var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
 
         var deltaRegistrationDecisionsResponse = await _submissionService.GetDeltaRegistrationSubmissions(submissionEventsLastSync.LastSyncTime, User.UserId());
         
@@ -204,7 +204,7 @@ public class SubmissionsController : ControllerBase
             return HandleError.HandleErrorWithStatusCode(deltaRegistrationDecisionsResponse.StatusCode);
         }
         
-        var deltaRegistrationDecisions = deltaRegistrationDecisionsResponse.Content.ReadFromJsonAsync<RegulatorRegistrationDecision[]>().Result;
+        var deltaRegistrationDecisions = await deltaRegistrationDecisionsResponse.Content.ReadFromJsonAsync<RegulatorRegistrationDecision[]>();
 
         var registrationSubmissionsRequest = new GetRegistrationSubmissionsRequest
         {

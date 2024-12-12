@@ -99,7 +99,7 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
-            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter);
+            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter, User.UserId());
 
             return Ok(result);
         }
@@ -107,7 +107,7 @@ public class OrganisationRegistrationSubmissionsController(
         {
             logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionList)}");
             return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionList)}",
-                HttpContext.Request.Path,
+                HttpContext?.Request?.Path,
                 StatusCodes.Status500InternalServerError);
         }
     }
@@ -128,9 +128,9 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId);
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
 
-            if (null == result)
+            if (result is null)
             {
                 return NotFound();
             }

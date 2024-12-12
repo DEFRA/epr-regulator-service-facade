@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -81,7 +82,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
             VerifyApiCall(_expectedUrl, HttpMethod.Post);
             response.IsSuccessStatusCode.Should().BeFalse();
         }
-        
+
         [TestMethod]
         public async Task Should_return_success_when_fetching_pom_submissions()
         {
@@ -97,7 +98,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
             VerifyApiCall(_expectedUrl, HttpMethod.Get);
             response.IsSuccessStatusCode.Should().BeTrue();
         }
-        
+
         [TestMethod]
         public async Task Should_return_bad_request_when_fetching_pom_submissions()
         {
@@ -113,7 +114,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
             VerifyApiCall(_expectedUrl, HttpMethod.Get);
             response.IsSuccessStatusCode.Should().BeFalse();
         }
-        
+
         [TestMethod]
         public async Task Should_return_success_when_fetching_registration_submissions()
         {
@@ -129,7 +130,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
             VerifyApiCall(_expectedUrl, HttpMethod.Get);
             response.IsSuccessStatusCode.Should().BeTrue();
         }
-        
+
         [TestMethod]
         public async Task Should_return_bad_request_when_fetching_registration_submissions()
         {
@@ -140,6 +141,40 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Submissions
 
             // Act
             var response = await _sut.GetDeltaRegistrationSubmissions(lastSyncTime, _userId);
+
+            // Assert
+            VerifyApiCall(_expectedUrl, HttpMethod.Get);
+            response.IsSuccessStatusCode.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Should_return_success_when_fetching_organisation_registration_events()
+        {
+            // Arrange
+            var lastSyncTime = DateTime.Now;
+            var submissionId = Guid.NewGuid();  // Optional, can be null as well
+            _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationEvents}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)}&SubmissionId={submissionId}";
+            SetupApiSuccessCall();
+
+            // Act
+            var response = await _sut.GetDeltaOrganisationRegistrationEvents(lastSyncTime, _userId, submissionId);
+
+            // Assert
+            VerifyApiCall(_expectedUrl, HttpMethod.Get);
+            response.IsSuccessStatusCode.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public async Task Should_return_bad_request_when_fetching_organisation_registration_events()
+        {
+            // Arrange
+            var lastSyncTime = DateTime.Now;
+            var submissionId = Guid.NewGuid();  // Optional, can be null as well
+            _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationEvents}?LastSyncTime={lastSyncTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)}&SubmissionId={submissionId}";
+            SetupApiBadRequestCall();
+
+            // Act
+            var response = await _sut.GetDeltaOrganisationRegistrationEvents(lastSyncTime, _userId, submissionId);
 
             // Assert
             VerifyApiCall(_expectedUrl, HttpMethod.Get);
