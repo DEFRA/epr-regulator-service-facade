@@ -81,7 +81,7 @@ public partial class OrganisationRegistrationSubmissionService(
 
         var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
 
-        if (deltaRegistrationDecisionsResponse.Count > 0)
+        if (deltaRegistrationDecisionsResponse.Count > 0 && requestedItem is not null)
         {
             MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
         }
