@@ -108,12 +108,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             {
                 item.ProducerComments += $"<br/>{cosmosItem.Comments}";
             }
-
-            if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
-            {
-                item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
-                item.SubmissionDetails.Status = item.SubmissionStatus;
-            }
         }
 
         private static void AssignRegulatorDetails(RegistrationSubmissionOrganisationDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
