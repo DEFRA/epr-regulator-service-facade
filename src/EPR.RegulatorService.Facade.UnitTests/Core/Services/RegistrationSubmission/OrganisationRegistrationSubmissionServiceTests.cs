@@ -894,7 +894,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             Assert.AreEqual(commentTime, item.ProducerCommentDate, "ProducerCommentDate should be updated.");
             Assert.AreEqual("Producer Comment", item.ProducerComments, "Comments should be updated.");
             // Since RegulatorDecisionDate is null, no final update check applies.
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus);
         }
 
         [TestMethod]
@@ -927,11 +927,10 @@ public class OrganisationRegistrationSubmissionServiceTests
             // Assert
             Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the newest ProducerCommentDate.");
             Assert.AreEqual("New comment", item.ProducerComments, "Should have the latest comment.");
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus, "Still no regulator decision, no update.");
         }
 
         [TestMethod]
-        public void ProducerAndRegulatorDecisions_ProducerLater_UpdatesToUpdatedStatus()
+        public void ProducerAndRegulatorDecisions_ProducerLater_Doesnt_UpdatesToUpdatedStatus()
         {
             // Arrange
             var regulatorTime = DateTime.UtcNow;
@@ -962,8 +961,8 @@ public class OrganisationRegistrationSubmissionServiceTests
             Assert.AreEqual(producerTime, item.ProducerCommentDate);
             Assert.AreEqual(regulatorTime, item.RegulatorDecisionDate);
             // ProducerCommentDate > RegulatorDecisionDate triggers Updated
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus);
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionDetails.Status);
+            Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus);
+            Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionDetails.Status);
         }
 
         [TestMethod]

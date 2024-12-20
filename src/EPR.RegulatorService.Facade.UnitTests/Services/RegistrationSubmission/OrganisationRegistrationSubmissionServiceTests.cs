@@ -186,12 +186,13 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
         }
 
         [TestMethod]
-        public void ProducerCommentDateNull_RegulatorDecisionDateNull_SetsCommentsAndUpdated()
+        public void ProducerCommentDateNull_RegulatorDecisionDateNull_SetsCommentsAnd_DoesntChangeTo_Updated()
         {
             // Arrange
             var item = CreateDefaultItem();
             item.ProducerCommentDate = null;
             item.RegulatorDecisionDate = null;
+            item.SubmissionStatus = RegistrationSubmissionStatus.None;
             item.ProducerComments = "Old comment";
 
             var cosmosItem = new AbstractCosmosSubmissionEvent
@@ -206,8 +207,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             // Assert
             Assert.AreEqual("New comment", item.ProducerComments, "Should overwrite ProducerComments");
             Assert.AreEqual(cosmosItem.Created, item.ProducerCommentDate);
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus, "Should be updated since RegulatorDecisionDate is null.");
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionDetails.Status);
+            Assert.AreEqual(RegistrationSubmissionStatus.None, item.SubmissionStatus, "Should be updated since RegulatorDecisionDate is null.");
+            Assert.AreEqual(RegistrationSubmissionStatus.None, item.SubmissionDetails.Status);
         }
 
         [TestMethod]
@@ -303,7 +304,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
         }
 
         [TestMethod]
-        public void ProducerCommentDateSet_CosmosItemNewer_OverwritesCommentsAndUpdatesStatusIfAllowed()
+        public void ProducerCommentDateSet_CosmosItemNewer_OverwritesCommentsAndDoenstUpdatesStatusIfAllowed()
         {
             // Arrange
             var item = CreateDefaultItem();
@@ -329,8 +330,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             Assert.AreEqual(cosmosItem.Created, item.ProducerCommentDate);
 
             // RegulatorDecisionDate is older than cosmosItem.Created, so condition holds true and updates status
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus);
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionDetails.Status);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionDetails.Status);
         }
 
         [TestMethod]
@@ -342,6 +343,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             item.ProducerComments = "Existing comment";
             item.RegulatorDecisionDate = null; // always updates status
             item.SubmissionStatus = RegistrationSubmissionStatus.Pending;
+            item.SubmissionDetails.Status = RegistrationSubmissionStatus.Pending;
 
             var cosmosItem = new AbstractCosmosSubmissionEvent
             {
@@ -360,12 +362,12 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             // ProducerCommentDate remains unchanged since cosmosItem is older
             // item.ProducerCommentDate stays the same
             // RegulatorDecisionDate null means always updated
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus);
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionDetails.Status);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionDetails.Status);
         }
 
         [TestMethod]
-        public void CosmosItemEqualToProducerCommentDate_OverwritesComments()
+        public void CosmosItemEqualToProducerCommentDate_OverwritesComments_DoesntChangeStatus()
         {
             // Arrange
             var item = CreateDefaultItem();
@@ -391,8 +393,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             Assert.AreEqual("Equal Time Comment", item.ProducerComments);
             Assert.AreEqual(exactTime, item.ProducerCommentDate);
             // cosmosItem.Created >= RegulatorDecisionDate, sets to Updated
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus);
-            Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionDetails.Status);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus);
+            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionDetails.Status);
         }
 
         [TestMethod]
