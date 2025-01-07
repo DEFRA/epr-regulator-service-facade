@@ -135,6 +135,21 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
+    public async Task<HttpResponseMessage> HandleCreatePackagingDataResubmissionFeePaymentEvent(PackagingDataResubmissionFeePaymentCreateRequest request, Guid userId)
+    {
+        return await submissionService.CreateSubmissionEvent(
+            request.SubmissionId,
+            new PackagingDataResubmissionFeePaymentEvent
+            {
+                SubmissionId = request.SubmissionId,
+                PaymentMethod = request.PaymentMethod,
+                PaymentStatus = request.PaymentStatus,
+                PaidAmount = $"£{request.PaidAmount}"
+            },
+            userId
+        );
+    }
+
     private async Task<DateTime?> GetLastSyncTime()
     {
         var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
