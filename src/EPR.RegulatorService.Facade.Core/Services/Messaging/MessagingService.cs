@@ -299,20 +299,22 @@ public class MessagingService : IMessagingService
      
     public void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model); 
+        ValidateOrganisationRegistrationSubmissionModel(model);
 
-        var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId : _messagingConfig.OrganisationRegistrationSubmissionQueriedId;
+        var templateId = 
+            (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId : _messagingConfig.OrganisationRegistrationSubmissionQueriedId;
 
-        _notificationClient.SendEmail(model.ToEmail, templateId, model.GetParameters);
+        SendEventEmail(model.ToEmail, templateId, model.GetParameters);
     }
 
     public void OrganisationRegistrationSubmissionDecision(OrganisationRegistrationSubmissionEmailModel model)
     {
         ValidateOrganisationRegistrationSubmissionModel(model); 
 
-        var templateId = (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId : _messagingConfig.OrganisationRegistrationSubmissionDecisionId;
+        var templateId = 
+            (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId : _messagingConfig.OrganisationRegistrationSubmissionDecisionId;
 
-        _notificationClient.SendEmail(model.ToEmail, templateId, model.GetParameters);
+        SendEventEmail(model.ToEmail, templateId, model.GetParameters);
     }  
     private static void ValidateOrganisationRegistrationSubmissionModel(OrganisationRegistrationSubmissionEmailModel model)
     {
@@ -402,5 +404,23 @@ public class MessagingService : IMessagingService
         }
 
         return notificationId;
+    }
+
+    private void SendEventEmail(string recipient, string templateId, Dictionary<string, object> parameters)
+    {
+        try
+        {
+            _ = _notificationClient.SendEmail(recipient, templateId, parameters);
+        }
+        catch (Exception ex)
+        {
+            string callingMethodName = (new StackTrace()).GetFrame(1).GetMethod().Name;
+
+            var organisationNumber = parameters.Single(x => x.Key == "organisation_number").Value.ToString();
+
+            _logger.LogError(ex, "GOV UK NOTIFY ERROR. Class: {TypeName}, Method: {CallingMethod}, Organisation: {OrgNumber}, Template: {TemplateId}", 
+                this.GetType().Name, callingMethodName, organisationNumber, templateId);
+        }
+
     }
 }
