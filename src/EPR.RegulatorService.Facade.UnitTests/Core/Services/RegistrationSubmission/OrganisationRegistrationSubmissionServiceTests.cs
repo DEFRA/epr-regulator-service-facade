@@ -59,6 +59,31 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
+    public async Task Should_return_valid_ReferenceNumber_ForAComplianceScheme()
+    {
+        //Arrange  
+        string year = "99";
+        string orgId = "123456";
+        string appRefNumber = "PEPR00000123425C1";
+
+        // Act 
+        var result = _sut.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.ComplianceScheme,
+            appRefNumber,
+            orgId,
+            year);
+
+        // Assert  
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length == 15);
+        Assert.IsTrue(result.StartsWith('R'));
+        Assert.IsTrue(result.StartsWith($"R{year}"));
+        Assert.IsTrue(result.StartsWith($"R{year}EC"));
+        Assert.IsTrue(result.StartsWith($"R{year}EC{orgId}0234"));
+    }
+
+    [TestMethod]
     public async Task Should_Return_GetRegistrationSubmissionList()
     {
         // Arrage

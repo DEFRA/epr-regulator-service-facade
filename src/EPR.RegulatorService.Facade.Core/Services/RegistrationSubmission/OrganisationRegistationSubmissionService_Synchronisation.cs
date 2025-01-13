@@ -38,7 +38,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
             var regType = ((char)registrationSubmissionType).ToString();
 
-            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme)
+            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme && applicationReferenceNumber.Length > 14)
             {
                 refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}0{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}";
             }
