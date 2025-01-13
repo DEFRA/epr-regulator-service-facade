@@ -71,6 +71,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
         private static string ExtractUniqueNumberFromAppRefNumber(string appRefNumber)
         {
+            // PEPR000001XXX25C1 is the agreed format of the reference number hence we are targetting the 10th index as per the requirements
             return appRefNumber.Substring(10, 3);
         }
 
