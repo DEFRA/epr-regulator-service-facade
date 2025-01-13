@@ -15,6 +15,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 {
     public partial class OrganisationRegistrationSubmissionService
     {
+        // 14 is used to support existing data and will be removed for R9.0
+        private const int _producerApplicationRefNumLength = 14;
+
         public string GenerateReferenceNumber(CountryName countryName,
                                               RegistrationSubmissionType registrationSubmissionType,
                                               string applicationReferenceNumber,
@@ -38,7 +41,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
             var regType = ((char)registrationSubmissionType).ToString();
 
-            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme && applicationReferenceNumber.Length > 14)
+            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme &&
+                applicationReferenceNumber.Length > _producerApplicationRefNumLength)
             {
                 refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}0{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}";
             }
