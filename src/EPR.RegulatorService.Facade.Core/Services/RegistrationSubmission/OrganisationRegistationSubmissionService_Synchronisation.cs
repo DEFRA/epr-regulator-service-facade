@@ -16,9 +16,14 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
     public partial class OrganisationRegistrationSubmissionService
     {
         public string GenerateReferenceNumber(CountryName countryName,
-                                              RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null,
+                                              RegistrationSubmissionType registrationSubmissionType,
+                                              string applicationReferenceNumber,
+                                              string organisationId,
+                                              string twoDigitYear = null,
                                               MaterialType materialType = MaterialType.None)
         {
+            string refNumber;
+
             if (string.IsNullOrEmpty(twoDigitYear))
             {
                 twoDigitYear = (DateTime.Now.Year % 100).ToString("D2");
@@ -33,7 +38,14 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
             var regType = ((char)registrationSubmissionType).ToString();
 
-            var refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
+            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme)
+            {
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}0{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}";
+            }
+            else
+            {
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
+            }
 
             if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor ||
                 registrationSubmissionType == RegistrationSubmissionType.Exporter)
@@ -53,14 +65,19 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             return randomNumber.ToString();
         }
 
+        private static string ExtractUniqueNumberFromAppRefNumber(string appRefNumber)
+        {
+            return appRefNumber.Substring(10, 3);
+        }
+
         public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList)
         {
             foreach (var item in requestedList.items)
             {
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
-                                  && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x=>x.Created);
+                                  && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created);
                 var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created).ToList();
-                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created );
+                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created);
 
                 foreach (var cosmosItem in regulatorDecisions)
                 {
