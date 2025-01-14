@@ -109,7 +109,14 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
 
         _registrationSubmissionServiceMock.Setup(s =>
-        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
+        s.GenerateReferenceNumber(
+            It.IsAny<CountryName>(),
+            It.IsAny<RegistrationSubmissionType>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MaterialType>()))
+            .Returns("EEE");
 
         // Act
         var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as CreatedResult;
@@ -152,7 +159,13 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
 
         _registrationSubmissionServiceMock.Setup(s =>
-        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
+        s.GenerateReferenceNumber(
+            It.IsAny<CountryName>(),
+            It.IsAny<RegistrationSubmissionType>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MaterialType>())).Returns("EEE");
 
         // Act
         var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as CreatedResult;
@@ -619,7 +632,14 @@ public class OrganisationRegistrationSubmissionsControllerTests
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
 
         _registrationSubmissionServiceMock.Setup(s =>
-        s.GenerateReferenceNumber(It.IsAny<CountryName>(), It.IsAny<RegistrationSubmissionType>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MaterialType>())).Returns("EEE");
+        s.GenerateReferenceNumber(
+            It.IsAny<CountryName>(),
+            It.IsAny<RegistrationSubmissionType>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MaterialType>()))
+            .Returns("EEE");
 
         _messageServiceMock.Setup(x => x.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>())).Throws(new Exception("Test Exception"));
 
