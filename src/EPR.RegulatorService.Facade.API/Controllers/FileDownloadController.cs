@@ -9,6 +9,7 @@ using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -35,16 +36,30 @@ public class FileDownloadController : ControllerBase
     [ExcludeFromCodeCoverage]
     public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequest request)
     {
-        // Coin toss logic
-        var random = new Random();
-        bool coinTossResult = random.Next(0, 2) == 0; // Randomly returns true or false
+        if (request == null || string.IsNullOrEmpty(request.BlobName) || string.IsNullOrEmpty(request.FileName))
+        {
+            return new BadRequestObjectResult("Invalid request payload.");
+        }
+
+        // Secure coin toss logic using RandomNumberGenerator
+        bool coinTossResult;
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            var randomByte = new byte[1];
+            rng.GetBytes(randomByte);
+            coinTossResult = (randomByte[0] % 2) == 0; // Generates a secure true/false result
+        }
 
         if (coinTossResult)
         {
             // Get file from blob storage
             var stream = await _blobStorageService.DownloadFileStreamAsync(request.SubmissionType, request.BlobName);
+            if (stream == null)
+            {
+                return new NotFoundObjectResult("The requested file could not be found.");
+            }
 
-            // send FileDownloadRequest to Trade antivirus API for checking
+            // Send FileDownloadRequest to Trade antivirus API for checking
             var userId = User.UserId();
             var email = User.Email();
             var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
@@ -68,7 +83,7 @@ public class FileDownloadController : ControllerBase
                 return new BadRequestObjectResult("There was an error communicating with the submissions API.");
             }
 
-            // if clean, return file
+            // If clean, return the file
             if (antiVirusResult == ContentScan.Clean)
             {
                 var file = new FileContentResult(stream.ToArray(), "text/csv")
@@ -79,10 +94,18 @@ public class FileDownloadController : ControllerBase
                 return file;
             }
 
-            return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
+            return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.")
+            {
+                StatusCode = StatusCodes.Status403Forbidden
+            };
         }
         else
-            return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status500InternalServerError };
+        {
+            return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.")
+            {
+                StatusCode = StatusCodes.Status500InternalServerError
+            };
+        }
     }
 
 }
