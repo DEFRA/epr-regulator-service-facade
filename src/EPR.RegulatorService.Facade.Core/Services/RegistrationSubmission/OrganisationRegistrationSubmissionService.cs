@@ -99,6 +99,7 @@ public partial class OrganisationRegistrationSubmissionService(
                 ? GenerateReferenceNumber(
                     request.CountryName.Value,
                     request.RegistrationSubmissionType.Value,
+                    request.ApplicationReferenceNumber,
                     request.OrganisationAccountManagementId.ToString(),
                     request.TwoDigitYear)
                 : string.Empty;
