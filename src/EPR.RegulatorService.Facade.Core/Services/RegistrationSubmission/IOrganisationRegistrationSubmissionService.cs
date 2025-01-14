@@ -15,5 +15,11 @@ public interface IOrganisationRegistrationSubmissionService
 
     Task<HttpResponseMessage> HandleCreateRegistrationFeePaymentSubmissionEvent(RegistrationFeePaymentCreateRequest request, Guid userId);
 
-    string GenerateReferenceNumber( CountryName countryName, RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null, MaterialType materialType = MaterialType.None);
+    string GenerateReferenceNumber(
+        CountryName countryName,
+        RegistrationSubmissionType registrationSubmissionType,
+        string applicationReferenceNumber,
+        string organisationId,
+        string twoDigitYear = null,
+        MaterialType materialType = MaterialType.None);
 }
