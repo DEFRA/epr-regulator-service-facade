@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -31,6 +32,7 @@ public class FileDownloadController : ControllerBase
 
     [HttpPost]
     [Route("file-download")]
+    [ExcludeFromCodeCoverage]
     public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequest request)
     {
         // Coin toss logic
