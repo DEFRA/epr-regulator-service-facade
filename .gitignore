@@ -374,3 +374,5 @@ src/certs/kainos-chain.p7b
 **/appsettings.development.json
 src/EPR.RegulatorService.Facade.API/.vshistory/
 /src/EPR.RegulatorService.Facade.API/appsettings.Development.json
+/src/EPR.RegulatorService.Facade.API/appsettings.development.json
+/src/EPR.RegulatorService.Facade.API/appsettings.development 11.json

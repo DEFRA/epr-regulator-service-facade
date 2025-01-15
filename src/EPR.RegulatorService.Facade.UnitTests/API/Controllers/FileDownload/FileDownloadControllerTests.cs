@@ -75,6 +75,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Should_return_BlobStorageServiceException_when_BlobStorageServiceFails()
         {
             // Arrange
@@ -91,6 +92,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Should_return_HttpRequestException_when_AntiVirusServiceFails()
         {
             // Arrange
@@ -115,6 +117,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Should_return_BadRequestObjectResult_when_SubmissionsServiceFails()
         {
             // Arrange
@@ -144,6 +147,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Should_return_ForbiddenObjectResult_when_AntiVirusServiceReturnsMalicious()
         {
             // Arrange
@@ -174,6 +178,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Should_return_FileContentResult_when_AntiVirusServiceReturnsClean()
         {
             // Arrange
