@@ -991,6 +991,107 @@ public class OrganisationRegistrationSubmissionsControllerTests
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer ProducerCommentDate still older than RegulatorCommentDate.");
     }
 
+    [TestMethod]
+    [DataRow("SubmissionId", "error")]
+    [DataRow("PaymentMethod", "error")]
+    [DataRow("PaymentStatus", "error")]
+    [DataRow("PaidAmount", "error")]
+    public async Task CreatePackagingDataResubmissionFeePaymentEvent_Should_Return_ValidationProblem_When_ModelState_Is_Invalid(string keyName, string errorMessage)
+    {
+        // Arrange
+        _sut.ModelState.AddModelError(keyName, errorMessage);
+
+        // Act
+        var result = await _sut.CreatePackagingDataResubmissionFeePaymentEvent(new PackagingDataResubmissionFeePaymentCreateRequest()) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType(typeof(ValidationProblemDetails));
+    }
+
+    [TestMethod]
+    public async Task CreatePackagingDataResubmissionFeePaymentEvent_Should_Return_Created_When_SubmissionService_Returns_Success()
+    {
+        // Arrange
+        var request = _fixture.Create<PackagingDataResubmissionFeePaymentCreateRequest>();
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<PackagingDataResubmissionFeePaymentEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreatePackagingDataResubmissionFeePaymentEvent(request) as CreatedResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<PackagingDataResubmissionFeePaymentEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    [DataRow(HttpStatusCode.InternalServerError)]
+    [DataRow(HttpStatusCode.BadGateway)]
+    [DataRow(HttpStatusCode.ServiceUnavailable)]
+    public async Task CreatePackagingDataResubmissionFeePaymentEvent_Should_Log_And_Return_Problem_When_SubmissionService_Returns_Non_Success(HttpStatusCode statusCode)
+    {
+        // Arrange
+        var request = _fixture.Create<PackagingDataResubmissionFeePaymentCreateRequest>();
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, statusCode)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<PackagingDataResubmissionFeePaymentEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreatePackagingDataResubmissionFeePaymentEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType(typeof(ProblemDetails));
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<PackagingDataResubmissionFeePaymentEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
+        _ctlLoggerMock.Verify(r => r.Log(
+            It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception, string>>()
+            ), Times.AtMostOnce);
+    }
+
+
+    [TestMethod]
+    public async Task CreatePackagingDataResubmissionFeePaymentEvent_Log_And_Should_Return_When_Exception_Thrown()
+    {
+        // Arrange
+        var request = _fixture.Create<PackagingDataResubmissionFeePaymentCreateRequest>();
+        _submissionsServiceMock
+            .Setup(r => r.CreateSubmissionEvent(request.SubmissionId, request, (Guid)request.UserId))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _sut.CreatePackagingDataResubmissionFeePaymentEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.Value.Should().BeOfType<ProblemDetails>();
+        result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+        _ctlLoggerMock.Verify(r => r.Log(
+            It.Is<LogLevel>(logLevel => logLevel == LogLevel.Warning),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            It.IsAny<Func<It.IsAnyType, Exception, string>>()
+            ), Times.AtMostOnce);
+    }
+
     // Include the actual MergeCosmosUpdates code here or reference it from the tested class
     // If in a different class, just ensure access is internal or public for testing.
     private static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList)

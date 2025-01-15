@@ -5,13 +5,14 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [Route("api")]
 public class OrganisationRegistrationSubmissionsController(
     IOrganisationRegistrationSubmissionService organisationRegistrationSubmissionService,
-    ILogger<OrganisationRegistrationSubmissionsController> logger, 
+    ILogger<OrganisationRegistrationSubmissionsController> logger,
     IMessagingService messagingService) : Controller
 {
     [HttpPost]
@@ -68,6 +69,40 @@ public class OrganisationRegistrationSubmissionsController(
             var serviceResult =
                 await organisationRegistrationSubmissionService.HandleCreateRegistrationFeePaymentSubmissionEvent(request,
                     GetUserId(request.UserId));
+
+            if (serviceResult.IsSuccessStatusCode)
+            {
+                return Created();
+            }
+
+            return await Problem(serviceResult);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(CreateRegulatorSubmissionDecisionEvent)}");
+            return Problem($"Exception occured processing {nameof(CreateRegulatorSubmissionDecisionEvent)}");
+        }
+    }
+
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Route("organisation-packaging-data-resubmission-fee-payment")]
+    public async Task<IActionResult> CreatePackagingDataResubmissionFeePaymentEvent(
+    [FromBody] PackagingDataResubmissionFeePaymentCreateRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem();
+            }
+
+            var serviceResult =
+                await organisationRegistrationSubmissionService.HandleCreatePackagingDataResubmissionFeePaymentEvent(request, GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
             {
@@ -176,7 +211,7 @@ public class OrganisationRegistrationSubmissionsController(
                     break;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(SendEventEmail)}");
         }
