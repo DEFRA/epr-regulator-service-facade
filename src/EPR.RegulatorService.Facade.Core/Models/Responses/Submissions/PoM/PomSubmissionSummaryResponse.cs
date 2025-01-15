@@ -28,4 +28,6 @@ public class PomSubmissionSummaryResponse
     public bool IsResubmission { get; set; }
     public string? PreviousRejectionComments { get; set; }
     public int NationId { get; set; }
+    public string PomFileName { get; set; }
+    public string PomBlobName { get; set; }
 }
