@@ -40,9 +40,7 @@ public class FileDownloadController : ControllerBase
         var userId = User.UserId();
         var email = User.Email();
         var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
-        // var antiVirusResponse = await _antivirusService.SendFile(request.SubmissionType, request.FileId, truncatedFileName, stream, userId, email);
-        // var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
-         var antiVirusResult = ContentScan.Malicious;
+        var antiVirusResult = ContentScan.Malicious;
         // Create a new submissions event for the download attempt
         var fileDownloadCheckEvent = new FileDownloadCheckEvent()
         {
