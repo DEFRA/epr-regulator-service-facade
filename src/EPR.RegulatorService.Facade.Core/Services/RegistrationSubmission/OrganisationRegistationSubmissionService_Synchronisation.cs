@@ -44,11 +44,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme &&
                 applicationReferenceNumber.Length > _producerApplicationRefNumLength)
             {
-                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}0{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}";
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}{GenerateXDigitNumber(100, 1000)}";
             }
             else
             {
-                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{GenerateXDigitNumber(1000, 10000)}";
             }
 
             if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor ||
@@ -60,13 +60,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             return refNumber;
         }
 
-        private static string Generate4DigitNumber()
+        private static int GenerateXDigitNumber(int min, int max)
         {
-            var min = 1000;
-            var max = 10000;
             var randomNumber = RandomNumberGenerator.GetInt32(min, max);
 
-            return randomNumber.ToString();
+            return randomNumber;
         }
 
         private static string ExtractUniqueNumberFromAppRefNumber(string appRefNumber)

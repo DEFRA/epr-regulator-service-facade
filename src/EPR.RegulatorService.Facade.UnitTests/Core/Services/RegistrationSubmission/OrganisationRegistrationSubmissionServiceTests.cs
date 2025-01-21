@@ -76,11 +76,11 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert  
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 15);
+        Assert.IsTrue(result.Length == 17);
         Assert.IsTrue(result.StartsWith('R'));
         Assert.IsTrue(result.StartsWith($"R{year}"));
         Assert.IsTrue(result.StartsWith($"R{year}EC"));
-        Assert.IsTrue(result.StartsWith($"R{year}EC{orgId}0234"));
+        Assert.IsTrue(result.StartsWith($"R{year}EC{orgId}234"));
     }
 
     [TestMethod]
