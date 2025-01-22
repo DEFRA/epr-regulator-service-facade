@@ -99,6 +99,7 @@ public partial class OrganisationRegistrationSubmissionService(
                 ? GenerateReferenceNumber(
                     request.CountryName.Value,
                     request.RegistrationSubmissionType.Value,
+                    request.ApplicationReferenceNumber,
                     request.OrganisationAccountManagementId.ToString(),
                     request.TwoDigitYear)
                 : string.Empty;
@@ -125,6 +126,21 @@ public partial class OrganisationRegistrationSubmissionService(
         return await submissionService.CreateSubmissionEvent(
             request.SubmissionId,
             new RegistrationFeePaymentEvent
+            {
+                SubmissionId = request.SubmissionId,
+                PaymentMethod = request.PaymentMethod,
+                PaymentStatus = request.PaymentStatus,
+                PaidAmount = $"£{request.PaidAmount}"
+            },
+            userId
+        );
+    }
+
+    public async Task<HttpResponseMessage> HandleCreatePackagingDataResubmissionFeePaymentEvent(PackagingDataResubmissionFeePaymentCreateRequest request, Guid userId)
+    {
+        return await submissionService.CreateSubmissionEvent(
+            request.SubmissionId,
+            new PackagingDataResubmissionFeePaymentEvent
             {
                 SubmissionId = request.SubmissionId,
                 PaymentMethod = request.PaymentMethod,

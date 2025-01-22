@@ -15,10 +15,18 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 {
     public partial class OrganisationRegistrationSubmissionService
     {
+        // 14 is used to support existing data and will be removed for R9.0
+        private const int _producerApplicationRefNumLength = 14;
+
         public string GenerateReferenceNumber(CountryName countryName,
-                                              RegistrationSubmissionType registrationSubmissionType, string organisationId, string twoDigitYear = null,
+                                              RegistrationSubmissionType registrationSubmissionType,
+                                              string applicationReferenceNumber,
+                                              string organisationId,
+                                              string twoDigitYear = null,
                                               MaterialType materialType = MaterialType.None)
         {
+            string refNumber;
+
             if (string.IsNullOrEmpty(twoDigitYear))
             {
                 twoDigitYear = (DateTime.Now.Year % 100).ToString("D2");
@@ -33,7 +41,15 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
             var regType = ((char)registrationSubmissionType).ToString();
 
-            var refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{Generate4DigitNumber()}";
+            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme &&
+                applicationReferenceNumber.Length > _producerApplicationRefNumLength)
+            {
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}{GenerateXDigitNumber(100, 1000)}";
+            }
+            else
+            {
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{GenerateXDigitNumber(1000, 10000)}";
+            }
 
             if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor ||
                 registrationSubmissionType == RegistrationSubmissionType.Exporter)
@@ -44,13 +60,17 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             return refNumber;
         }
 
-        private static string Generate4DigitNumber()
+        private static int GenerateXDigitNumber(int min, int max)
         {
-            var min = 1000;
-            var max = 10000;
             var randomNumber = RandomNumberGenerator.GetInt32(min, max);
 
-            return randomNumber.ToString();
+            return randomNumber;
+        }
+
+        private static string ExtractUniqueNumberFromAppRefNumber(string appRefNumber)
+        {
+            // PEPR000001XXX25C1 is the agreed format of the reference number hence we are targetting the 10th index as per the requirements
+            return appRefNumber.Substring(10, 3);
         }
 
         public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList)
@@ -58,9 +78,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             foreach (var item in requestedList.items)
             {
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
-                                  && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x=>x.Created);
+                                  && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created);
                 var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created).ToList();
-                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created );
+                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created);
 
                 foreach (var cosmosItem in regulatorDecisions)
                 {

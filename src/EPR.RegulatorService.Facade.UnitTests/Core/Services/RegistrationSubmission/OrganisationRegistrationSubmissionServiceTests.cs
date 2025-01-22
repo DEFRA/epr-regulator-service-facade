@@ -33,16 +33,22 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         _fixture = new Fixture().Customize(new AutoMoqCustomization());
     }
-    
+
     [TestMethod]
     public async Task Should_return_valid_ReferenceNumber()
     {
         //Arrange  
         string year = "99";
         string orgId = "123456";
+        string appRefNumber = string.Empty;
 
         // Act 
-        var result = _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, orgId, year);
+        var result = _sut.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.Producer,
+            appRefNumber,
+            orgId,
+            year);
 
         // Assert  
         Assert.IsNotNull(result);
@@ -50,6 +56,31 @@ public class OrganisationRegistrationSubmissionServiceTests
         Assert.IsTrue(result.StartsWith('R'));
         Assert.IsTrue(result.StartsWith($"R{year}"));
         Assert.IsTrue(result.StartsWith($"R{year}EP"));
+    }
+
+    [TestMethod]
+    public async Task Should_return_valid_ReferenceNumber_ForAComplianceScheme()
+    {
+        //Arrange  
+        string year = "99";
+        string orgId = "123456";
+        string appRefNumber = "PEPR00000123425C1";
+
+        // Act 
+        var result = _sut.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.ComplianceScheme,
+            appRefNumber,
+            orgId,
+            year);
+
+        // Assert  
+        Assert.IsNotNull(result);
+        Assert.IsTrue(result.Length == 17);
+        Assert.IsTrue(result.StartsWith('R'));
+        Assert.IsTrue(result.StartsWith($"R{year}"));
+        Assert.IsTrue(result.StartsWith($"R{year}EC"));
+        Assert.IsTrue(result.StartsWith($"R{year}EC{orgId}234"));
     }
 
     [TestMethod]
@@ -350,7 +381,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                                                                         .ToList();
 
 
-        List<AbstractCosmosSubmissionEvent>  updateDeltaRegistrationDecisions = deltaRegistrationDecisions.Select(x => new AbstractCosmosSubmissionEvent
+        List<AbstractCosmosSubmissionEvent> updateDeltaRegistrationDecisions = deltaRegistrationDecisions.Select(x => new AbstractCosmosSubmissionEvent
         {
             AppReferenceNumber = response.ApplicationReferenceNumber,
             RegistrationReferenceNumber = response.RegistrationReferenceNumber,
@@ -397,9 +428,15 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Arrange  
         string year = (DateTime.Now.Year % 100).ToString("D2");
         string orgId = "123456";
-        
+        string appRefNumber = string.Empty;
+
         // Act 
-        var result = _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, orgId, null);
+        var result = _sut.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.Producer,
+            appRefNumber,
+            orgId,
+            null);
 
         // Assert  
         Assert.IsNotNull(result);
@@ -415,9 +452,15 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Arrange  
         string year = (DateTime.Now.Year % 100).ToString("D2");
         string orgId = "123456";
-        
+        string appRefNumber = string.Empty;
+
         // Act 
-        var result = _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Exporter, orgId, null, MaterialType.Steel);
+        var result = _sut.GenerateReferenceNumber(CountryName.Eng,
+            RegistrationSubmissionType.Exporter,
+            appRefNumber,
+            orgId,
+            null,
+            MaterialType.Steel);
 
         // Assert  
         Assert.IsNotNull(result);
@@ -434,9 +477,16 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Arrange  
         string year = (DateTime.Now.Year % 100).ToString("D2");
         string orgId = "123456";
-        
+        string appRefNumber = string.Empty;
+
         // Act 
-        var result = _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Reprocessor, orgId, null, MaterialType.Plastic);
+        var result = _sut.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.Reprocessor,
+            appRefNumber,
+            orgId,
+            null,
+            MaterialType.Plastic);
 
         // Assert  
         Assert.IsNotNull(result);
@@ -451,7 +501,7 @@ public class OrganisationRegistrationSubmissionServiceTests
     public async Task Should_throw_exception_if_OrgId_IsNull()
     {
         // Act 
-        Assert.ThrowsException<ArgumentNullException>(() => _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, null) );
+        Assert.ThrowsException<ArgumentNullException>(() => _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, null));
     }
 
     [TestMethod]
