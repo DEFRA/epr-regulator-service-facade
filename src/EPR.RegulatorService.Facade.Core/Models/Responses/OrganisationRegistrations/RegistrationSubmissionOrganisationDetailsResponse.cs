@@ -56,6 +56,8 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public string SubmissionPeriod { get; internal set; }
     public List<CsoMembershipDetailsDto> CsoMembershipDetails { get; set; }
 
+    public bool IsResubmission { get; set; }
+
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
         (RegistrationSubmissionOrganisationDetailsResponse details) => new()
         {
@@ -70,6 +72,7 @@ public class RegistrationSubmissionOrganisationDetailsResponse
             ApplicationReferenceNumber = details.ApplicationReferenceNumber,
             RegistrationReferenceNumber = details.RegistrationReferenceNumber,
             NationId = details.NationId,
-            SubmissionDate = details.SubmissionDate
+            SubmissionDate = details.SubmissionDate,
+            IsResubmission = details.IsResubmission
         };
 }
