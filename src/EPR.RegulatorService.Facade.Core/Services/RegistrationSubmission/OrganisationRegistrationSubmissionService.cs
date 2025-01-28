@@ -93,7 +93,7 @@ public partial class OrganisationRegistrationSubmissionService(
         RegulatorDecisionCreateRequest request, Guid userId)
     {
         var regRefNumber =
-            request.Status == RegistrationSubmissionStatus.Granted &&
+            !request.IsResubmission && request.Status == RegistrationSubmissionStatus.Granted &&
             request.CountryName.HasValue &&
             request.RegistrationSubmissionType.HasValue
                 ? GenerateReferenceNumber(
@@ -104,20 +104,24 @@ public partial class OrganisationRegistrationSubmissionService(
                     request.TwoDigitYear)
                 : string.Empty;
 
-        return await submissionService.CreateSubmissionEvent(
+        var req = new RegistrationSubmissionDecisionEvent
+        {
+            ApplicationReferenceNumber = request.ApplicationReferenceNumber,
+            OrganisationId = request.OrganisationId,
+            SubmissionId = request.SubmissionId,
+            Decision = request.Status.GetRegulatorDecision(),
+            Comments = request.Comments,
+            RegistrationReferenceNumber = regRefNumber,
+            DecisionDate = request.DecisionDate
+        };
+
+        var res = await submissionService.CreateSubmissionEvent(
             request.SubmissionId,
-            new RegistrationSubmissionDecisionEvent
-            {
-                ApplicationReferenceNumber = request.ApplicationReferenceNumber,
-                OrganisationId = request.OrganisationId,
-                SubmissionId = request.SubmissionId,
-                Decision = request.Status.GetRegulatorDecision(),
-                Comments = request.Comments,
-                RegistrationReferenceNumber = regRefNumber,
-                DecisionDate = request.DecisionDate
-            },
+            req,
             userId
         );
+
+        return res;
     }
 
 

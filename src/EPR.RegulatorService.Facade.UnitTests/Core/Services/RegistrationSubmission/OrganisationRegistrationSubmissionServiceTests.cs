@@ -13,6 +13,9 @@ using Moq;
 using Newtonsoft.Json;
 using static EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.OrganisationRegistrationSubmissionService;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
+using FluentAssertions;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -833,6 +836,73 @@ public class OrganisationRegistrationSubmissionServiceTests
         Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the last (newest) ProducerCommentDate.");
         // Since ProducerCommentDate < RegulatorCommentDate, no status update.
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer ProducerCommentDate still older than RegulatorCommentDate.");
+    }
+
+    [TestMethod]
+    public async Task ShouldCreateRegulatorDecisionSubmissionEvent()
+    {
+        // Arrange
+        var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var request = new RegulatorDecisionCreateRequest
+        {
+            SubmissionId = submissionId, Status = RegistrationSubmissionStatus.Granted,
+            ApplicationReferenceNumber = "PEPR12345678", CountryName = CountryName.Eng,
+            RegistrationSubmissionType = RegistrationSubmissionType.Producer,
+            OrganisationAccountManagementId = "123456", TwoDigitYear = "25"
+        };
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
+            .ReturnsAsync(handlerResponse)
+            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) => {
+                reqEvent.RegistrationReferenceNumber.Should().StartWith("R25EP123456");
+            });
+
+        // Act
+        var result = await _sut.HandleCreateRegulatorDecisionSubmissionEvent(request, userId);
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
+
+    [TestMethod]
+    public async Task ShouldCreateRegulatorDecisionSubmissionEventForResubmission()
+    {
+        // Arrange
+        var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var request = new RegulatorDecisionCreateRequest
+        {
+            SubmissionId = submissionId,
+            Status = RegistrationSubmissionStatus.Granted,
+            IsResubmission = true
+        };
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
+            .ReturnsAsync(handlerResponse)
+            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) => {
+                reqEvent.RegistrationReferenceNumber.Should().BeEmpty();
+            });
+
+        // Act
+        var result = await _sut.HandleCreateRegulatorDecisionSubmissionEvent(request, userId);
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [TestClass]
