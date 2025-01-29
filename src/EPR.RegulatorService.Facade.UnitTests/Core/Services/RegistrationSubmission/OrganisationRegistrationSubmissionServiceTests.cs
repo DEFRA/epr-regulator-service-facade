@@ -426,27 +426,12 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
-    public async Task Should_return_valid_ReferenceNumber_with_null_year()
+    public async Task Should_throw_with_null_year()
     {
         //Arrange  
-        string year = (DateTime.Now.Year % 100).ToString("D2");
-        string orgId = "123456";
-        string appRefNumber = string.Empty;
-
-        // Act 
-        var result = _sut.GenerateReferenceNumber(
-            CountryName.Eng,
-            RegistrationSubmissionType.Producer,
-            appRefNumber,
-            orgId,
-            null);
-
-        // Assert  
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 15);
-        Assert.IsTrue(result.StartsWith('R'));
-        Assert.IsTrue(result.StartsWith($"R{year}"));
-        Assert.IsTrue(result.StartsWith($"R{year}EP"));
+        // Act
+        Assert.ThrowsException<ArgumentNullException>(() => 
+        _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, "123456"));
     }
 
     [TestMethod]
@@ -462,7 +447,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             RegistrationSubmissionType.Exporter,
             appRefNumber,
             orgId,
-            null,
+            year,
             MaterialType.Steel);
 
         // Assert  
@@ -488,7 +473,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             RegistrationSubmissionType.Reprocessor,
             appRefNumber,
             orgId,
-            null,
+            year,
             MaterialType.Plastic);
 
         // Assert  
@@ -882,7 +867,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         {
             SubmissionId = submissionId,
             Status = RegistrationSubmissionStatus.Granted,
-            IsResubmission = true
+            IsResubmission = true,
+            ExistingRegRefNumber = "R25EP123456"
         };
         var handlerResponse =
                 _fixture
@@ -894,7 +880,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
             .ReturnsAsync(handlerResponse)
             .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) => {
-                reqEvent.RegistrationReferenceNumber.Should().BeEmpty();
+                reqEvent.RegistrationReferenceNumber.Should().StartWith("R25EP123456");
             });
 
         // Act

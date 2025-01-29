@@ -92,36 +92,35 @@ public partial class OrganisationRegistrationSubmissionService(
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
         RegulatorDecisionCreateRequest request, Guid userId)
     {
-        var regRefNumber =
-            !request.IsResubmission && request.Status == RegistrationSubmissionStatus.Granted &&
-            request.CountryName.HasValue &&
-            request.RegistrationSubmissionType.HasValue
-                ? GenerateReferenceNumber(
+        var regRefNumber = string.Empty;
+        if (request.Status == RegistrationSubmissionStatus.Granted)
+        {
+            regRefNumber = request.ExistingRegRefNumber;
+            if (!request.IsResubmission && request.CountryName.HasValue && request.RegistrationSubmissionType.HasValue)
+            {
+                regRefNumber = GenerateReferenceNumber(
                     request.CountryName.Value,
                     request.RegistrationSubmissionType.Value,
                     request.ApplicationReferenceNumber,
                     request.OrganisationAccountManagementId.ToString(),
-                    request.TwoDigitYear)
-                : string.Empty;
+                    request.TwoDigitYear);
+            }
+        }
 
-        var req = new RegistrationSubmissionDecisionEvent
-        {
-            ApplicationReferenceNumber = request.ApplicationReferenceNumber,
-            OrganisationId = request.OrganisationId,
-            SubmissionId = request.SubmissionId,
-            Decision = request.Status.GetRegulatorDecision(),
-            Comments = request.Comments,
-            RegistrationReferenceNumber = regRefNumber,
-            DecisionDate = request.DecisionDate
-        };
-
-        var res = await submissionService.CreateSubmissionEvent(
+        return await submissionService.CreateSubmissionEvent(
             request.SubmissionId,
-            req,
+            new RegistrationSubmissionDecisionEvent
+            {
+                ApplicationReferenceNumber = request.ApplicationReferenceNumber,
+                OrganisationId = request.OrganisationId,
+                SubmissionId = request.SubmissionId,
+                Decision = request.Status.GetRegulatorDecision(),
+                Comments = request.Comments,
+                RegistrationReferenceNumber = regRefNumber,
+                DecisionDate = request.DecisionDate
+            },
             userId
         );
-
-        return res;
     }
 
 

@@ -499,6 +499,28 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow(" ")]
+    public async Task Should_Return_Problem_When_RegRefNumber_Is_Invalid_For_Resubmission(string existingRegRefNum)
+    {
+        // Arrange
+        var request = _fixture.Create<RegulatorDecisionCreateRequest>();
+        request.IsResubmission = true;
+        request.ExistingRegRefNumber = existingRegRefNum;
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object, _messageServiceMock.Object);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        var problemDetails = result.Value as ValidationProblemDetails;
+        problemDetails.Should().NotBeNull();
+        problemDetails.Errors.First().Value[0].Should().Be("ExistingRegRefNumber is required for resubmission");
+    }
+
+    [TestMethod]
     [DataRow("SubmissionId", "error")]
     [DataRow("PaymentMethod", "error")]
     [DataRow("PaymentStatus", "error")]

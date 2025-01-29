@@ -30,6 +30,11 @@ public class OrganisationRegistrationSubmissionsController(
             {
                 return ValidationProblem();
             }
+            else if (request.IsResubmission && string.IsNullOrWhiteSpace(request.ExistingRegRefNumber))
+            {
+                ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "ExistingRegRefNumber is required for resubmission");
+                return ValidationProblem(ModelState);
+            }
 
             var serviceResult =
                 await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,

@@ -51,4 +51,6 @@ public class RegulatorDecisionCreateRequest
     public bool? IsWelsh { get; init; } = false;
 
     public bool IsResubmission { get; set; }
+
+    public string? ExistingRegRefNumber { get; set; } = string.Empty;
 }
