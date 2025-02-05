@@ -3,9 +3,9 @@ namespace EPR.RegulatorService.Facade.Core.Configs;
 public class MessagingConfig
 {
     public const string SectionName = "MessagingConfig";
-    
+
     public string ApiKey { get; set; } = string.Empty;
-    
+
     public string ToApprovedPersonApprovedPersonAccepted { get; set; } = string.Empty;
     public string ToApprovedPersonDelegatedPersonAccepted { get; set; } = string.Empty;
     public string ToDelegatedPersonDelegatedPersonAccepted { get; set; } = string.Empty;
@@ -26,7 +26,10 @@ public class MessagingConfig
     public string AccountCreationUrl { get; set; } = string.Empty;
 
     public string OrganisationRegistrationSubmissionQueriedId { get; set; } = string.Empty;
-    public string OrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty; 
     public string WelshOrganisationRegistrationSubmissionQueriedId { get; set; } = string.Empty;
-    public string WelshOrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty; 
+
+    public string OrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty;
+
+    public string OrganisationRegistrationResubmissionDecisionId { get; set; } = string.Empty;
 }

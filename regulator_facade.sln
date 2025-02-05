@@ -13,8 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		RegistrationDecisionEmailTemplate.md = RegistrationDecisionEmailTemplate.md
 		RegistrationQueriedEmailTemplate.md = RegistrationQueriedEmailTemplate.md
+		RegistrationResubmissionDecisionEmailTemplate.md = RegistrationResubmissionDecisionEmailTemplate.md
 		RegistrationWelshDecisionEmailTemplate.md = RegistrationWelshDecisionEmailTemplate.md
 		RegistrationWelshQueriedEmailTemplate.md = RegistrationWelshQueriedEmailTemplate.md
+		WelshRegistrationResubmissionDecisionEmailTemplate.md = WelshRegistrationResubmissionDecisionEmailTemplate.md
 	EndProjectSection
 EndProject
 Global
@@ -38,5 +40,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22C667D5-2E18-4114-907C-EE4648243C1C}
 	EndGlobalSection
 EndGlobal
