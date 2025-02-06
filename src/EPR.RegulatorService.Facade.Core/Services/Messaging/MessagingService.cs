@@ -299,33 +299,36 @@ public class MessagingService : IMessagingService
 
     public void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-
-        var templateId =
-            (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId : _messagingConfig.OrganisationRegistrationSubmissionQueriedId;
-
-        SendEventEmail(model.ToEmail, templateId, model.GetParameters);
+        SendRegistrationSubmissionEmail(
+            model,
+            _messagingConfig.OrganisationRegistrationSubmissionQueriedId,
+            _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId);
     }
 
     public void OrganisationRegistrationSubmissionDecision(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-
-        var templateId =
-            (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId : _messagingConfig.OrganisationRegistrationSubmissionDecisionId;
-
-        SendEventEmail(model.ToEmail, templateId, model.GetParameters);
+        SendRegistrationSubmissionEmail(
+            model,
+            _messagingConfig.OrganisationRegistrationSubmissionDecisionId,
+            _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId);
     }
 
     public void OrganisationRegistrationResubmissionDecision(OrganisationRegistrationSubmissionEmailModel model)
     {
+        SendRegistrationSubmissionEmail(
+            model,
+            _messagingConfig.OrganisationRegistrationResubmissionDecisionId,
+            _messagingConfig.WelshOrganisationRegistrationResubmissionDecisionId);
+    }
+
+    private void SendRegistrationSubmissionEmail(
+        OrganisationRegistrationSubmissionEmailModel model,
+        string englishTemplateId,
+        string welshTemplateId)
+    {
         ValidateOrganisationRegistrationSubmissionModel(model);
 
-        var templateId =
-            (bool)model.IsWelsh
-            ? _messagingConfig.WelshOrganisationRegistrationResubmissionDecisionId
-            : _messagingConfig.OrganisationRegistrationResubmissionDecisionId;
-
+        var templateId = (bool)model.IsWelsh ? welshTemplateId : englishTemplateId;
         SendEventEmail(model.ToEmail, templateId, model.GetParameters);
     }
 

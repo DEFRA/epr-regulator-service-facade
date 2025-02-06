@@ -1165,7 +1165,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Granted_English_SendsResubmissionEmail()
+    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Granted_SendsResubmissionEmail()
     {
         // Arrange
         SetupMockWithMockService();
@@ -1189,32 +1189,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Granted_Welsh_SendsResubmissionEmail()
-    {
-        // Arrange
-        SetupMockWithMockService();
-
-        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
-            .With(r => r.Status, RegistrationSubmissionStatus.Granted)
-            .With(r => r.IsResubmission, true)
-            .With(r => r.IsWelsh, true)
-            .Create();
-
-        _registrationSubmissionServiceMock
-            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
-            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
-
-        // Act
-        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
-
-        // Assert
-        result.Should().BeOfType<CreatedResult>();
-        _messageServiceMock.Verify(m =>
-            m.OrganisationRegistrationResubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
-    }
-
-    [TestMethod]
-    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Refused_English_SendsResubmissionEmail()
+    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Refused_SendsResubmissionEmail()
     {
         // Arrange
         SetupMockWithMockService();
@@ -1222,31 +1197,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var request = _fixture.Build<RegulatorDecisionCreateRequest>()
             .With(r => r.Status, RegistrationSubmissionStatus.Refused)
             .With(r => r.IsResubmission, true)
-            .Create();
-
-        _registrationSubmissionServiceMock
-            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
-            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
-
-        // Act
-        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
-
-        // Assert
-        result.Should().BeOfType<CreatedResult>();
-        _messageServiceMock.Verify(m =>
-            m.OrganisationRegistrationResubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
-    }
-
-    [TestMethod]
-    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Refused_Welsh_SendsResubmissionEmail()
-    {
-        // Arrange
-        SetupMockWithMockService();
-
-        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
-            .With(r => r.Status, RegistrationSubmissionStatus.Refused)
-            .With(r => r.IsResubmission, true)
-            .With(r => r.IsWelsh, true)
             .Create();
 
         _registrationSubmissionServiceMock
