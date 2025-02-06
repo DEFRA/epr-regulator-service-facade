@@ -321,7 +321,12 @@ public class MessagingService : IMessagingService
     {
         ValidateOrganisationRegistrationSubmissionModel(model);
 
-        SendEventEmail(model.ToEmail, _messagingConfig.OrganisationRegistrationResubmissionDecisionId, model.GetParameters);
+        var templateId =
+            (bool)model.IsWelsh
+            ? _messagingConfig.WelshOrganisationRegistrationResubmissionDecisionId
+            : _messagingConfig.OrganisationRegistrationResubmissionDecisionId;
+
+        SendEventEmail(model.ToEmail, templateId, model.GetParameters);
     }
 
     private static void ValidateOrganisationRegistrationSubmissionModel(OrganisationRegistrationSubmissionEmailModel model)

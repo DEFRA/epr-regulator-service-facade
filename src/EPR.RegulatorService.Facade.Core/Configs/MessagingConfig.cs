@@ -32,4 +32,5 @@ public class MessagingConfig
     public string WelshOrganisationRegistrationSubmissionDecisionId { get; set; } = string.Empty;
 
     public string OrganisationRegistrationResubmissionDecisionId { get; set; } = string.Empty;
+    public string WelshOrganisationRegistrationResubmissionDecisionId { get; set; } = string.Empty;
 }
