@@ -1114,6 +1114,153 @@ public class OrganisationRegistrationSubmissionsControllerTests
             ), Times.AtMostOnce);
     }
 
+    #region SendEventEmail (Indirect testing)
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_ValidRequest_Granted_SendsEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Granted)
+            .With(r => r.IsResubmission, false) // Testing normal submission
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_ValidRequest_Rejected_SendsEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Refused)
+            .With(r => r.IsResubmission, false) // Testing normal submission
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Granted_SendsResubmissionEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Granted)
+            .With(r => r.IsResubmission, true)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationResubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Refused_SendsResubmissionEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Refused)
+            .With(r => r.IsResubmission, true)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationResubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Queried_SendsQueriedEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Queried)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationSubmissionQueried(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Cancelled_DoesNotSendEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Cancelled)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+
+        _messageServiceMock.VerifyNoOtherCalls(); // Ensure no email is sent
+    }
+
+    #endregion
+
     // Include the actual MergeCosmosUpdates code here or reference it from the tested class
     // If in a different class, just ensure access is internal or public for testing.
     private static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList)
