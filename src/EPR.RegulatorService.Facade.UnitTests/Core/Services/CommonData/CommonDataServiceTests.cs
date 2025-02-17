@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -35,6 +36,7 @@ public class CommonDataServiceTests
     private const string GetPoMSubmissions = "GetPoMSubmissions";
     private const string GetOrganisationRegistrationDetails = "GetOrganisationRegistrationDetails";
     private const string GetOrganisationRegistrationSubmissionsSummaries = "GetOrganisationRegistrationSubmissionsSummaries";
+    private const string GetPomResubmissionPayCalParameters = "submissions/pom-resubmission-paycal-parameters";
     private HttpClient _httpClient;
     private string _expectedUrl;
     private Guid _userId = Guid.NewGuid();
@@ -51,7 +53,8 @@ public class CommonDataServiceTests
             {
                 GetPoMSubmissions = GetPoMSubmissions,
                 GetOrganisationRegistrationSubmissionDetails = GetOrganisationRegistrationDetails,
-                GetOrganisationRegistrationSubmissionsSummaries = GetOrganisationRegistrationSubmissionsSummaries
+                GetOrganisationRegistrationSubmissionsSummaries = GetOrganisationRegistrationSubmissionsSummaries,
+                GetPomResubmissionPaycalParameters = GetPomResubmissionPayCalParameters
             }
         });
         _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
@@ -314,6 +317,7 @@ public class CommonDataServiceTests
         Assert.IsNotNull(results);
     }
 
+
     [TestMethod]
     public async Task Should_Return_Success_With_Deafult_OrganisationRegistrationSubmissionSummary_When_CommonDataApi_Response_Content_IsNull()
     {
@@ -336,6 +340,71 @@ public class CommonDataServiceTests
         results.Should().NotBeNull();
         results.totalItems.Should().Be(0);  
         results.currentPage.Should().Be(1);
+    }
+
+    [TestMethod]
+    public async Task Should_Return_Null_When_Api_Response_Is_Empty()
+    {
+        // Arrange
+        var submissionId = Guid.NewGuid();
+        var url = $"pom/get-resubmission-paycal-parameters/{submissionId}";
+
+        SetupNullApiSuccessCall("");
+
+        // Act
+        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task Pom_Resubmission_Should_Construct_Correct_Url_When_ComplianceSchemeId_Is_Not_Provided()
+    {
+        // Arrange
+        var submissionId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}";
+
+        SetupApiSuccessCall("{}");
+        
+        // Act
+        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
+
+        // Assert
+        _httpMessageHandlerMock.Verify(); // Verifies that the expected URL was called
+    }
+
+    [TestMethod]
+    public async Task Pom_Resubmission_Should_Construct_Correct_Url_When_ComplianceSchemeId_Is_Provided()
+    {
+        // Arrange
+        var submissionId = Guid.NewGuid();
+        var complianceSchemeId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}?ComplianceSchemeId={complianceSchemeId}";
+
+        SetupApiSuccessCall("{}");
+
+        // Act
+        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+
+        // Assert
+        _httpMessageHandlerMock.Verify(); // Verifies that the expected URL was called
+    }
+
+    [TestMethod]
+    public async Task Pom_Resubmission_Should_Return_Null_When_Response_Is_Empty()
+    {
+        var submissionId = Guid.NewGuid();
+        var complianceSchemeId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}?ComplianceSchemeId={complianceSchemeId}";
+
+        SetupApiSuccessCall("");
+
+        // Act
+        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+
+        // Assert
+        result.Should().BeNull(); // Verifies that the expected URL was called
     }
 
     [TestMethod]
