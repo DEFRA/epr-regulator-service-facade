@@ -20,12 +20,30 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<INotificationClient> _notificationClientMock = new();
         private readonly NullLogger<MessagingService> _nullLogger = new();
+        private readonly Mock<IOptions<MessagingConfig>> _messagingConfigMock = new();
         private const string InvalidUserRecipient = "john.smith@gmail.com.com";
         private const string ApprovedUserRecipient = "john.smith@gmail.com";
         private const string ApprovedUserFirstName = "John";
         private const string ApprovedUserLastName = "Smith";
 
         private MessagingService _sut;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            var messagingConfig = new MessagingConfig
+            {
+                OrganisationRegistrationSubmissionQueriedId = "queried-template-id",
+                WelshOrganisationRegistrationSubmissionQueriedId = "welsh-queried-template-id",
+                OrganisationRegistrationSubmissionDecisionId = "decision-template-id",
+                WelshOrganisationRegistrationSubmissionDecisionId = "welsh-decision-template-id",
+                OrganisationRegistrationResubmissionDecisionId = "resubmission-template-id",
+                WelshOrganisationRegistrationResubmissionDecisionId = "welsh-resubmission-template-id"
+            };
+
+            _messagingConfigMock.Setup(m => m.Value).Returns(messagingConfig);
+            _sut = new MessagingService(_notificationClientMock.Object, _messagingConfigMock.Object, _nullLogger);
+        }
 
         [TestMethod]
         [DataRow("", "firstName", "lastName", "Org 1", "123456789", "https://www.gov.uk/")]
@@ -1065,6 +1083,140 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                null), Times.Exactly(1));
         }
 
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionQueried_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId_English()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                Period = "2025"
+            };
+
+            // Set up the mock for SendEmail
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
+
+            // Act
+            _sut.OrganisationRegistrationSubmissionQueried(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                It.Is<string>(x => x == model.ToEmail),
+                (bool)model.IsWelsh ? "welsh-queried-template-id" : "queried-template-id",
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null),
+                Times.Exactly(1));
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionQueried_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId_Welsh()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "welsh@test.com;english@test.com",
+                Period = "2025",
+                IsWelsh = true
+            };
+
+            // Set up the mock for SendEmail
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
+
+            // Act
+            _sut.OrganisationRegistrationSubmissionQueried(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                It.Is<string>(x => x == model.ToEmail),
+                "welsh-queried-template-id",
+                It.Is<Dictionary<string, object>>(p =>
+                    p["agency_welsh"].ToString() == "Cyfoeth Naturiol Cymru (CNC)" &&
+                    p["agency_email_welsh"].ToString() == "welsh@test.com" &&
+                    p["agency_email"].ToString() == "english@test.com"),
+                null,
+                null,
+                null),
+                Times.Exactly(1));
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionDecision_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "agency@test.com",
+                Period = "2025",
+                IsWelsh = false
+            };
+
+            // Act
+            _sut.OrganisationRegistrationSubmissionDecision(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                model.ToEmail,
+                "decision-template-id",
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationResubmissionDecision_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "agency@test.com",
+                Period = "2025",
+                IsWelsh = false
+            };
+
+            // Act
+            _sut.OrganisationRegistrationResubmissionDecision(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                model.ToEmail,
+                "resubmission-template-id",
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null),
+                Times.Once);
+        }
 
         [TestMethod]
         [DataRow("", "InvitedUserFirstName",

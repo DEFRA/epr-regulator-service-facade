@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		RegistrationResubmissionDecisionEmailTemplate.md = RegistrationResubmissionDecisionEmailTemplate.md
 		RegistrationWelshDecisionEmailTemplate.md = RegistrationWelshDecisionEmailTemplate.md
 		RegistrationWelshQueriedEmailTemplate.md = RegistrationWelshQueriedEmailTemplate.md
+		RegistrationWelshResubmissionDecisionEmailTemplate.md = RegistrationWelshResubmissionDecisionEmailTemplate.md
 	EndProjectSection
 EndProject
 Global
