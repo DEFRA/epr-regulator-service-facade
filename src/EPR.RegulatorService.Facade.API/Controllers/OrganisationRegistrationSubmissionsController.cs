@@ -205,8 +205,15 @@ public class OrganisationRegistrationSubmissionsController(
             switch (request.Status)
             {
                 case Core.Enums.RegistrationSubmissionStatus.Refused:
-                case Core.Enums.RegistrationSubmissionStatus.Granted:
-                    messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
+                case Core.Enums.RegistrationSubmissionStatus.Granted: // Same email for both accept and reject
+                    if (request.IsResubmission)
+                    {
+                        messagingService.OrganisationRegistrationResubmissionDecision(model);
+                    }
+                    else
+                    {
+                        messagingService.OrganisationRegistrationSubmissionDecision(model);
+                    }
                     break;
                 case Core.Enums.RegistrationSubmissionStatus.Queried:
                     messagingService.OrganisationRegistrationSubmissionQueried(model);
