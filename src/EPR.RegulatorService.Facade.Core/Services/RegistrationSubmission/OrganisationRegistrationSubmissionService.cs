@@ -26,7 +26,7 @@ public partial class OrganisationRegistrationSubmissionService(
     };
 
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
-        GetOrganisationRegistrationSubmissionsCommonDataFilter filter, Guid userId)
+        GetOrganisationRegistrationSubmissionsFilter filter, Guid userId)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
         DateTime? lastSyncTime = null;

@@ -63,7 +63,7 @@ public class CommonDataService(
         return ConvertCommonDataDetailToFEData(jsonObject);
     }
 
-    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsCommonDataFilter filter)
+    public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{filter.GenerateQueryString()}";
 

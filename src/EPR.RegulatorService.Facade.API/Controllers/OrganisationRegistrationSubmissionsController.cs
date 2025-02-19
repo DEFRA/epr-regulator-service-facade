@@ -139,7 +139,7 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
-            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter, User.UserId());
+            var result = await organisationRegistrationSubmissionService.HandleGetRegistrationSubmissionList(filter, GetUserId(Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6")));
 
             return Ok(result);
         }

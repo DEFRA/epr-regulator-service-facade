@@ -21,7 +21,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             {
                 new() { Decision = "Pending", AppReferenceNumber = "APP001" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = ""; // no statuses
 
             // Act
@@ -39,7 +39,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             {
                 new() { Decision = "Granted", AppReferenceNumber = "APP002" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "   "; // whitespace only
 
             // Act
@@ -57,7 +57,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             {
                 new() { Decision = "Granted", AppReferenceNumber = "APP003" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "Refused"; // no event with Decision = Refused
 
             // Act
@@ -75,7 +75,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             {
                 new() { Decision = "Pending", AppReferenceNumber = "APP004" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "Pending";
 
             // Act
@@ -94,7 +94,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
                 new() { Decision = "Pending", AppReferenceNumber = "APP005" },
                 new() { Decision = "Pending", AppReferenceNumber = "APP006" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "Pending";
 
             // Act
@@ -115,7 +115,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
                 new() { Decision = "Granted", AppReferenceNumber = "APP008" },
                 new() { Decision = "Granted", AppReferenceNumber = "APP009" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "Pending Granted";
 
             // Act
@@ -135,7 +135,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
                 new() { Decision = "Refused", AppReferenceNumber = "APP010" },
                 new() { Decision = "Cancelled", AppReferenceNumber = "APP011" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "  Refused   Cancelled  "; // extra spaces
 
             // Act
@@ -153,7 +153,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             {
                 new() { Decision = "PENDING", AppReferenceNumber = "APP012" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "Pending"; // differs in case
 
             // Act
@@ -174,7 +174,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
                 new() { Decision = "Pending", AppReferenceNumber = "APP013" }, // duplicate AppRef
                 new() { Decision = "Pending", AppReferenceNumber = "APP014" }
             };
-            var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+            var filter = new GetOrganisationRegistrationSubmissionsFilter();
             var statuses = "Pending";
 
             // Act

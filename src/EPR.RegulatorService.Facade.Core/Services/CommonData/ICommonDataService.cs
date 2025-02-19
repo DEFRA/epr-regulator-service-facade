@@ -18,7 +18,7 @@ public interface ICommonDataService
 
     Task<RegistrationSubmissionOrganisationDetailsResponse> GetOrganisationRegistrationSubmissionDetails(Guid submissionId);
 
-    Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsCommonDataFilter filter);
+    Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter);
 
     Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId);
 }

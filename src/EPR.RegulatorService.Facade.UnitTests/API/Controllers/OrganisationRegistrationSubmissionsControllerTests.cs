@@ -382,7 +382,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _sut.ModelState.AddModelError("PageNumber", "PageNumber is required");
 
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
                     .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>());
 
         // Act
@@ -404,7 +404,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         // Arrange
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
                     .Throws(new InvalidDataException("Invalid"));
 
         // Act
@@ -421,7 +421,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         var expectedResult = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>();
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
                     .ReturnsAsync(expectedResult);
 
         // Act
@@ -443,7 +443,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         SetupMockWithMockService();
 
-        _registrationSubmissionServiceMock.Setup(x => x.HandleGetRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>(), It.IsAny<Guid>())).ThrowsAsync(expectedException);
+        _registrationSubmissionServiceMock.Setup(x => x.HandleGetRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>(), It.IsAny<Guid>())).ThrowsAsync(expectedException);
 
         var result = await _sut.GetRegistrationSubmissionList(parameter);
 

@@ -148,7 +148,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
 
-        public static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsCommonDataFilter filter)
+        public static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsFilter filter)
         {
             filter.ApplicationReferenceNumbers = string.Join(" ",
                 statuses
