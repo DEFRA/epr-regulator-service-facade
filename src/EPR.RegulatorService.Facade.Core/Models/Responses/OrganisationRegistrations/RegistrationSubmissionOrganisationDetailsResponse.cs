@@ -57,6 +57,8 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public List<CsoMembershipDetailsDto> CsoMembershipDetails { get; set; }
     public bool IsResubmission { get; set; }
 
+    public bool IsResubmission { get; set; }
+
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
         (RegistrationSubmissionOrganisationDetailsResponse details) => new()
         {
