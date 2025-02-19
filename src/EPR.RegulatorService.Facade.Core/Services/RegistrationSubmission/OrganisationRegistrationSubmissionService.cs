@@ -92,17 +92,20 @@ public partial class OrganisationRegistrationSubmissionService(
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
         RegulatorDecisionCreateRequest request, Guid userId)
     {
-        var regRefNumber =
-            request.Status == RegistrationSubmissionStatus.Granted &&
-            request.CountryName.HasValue &&
-            request.RegistrationSubmissionType.HasValue
-                ? GenerateReferenceNumber(
+        var regRefNumber = string.Empty;
+        if (request.Status == RegistrationSubmissionStatus.Granted)
+        {
+            regRefNumber = request.ExistingRegRefNumber;
+            if (!request.IsResubmission && request.CountryName.HasValue && request.RegistrationSubmissionType.HasValue)
+            {
+                regRefNumber = GenerateReferenceNumber(
                     request.CountryName.Value,
                     request.RegistrationSubmissionType.Value,
                     request.ApplicationReferenceNumber,
                     request.OrganisationAccountManagementId.ToString(),
-                    request.TwoDigitYear)
-                : string.Empty;
+                    request.TwoDigitYear);
+            }
+        }
 
         return await submissionService.CreateSubmissionEvent(
             request.SubmissionId,

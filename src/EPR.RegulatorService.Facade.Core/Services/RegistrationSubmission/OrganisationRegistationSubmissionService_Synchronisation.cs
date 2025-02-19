@@ -27,12 +27,12 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
         {
             string refNumber;
 
-            if (string.IsNullOrEmpty(twoDigitYear))
+            if (string.IsNullOrWhiteSpace(twoDigitYear))
             {
-                twoDigitYear = (DateTime.Now.Year % 100).ToString("D2");
+                throw new ArgumentNullException(nameof(twoDigitYear));
             }
 
-            if (string.IsNullOrEmpty(organisationId))
+            if (string.IsNullOrWhiteSpace(organisationId))
             {
                 throw new ArgumentNullException(nameof(organisationId));
             }
