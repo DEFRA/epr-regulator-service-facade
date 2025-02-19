@@ -7,9 +7,15 @@ namespace EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissio
 public class GetOrganisationRegistrationSubmissionsFilter
 {
     public string? OrganisationName { get; set; }
+
     public string? OrganisationReference { get; set; }
+
     public string? OrganisationType { get; set; }
+
     public string? Statuses { get; set; }
+
+    public string? ResubmissionStatuses { get; set; }
+
     public string? RelevantYears { get; set; }
 
     [Required]
@@ -31,7 +37,8 @@ public class GetOrganisationRegistrationSubmissionsFilter
         PageNumber = rhs.PageNumber,
         PageSize = rhs.PageSize,
         RelevantYears = rhs.RelevantYears,
-        Statuses = rhs.Statuses
+        Statuses = rhs.Statuses,
+        ResubmissionStatuses = rhs.ResubmissionStatuses
     };
 }
 
@@ -39,9 +46,15 @@ public class GetOrganisationRegistrationSubmissionsFilter
 public class GetOrganisationRegistrationSubmissionsCommonDataFilter
 {
     public string? OrganisationName { get; set; }
+
     public string? OrganisationReference { get; set; }
+
     public string? OrganisationType { get; set; }
+
     public string? Statuses { get; set; }
+
+    public string? ResubmissionStatuses { get; set; }
+
     public string? RelevantYears { get; set; }
 
     [Required]
