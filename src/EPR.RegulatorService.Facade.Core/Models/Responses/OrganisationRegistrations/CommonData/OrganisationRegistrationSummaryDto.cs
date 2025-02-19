@@ -83,6 +83,7 @@ public class OrganisationRegistrationSummaryDto
         }
 
         response.RegulatorUserId = dto.RegulatorUserId;
+        response.IsResubmission = dto.IsResubmission;
 
         response.IsResubmission = dto.IsResubmission;
 
