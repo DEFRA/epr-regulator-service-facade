@@ -18,6 +18,9 @@ using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+using System.Security.Cryptography.Xml;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -140,7 +143,30 @@ public class SubmissionsController : ControllerBase
 
         return HandleError.HandleErrorWithStatusCode(submissions.StatusCode);
     }
-    
+
+    [HttpGet]
+    [Route("pom/get-resubmission-paycal-parameters")]
+    public async Task<IActionResult> GetResubmissionPaycalDetails([FromQuery] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
+    {
+        if( !ModelState.IsValid )
+        {
+            return ValidationProblem();
+        }
+
+        var pomData = await _commonDataService.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+
+        if ( pomData is not null )
+        {
+            if ( pomData.Reference is null && pomData.IsResubmission )
+            {
+                return StatusCode((int)HttpStatusCode.PreconditionRequired, "No Reference Number is available for the Resubmission");
+            }
+            return Ok(pomData);
+        }
+
+        return BadRequest();
+    }
+
     [HttpPost]
     [Route("registration/regulator-decision")]
     public async Task<IActionResult> CreateRegulatorRegistrationDecisionEvent([FromBody] RegulatorRegistrationDecisionCreateRequest request)

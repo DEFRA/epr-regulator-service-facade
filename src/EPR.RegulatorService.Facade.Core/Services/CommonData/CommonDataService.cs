@@ -9,6 +9,7 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -86,6 +87,39 @@ public class CommonDataService(
         var jsonObject = JsonSerializer.Deserialize<PaginatedResponse<OrganisationRegistrationSummaryDto>>(content, _deserialisationOptions);
 
         return ConvertCommonDataCollectionToFEData(jsonObject);
+    }
+
+    public async Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId)
+    {
+        var url = $"{_config.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}";
+        
+        if (complianceSchemeId.HasValue)
+        {
+            url += $"?ComplianceSchemeId={complianceSchemeId}";
+        }
+
+        try
+        {
+            var response = await httpClient.GetAsync(url);
+
+            response.EnsureSuccessStatusCode();
+
+            string content = await response.Content.ReadAsStringAsync();
+            
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return null;
+            }
+            var jsonObject = JsonSerializer.Deserialize<PomResubmissionPaycalParametersDto>(content, _deserialisationOptions);
+
+            return jsonObject;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error processing Pom Resubmission Paycal details");
+        }
+
+        return null;
     }
 
     [ExcludeFromCodeCoverage]
