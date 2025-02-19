@@ -32,4 +32,6 @@ public class OrganisationRegistrationSubmissionSummaryResponse
     public DateTime? RegulatorCommentDate { get; internal set; }
     public DateTime? ProducerCommentDate { get; internal set; }
     public Guid? RegulatorUserId { get; internal set; }
+
+    public bool IsResubmission { get; set; }
 }

@@ -20,12 +20,30 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<INotificationClient> _notificationClientMock = new();
         private readonly NullLogger<MessagingService> _nullLogger = new();
+        private readonly Mock<IOptions<MessagingConfig>> _messagingConfigMock = new();
         private const string InvalidUserRecipient = "john.smith@gmail.com.com";
         private const string ApprovedUserRecipient = "john.smith@gmail.com";
         private const string ApprovedUserFirstName = "John";
         private const string ApprovedUserLastName = "Smith";
 
         private MessagingService _sut;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            var messagingConfig = new MessagingConfig
+            {
+                OrganisationRegistrationSubmissionQueriedId = "queried-template-id",
+                WelshOrganisationRegistrationSubmissionQueriedId = "welsh-queried-template-id",
+                OrganisationRegistrationSubmissionDecisionId = "decision-template-id",
+                WelshOrganisationRegistrationSubmissionDecisionId = "welsh-decision-template-id",
+                OrganisationRegistrationResubmissionDecisionId = "resubmission-template-id",
+                WelshOrganisationRegistrationResubmissionDecisionId = "welsh-resubmission-template-id"
+            };
+
+            _messagingConfigMock.Setup(m => m.Value).Returns(messagingConfig);
+            _sut = new MessagingService(_notificationClientMock.Object, _messagingConfigMock.Object, _nullLogger);
+        }
 
         [TestMethod]
         [DataRow("", "firstName", "lastName", "Org 1", "123456789", "https://www.gov.uk/")]
@@ -91,7 +109,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailId});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailId });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -181,7 +199,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -223,7 +241,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             // Arrange
             var model = new ApplicationEmailModel
             {
-                ApprovedPerson = new UserEmailModel() {Email = email, FirstName = firstName, LastName = lastName},
+                ApprovedPerson = new UserEmailModel() { Email = email, FirstName = firstName, LastName = lastName },
                 OrganisationName = organisationName,
                 OrganisationNumber = organisationNumber,
                 AccountLoginUrl = accountLoginUrl,
@@ -245,7 +263,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             var applicationEmailModel = new ApplicationEmailModel
             {
                 ApprovedPerson = new UserEmailModel()
-                    {Email = ApprovedUserRecipient, FirstName = ApprovedUserLastName, LastName = ApprovedUserLastName},
+                { Email = ApprovedUserRecipient, FirstName = ApprovedUserLastName, LastName = ApprovedUserLastName },
                 OrganisationName = "Org 3",
                 OrganisationNumber = "123456789",
                 AccountLoginUrl = "http://www.gov.uk/guidance/report-packaging-data",
@@ -285,7 +303,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -376,7 +394,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -417,7 +435,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -437,7 +455,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null,
                 null), Times.Exactly(3));
         }
-        
+
         [TestMethod]
         public void RegistrationAccepted_Email_Sends_To_All_Users_With_Approved_Enrolments()
         {
@@ -458,7 +476,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -479,7 +497,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null), Times.Exactly(3));
         }
 
-        
+
         [TestMethod]
         public void SubmissionRejected_Resubmission_Required_Email_Sends_To_All_Users_With_Approved_Enrolments()
         {
@@ -501,7 +519,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -521,7 +539,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null,
                 null), Times.Exactly(3));
         }
-        
+
         [TestMethod]
         public void RegistrationRejected_Email_Sends_To_All_Users_With_Approved_Enrolments()
         {
@@ -543,7 +561,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -563,7 +581,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null,
                 null), Times.Exactly(3));
         }
-        
+
         [TestMethod]
         public void SubmissionRejected_Resubmission_Not_Required_Email_Sends_To_All_Users_With_Approved_Enrolments()
         {
@@ -585,7 +603,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     null,
                     null,
                     null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = Guid.NewGuid().ToString()});
+                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = Guid.NewGuid().ToString() });
 
             var messagingConfig = Options.Create(new MessagingConfig());
 
@@ -605,19 +623,19 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 null,
                 null), Times.Exactly(3));
         }
-        
-         [TestMethod]
-         [DataRow("", "firstName", "lastName", "123456789", "DemotedDelegatedUsed")]
-         [DataRow("bob@hotmail.com", "", "lastName", "123456789", "DemotedDelegatedUsed")]
-         [DataRow("bob@hotmail.com", "firstName", "","123456789", "DemotedDelegatedUsed")]
-         [DataRow("bob@hotmail.com", "firstName", "lastName","", "DemotedDelegatedUsed")]
-         [ExpectedException(typeof(ArgumentException))]
+
+        [TestMethod]
+        [DataRow("", "firstName", "lastName", "123456789", "DemotedDelegatedUsed")]
+        [DataRow("bob@hotmail.com", "", "lastName", "123456789", "DemotedDelegatedUsed")]
+        [DataRow("bob@hotmail.com", "firstName", "", "123456789", "DemotedDelegatedUsed")]
+        [DataRow("bob@hotmail.com", "firstName", "lastName", "", "DemotedDelegatedUsed")]
+        [ExpectedException(typeof(ArgumentException))]
         public void RemovedPerson_DelegatedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
-            string email,
-            string firstName, 
-            string lastName, 
-            string organisationNumber,
-            string type)
+           string email,
+           string firstName,
+           string lastName,
+           string organisationNumber,
+           string type)
         {
             // Arrange
             var model = new AssociatedPersonResults
@@ -626,182 +644,182 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 FirstName = firstName,
                 LastName = lastName,
                 OrganisationId = organisationNumber,
-                EmailNotificationType = type 
+                EmailNotificationType = type
             };
 
             var messagingConfig = Options.Create(new MessagingConfig());
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType );
+            _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType);
         }
-         
-         [TestMethod]
-         [DataRow("", "firstName", "lastName", "123456789", "Org 1", "RemovedApprovedUser")]
-         [DataRow("bob@hotmail.com", "", "lastName", "123456789","Org 1", "RemovedApprovedUser")]
-         [DataRow("bob@hotmail.com", "firstName", "", "123456789","Org 1", "RemovedApprovedUser")]
-         [DataRow("bob@hotmail.com", "firstName", "lastName",  "123456789","", "RemovedApprovedUser")]
-         [DataRow("bob@hotmail.com", "firstName", "lastName", "","Org 1", "RemovedApprovedUser")]
-         [ExpectedException(typeof(ArgumentException))]
-         public void RemovedPerson_ApprovedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
-             string email,
-             string firstName, 
-             string lastName, 
-             string organisationNumber,
-             string companyName,
-             string type)
-         {
-             // Arrange
-             var model = new AssociatedPersonResults
-             {
-                 Email = email,
-                 FirstName = firstName,
-                 LastName = lastName,
-                 CompanyName = companyName,
-                 OrganisationId = organisationNumber,
-                 EmailNotificationType = type,
-             };
 
-             var messagingConfig = Options.Create(new MessagingConfig());
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+        [TestMethod]
+        [DataRow("", "firstName", "lastName", "123456789", "Org 1", "RemovedApprovedUser")]
+        [DataRow("bob@hotmail.com", "", "lastName", "123456789", "Org 1", "RemovedApprovedUser")]
+        [DataRow("bob@hotmail.com", "firstName", "", "123456789", "Org 1", "RemovedApprovedUser")]
+        [DataRow("bob@hotmail.com", "firstName", "lastName", "123456789", "", "RemovedApprovedUser")]
+        [DataRow("bob@hotmail.com", "firstName", "lastName", "", "Org 1", "RemovedApprovedUser")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void RemovedPerson_ApprovedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
+            string email,
+            string firstName,
+            string lastName,
+            string organisationNumber,
+            string companyName,
+            string type)
+        {
+            // Arrange
+            var model = new AssociatedPersonResults
+            {
+                Email = email,
+                FirstName = firstName,
+                LastName = lastName,
+                CompanyName = companyName,
+                OrganisationId = organisationNumber,
+                EmailNotificationType = type,
+            };
 
-             // Act
-             _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType );
-         }
-         
-         [TestMethod]
-         public void RemoveApprovedPerson_Email_Sends_To_ApprovedUser()
-         {
-             var emailNotificationId = "C123456";
-             // Arrange
-             var model = new AssociatedPersonResults
-             {
-                 Email = ApprovedUserRecipient,
-                 FirstName = ApprovedUserFirstName,
-                 LastName = ApprovedUserLastName,
-                 CompanyName = "Test Company",
-                 OrganisationId = "123987345",
-                 ServiceRoleId = 1,
-                 AccountSignInUrl = "https://www.gov.uk/report-data"
-             };
+            var messagingConfig = Options.Create(new MessagingConfig());
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
-             _notificationClientMock.Setup(x => x.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, object>>(),
-                null,
-                null,
-                null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+            // Act
+            _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType);
+        }
 
-             var messagingConfig = Options.Create(new MessagingConfig());
+        [TestMethod]
+        public void RemoveApprovedPerson_Email_Sends_To_ApprovedUser()
+        {
+            var emailNotificationId = "C123456";
+            // Arrange
+            var model = new AssociatedPersonResults
+            {
+                Email = ApprovedUserRecipient,
+                FirstName = ApprovedUserFirstName,
+                LastName = ApprovedUserLastName,
+                CompanyName = "Test Company",
+                OrganisationId = "123987345",
+                ServiceRoleId = 1,
+                AccountSignInUrl = "https://www.gov.uk/report-data"
+            };
 
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null))
+               .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
 
-             // Act
-             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "RemovedApprovedUser");
+            var messagingConfig = Options.Create(new MessagingConfig());
 
-             // Assert
-             notificationId.Should().Be(emailNotificationId);
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
-             _notificationClientMock.Verify(x => x.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, object>>(),
-                null,
-                null,
-                null), Times.Exactly(1));
-         }
-         
-         [TestMethod]
-         public void RemoveApprovedPerson_Email_Sends_To_DemotedDelegatedUser()
-         {
-             var emailNotificationId = "P521254";
-             // Arrange
-             var model = new AssociatedPersonResults
-             {
-                 Email = ApprovedUserRecipient,
-                 FirstName = ApprovedUserFirstName,
-                 LastName = ApprovedUserLastName,
-                 CompanyName = "Test Company",
-                 OrganisationId = "123987345",
-                 ServiceRoleId = 3,
-             };
+            // Act
+            var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "RemovedApprovedUser");
 
-             _notificationClientMock.Setup(x => x.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, object>>(),
-                null,
-                null,
-                null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+            // Assert
+            notificationId.Should().Be(emailNotificationId);
 
-             var messagingConfig = Options.Create(new MessagingConfig());
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
 
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+        [TestMethod]
+        public void RemoveApprovedPerson_Email_Sends_To_DemotedDelegatedUser()
+        {
+            var emailNotificationId = "P521254";
+            // Arrange
+            var model = new AssociatedPersonResults
+            {
+                Email = ApprovedUserRecipient,
+                FirstName = ApprovedUserFirstName,
+                LastName = ApprovedUserLastName,
+                CompanyName = "Test Company",
+                OrganisationId = "123987345",
+                ServiceRoleId = 3,
+            };
 
-             // Act
-             var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "DemotedDelegatedUsed");
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null))
+               .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
 
-             // Assert
-             notificationId.Should().Be(emailNotificationId);
+            var messagingConfig = Options.Create(new MessagingConfig());
 
-             _notificationClientMock.Verify(x => x.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, object>>(),
-                null,
-                null,
-                null), Times.Exactly(1));
-         }
-         
-         [TestMethod]
-         public void InviteNewApprovedPerson_ValidParameters_EmailSendsSuccessfully()
-         {
-             var emailNotificationId = "C123456";
-             // Arrange
-             var model = new AddRemoveNewApprovedPersonEmailModel
-             {
-                 Email = "test@test.com",
-                 FirstName = "InvitedUserFirstName",
-                 LastName = "InvitedUserLastName",
-                 OrganisationNumber = "OrganisationNumber",
-                 InviteLink = "SomeInviteLink",
-                 CompanyName = "BlahCompanyName"
-             };
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
-             _notificationClientMock.Setup(x => x.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<Dictionary<string, object>>(),
-                null,
-                null,
-                null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() {id = emailNotificationId});
+            // Act
+            var notificationId = _sut.SendRemovedApprovedPersonNotification(model, "DemotedDelegatedUsed");
 
-             var messagingConfig = Options.Create(
-                 new MessagingConfig
-             {
-                 InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
-             });
+            // Assert
+            notificationId.Should().Be(emailNotificationId);
 
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
 
-             // Act
-             var notificationId = _sut.SendEmailToInvitedNewApprovedPerson(model);
+        [TestMethod]
+        public void InviteNewApprovedPerson_ValidParameters_EmailSendsSuccessfully()
+        {
+            var emailNotificationId = "C123456";
+            // Arrange
+            var model = new AddRemoveNewApprovedPersonEmailModel
+            {
+                Email = "test@test.com",
+                FirstName = "InvitedUserFirstName",
+                LastName = "InvitedUserLastName",
+                OrganisationNumber = "OrganisationNumber",
+                InviteLink = "SomeInviteLink",
+                CompanyName = "BlahCompanyName"
+            };
 
-             // Assert
-             notificationId.Should().Be(emailNotificationId);
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null))
+               .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
 
-             _notificationClientMock.Verify(x => x.SendEmail(
-                It.Is<string>(x => x == model.Email),
-                It.Is<string>(x => x == messagingConfig.Value.InviteNewApprovedPersonTemplateId),
-                It.IsAny<Dictionary<string, object>>(),
-                null,
-                null,
-                null), Times.Exactly(1));
-         }
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
+                });
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            // Act
+            var notificationId = _sut.SendEmailToInvitedNewApprovedPerson(model);
+
+            // Assert
+            notificationId.Should().Be(emailNotificationId);
+
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.Is<string>(x => x == model.Email),
+               It.Is<string>(x => x == messagingConfig.Value.InviteNewApprovedPersonTemplateId),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
 
         [TestMethod]
         public void OrganisationRegistrationSubmissionQueried_SendsEmail()
@@ -812,7 +830,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 OrganisationName = "org name",
                 OrganisationNumber = "12345",
                 Agency = "Agency",
-                Period = "2025" 
+                Period = "2025"
             };
 
 
@@ -822,7 +840,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                It.IsAny<Dictionary<string, object>>(),
                null,
                null,
-               null)) ;
+               null));
 
             var messagingConfig = Options.Create(
                 new MessagingConfig
@@ -830,7 +848,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                     OrganisationRegistrationSubmissionQueriedId = "SomeInviteNewApprovedPersonTemplateId"
                 });
 
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
             _sut.OrganisationRegistrationSubmissionQueried(model);
 
             _notificationClientMock.Verify(x => x.SendEmail(
@@ -897,9 +915,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 
             var data = model.GetParameters;
 
-            Assert.AreEqual( "test@test.com", data["agency_email_welsh"]);
-            Assert.AreEqual( "test2@test.com", data["agency_email"]);
-            Assert.AreEqual( "Cyfoeth Naturiol Cymru (CNC)", data["agency_welsh"]); 
+            Assert.AreEqual("test@test.com", data["agency_email_welsh"]);
+            Assert.AreEqual("test2@test.com", data["agency_email"]);
+            Assert.AreEqual("Cyfoeth Naturiol Cymru (CNC)", data["agency_welsh"]);
         }
 
         [TestMethod]
@@ -911,7 +929,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 OrganisationName = "org name",
                 OrganisationNumber = "12345",
                 Agency = "Agency",
-                Period = "2025" 
+                Period = "2025"
             };
 
 
@@ -940,7 +958,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                null,
                null), Times.Exactly(1));
         }
-         
+
         [TestMethod]
         public void OrganisationRegistrationSubmissionAccepted_SendsEmail()
         {
@@ -950,7 +968,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                 OrganisationName = "org name",
                 OrganisationNumber = "12345",
                 Agency = "Agency",
-                Period = "2025" 
+                Period = "2025"
             };
 
 
@@ -1019,57 +1037,237 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
                null), Times.Exactly(1));
         }
 
+        [TestMethod]
+        public void OrganisationRegistrationResubmissionDecision_SendsEmail()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                Period = "2025"
+            };
+
+            // Set up the mock for SendEmail
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
+
+            // Set up the messaging configuration
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    OrganisationRegistrationResubmissionDecisionId = "SomeResubmissionTemplateId"
+                });
+
+            // Initialize the system under test (SUT)
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            // Act
+            _sut.OrganisationRegistrationResubmissionDecision(model);
+
+            // Assert
+            // Verify that SendEmail is called with the correct parameters
+            _notificationClientMock.Verify(x => x.SendEmail(
+               It.Is<string>(x => x == model.ToEmail),
+               It.Is<string>(x => x == messagingConfig.Value.OrganisationRegistrationResubmissionDecisionId),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null), Times.Exactly(1));
+        }
 
         [TestMethod]
-         [DataRow("", "InvitedUserFirstName",
-             "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
-         [DataRow("test@test.com", "",
-              "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
-         [DataRow("test@test.com", "InvitedUserFirstName",
-              "", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
-         [DataRow("test@test.com", "InvitedUserFirstName",
-              "InvitedUserLastName", "", "SomeInviteLink", "CompanyName")]
-         [DataRow("test@test.com", "InvitedUserFirstName",
-              "InvitedUserLastName", "OrganisationNumber", "", "CompanyName")]
-         [DataRow("test@test.com", "InvitedUserFirstName",
-             "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "")]
-         public void InviteNewApprovedPerson_InvalidParameters_ShouldThrowArgumentException(
-             string email, string firstName, 
-             string lastName, string organisationNumber, 
-             string inviteLink, string companyName)
+        public void OrganisationRegistrationSubmissionQueried_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId_English()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                Period = "2025"
+            };
 
-         {
-             var emailNotificationId = "C123456";
-             // Arrange
-             var model = new AddRemoveNewApprovedPersonEmailModel
-             {
-                 Email = email,
-                 FirstName = firstName,
-                 LastName = lastName,
-                 OrganisationNumber = organisationNumber,
-                 InviteLink = inviteLink, 
-                 CompanyName = companyName
-             };
+            // Set up the mock for SendEmail
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
 
-             _notificationClientMock.Setup(x => x.SendEmail(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
+            // Act
+            _sut.OrganisationRegistrationSubmissionQueried(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                It.Is<string>(x => x == model.ToEmail),
+                (bool)model.IsWelsh ? "welsh-queried-template-id" : "queried-template-id",
                 It.IsAny<Dictionary<string, object>>(),
                 null,
                 null,
-                null))
-                .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
+                null),
+                Times.Exactly(1));
+        }
 
-             var messagingConfig = Options.Create(
-                 new MessagingConfig
-                 {
-                     InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
-                 });
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionQueried_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId_Welsh()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "welsh@test.com;english@test.com",
+                Period = "2025",
+                IsWelsh = true
+            };
 
-             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+            // Set up the mock for SendEmail
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null));
 
-             Assert.ThrowsException<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
-         }
+            // Act
+            _sut.OrganisationRegistrationSubmissionQueried(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                It.Is<string>(x => x == model.ToEmail),
+                "welsh-queried-template-id",
+                It.Is<Dictionary<string, object>>(p =>
+                    p["agency_welsh"].ToString() == "Cyfoeth Naturiol Cymru (CNC)" &&
+                    p["agency_email_welsh"].ToString() == "welsh@test.com" &&
+                    p["agency_email"].ToString() == "english@test.com"),
+                null,
+                null,
+                null),
+                Times.Exactly(1));
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationSubmissionDecision_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "agency@test.com",
+                Period = "2025",
+                IsWelsh = false
+            };
+
+            // Act
+            _sut.OrganisationRegistrationSubmissionDecision(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                model.ToEmail,
+                "decision-template-id",
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void OrganisationRegistrationResubmissionDecision_Should_Call_SendRegistrationSubmissionEmail_With_Correct_TemplateId()
+        {
+            // Arrange
+            var model = new OrganisationRegistrationSubmissionEmailModel
+            {
+                ToEmail = "test@test.com",
+                OrganisationName = "org name",
+                OrganisationNumber = "12345",
+                Agency = "Agency",
+                AgencyEmail = "agency@test.com",
+                Period = "2025",
+                IsWelsh = false
+            };
+
+            // Act
+            _sut.OrganisationRegistrationResubmissionDecision(model);
+
+            // Assert
+            _notificationClientMock.Verify(nc => nc.SendEmail(
+                model.ToEmail,
+                "resubmission-template-id",
+                It.IsAny<Dictionary<string, object>>(),
+                null,
+                null,
+                null),
+                Times.Once);
+        }
+
+        [TestMethod]
+        [DataRow("", "InvitedUserFirstName",
+             "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
+        [DataRow("test@test.com", "",
+              "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
+        [DataRow("test@test.com", "InvitedUserFirstName",
+              "", "OrganisationNumber", "SomeInviteLink", "CompanyName")]
+        [DataRow("test@test.com", "InvitedUserFirstName",
+              "InvitedUserLastName", "", "SomeInviteLink", "CompanyName")]
+        [DataRow("test@test.com", "InvitedUserFirstName",
+              "InvitedUserLastName", "OrganisationNumber", "", "CompanyName")]
+        [DataRow("test@test.com", "InvitedUserFirstName",
+             "InvitedUserLastName", "OrganisationNumber", "SomeInviteLink", "")]
+        public void InviteNewApprovedPerson_InvalidParameters_ShouldThrowArgumentException(
+             string email, string firstName,
+             string lastName, string organisationNumber,
+             string inviteLink, string companyName)
+
+        {
+            var emailNotificationId = "C123456";
+            // Arrange
+            var model = new AddRemoveNewApprovedPersonEmailModel
+            {
+                Email = email,
+                FirstName = firstName,
+                LastName = lastName,
+                OrganisationNumber = organisationNumber,
+                InviteLink = inviteLink,
+                CompanyName = companyName
+            };
+
+            _notificationClientMock.Setup(x => x.SendEmail(
+               It.IsAny<string>(),
+               It.IsAny<string>(),
+               It.IsAny<Dictionary<string, object>>(),
+               null,
+               null,
+               null))
+               .Returns(new Notify.Models.Responses.EmailNotificationResponse() { id = emailNotificationId });
+
+            var messagingConfig = Options.Create(
+                new MessagingConfig
+                {
+                    InviteNewApprovedPersonTemplateId = "SomeInviteNewApprovedPersonTemplateId"
+                });
+
+            _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
+
+            Assert.ThrowsException<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
+        }
 
 
         [TestMethod]

@@ -22,6 +22,7 @@ public class OrganisationRegistrationSummaryDto
     public string? ProducerCommentDate { get; set; }
     public Guid? RegulatorUserId { get; set; }
     public int NationId { get; set; }
+    public bool IsResubmission { get; set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse(OrganisationRegistrationSummaryDto dto)
     {
@@ -82,6 +83,9 @@ public class OrganisationRegistrationSummaryDto
         }
 
         response.RegulatorUserId = dto.RegulatorUserId;
+        response.IsResubmission = dto.IsResubmission;
+
+        response.IsResubmission = dto.IsResubmission;
 
         return response;
     }

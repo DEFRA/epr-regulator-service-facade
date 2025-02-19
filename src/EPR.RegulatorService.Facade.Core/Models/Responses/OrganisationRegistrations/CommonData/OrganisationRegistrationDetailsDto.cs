@@ -74,6 +74,7 @@ public class OrganisationRegistrationDetailsDto
     public string? BrandsFileName { get; set; }
     public string? BrandsBlobName { get; set; }
     public string? CSOJson { get; set; }
+    public bool IsResubmission { get; set; }
 
     public static implicit operator RegistrationSubmissionOrganisationDetailsResponse(OrganisationRegistrationDetailsDto dto)
     {
@@ -172,7 +173,7 @@ public class OrganisationRegistrationDetailsDto
             SubmissionPeriod = dto.SubmissionPeriod
         };
         response.SubmissionDetails = submissionDetails;
-
+        response.IsResubmission = dto.IsResubmission;
         return response;
     }
 
