@@ -84,9 +84,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
                 foreach (var cosmosItem in regulatorDecisions)
                 {
-                    if (item.RegulatorCommentDate is null || cosmosItem.Created > item.RegulatorCommentDate)
+                    if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
                     {
-                        item.RegulatorCommentDate = cosmosItem.Created;
+                        item.RegulatorDecisionDate = cosmosItem.Created;
                         item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
                         item.StatusPendingDate = cosmosItem.DecisionDate;
                         item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
@@ -94,7 +94,14 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 }
                 foreach (var cosmosDate in producerComments)
                 {
-                    item.ProducerCommentDate = cosmosDate;
+                    if (cosmosDate > item.SubmissionDate)
+                    {
+                        if (!item.IsResubmission)
+                        {
+                            item.IsResubmission = true;
+                            item.ResubmissionDate = cosmosDate;
+                        }
+                    }
                 }
             }
         }
