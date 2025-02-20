@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
@@ -102,20 +103,20 @@ public class CommonDataService(
         {
             var response = await httpClient.GetAsync(url);
 
-            if (response.StatusCode ==  System.Net.HttpStatusCode.PreconditionFailed)
+            if (response.StatusCode ==  HttpStatusCode.PreconditionFailed)
             {
                 return new PomResubmissionPaycalParametersDto { 
                     ReferenceFieldNotAvailable = true };
             }
 
-            if (response.StatusCode == System.Net.HttpStatusCode.PreconditionRequired)
+            if (response.StatusCode == HttpStatusCode.PreconditionRequired)
             {
                 return new PomResubmissionPaycalParametersDto { 
                     ReferenceNotAvailable = true };
             }
 
             response.EnsureSuccessStatusCode();
-            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            if (response.StatusCode == HttpStatusCode.NoContent)
             {
                 return default;
             }
