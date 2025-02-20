@@ -7,7 +7,7 @@ namespace EPR.RegulatorService.Facade.Core.Extensions;
 [ExcludeFromCodeCoverage]
 public static class GetOrganisationRegistrationSubmissionsFilterExtensions
 {
-    public static string GenerateQueryString(this GetOrganisationRegistrationSubmissionsCommonDataFilter source)
+    public static string GenerateQueryString(this GetOrganisationRegistrationSubmissionsFilter source)
     {
         static string? convertSpaceToComma(string? input) =>
            string.IsNullOrWhiteSpace(input)

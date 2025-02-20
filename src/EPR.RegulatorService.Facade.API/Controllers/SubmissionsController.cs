@@ -19,7 +19,6 @@ using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
-using System.Security.Cryptography.Xml;
 using System.Net;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
@@ -108,7 +107,7 @@ public class SubmissionsController : ControllerBase
             return HandleError.HandleErrorWithStatusCode(lastSyncResponse.StatusCode);
         }
 
-        var submissionEventsLastSync = lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>().Result;
+        var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
 
         var deltaPoMDecisionsResponse = await _submissionService.GetDeltaPoMSubmissions(submissionEventsLastSync.LastSyncTime, User.UserId());
         
@@ -117,7 +116,7 @@ public class SubmissionsController : ControllerBase
             return HandleError.HandleErrorWithStatusCode(deltaPoMDecisionsResponse.StatusCode);
         }
         
-        var deltaPoMDecisions = deltaPoMDecisionsResponse.Content.ReadFromJsonAsync<RegulatorPomDecision[]>().Result;
+        var deltaPoMDecisions = await deltaPoMDecisionsResponse.Content.ReadFromJsonAsync<RegulatorPomDecision[]>();
 
         var pomSubmissionsRequest = new GetPomSubmissionsRequest
         {
@@ -145,8 +144,8 @@ public class SubmissionsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("pom/get-resubmission-paycal-parameters")]
-    public async Task<IActionResult> GetResubmissionPaycalDetails([FromQuery] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
+    [Route("pom/get-resubmission-paycal-parameters/{submissionId}")]
+    public async Task<IActionResult> GetResubmissionPaycalDetails([FromRoute] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
     {
         if( !ModelState.IsValid )
         {

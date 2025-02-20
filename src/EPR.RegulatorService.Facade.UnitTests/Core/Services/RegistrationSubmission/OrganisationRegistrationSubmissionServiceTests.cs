@@ -256,7 +256,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         };
 
         _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>())).ReturnsAsync(organisationRegistrationSubmissionSummaryResponse);
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>())).ReturnsAsync(organisationRegistrationSubmissionSummaryResponse);
         _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null))
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
