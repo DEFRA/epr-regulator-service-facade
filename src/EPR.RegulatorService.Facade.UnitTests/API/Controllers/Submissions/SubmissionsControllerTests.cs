@@ -608,12 +608,12 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
         [TestMethod]
         public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Throw_428_When_No_ReferenceNumber_Available_And_IsResubmission_IsTrue()
         {
-            PomResubmissionPaycalParametersDto returnObj = new PomResubmissionPaycalParametersDto { IsResubmission = true, Reference = null };
+            PomResubmissionPaycalParametersDto returnObj = new PomResubmissionPaycalParametersDto { IsResubmission = true, ReferenceNotAvailable = true };
 
             // Arrange
             _mockCommonDataService
                 .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
-                .ReturnsAsync((PomResubmissionPaycalParametersDto)returnObj);
+                .ReturnsAsync(returnObj);
 
             // Act
             var result = await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), null);
@@ -624,20 +624,20 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
         }
 
         [TestMethod]
-        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Return_OK_When_No_ReferenceNumber_Available_And_IsResubmission_IsFalse()
+        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Return_NoContent_When_IsResubmission_IsFalse()
         {
-            PomResubmissionPaycalParametersDto returnObj = new PomResubmissionPaycalParametersDto { IsResubmission = false, Reference = null };
+            PomResubmissionPaycalParametersDto returnObj = new PomResubmissionPaycalParametersDto { IsResubmission = false };
 
             // Arrange
             _mockCommonDataService
                 .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
-                .ReturnsAsync((PomResubmissionPaycalParametersDto)returnObj);
+                .ReturnsAsync(returnObj);
 
             // Act
             var result = await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), null);
 
             // Assert
-            result.Should().BeOfType<OkObjectResult>();
+            result.Should().BeOfType<NoContentResult>();
         }
 
         [TestMethod]
@@ -645,6 +645,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
         {
             // Arrange
             var response = _fixture.Create<PomResubmissionPaycalParametersDto>();
+            response.ReferenceFieldNotAvailable = false;
             _mockCommonDataService
                 .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
                 .ReturnsAsync(response);

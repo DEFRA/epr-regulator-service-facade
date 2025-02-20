@@ -8,5 +8,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.Submissions
         public DateTime? ResubmissionDate { get; set; }
         public int? MemberCount { get; set; }
         public string? Reference { get; set; }
+        public bool ReferenceNotAvailable { get; set; }
+        public bool ReferenceFieldNotAvailable { get; set; }
     }
 }

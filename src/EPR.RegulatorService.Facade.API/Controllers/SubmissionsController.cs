@@ -34,10 +34,10 @@ public class SubmissionsController : ControllerBase
     private readonly ICommonDataService _commonDataService;
 
     public SubmissionsController(
-        ILogger<SubmissionsController> logger, 
-        ISubmissionService submissionService, 
+        ILogger<SubmissionsController> logger,
+        ISubmissionService submissionService,
         IRegulatorOrganisationService regulatorOrganisationService,
-        IOptions<MessagingConfig> messagingConfig, 
+        IOptions<MessagingConfig> messagingConfig,
         IMessagingService messagingService,
         ICommonDataService commonDataService)
     {
@@ -65,9 +65,9 @@ public class SubmissionsController : ControllerBase
             Comments = request.Comments,
             FileId = request.FileId
         };
-        
+
         var submissionEvent = await _submissionService.CreateSubmissionEvent(request.SubmissionId, regulatorPoMDecisionEvent, User.UserId());
-        
+
         if (submissionEvent.IsSuccessStatusCode)
         {
             var users = await _regulatorUsers.GetRegulatorUsers(User.UserId(), request.OrganisationId);
@@ -80,11 +80,11 @@ public class SubmissionsController : ControllerBase
             }
             else
             {
-                emailIds = request.IsResubmissionRequired 
-                    ? _messagingService.SubmissionRejected(model, true) 
+                emailIds = request.IsResubmissionRequired
+                    ? _messagingService.SubmissionRejected(model, true)
                     : _messagingService.SubmissionRejected(model, false);
             }
-            
+
             return Ok(emailIds);
         }
 
@@ -110,12 +110,12 @@ public class SubmissionsController : ControllerBase
         var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
 
         var deltaPoMDecisionsResponse = await _submissionService.GetDeltaPoMSubmissions(submissionEventsLastSync.LastSyncTime, User.UserId());
-        
+
         if (!deltaPoMDecisionsResponse.IsSuccessStatusCode)
         {
             return HandleError.HandleErrorWithStatusCode(deltaPoMDecisionsResponse.StatusCode);
         }
-        
+
         var deltaPoMDecisions = await deltaPoMDecisionsResponse.Content.ReadFromJsonAsync<RegulatorPomDecision[]>();
 
         var pomSubmissionsRequest = new GetPomSubmissionsRequest
@@ -147,23 +147,29 @@ public class SubmissionsController : ControllerBase
     [Route("pom/get-resubmission-paycal-parameters/{submissionId}")]
     public async Task<IActionResult> GetResubmissionPaycalDetails([FromRoute] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
     {
-        if( !ModelState.IsValid )
+        if (!ModelState.IsValid)
         {
             return ValidationProblem();
         }
 
         var pomData = await _commonDataService.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
 
-        if ( pomData is not null )
+        if (pomData is not null && pomData.IsResubmission)
         {
-            if ( pomData.Reference is null && pomData.IsResubmission )
+            if (pomData.ReferenceFieldNotAvailable)
+            {
+                return StatusCode((int)HttpStatusCode.PreconditionFailed, "No Reference field is available for the Resubmission");
+            }
+
+            if (pomData.ReferenceNotAvailable)
             {
                 return StatusCode((int)HttpStatusCode.PreconditionRequired, "No Reference Number is available for the Resubmission");
             }
+            
             return Ok(pomData);
         }
 
-        return BadRequest();
+        return NoContent();
     }
 
     [HttpPost]
@@ -181,14 +187,14 @@ public class SubmissionsController : ControllerBase
             Comments = request.Comments,
             FileId = request.FileId
         };
-        
+
         var submissionEvent = await _submissionService.CreateSubmissionEvent(request.SubmissionId, regulatorRegistrationDecisionEvent, User.UserId());
-        
+
         if (submissionEvent.IsSuccessStatusCode)
         {
             var users = await _regulatorUsers.GetRegulatorUsers(User.UserId(), request.OrganisationId);
             var model = CreateBaseEmailModel(users, request);
-           
+
             List<string> emailIds;
             if (request.Decision == RegulatorDecision.Accepted)
             {
@@ -198,13 +204,13 @@ public class SubmissionsController : ControllerBase
             {
                 emailIds = _messagingService.SubmissionRejected(model, null);
             }
-            
+
             return Ok(emailIds);
         }
 
         return new BadRequestResult();
     }
-    
+
     [HttpGet]
     [Route("registrations/get-submissions")]
     public async Task<IActionResult> GetRegistrationSubmissions([FromQuery] RegistrationSubmissionsFilters request)
@@ -223,12 +229,12 @@ public class SubmissionsController : ControllerBase
         var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
 
         var deltaRegistrationDecisionsResponse = await _submissionService.GetDeltaRegistrationSubmissions(submissionEventsLastSync.LastSyncTime, User.UserId());
-        
+
         if (!deltaRegistrationDecisionsResponse.IsSuccessStatusCode)
         {
             return HandleError.HandleErrorWithStatusCode(deltaRegistrationDecisionsResponse.StatusCode);
         }
-        
+
         var deltaRegistrationDecisions = await deltaRegistrationDecisionsResponse.Content.ReadFromJsonAsync<RegulatorRegistrationDecision[]>();
 
         var registrationSubmissionsRequest = new GetRegistrationSubmissionsRequest
@@ -255,13 +261,13 @@ public class SubmissionsController : ControllerBase
 
         return HandleError.HandleErrorWithStatusCode(submissions.StatusCode);
     }
-    
+
     private SubmissionEmailModel CreateBaseEmailModel(List<OrganisationUser> users, AbstractDecisionRequest request)
     {
         var userEmails = users.Select(user => new UserEmailModel
         {
-            Email = user.Email, 
-            FirstName = user.FirstName, 
+            Email = user.Email,
+            FirstName = user.FirstName,
             LastName = user.LastName
         }).ToList();
 

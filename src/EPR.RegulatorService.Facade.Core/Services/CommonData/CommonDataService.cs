@@ -102,24 +102,35 @@ public class CommonDataService(
         {
             var response = await httpClient.GetAsync(url);
 
+            if (response.StatusCode ==  System.Net.HttpStatusCode.PreconditionFailed)
+            {
+                return new PomResubmissionPaycalParametersDto { 
+                    ReferenceFieldNotAvailable = true };
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.PreconditionRequired)
+            {
+                return new PomResubmissionPaycalParametersDto { 
+                    ReferenceNotAvailable = true };
+            }
+
             response.EnsureSuccessStatusCode();
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return default;
+            }
 
             string content = await response.Content.ReadAsStringAsync();
-            
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                return null;
-            }
-            var jsonObject = JsonSerializer.Deserialize<PomResubmissionPaycalParametersDto>(content, _deserialisationOptions);
+            var pomResubmissionPaycalParameters = JsonSerializer.Deserialize<PomResubmissionPaycalParametersDto>(content, _deserialisationOptions);
 
-            return jsonObject;
+            return pomResubmissionPaycalParameters;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error processing Pom Resubmission Paycal details");
         }
 
-        return null;
+        return default;
     }
 
     [ExcludeFromCodeCoverage]
