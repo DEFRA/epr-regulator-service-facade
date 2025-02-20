@@ -153,23 +153,12 @@ public class SubmissionsController : ControllerBase
         }
 
         var pomData = await _commonDataService.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
-
-        if (pomData is not null && pomData.IsResubmission)
+        if (pomData is null)
         {
-            if (pomData.ReferenceFieldNotAvailable)
-            {
-                return StatusCode((int)HttpStatusCode.PreconditionFailed, "No Reference field is available for the Resubmission");
-            }
-
-            if (pomData.ReferenceNotAvailable)
-            {
-                return StatusCode((int)HttpStatusCode.PreconditionRequired, "No Reference Number is available for the Resubmission");
-            }
-            
-            return Ok(pomData);
+            return NoContent();
         }
 
-        return NoContent();
+        return Ok(pomData);
     }
 
     [HttpPost]
