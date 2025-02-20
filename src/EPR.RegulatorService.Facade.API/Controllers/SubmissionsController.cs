@@ -144,8 +144,8 @@ public class SubmissionsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("pom/get-resubmission-paycal-parameters")]
-    public async Task<IActionResult> GetResubmissionPaycalDetails([FromQuery] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
+    [Route("pom/get-resubmission-paycal-parameters/{submissionId}")]
+    public async Task<IActionResult> GetResubmissionPaycalDetails([FromRoute] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
     {
         if( !ModelState.IsValid )
         {
