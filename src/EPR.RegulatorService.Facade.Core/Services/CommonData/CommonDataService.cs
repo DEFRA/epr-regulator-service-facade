@@ -123,7 +123,7 @@ public class CommonDataService(
     }
 
     [ExcludeFromCodeCoverage]
-    private static PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection) => new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>()
+    private static PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection) => new()
     {
         items = commonDataPaginatedCollection.items.Select(x => (OrganisationRegistrationSubmissionSummaryResponse)x).ToList(),
         totalItems = commonDataPaginatedCollection.totalItems,
