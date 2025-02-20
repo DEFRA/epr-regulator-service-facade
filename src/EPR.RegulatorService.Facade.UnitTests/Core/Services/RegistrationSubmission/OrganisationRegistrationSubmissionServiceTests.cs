@@ -502,7 +502,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending
                     }
                 }
@@ -524,7 +524,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.IsNull(item.RegulatorCommentDate, "No matching events means RegulatorCommentDate remains null.");
+        Assert.IsNull(item.RegulatorDecisionDate, "No matching events means RegulatorCommentDate remains null.");
         Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus, "SubmissionStatus should remain unchanged.");
     }
 
@@ -539,7 +539,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending,
                         RegistrationReferenceNumber = "OLD_REF"
                     }
@@ -563,7 +563,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(now, item.RegulatorCommentDate, "RegulatorCommentDate should update to event's Created.");
+        Assert.AreEqual(now, item.RegulatorDecisionDate, "RegulatorCommentDate should update to event's Created.");
         Assert.AreEqual("NEW_REF", item.RegistrationReferenceNumber, "RegistrationReferenceNumber should update from event.");
         Assert.AreEqual(now.AddDays(-1), item.StatusPendingDate, "StatusPendingDate should match DecisionDate from event.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "SubmissionStatus should match event's Decision.");
@@ -583,7 +583,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = existingDate,
+                        RegulatorDecisionDate = existingDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending,
                         RegistrationReferenceNumber = "OLD_REF"
                     }
@@ -619,7 +619,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         var item = requestedList.items[0];
         // The older event should not have changed anything
         // The newer event should take precedence
-        Assert.AreEqual(newDate, item.RegulatorCommentDate, "Should update to the newer event's Created date.");
+        Assert.AreEqual(newDate, item.RegulatorDecisionDate, "Should update to the newer event's Created date.");
         Assert.AreEqual("NEW_REF", item.RegistrationReferenceNumber, "Should update to the newer event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Cancelled, item.SubmissionStatus, "Should update to the newer event's Decision.");
     }
@@ -635,7 +635,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 }
@@ -655,7 +655,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(commentDate, item.ProducerCommentDate, "ProducerCommentDate should match the event's Created date.");
+        Assert.AreEqual(commentDate, item.SubmissionDate, "ProducerCommentDate should match the event's Created date.");
         // RegulatorCommentDate is null, ProducerCommentDate > null condition is irrelevant, but code sets SubmissionStatus to Updated if ProducerCommentDate > RegulatorCommentDate
         // Since RegulatorCommentDate is null, we can consider ProducerCommentDate > null logically true for this code's logic.
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "SubmissionStatus should change to Updated due to producer comment.");
@@ -674,7 +674,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
+                        RegulatorDecisionDate = regulatorDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 }
@@ -694,7 +694,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.ProducerCommentDate, "ProducerCommentDate should match the event.");
+        Assert.AreEqual(producerDate, item.SubmissionDate, "ProducerCommentDate should match the event.");
         // Since ProducerCommentDate > RegulatorCommentDate, SubmissionStatus should become Updated.
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Status should update to Updated.");
     }
@@ -712,7 +712,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
+                        RegulatorDecisionDate = regulatorDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 }
@@ -733,7 +733,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.ProducerCommentDate, "Should set ProducerCommentDate to the event's Created date.");
+        Assert.AreEqual(producerDate, item.SubmissionDate, "Should set ProducerCommentDate to the event's Created date.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "No status update as ProducerCommentDate < RegulatorCommentDate.");
     }
 
@@ -781,7 +781,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Assert
         var item = requestedList.items[0];
         // Should reflect the later event
-        Assert.AreEqual(later, item.RegulatorCommentDate, "Should use the later event's Created date.");
+        Assert.AreEqual(later, item.RegulatorDecisionDate, "Should use the later event's Created date.");
         Assert.AreEqual("REF2", item.RegistrationReferenceNumber, "Should use the later event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Refused, item.SubmissionStatus, "Should reflect the later event's Decision.");
     }
@@ -800,7 +800,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
+                        RegulatorDecisionDate = regulatorDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 }
@@ -817,9 +817,9 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        // The code sets ProducerCommentDate to each cosmos date it finds in turn. The last one processed wins.
-        Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the last (newest) ProducerCommentDate.");
-        // Since ProducerCommentDate < RegulatorCommentDate, no status update.
+        // The code sets SubmissionDate to each cosmos date it finds in turn. The last one processed wins.
+        Assert.AreEqual(newerComment, item.SubmissionDate, "Should have the last (newest) ProducerCommentDate.");
+        // Since SubmissionDate < RegulatorDecisionDate, no status update.
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer ProducerCommentDate still older than RegulatorCommentDate.");
     }
 
