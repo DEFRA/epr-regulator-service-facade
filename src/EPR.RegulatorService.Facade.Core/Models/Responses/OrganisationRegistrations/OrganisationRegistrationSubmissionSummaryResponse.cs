@@ -31,8 +31,12 @@ public class OrganisationRegistrationSubmissionSummaryResponse
     public int NationId { get; set; }
 
     public bool IsResubmission { get; set; }
+
     public RegistrationSubmissionStatus? ResubmissionStatus { get; set; }
+
     public DateTime? ResubmissionDate { get; set; }
+
     public DateTime? RegistrationDate { get; set; }
+
     public DateTime? RegulatorDecisionDate { get; set; }
 }

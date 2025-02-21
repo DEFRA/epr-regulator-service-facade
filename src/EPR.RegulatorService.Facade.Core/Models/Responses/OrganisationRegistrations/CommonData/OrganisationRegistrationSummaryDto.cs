@@ -87,12 +87,15 @@ public class OrganisationRegistrationSummaryDto
 
         response.IsResubmission = dto.IsResubmission;
 
-        if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var resubmissionStatus))
+        if (dto.IsResubmission)
         {
-            throw new InvalidCastException($"Invalid ResubmissionStatus: {dto.ResubmissionStatus}");
+            if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var resubmissionStatus))
+            {
+                throw new InvalidCastException($"Invalid ResubmissionStatus: {dto.ResubmissionStatus}");
+            }
+            response.ResubmissionStatus = resubmissionStatus;
         }
-        response.ResubmissionStatus = resubmissionStatus;
-
+        
         if (!string.IsNullOrWhiteSpace(dto.RegulatorDecisionDate))
         {
             response.RegulatorDecisionDate = DateTime.Parse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture);
