@@ -128,7 +128,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    public async Task CreateRegulatorSubmissionDecisionEvent_Should_Fetach_UserId_from_HttpContext_When_Input_Reuqest_UserId_Is_Null()
+    public async Task CreateRegulatorSubmissionDecisionEvent_Should_Fetch_UserId_from_HttpContext_When_Input_Request_UserId_Is_Null()
     {
         // Arrange
         var request = new RegulatorDecisionCreateRequest
@@ -371,8 +371,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
         statusCodeResult?.StatusCode.Should().Be(200);
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
     }
-
-
 
 
     [TestMethod()]

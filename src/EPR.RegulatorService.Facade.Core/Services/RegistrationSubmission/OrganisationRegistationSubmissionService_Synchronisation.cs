@@ -80,31 +80,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
                                   && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created);
                 var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created).ToList();
-                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created);
 
-                foreach (var cosmosItem in regulatorDecisions)
-                {
-                    if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
-                    {
-                        item.RegulatorDecisionDate = cosmosItem.Created;
-                        item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
-                        item.StatusPendingDate = cosmosItem.DecisionDate;
-                        item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    }
-                }
-                foreach (var cosmosDate in producerComments)
-                {
-                    if (cosmosDate > item.SubmissionDate)
-                    {
-                        if (!item.IsResubmission)
-                        {
-                            item.IsResubmission = true;
-                            item.ResubmissionDate = cosmosDate;
-                        }
-                    }
-                }
+                ProcessRegulatorDecisions(item, regulatorDecisions);
             }
-        }
+        }        
 
         public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsResponse item)
         {
@@ -120,6 +99,20 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
                 {
                     AssignProducerDetails(item, cosmosItem);
+                }
+            }
+        }
+        
+        private static void ProcessRegulatorDecisions(OrganisationRegistrationSubmissionSummaryResponse item, List<AbstractCosmosSubmissionEvent> regulatorDecisions)
+        {
+            foreach (var cosmosItem in regulatorDecisions)
+            {
+                if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
+                {
+                    item.RegulatorDecisionDate = cosmosItem.Created;
+                    item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
+                    item.StatusPendingDate = cosmosItem.DecisionDate;
+                    item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                 }
             }
         }
