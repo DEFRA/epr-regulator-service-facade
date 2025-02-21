@@ -606,32 +606,12 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
         }
 
         [TestMethod]
-        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Throw_428_When_No_ReferenceNumber_Available_And_IsResubmission_IsTrue()
+        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Return_NoContent_When_Service_Returns_Null()
         {
-            PomResubmissionPaycalParametersDto returnObj = new PomResubmissionPaycalParametersDto { IsResubmission = true, ReferenceNotAvailable = true };
-
             // Arrange
             _mockCommonDataService
                 .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
-                .ReturnsAsync(returnObj);
-
-            // Act
-            var result = await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), null);
-
-            // Assert
-            result.Should().BeOfType<ObjectResult>();
-            (result as ObjectResult).StatusCode.Should().Be(428);
-        }
-
-        [TestMethod]
-        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Return_NoContent_When_IsResubmission_IsFalse()
-        {
-            PomResubmissionPaycalParametersDto returnObj = new PomResubmissionPaycalParametersDto { IsResubmission = false };
-
-            // Arrange
-            _mockCommonDataService
-                .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
-                .ReturnsAsync(returnObj);
+                .ReturnsAsync(default(PomResubmissionPaycalParametersDto));
 
             // Act
             var result = await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), null);

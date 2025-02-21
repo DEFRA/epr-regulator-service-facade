@@ -408,6 +408,60 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
+    [DataRow(HttpStatusCode.PreconditionFailed, true, false)]
+    [DataRow(HttpStatusCode.PreconditionRequired, false, true)]
+    public async Task Pom_Resubmission_Should_Return_Correct_Response_For_PreConditionCheck(HttpStatusCode httpStatusCode, bool hasReferenceField, bool hasReference)
+    {
+        var submissionId = Guid.NewGuid();
+        var complianceSchemeId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}?ComplianceSchemeId={complianceSchemeId}";
+
+        var apiResponse = _fixture
+            .Build<HttpResponseMessage>()
+            .With(x => x.StatusCode, httpStatusCode)
+            .Create();
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == _expectedUrl),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(apiResponse).Verifiable();
+
+        // Act
+        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.ReferenceFieldNotAvailable.Should().Be(hasReferenceField);
+        result.ReferenceNotAvailable.Should().Be(hasReference);
+    }
+
+    [TestMethod]
+    public async Task Pom_Resubmission_Should_Return_Null_Response_For_NoContent()
+    {
+        var submissionId = Guid.NewGuid();
+        var complianceSchemeId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}?ComplianceSchemeId={complianceSchemeId}";
+
+        var apiResponse = _fixture
+            .Build<HttpResponseMessage>()
+            .With(x => x.StatusCode, HttpStatusCode.NoContent)
+            .Create();
+
+        _httpMessageHandlerMock.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync",
+                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri != null && x.RequestUri.ToString() == _expectedUrl),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(apiResponse).Verifiable();
+
+        // Act
+        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
     public async Task Should_Throw_HttpRequestException_when_fetching_registration_submission_details_And_Api_Fails()
     {
         //Arrange

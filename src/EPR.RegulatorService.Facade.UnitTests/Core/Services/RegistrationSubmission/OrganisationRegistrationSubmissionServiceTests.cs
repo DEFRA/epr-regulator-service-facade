@@ -16,6 +16,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using FluentAssertions;
 using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -435,6 +436,18 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
+    [DataRow("")]
+    [DataRow(" ")]
+    [DataRow(null)]
+    public async Task Should_Throw_With_Incorrect_OrganisationId(string organisationId)
+    {
+        //Arrange  
+        // Act
+        Assert.ThrowsException<ArgumentNullException>(() =>
+        _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, organisationId, "24"));
+    }
+
+    [TestMethod]
     public async Task Should_return_valid_ReferenceNumber_For_Exporter_With_Steel()
     {
         //Arrange  
@@ -624,84 +637,6 @@ public class OrganisationRegistrationSubmissionServiceTests
         Assert.AreEqual(RegistrationSubmissionStatus.Cancelled, item.SubmissionStatus, "Should update to the newer event's Decision.");
     }
 
-    [Ignore("TODO::Revisit business logic")]
-    [TestMethod]
-    public void ProducerCommentsWithoutRegulatorCommentDate()
-    {
-        // Arrange
-        var commentDate = DateTime.UtcNow;
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorDecisionDate = null,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Created = commentDate,
-                    Type = "RegistrationApplicationSubmitted"
-                }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.AreEqual(commentDate, item.SubmissionDate, "SubmissionDate should match the event's Created date.");
-        // RegulatorDecisionDate is null, SubmissionDate > null condition is irrelevant, but code sets SubmissionStatus to Updated if ProducerCommentDate > RegulatorCommentDate
-        // Since RegulatorDecisionDate is null, we can consider SubmissionDate > null logically true for this code's logic.
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "SubmissionStatus should change to Updated due to producer comment.");
-    }
-
-    [Ignore("TODO::Revisit business logic")]
-    [TestMethod]
-    public void ProducerCommentsWhenRegulatorCommentDateNotNullAndProducerLater()
-    {
-        // Arrange
-        var regulatorDate = DateTime.UtcNow.AddHours(-2);
-        var producerDate = DateTime.UtcNow;
-
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorDecisionDate = regulatorDate,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Created = producerDate,
-                    Type = "RegistrationApplicationSubmitted"
-                }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.SubmissionDate, "SubmissionDate should match the event.");
-        // Since ProducerCommentDate > RegulatorCommentDate, SubmissionStatus should become Updated.
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Status should update to Updated.");
-    }
-
-    [Ignore("TODO::Revisit business logic")]
     [TestMethod]
     public void ProducerCommentsWhenRegulatorCommentDateNewerThanProducer()
     {
@@ -716,6 +651,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                     new() {
                         ApplicationReferenceNumber = "APP123",
                         RegulatorDecisionDate = regulatorDate,
+                        SubmissionDate = producerDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 }
@@ -789,13 +725,13 @@ public class OrganisationRegistrationSubmissionServiceTests
         Assert.AreEqual(RegistrationSubmissionStatus.Refused, item.SubmissionStatus, "Should reflect the later event's Decision.");
     }
 
-    [Ignore("TODO::Revisit business logic")]
+    [Ignore("Logic to indicate Resubmission from Cosmos is invalid as the Resubmitted data may not be avialable in Synapse")]
     [TestMethod]
-    public void MultipleProducerCommentsUseTheLatestOneForProducerCommentDateOnly()
+    public void MultipleProducerRegistrationsUpdatesResubmissionStatus()
     {
         // Arrange
-        var olderComment = DateTime.UtcNow.AddHours(-2);
-        var newerComment = DateTime.UtcNow.AddHours(-1);
+        var olderComment = DateTime.UtcNow.AddHours(-1);
+        var newerComment = DateTime.UtcNow.AddHours(+1);
         var regulatorDate = DateTime.UtcNow;
 
         var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
@@ -821,9 +757,9 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        // The code sets SubmissionDate to each cosmos date it finds in turn. The last one processed wins.
-        Assert.AreEqual(newerComment, item.SubmissionDate, "Should have the last (newest) SubmissionDate.");
-        // Since SubmissionDate < RegulatorDecisionDate, no status update.
+        Assert.IsNotNull(item);
+        item.IsResubmission.Should().BeTrue();
+        Assert.AreEqual(newerComment, item.ResubmissionDate, "Should have the last (newest) ResubmissionDate.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer SubmissionDate still older than RegulatorDecisionDate.");
     }
 
