@@ -16,6 +16,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using FluentAssertions;
 using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -435,6 +436,18 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
+    [DataRow("")]
+    [DataRow(" ")]
+    [DataRow(null)]
+    public async Task Should_Throw_With_Incorrect_OrganisationId(string organisationId)
+    {
+        //Arrange  
+        // Act
+        Assert.ThrowsException<ArgumentNullException>(() =>
+        _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, organisationId, "24"));
+    }
+
+    [TestMethod]
     public async Task Should_return_valid_ReferenceNumber_For_Exporter_With_Steel()
     {
         //Arrange  
@@ -789,13 +802,12 @@ public class OrganisationRegistrationSubmissionServiceTests
         Assert.AreEqual(RegistrationSubmissionStatus.Refused, item.SubmissionStatus, "Should reflect the later event's Decision.");
     }
 
-    [Ignore("TODO::Revisit business logic")]
     [TestMethod]
-    public void MultipleProducerCommentsUseTheLatestOneForProducerCommentDateOnly()
+    public void MultipleProducerRegistrationsUpdatesResubmissionStatus()
     {
         // Arrange
-        var olderComment = DateTime.UtcNow.AddHours(-2);
-        var newerComment = DateTime.UtcNow.AddHours(-1);
+        var olderComment = DateTime.UtcNow.AddHours(-1);
+        var newerComment = DateTime.UtcNow.AddHours(+1);
         var regulatorDate = DateTime.UtcNow;
 
         var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
@@ -821,9 +833,9 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        // The code sets SubmissionDate to each cosmos date it finds in turn. The last one processed wins.
-        Assert.AreEqual(newerComment, item.SubmissionDate, "Should have the last (newest) SubmissionDate.");
-        // Since SubmissionDate < RegulatorDecisionDate, no status update.
+        Assert.IsNotNull(item);
+        item.IsResubmission.Should().BeTrue();
+        Assert.AreEqual(newerComment, item.ResubmissionDate, "Should have the last (newest) ResubmissionDate.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer SubmissionDate still older than RegulatorDecisionDate.");
     }
 
