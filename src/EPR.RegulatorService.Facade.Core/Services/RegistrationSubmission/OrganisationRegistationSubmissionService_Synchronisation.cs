@@ -80,10 +80,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
                                   && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created);
                 var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created).ToList();
-                //var producerSubmissions = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created);
 
                 ProcessRegulatorDecisions(item, regulatorDecisions);
-                //ProcessProducerSubmissions(item, producerSubmissions);
             }
         }        
 
@@ -118,19 +116,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 }
             }
         }
-
-        //private static void ProcessProducerSubmissions(OrganisationRegistrationSubmissionSummaryResponse item, IEnumerable<DateTime> producerSubmissions)
-        //{
-        //    foreach (var cosmosDate in producerSubmissions)
-        //    {
-        //        if (cosmosDate > item.RegulatorDecisionDate && (!item.IsResubmission && item.SubmissionStatus == RegistrationSubmissionStatus.Granted))
-        //        {
-        //            item.IsResubmission = true;
-        //            item.ResubmissionDate = cosmosDate;
-        //            item.ResubmissionStatus = RegistrationSubmissionStatus.Pending;
-        //        }
-        //    }
-        //}
 
         public static void AssignProducerDetails(RegistrationSubmissionOrganisationDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
         {
