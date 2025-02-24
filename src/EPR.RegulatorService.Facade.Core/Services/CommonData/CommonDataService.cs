@@ -44,7 +44,7 @@ public class CommonDataService(
         return await httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsResponse> GetOrganisationRegistrationSubmissionDetails(Guid submissionId)
+    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(Guid submissionId)
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
      
@@ -144,11 +144,11 @@ public class CommonDataService(
     };
 
     [ExcludeFromCodeCoverage]
-    private RegistrationSubmissionOrganisationDetailsResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
+    private RegistrationSubmissionOrganisationDetailsFacadeResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
     {
         if ( jsonObject == null) return null;
 
-        var objRet = (RegistrationSubmissionOrganisationDetailsResponse)jsonObject;
+        var objRet = (RegistrationSubmissionOrganisationDetailsFacadeResponse)jsonObject;
 
         if (!string.IsNullOrWhiteSpace(jsonObject.CSOJson))
         {

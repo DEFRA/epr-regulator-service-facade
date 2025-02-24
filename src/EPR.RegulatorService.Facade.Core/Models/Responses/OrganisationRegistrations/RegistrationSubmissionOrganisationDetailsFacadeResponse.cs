@@ -13,7 +13,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 
 [ExcludeFromCodeCoverage]
-public class RegistrationSubmissionOrganisationDetailsResponse
+public class RegistrationSubmissionOrganisationDetailsFacadeResponse
 {
     public Guid SubmissionId { get; set; }
     public Guid OrganisationId { get; set; }
@@ -26,7 +26,11 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public int RelevantYear { get; set; }
     public DateTime SubmissionDate { get; set; }
     public RegistrationSubmissionStatus SubmissionStatus { get; set; }
+    public RegistrationSubmissionStatus ResubmissionStatus { get; set; }
+    public DateTime? ResubmissionDate { get; set; }
     public DateTime? StatusPendingDate { get; set; }
+    public bool IsResubmission { get; set; }
+    public DateTime? RegistrationDate { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
     public string? ProducerComments { get; set; } = string.Empty;
     public string ApplicationReferenceNumber { get; set; } = string.Empty;
@@ -55,11 +59,9 @@ public class RegistrationSubmissionOrganisationDetailsResponse
     public bool IsComplianceScheme { get; internal set; }
     public string SubmissionPeriod { get; internal set; }
     public List<CsoMembershipDetailsDto> CsoMembershipDetails { get; set; }
-    public bool IsResubmission { get; set; }
-
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
-        (RegistrationSubmissionOrganisationDetailsResponse details) => new()
+        (RegistrationSubmissionOrganisationDetailsFacadeResponse details) => new()
         {
             SubmissionId = details.SubmissionId,
             OrganisationId = details.OrganisationId,
@@ -69,6 +71,10 @@ public class RegistrationSubmissionOrganisationDetailsResponse
             RegistrationYear = details.RelevantYear,
             SubmissionStatus = details.SubmissionStatus,
             StatusPendingDate = details.StatusPendingDate,
+            RegistrationDate = details.RegistrationDate,
+            RegulatorDecisionDate = details.RegulatorDecisionDate,
+            ResubmissionDate = details.ResubmissionDate,
+            ResubmissionStatus = details.ResubmissionStatus,
             ApplicationReferenceNumber = details.ApplicationReferenceNumber,
             RegistrationReferenceNumber = details.RegistrationReferenceNumber,
             NationId = details.NationId,

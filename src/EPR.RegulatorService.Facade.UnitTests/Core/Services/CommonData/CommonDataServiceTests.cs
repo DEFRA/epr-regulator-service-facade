@@ -266,7 +266,7 @@ public class CommonDataServiceTests
         // Act
         var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
 
-        results.Should().BeOfType<RegistrationSubmissionOrganisationDetailsResponse>();
+        results.Should().BeOfType<RegistrationSubmissionOrganisationDetailsFacadeResponse>();
         Assert.IsNotNull(results);
         Assert.AreEqual(results.SubmissionId, submissionId);
     }

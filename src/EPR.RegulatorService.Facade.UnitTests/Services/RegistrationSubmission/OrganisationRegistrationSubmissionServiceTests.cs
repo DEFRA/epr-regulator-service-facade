@@ -427,9 +427,9 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.Tests
             Assert.AreEqual(RegistrationSubmissionStatus.Queried, item.SubmissionDetails.Status);
         }
         
-        private RegistrationSubmissionOrganisationDetailsResponse CreateDefaultItem()
+        private RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem()
         {
-            return new RegistrationSubmissionOrganisationDetailsResponse
+            return new RegistrationSubmissionOrganisationDetailsFacadeResponse
             {
                 SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails
                 {

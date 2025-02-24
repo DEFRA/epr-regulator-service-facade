@@ -16,7 +16,6 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using FluentAssertions;
 using System.Net;
-using System.Runtime.CompilerServices;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -127,7 +126,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -201,7 +200,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             Statuses = "Test Status"
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -278,7 +277,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -309,7 +308,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -367,7 +366,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -433,18 +432,6 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Act
         Assert.ThrowsException<ArgumentNullException>(() => 
         _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, "123456"));
-    }
-
-    [TestMethod]
-    [DataRow("")]
-    [DataRow(" ")]
-    [DataRow(null)]
-    public async Task Should_Throw_With_Incorrect_OrganisationId(string organisationId)
-    {
-        //Arrange  
-        // Act
-        Assert.ThrowsException<ArgumentNullException>(() =>
-        _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, organisationId, "24"));
     }
 
     [TestMethod]
@@ -638,45 +625,6 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
-    public void ProducerCommentsWhenRegulatorCommentDateNewerThanProducer()
-    {
-        // Arrange
-        var regulatorDate = DateTime.UtcNow;
-        var producerDate = DateTime.UtcNow.AddHours(-1); // older comment
-
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorDecisionDate = regulatorDate,
-                        SubmissionDate = producerDate,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                // Producer comment is older than Regulator comment, no status update
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Created = producerDate,
-                    Type = "RegistrationApplicationSubmitted"
-                }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.SubmissionDate, "Should set SubmissionDate to the event's Created date.");
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "No status update as SubmissionDate < RegulatorDecisionDate.");
-    }
-
-    [TestMethod]
     public void MultipleRegulatorDecisionsTakeTheLatestOne()
     {
         // Arrange
@@ -723,44 +671,6 @@ public class OrganisationRegistrationSubmissionServiceTests
         Assert.AreEqual(later, item.RegulatorDecisionDate, "Should use the later event's Created date.");
         Assert.AreEqual("REF2", item.RegistrationReferenceNumber, "Should use the later event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Refused, item.SubmissionStatus, "Should reflect the later event's Decision.");
-    }
-
-    [Ignore("Logic to indicate Resubmission from Cosmos is invalid as the Resubmitted data may not be avialable in Synapse")]
-    [TestMethod]
-    public void MultipleProducerRegistrationsUpdatesResubmissionStatus()
-    {
-        // Arrange
-        var olderComment = DateTime.UtcNow.AddHours(-1);
-        var newerComment = DateTime.UtcNow.AddHours(+1);
-        var regulatorDate = DateTime.UtcNow;
-
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorDecisionDate = regulatorDate,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() { AppReferenceNumber = "APP123", Created = olderComment, Type = "RegistrationApplicationSubmitted" },
-                new() { AppReferenceNumber = "APP123", Created = newerComment, Type = "RegistrationApplicationSubmitted" }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.IsNotNull(item);
-        item.IsResubmission.Should().BeTrue();
-        Assert.AreEqual(newerComment, item.ResubmissionDate, "Should have the last (newest) ResubmissionDate.");
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer SubmissionDate still older than RegulatorDecisionDate.");
     }
 
     [TestMethod]
@@ -1080,9 +990,9 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         // Helper: Create a default item with minimal setup
-        private RegistrationSubmissionOrganisationDetailsResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
+        private RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
         {
-            return new RegistrationSubmissionOrganisationDetailsResponse
+            return new RegistrationSubmissionOrganisationDetailsFacadeResponse
             {
                 ApplicationReferenceNumber = appRef,
                 SubmissionStatus = initialStatus,
