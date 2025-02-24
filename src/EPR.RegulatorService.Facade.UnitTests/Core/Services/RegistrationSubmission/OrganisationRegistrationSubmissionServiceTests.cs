@@ -300,6 +300,63 @@ public class OrganisationRegistrationSubmissionServiceTests
         _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
     }
 
+    [TestMethod]
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus )
+    {
+        // Arrange
+        var appRefNum = "APPREF123";
+        var submissionId = Guid.NewGuid();
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        {
+
+            OrganisationReference = "ORGREF1234567890",
+            OrganisationName = "Test Organisation",
+            ApplicationReferenceNumber = appRefNum,
+            RegistrationReferenceNumber = "REGREF456",
+            OrganisationType = RegistrationSubmissionOrganisationType.small,
+            IsResubmission = true,
+            SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails(),
+            ResubmissionStatus = RegistrationSubmissionStatus.Granted
+        };
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+            .ReturnsAsync(response).Verifiable();
+
+        var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
+        var submissionLastSyncTimeResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(submissionEventsLastSync))
+
+        };
+        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
+
+         var deltaRegistrationDecisions = Enumerable.Range(0, 1).Select(x => _fixture.Build<AbstractCosmosSubmissionEvent>()
+            .Create()).ToList();
+        deltaRegistrationDecisions[0].AppReferenceNumber = appRefNum;
+        deltaRegistrationDecisions[0].Type = "RegulatorRegistrationDecision";
+        deltaRegistrationDecisions[0].Decision = actualStatus;
+        var deltaRegistrationDecisionsResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(deltaRegistrationDecisions))
+
+        };
+        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(deltaRegistrationDecisionsResponse);
+
+        //Act
+        var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+
+        //Assert
+        Assert.IsNotNull(result);
+        result.ResubmissionStatus.Should().Be(expectedStatus);
+        result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
+    }
+
 
     [TestMethod]
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_With_lastSyncTime_True()

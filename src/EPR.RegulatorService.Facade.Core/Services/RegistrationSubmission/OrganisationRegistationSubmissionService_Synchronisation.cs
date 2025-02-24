@@ -136,11 +136,31 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             {
                 item.RegulatorComments = cosmosItem.Comments;
                 item.RegulatorDecisionDate = cosmosItem.Created;
-                item.StatusPendingDate = cosmosItem.DecisionDate;
-                item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                item.SubmissionDetails.Status = item.SubmissionStatus;
                 item.SubmissionDetails.DecisionDate = cosmosItem.DecisionDate ?? cosmosItem.Created;
-                item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
+
+                if (item.IsResubmission)
+                {
+                    //To avoid checking magic strings, assign the decision first & check on the enum
+                    //and then re-assign as resubmission uses different status
+                    item.ResubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    if (item.ResubmissionStatus == RegistrationSubmissionStatus.Granted)
+                    {
+                        item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
+                    }
+                    else if (item.ResubmissionStatus == RegistrationSubmissionStatus.Refused)
+                    {
+                        item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
+                    }
+
+                    item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                }
+                else
+                {
+                    item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    item.StatusPendingDate = cosmosItem.DecisionDate;
+                    item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
+                    item.SubmissionDetails.Status = item.SubmissionStatus;
+                }
             }
             else
             {
