@@ -68,7 +68,7 @@ public partial class OrganisationRegistrationSubmissionService(
         }
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
+    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
 
