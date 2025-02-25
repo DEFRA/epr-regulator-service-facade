@@ -83,7 +83,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 
                 ProcessRegulatorDecisions(item, regulatorDecisions);
             }
-        }        
+        }
 
         public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsFacadeResponse item)
         {
@@ -102,18 +102,51 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 }
             }
         }
-        
-        private static void ProcessRegulatorDecisions(OrganisationRegistrationSubmissionSummaryResponse item, List<AbstractCosmosSubmissionEvent> regulatorDecisions)
+
+        private static void ProcessRegulatorDecisions(
+            OrganisationRegistrationSubmissionSummaryResponse item,
+            List<AbstractCosmosSubmissionEvent> regulatorDecisions)
         {
             foreach (var cosmosItem in regulatorDecisions)
             {
                 if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
                 {
+                    if (item.IsResubmission)
+                    {
+                        ProcessResubmissionDecision(item, cosmosItem.Decision);
+                    }
+                    else
+                    {
+                        ProcessStandardDecision(item, cosmosItem);
+                    }
+
                     item.RegulatorDecisionDate = cosmosItem.Created;
-                    item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
-                    item.StatusPendingDate = cosmosItem.DecisionDate;
-                    item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                 }
+            }
+        }
+
+        private static void ProcessResubmissionDecision(
+            OrganisationRegistrationSubmissionSummaryResponse item,
+            string decision)
+        {
+            item.ResubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(decision);
+            item.ResubmissionStatus = item.ResubmissionStatus switch
+            {
+                RegistrationSubmissionStatus.Granted => RegistrationSubmissionStatus.Accepted,
+                RegistrationSubmissionStatus.Refused => RegistrationSubmissionStatus.Rejected,
+                _ => item.ResubmissionStatus
+            };
+        }
+
+        private static void ProcessStandardDecision(
+            OrganisationRegistrationSubmissionSummaryResponse item,
+            AbstractCosmosSubmissionEvent cosmosItem)
+        {
+            item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+            item.StatusPendingDate = cosmosItem.DecisionDate;
+            if (!string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber))
+            {
+                item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
             }
         }
 
