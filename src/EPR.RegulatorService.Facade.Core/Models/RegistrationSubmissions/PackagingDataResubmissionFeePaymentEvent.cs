@@ -8,7 +8,7 @@ public class PackagingDataResubmissionFeePaymentEvent
 {
     public Guid SubmissionId { get; set; }
 
-    public EventType Type { get; set; } = EventType.PackagingDataResubmissionFeePayment;
+    public EventType Type { get; set; } = EventType.PackagingResubmissionFeePayment; // NOSONAR
 
     public string PaymentMethod { get; set; }
 

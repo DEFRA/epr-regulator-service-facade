@@ -7,5 +7,5 @@ public enum EventType
     FileDownloadCheck = 11,
     RegistrationFeePayment = 12,
     RegistrationApplicationSubmitted = 13,
-    PackagingDataResubmissionFeePayment = 14
+    PackagingResubmissionFeePayment = 14
 }
