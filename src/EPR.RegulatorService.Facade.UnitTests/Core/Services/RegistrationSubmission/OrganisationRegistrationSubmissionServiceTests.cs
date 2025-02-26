@@ -303,7 +303,7 @@ public class OrganisationRegistrationSubmissionServiceTests
     [TestMethod]
     [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
     [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
-    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus )
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus)
     {
         // Arrange
         var appRefNum = "APPREF123";
@@ -332,8 +332,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         };
         _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
 
-         var deltaRegistrationDecisions = Enumerable.Range(0, 1).Select(x => _fixture.Build<AbstractCosmosSubmissionEvent>()
-            .Create()).ToList();
+        var deltaRegistrationDecisions = Enumerable.Range(0, 1).Select(x => _fixture.Build<AbstractCosmosSubmissionEvent>()
+           .Create()).ToList();
         deltaRegistrationDecisions[0].AppReferenceNumber = appRefNum;
         deltaRegistrationDecisions[0].Type = "RegulatorRegistrationDecision";
         deltaRegistrationDecisions[0].Decision = actualStatus;
@@ -357,6 +357,86 @@ public class OrganisationRegistrationSubmissionServiceTests
         _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
     }
 
+    [TestMethod]
+    [DataRow("Pending", RegistrationSubmissionStatus.Pending)]
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
+    public async Task Should_ProcessRegulatorDecisions_Correctly(string actualStatus, RegistrationSubmissionStatus expectedStatus)
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var appRefNum = "APPREF123";
+
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
+        {
+            ApplicationReferenceNumbers = null,
+            NationId = 1,
+            OrganisationName = null,
+            OrganisationReference = null,
+            OrganisationType = "",
+            PageNumber = 1,
+            PageSize = 20,
+            RelevantYears = "",
+            ResubmissionStatuses = actualStatus,
+            Statuses = null
+        };
+
+        var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
+        var submissionLastSyncTimeResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(submissionEventsLastSync))
+
+        };
+        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
+
+        var deltaRegistrationDecisions = Enumerable.Range(0, 1).Select(x => _fixture.Build<AbstractCosmosSubmissionEvent>()
+           .Create()).ToList();
+
+        deltaRegistrationDecisions[0].AppReferenceNumber = appRefNum;
+        deltaRegistrationDecisions[0].Type = "RegulatorRegistrationDecision";
+        deltaRegistrationDecisions[0].Decision = actualStatus;
+        deltaRegistrationDecisions[0].Created = DateTime.UtcNow;
+
+        var deltaRegistrationDecisionsResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(deltaRegistrationDecisions))
+
+        };
+        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null))
+            .ReturnsAsync(deltaRegistrationDecisionsResponse);
+
+
+        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
+        {
+            currentPage = 1,
+            items =
+            [
+               new OrganisationRegistrationSubmissionSummaryResponse
+               {
+                   ApplicationReferenceNumber = appRefNum,
+                   IsResubmission = true,
+                   NationId = 1,
+                   ResubmissionStatus = RegistrationSubmissionStatus.Accepted,
+                   SubmissionStatus = RegistrationSubmissionStatus.Granted
+               }
+            ],
+            pageSize = 20,
+            totalItems = 1
+        };
+
+        _commonDataServiceMock.Setup(m => m.GetOrganisationRegistrationSubmissionList(filter)).ReturnsAsync(requestedList);
+
+        //Act
+        var result = await _sut.HandleGetRegistrationSubmissionList(filter, userId);
+
+        //Assert
+        Assert.IsNotNull(result);
+        result.items[0].ResubmissionStatus.Should().Be(expectedStatus);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
+        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null), Times.AtMostOnce);
+    }
 
     [TestMethod]
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_With_lastSyncTime_True()
@@ -487,7 +567,7 @@ public class OrganisationRegistrationSubmissionServiceTests
     {
         //Arrange  
         // Act
-        Assert.ThrowsException<ArgumentNullException>(() => 
+        Assert.ThrowsException<ArgumentNullException>(() =>
         _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, "123456"));
     }
 
@@ -738,10 +818,13 @@ public class OrganisationRegistrationSubmissionServiceTests
         var userId = Guid.NewGuid();
         var request = new RegulatorDecisionCreateRequest
         {
-            SubmissionId = submissionId, Status = RegistrationSubmissionStatus.Granted,
-            ApplicationReferenceNumber = "PEPR12345678", CountryName = CountryName.Eng,
+            SubmissionId = submissionId,
+            Status = RegistrationSubmissionStatus.Granted,
+            ApplicationReferenceNumber = "PEPR12345678",
+            CountryName = CountryName.Eng,
             RegistrationSubmissionType = RegistrationSubmissionType.Producer,
-            OrganisationAccountManagementId = "123456", TwoDigitYear = "25"
+            OrganisationAccountManagementId = "123456",
+            TwoDigitYear = "25"
         };
         var handlerResponse =
                 _fixture
@@ -752,7 +835,8 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
             .ReturnsAsync(handlerResponse)
-            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) => {
+            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) =>
+            {
                 reqEvent.RegistrationReferenceNumber.Should().StartWith("R25EP123456");
             });
 
@@ -786,7 +870,8 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
             .ReturnsAsync(handlerResponse)
-            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) => {
+            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) =>
+            {
                 reqEvent.RegistrationReferenceNumber.Should().StartWith("R25EP123456");
             });
 
