@@ -89,17 +89,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
         {
             var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
                                                                 .OrderBy(x => x.Created);
+            var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderByDescending(x => x.Created );
 
-            foreach (var cosmosItem in cosmosItems)
+            foreach (var decision in regulatorDecisions)
             {
-                if (cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
-                {
-                    AssignRegulatorDetails(item, cosmosItem);
-                }
-                else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
-                {
-                    AssignProducerDetails(item, cosmosItem);
-                }
+                AssignRegulatorDetails(item, decision);
             }
         }
 
@@ -147,19 +141,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             if (!string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber))
             {
                 item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
-            }
-        }
-
-        public static void AssignProducerDetails(RegistrationSubmissionOrganisationDetailsFacadeResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
-        {
-            if (item.ProducerCommentDate is null || cosmosItem.Created >= item.ProducerCommentDate)
-            {
-                item.ProducerComments = cosmosItem.Comments;
-                item.ProducerCommentDate = cosmosItem.Created;
-            }
-            else
-            {
-                item.ProducerComments += $"<br/>{cosmosItem.Comments}";
             }
         }
 
@@ -225,6 +206,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             public string RegistrationReferenceNumber { get; set; }
             public Guid SubmissionId { get; set; }
             public string Type { get; set; }
+
+            public string FileId { get; set; }
         }
 
         private async Task<List<AbstractCosmosSubmissionEvent>> GetDeltaSubmissionEvents(DateTime? lastSyncTime, Guid userId, Guid? SubmissionId = null)
