@@ -61,7 +61,7 @@ public class OrganisationRegistrationSummaryDto
 
         if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.SubmissionStatus, true, out var submissionStatus))
         {
-            throw new InvalidCastException($"Invalid SubmissionStatus: {dto.SubmissionStatus}");
+            submissionStatus = RegistrationSubmissionStatus.None;
         }
         response.SubmissionStatus = submissionStatus;
 
@@ -91,7 +91,7 @@ public class OrganisationRegistrationSummaryDto
         {
             if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var resubmissionStatus))
             {
-                throw new InvalidCastException($"Invalid ResubmissionStatus: {dto.ResubmissionStatus}");
+                resubmissionStatus = RegistrationSubmissionStatus.None;
             }
             response.ResubmissionStatus = resubmissionStatus;
         }

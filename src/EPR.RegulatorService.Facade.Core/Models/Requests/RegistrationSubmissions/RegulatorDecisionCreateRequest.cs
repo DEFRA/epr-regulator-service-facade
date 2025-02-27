@@ -52,5 +52,7 @@ public class RegulatorDecisionCreateRequest
 
     public bool IsResubmission { get; set; }
 
+    public string? FileId { get; set; }
+
     public string? ExistingRegRefNumber { get; set; } = string.Empty;
 }

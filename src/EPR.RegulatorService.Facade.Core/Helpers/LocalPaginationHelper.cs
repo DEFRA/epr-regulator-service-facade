@@ -4,7 +4,6 @@ using EPR.RegulatorService.Facade.Core.Helpers.Filters;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.Core.Helpers
 {

@@ -34,4 +34,5 @@ public class RegistrationSubmissionOrganisationSubmissionSummaryDetails
     public string RegistrationDate { get; internal set; }
     public string ResubmissionDate { get; internal set; }
     public bool IsResubmission { get; internal set; }
+    public string? ResubmissionFileId { get; internal set; }
 }

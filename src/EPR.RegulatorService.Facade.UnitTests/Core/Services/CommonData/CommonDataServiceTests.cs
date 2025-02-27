@@ -1,18 +1,15 @@
 using System.Net;
-using System.Text;
 using System.Text.Json;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
@@ -277,9 +274,7 @@ public class CommonDataServiceTests
         var submissionId = Guid.NewGuid();
         _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
 
-        object expectedResult = null;
-
-        SetupNullApiSuccessCall(JsonSerializer.Serialize(expectedResult));
+        SetupNullApiSuccessCall();
 
         // Act
         var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
@@ -347,9 +342,8 @@ public class CommonDataServiceTests
     {
         // Arrange
         var submissionId = Guid.NewGuid();
-        var url = $"pom/get-resubmission-paycal-parameters/{submissionId}";
-
-        SetupNullApiSuccessCall("");
+        
+        SetupNullApiSuccessCall();
 
         // Act
         var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
@@ -368,7 +362,7 @@ public class CommonDataServiceTests
         SetupApiSuccessCall("{}");
         
         // Act
-        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
+        await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
 
         // Assert
         _httpMessageHandlerMock.Verify(); // Verifies that the expected URL was called
@@ -385,7 +379,7 @@ public class CommonDataServiceTests
         SetupApiSuccessCall("{}");
 
         // Act
-        var result = await _sut.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+        await _sut.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
 
         // Assert
         _httpMessageHandlerMock.Verify(); // Verifies that the expected URL was called
@@ -501,12 +495,11 @@ public class CommonDataServiceTests
             .ReturnsAsync(apiResponse).Verifiable();
     }
 
-    private void SetupNullApiSuccessCall(string content)
+    private void SetupApiSuccessCall()
     {
         var apiResponse = _fixture
             .Build<HttpResponseMessage>()
             .With(x => x.StatusCode, HttpStatusCode.OK)
-            .With(x => x.Content, new StringContent(string.Empty))
             .Create();
 
         _httpMessageHandlerMock.Protected()
@@ -516,11 +509,12 @@ public class CommonDataServiceTests
             .ReturnsAsync(apiResponse).Verifiable();
     }
 
-    private void SetupApiSuccessCall()
+    private void SetupNullApiSuccessCall()
     {
         var apiResponse = _fixture
             .Build<HttpResponseMessage>()
             .With(x => x.StatusCode, HttpStatusCode.OK)
+            .With(x => x.Content, new StringContent(string.Empty))
             .Create();
 
         _httpMessageHandlerMock.Protected()

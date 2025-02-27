@@ -28,6 +28,7 @@ public class OrganisationRegistrationDetailsDto
     public string ResubmissionStatus { get; set; }
     public string? RegistrationDate { get; set; }
     public string? ResubmissionDate { get; set; }
+    public string? ResubmissionFileId { get; set; }
     public bool IsComplianceScheme { get; set; }
     public string OrganisationSize { get; set; }
     public string OrganisationType { get; set; }
@@ -124,7 +125,7 @@ public class OrganisationRegistrationDetailsDto
         response.RegistrationDate = convertDateTime(dto.RegistrationDate);
         response.ResubmissionDate = convertDateTime(dto.ResubmissionDate);
         response.IsResubmission = dto.IsResubmission;
-
+        response.ResubmissionFileId = dto.ResubmissionFileId;
         response.StatusPendingDate = convertDateTime(dto.StatusPendingDate);
         response.SubmissionDate = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow;
         response.IsLateSubmission = dto.IsLateSubmission;
@@ -190,6 +191,7 @@ public class OrganisationRegistrationDetailsDto
             ResubmissionStatus = dto.ResubmissionStatus,
             RegistrationDate = dto.RegistrationDate,
             ResubmissionDate = dto.ResubmissionDate,
+            ResubmissionFileId = dto.ResubmissionFileId,
             IsResubmission = dto.IsResubmission
         };
         response.SubmissionDetails = submissionDetails;

@@ -59,6 +59,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public bool IsComplianceScheme { get; internal set; }
     public string SubmissionPeriod { get; internal set; }
     public List<CsoMembershipDetailsDto> CsoMembershipDetails { get; set; }
+    public string? ResubmissionFileId { get; internal set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
         (RegistrationSubmissionOrganisationDetailsFacadeResponse details) => new()
