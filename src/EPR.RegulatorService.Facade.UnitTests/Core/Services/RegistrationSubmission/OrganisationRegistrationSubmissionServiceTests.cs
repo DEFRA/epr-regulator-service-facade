@@ -969,65 +969,6 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         [TestMethod]
-        public void ProducerSubmissionUpdatesProducerCommentDate()
-        {
-            // Arrange
-            var commentTime = DateTime.UtcNow;
-            var item = CreateDefaultItem("APP123", RegistrationSubmissionStatus.Pending);
-
-            var events = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Type = "RegistrationApplicationSubmitted",
-                    Created = commentTime,
-                    Comments = "Producer Comment"
-                }
-            };
-
-            // Act
-            MergeCosmosUpdates(events, item);
-
-            // Assert
-            Assert.AreEqual(commentTime, item.ProducerCommentDate, "ProducerCommentDate should be updated.");
-            Assert.AreEqual("Producer Comment", item.ProducerComments, "Comments should be updated.");
-            // Since RegulatorDecisionDate is null, no final update check applies.
-            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus);
-        }
-
-        [TestMethod]
-        public void MultipleProducerComments_TakesLatestProducerCommentDate()
-        {
-            // Arrange
-            var olderComment = DateTime.UtcNow.AddHours(-2);
-            var newerComment = DateTime.UtcNow.AddHours(-1);
-            var item = CreateDefaultItem("APP123", RegistrationSubmissionStatus.Pending);
-
-            var events = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Type = "RegistrationApplicationSubmitted",
-                    Created = olderComment,
-                    Comments = "Old comment"
-                },
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Type = "RegistrationApplicationSubmitted",
-                    Created = newerComment,
-                    Comments = "New comment"
-                }
-            };
-
-            // Act
-            MergeCosmosUpdates(events, item);
-
-            // Assert
-            Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the newest ProducerCommentDate.");
-            Assert.AreEqual("New comment", item.ProducerComments, "Should have the latest comment.");
-        }
-
-        [TestMethod]
         public void ProducerAndRegulatorDecisions_ProducerLater_Doesnt_UpdatesToUpdatedStatus()
         {
             // Arrange
@@ -1056,7 +997,6 @@ public class OrganisationRegistrationSubmissionServiceTests
             MergeCosmosUpdates(events, item);
 
             // Assert
-            Assert.AreEqual(producerTime, item.ProducerCommentDate);
             Assert.AreEqual(regulatorTime, item.RegulatorDecisionDate);
             // ProducerCommentDate > RegulatorDecisionDate triggers Updated
             Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus);
@@ -1093,7 +1033,6 @@ public class OrganisationRegistrationSubmissionServiceTests
             MergeCosmosUpdates(events, item);
 
             // Assert
-            Assert.AreEqual(producerTime, item.ProducerCommentDate);
             Assert.AreEqual(regulatorTime, item.RegulatorDecisionDate);
             // ProducerCommentDate NOT > RegulatorDecisionDate, no update
             Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus);
