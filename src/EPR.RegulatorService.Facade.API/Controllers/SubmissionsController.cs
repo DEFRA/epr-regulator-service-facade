@@ -19,7 +19,6 @@ using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
-using System.Net;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 

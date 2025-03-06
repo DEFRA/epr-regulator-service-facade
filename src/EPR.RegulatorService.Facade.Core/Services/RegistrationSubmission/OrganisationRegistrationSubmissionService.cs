@@ -117,7 +117,8 @@ public partial class OrganisationRegistrationSubmissionService(
                 Decision = request.Status.GetRegulatorDecision(),
                 Comments = request.Comments,
                 RegistrationReferenceNumber = regRefNumber,
-                DecisionDate = request.DecisionDate
+                DecisionDate = request.DecisionDate,
+                FileId = request.FileId
             },
             userId
         );

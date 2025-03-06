@@ -30,9 +30,15 @@ public class OrganisationRegistrationSubmissionsController(
             {
                 return ValidationProblem();
             }
-            else if (request.IsResubmission && string.IsNullOrWhiteSpace(request.ExistingRegRefNumber))
+            else if (request.IsResubmission 
+                    && (string.IsNullOrWhiteSpace(request.ExistingRegRefNumber)
+                    || string.IsNullOrWhiteSpace(request.FileId)))
             {
-                ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "ExistingRegRefNumber is required for resubmission");
+                if (string.IsNullOrWhiteSpace(request.ExistingRegRefNumber))
+                    ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "ExistingRegRefNumber is required for resubmission");
+                if(string.IsNullOrWhiteSpace(request.FileId))
+                    ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "FileId is required for resubmission");
+
                 return ValidationProblem(ModelState);
             }
 
