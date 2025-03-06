@@ -269,6 +269,32 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
+    public async Task Should_map_submissiondetailscorrectly_when_fetching_registration_submission_details()
+    {
+        //Arrange
+        var submissionId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
+        var expectedResult = _fixture
+            .Build<OrganisationRegistrationDetailsDto>()
+            .With(x => x.SubmissionId, submissionId)     // Generate a valid Guid
+            .With(x => x.SubmissionStatus, RandomStatus().ToString())
+            .With(x => x.IsLateSubmission, false)
+            .Create();
+
+        SetupApiSuccessCall(JsonSerializer.Serialize(expectedResult));
+
+        // Act
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+
+        // Assert
+        results.Should().BeOfType<RegistrationSubmissionOrganisationDetailsResponse>();
+        Assert.IsNotNull(results);
+        Assert.AreEqual(results.SubmissionId, submissionId);
+        Assert.IsTrue(results.SubmissionDetails.SubmittedOnTime);
+    }
+
+    [TestMethod]
     public async Task Should_Return_Null_When_HTTP_Results_AreEmpty()
     {
         var submissionId = Guid.NewGuid();
