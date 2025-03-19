@@ -28,7 +28,7 @@ namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
                 Collection = GetCollectionName(submissionType.GetDisplayName<SubmissionType>()),
                 UserId = userId,
                 UserEmail = email,
-                PersistFile = _antivirusApiConfig.PersistFile
+                PersistFile = _antivirusApiConfig.PersistFile,
             };
 
             return await _antivirusClient.VirusScanFile(fileDetails, fileName, fileStream);
