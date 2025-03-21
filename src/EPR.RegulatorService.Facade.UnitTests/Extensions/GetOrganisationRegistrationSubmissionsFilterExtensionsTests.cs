@@ -17,7 +17,7 @@ public class GetOrganisationRegistrationSubmissionsFilterExtensionsTests
     public void GenerateQueryString_AllParametersPresent_ReturnsCorrectQueryString()
     {
         // Arrange
-        var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
         {
             OrganisationName = "Org1 Org2",
             OrganisationReference = "123 456",
@@ -47,7 +47,7 @@ public class GetOrganisationRegistrationSubmissionsFilterExtensionsTests
     public void GenerateQueryString_NullOrEmptyParameters_ExcludesNullValues()
     {
         // Arrange
-        var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
         {
             OrganisationName = null,
             OrganisationReference = string.Empty,
@@ -73,7 +73,7 @@ public class GetOrganisationRegistrationSubmissionsFilterExtensionsTests
     public void GenerateQueryString_SpacesInParameters_AreConvertedToCommas()
     {
         // Arrange
-        var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
         {
             OrganisationName = "Org1  Org2    Org3",
             OrganisationReference = " 123   456 ",
@@ -100,7 +100,7 @@ public class GetOrganisationRegistrationSubmissionsFilterExtensionsTests
     public void GenerateQueryString_SpecialCharacters_AreUrlEncoded()
     {
         // Arrange
-        var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
         {
             OrganisationName = "Org&1 Org=2",
             OrganisationReference = "123+456",
@@ -137,7 +137,7 @@ public class GetOrganisationRegistrationSubmissionsFilterExtensionsTests
     public void GenerateQueryString_AllNullParameters_ReturnsEmptyQueryString()
     {
         // Arrange
-        var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
         {
             OrganisationName = null,
             OrganisationReference = null,
@@ -162,7 +162,7 @@ public class GetOrganisationRegistrationSubmissionsFilterExtensionsTests
         var expected = HttpUtility.UrlEncode("PageNumber") + "=" + HttpUtility.UrlEncode("1") + "&" +
                        HttpUtility.UrlEncode("PageSize") + "=" + HttpUtility.UrlEncode("20");
 
-        var filter = new GetOrganisationRegistrationSubmissionsCommonDataFilter();
+        var filter = new GetOrganisationRegistrationSubmissionsFilter();
 
         // Act
         var queryString = filter.GenerateQueryString();

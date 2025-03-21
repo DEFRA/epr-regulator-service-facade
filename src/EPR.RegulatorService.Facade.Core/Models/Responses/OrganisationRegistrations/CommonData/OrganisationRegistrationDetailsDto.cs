@@ -24,6 +24,11 @@ public class OrganisationRegistrationDetailsDto
     public string SubmissionPeriod { get; set; }
     public int RelevantYear { get; set; }
 
+    public bool IsResubmission { get; set; }
+    public string ResubmissionStatus { get; set; }
+    public string? RegistrationDate { get; set; }
+    public string? ResubmissionDate { get; set; }
+    public string? ResubmissionFileId { get; set; }
     public bool IsComplianceScheme { get; set; }
     public string OrganisationSize { get; set; }
     public string OrganisationType { get; set; }
@@ -75,7 +80,7 @@ public class OrganisationRegistrationDetailsDto
     public string? BrandsBlobName { get; set; }
     public string? CSOJson { get; set; }
 
-    public static implicit operator RegistrationSubmissionOrganisationDetailsResponse(OrganisationRegistrationDetailsDto dto)
+    public static implicit operator RegistrationSubmissionOrganisationDetailsFacadeResponse(OrganisationRegistrationDetailsDto dto)
     {
         static DateTime? convertDateTime(string dateTimeString)
         {
@@ -90,7 +95,7 @@ public class OrganisationRegistrationDetailsDto
 
         if (dto is null) return null;
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse();
+        RegistrationSubmissionOrganisationDetailsFacadeResponse response = new ();
 
         response.SubmissionId = dto.SubmissionId;
         response.OrganisationId = dto.OrganisationId;
@@ -108,6 +113,19 @@ public class OrganisationRegistrationDetailsDto
             response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
         }
 
+        if (Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out submissionStatus))
+        {
+            response.ResubmissionStatus = submissionStatus;
+        }
+        else
+        {
+            response.ResubmissionStatus = RegistrationSubmissionStatus.Pending;
+        }
+
+        response.RegistrationDate = convertDateTime(dto.RegistrationDate);
+        response.ResubmissionDate = convertDateTime(dto.ResubmissionDate);
+        response.IsResubmission = dto.IsResubmission;
+        response.ResubmissionFileId = dto.ResubmissionFileId;
         response.StatusPendingDate = convertDateTime(dto.StatusPendingDate);
         response.SubmissionDate = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow;
         response.IsLateSubmission = dto.IsLateSubmission;
@@ -157,7 +175,7 @@ public class OrganisationRegistrationDetailsDto
         {
             AccountRoleId = dto.ServiceRoleId,
             AccountRole = dto.ServiceRole,
-            SubmittedOnTime = dto.IsLateSubmission,
+            SubmittedOnTime = !dto.IsLateSubmission,
             DecisionDate = convertDateTime(dto.StatusPendingDate ?? dto.RegulatorDecisionDate),
             Email = dto.Email,
             TimeAndDateOfSubmission = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow,
@@ -169,10 +187,15 @@ public class OrganisationRegistrationDetailsDto
             Status = Enum.Parse<RegistrationSubmissionStatus>(dto.SubmissionStatus),
             Files = GetSubmissionFileDetails(dto),
             SubmittedByUserId = dto.SubmittedUserId,
-            SubmissionPeriod = dto.SubmissionPeriod
+            SubmissionPeriod = dto.SubmissionPeriod,
+            ResubmissionStatus = dto.ResubmissionStatus,
+            RegistrationDate = dto.RegistrationDate,
+            ResubmissionDate = dto.ResubmissionDate,
+            ResubmissionFileId = dto.ResubmissionFileId,
+            IsResubmission = dto.IsResubmission
         };
         response.SubmissionDetails = submissionDetails;
-
+        response.IsResubmission = dto.IsResubmission;
         return response;
     }
 

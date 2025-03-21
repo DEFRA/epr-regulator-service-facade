@@ -18,6 +18,7 @@ using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
 
@@ -32,10 +33,10 @@ public class SubmissionsController : ControllerBase
     private readonly ICommonDataService _commonDataService;
 
     public SubmissionsController(
-        ILogger<SubmissionsController> logger, 
-        ISubmissionService submissionService, 
+        ILogger<SubmissionsController> logger,
+        ISubmissionService submissionService,
         IRegulatorOrganisationService regulatorOrganisationService,
-        IOptions<MessagingConfig> messagingConfig, 
+        IOptions<MessagingConfig> messagingConfig,
         IMessagingService messagingService,
         ICommonDataService commonDataService)
     {
@@ -63,9 +64,9 @@ public class SubmissionsController : ControllerBase
             Comments = request.Comments,
             FileId = request.FileId
         };
-        
+
         var submissionEvent = await _submissionService.CreateSubmissionEvent(request.SubmissionId, regulatorPoMDecisionEvent, User.UserId());
-        
+
         if (submissionEvent.IsSuccessStatusCode)
         {
             var users = await _regulatorUsers.GetRegulatorUsers(User.UserId(), request.OrganisationId);
@@ -78,11 +79,11 @@ public class SubmissionsController : ControllerBase
             }
             else
             {
-                emailIds = request.IsResubmissionRequired 
-                    ? _messagingService.SubmissionRejected(model, true) 
+                emailIds = request.IsResubmissionRequired
+                    ? _messagingService.SubmissionRejected(model, true)
                     : _messagingService.SubmissionRejected(model, false);
             }
-            
+
             return Ok(emailIds);
         }
 
@@ -105,16 +106,16 @@ public class SubmissionsController : ControllerBase
             return HandleError.HandleErrorWithStatusCode(lastSyncResponse.StatusCode);
         }
 
-        var submissionEventsLastSync = lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>().Result;
+        var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
 
         var deltaPoMDecisionsResponse = await _submissionService.GetDeltaPoMSubmissions(submissionEventsLastSync.LastSyncTime, User.UserId());
-        
+
         if (!deltaPoMDecisionsResponse.IsSuccessStatusCode)
         {
             return HandleError.HandleErrorWithStatusCode(deltaPoMDecisionsResponse.StatusCode);
         }
-        
-        var deltaPoMDecisions = deltaPoMDecisionsResponse.Content.ReadFromJsonAsync<RegulatorPomDecision[]>().Result;
+
+        var deltaPoMDecisions = await deltaPoMDecisionsResponse.Content.ReadFromJsonAsync<RegulatorPomDecision[]>();
 
         var pomSubmissionsRequest = new GetPomSubmissionsRequest
         {
@@ -140,7 +141,25 @@ public class SubmissionsController : ControllerBase
 
         return HandleError.HandleErrorWithStatusCode(submissions.StatusCode);
     }
-    
+
+    [HttpGet]
+    [Route("pom/get-resubmission-paycal-parameters/{submissionId}")]
+    public async Task<IActionResult> GetResubmissionPaycalDetails([FromRoute] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem();
+        }
+
+        var pomData = await _commonDataService.GetPomResubmissionPaycalDetails(submissionId, complianceSchemeId);
+        if (pomData is null)
+        {
+            return NoContent();
+        }
+
+        return Ok(pomData);
+    }
+
     [HttpPost]
     [Route("registration/regulator-decision")]
     public async Task<IActionResult> CreateRegulatorRegistrationDecisionEvent([FromBody] RegulatorRegistrationDecisionCreateRequest request)
@@ -156,14 +175,14 @@ public class SubmissionsController : ControllerBase
             Comments = request.Comments,
             FileId = request.FileId
         };
-        
+
         var submissionEvent = await _submissionService.CreateSubmissionEvent(request.SubmissionId, regulatorRegistrationDecisionEvent, User.UserId());
-        
+
         if (submissionEvent.IsSuccessStatusCode)
         {
             var users = await _regulatorUsers.GetRegulatorUsers(User.UserId(), request.OrganisationId);
             var model = CreateBaseEmailModel(users, request);
-           
+
             List<string> emailIds;
             if (request.Decision == RegulatorDecision.Accepted)
             {
@@ -173,13 +192,13 @@ public class SubmissionsController : ControllerBase
             {
                 emailIds = _messagingService.SubmissionRejected(model, null);
             }
-            
+
             return Ok(emailIds);
         }
 
         return new BadRequestResult();
     }
-    
+
     [HttpGet]
     [Route("registrations/get-submissions")]
     public async Task<IActionResult> GetRegistrationSubmissions([FromQuery] RegistrationSubmissionsFilters request)
@@ -198,12 +217,12 @@ public class SubmissionsController : ControllerBase
         var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
 
         var deltaRegistrationDecisionsResponse = await _submissionService.GetDeltaRegistrationSubmissions(submissionEventsLastSync.LastSyncTime, User.UserId());
-        
+
         if (!deltaRegistrationDecisionsResponse.IsSuccessStatusCode)
         {
             return HandleError.HandleErrorWithStatusCode(deltaRegistrationDecisionsResponse.StatusCode);
         }
-        
+
         var deltaRegistrationDecisions = await deltaRegistrationDecisionsResponse.Content.ReadFromJsonAsync<RegulatorRegistrationDecision[]>();
 
         var registrationSubmissionsRequest = new GetRegistrationSubmissionsRequest
@@ -230,13 +249,13 @@ public class SubmissionsController : ControllerBase
 
         return HandleError.HandleErrorWithStatusCode(submissions.StatusCode);
     }
-    
+
     private SubmissionEmailModel CreateBaseEmailModel(List<OrganisationUser> users, AbstractDecisionRequest request)
     {
         var userEmails = users.Select(user => new UserEmailModel
         {
-            Email = user.Email, 
-            FirstName = user.FirstName, 
+            Email = user.Email,
+            FirstName = user.FirstName,
             LastName = user.LastName
         }).ToList();
 

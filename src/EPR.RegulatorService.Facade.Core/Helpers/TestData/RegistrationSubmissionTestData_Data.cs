@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace EPR.RegulatorService.Facade.Core.Helpers.TestData;
 
 public static partial class RegistrationSubmissionTestData

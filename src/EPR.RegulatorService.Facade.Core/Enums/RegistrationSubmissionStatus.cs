@@ -19,5 +19,9 @@ public enum RegistrationSubmissionStatus
 
     Cancelled = 40,
 
-    Updated = 50
+    Updated = 50,
+
+    Accepted = 60,
+
+    Rejected = 70
 }

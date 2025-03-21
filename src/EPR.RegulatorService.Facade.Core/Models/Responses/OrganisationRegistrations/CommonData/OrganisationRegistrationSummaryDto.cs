@@ -18,10 +18,14 @@ public class OrganisationRegistrationSummaryDto
     public string? RegistrationReferenceNumber { get; set; }
     public int RelevantYear { get; set; }
     public string SubmittedDateTime { get; set; }
-    public string? RegulatorCommentDate { get; set; }
-    public string? ProducerCommentDate { get; set; }
+    public string? RegulatorDecisionDate { get; set; }
     public Guid? RegulatorUserId { get; set; }
     public int NationId { get; set; }
+    public bool IsResubmission { get; set; }
+    public string? ResubmissionStatus { get; set; }
+    public string? ResubmissionDate { get; set; }
+    public string? RegistrationDate { get; set; }
+
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse(OrganisationRegistrationSummaryDto dto)
     {
@@ -57,7 +61,7 @@ public class OrganisationRegistrationSummaryDto
 
         if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.SubmissionStatus, true, out var submissionStatus))
         {
-            throw new InvalidCastException($"Invalid SubmissionStatus: {dto.SubmissionStatus}");
+            submissionStatus = RegistrationSubmissionStatus.None;
         }
         response.SubmissionStatus = submissionStatus;
 
@@ -69,19 +73,33 @@ public class OrganisationRegistrationSummaryDto
 
         response.NationId = dto.NationId;
 
-        response.RegulatorCommentDate = null;
-        if (!string.IsNullOrWhiteSpace(dto.RegulatorCommentDate))
+        response.RegistrationDate = null;
+        if (!string.IsNullOrWhiteSpace(dto.RegistrationDate))
         {
-            response.RegulatorCommentDate = DateTime.Parse(dto.RegulatorCommentDate, CultureInfo.InvariantCulture);
+            response.RegistrationDate = DateTime.Parse(dto.RegistrationDate, CultureInfo.InvariantCulture);
         }
 
-        response.ProducerCommentDate = null;
-        if (!string.IsNullOrWhiteSpace(dto.ProducerCommentDate))
+        response.ResubmissionDate = null;
+        if (!string.IsNullOrWhiteSpace(dto.ResubmissionDate))
         {
-            response.ProducerCommentDate = DateTime.Parse(dto.ProducerCommentDate, CultureInfo.InvariantCulture);
+            response.ResubmissionDate = DateTime.Parse(dto.ResubmissionDate, CultureInfo.InvariantCulture);
         }
 
-        response.RegulatorUserId = dto.RegulatorUserId;
+        response.IsResubmission = dto.IsResubmission;
+
+        if (dto.IsResubmission)
+        {
+            if (!Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var resubmissionStatus))
+            {
+                resubmissionStatus = RegistrationSubmissionStatus.None;
+            }
+            response.ResubmissionStatus = resubmissionStatus;
+        }
+        
+        if (!string.IsNullOrWhiteSpace(dto.RegulatorDecisionDate))
+        {
+            response.RegulatorDecisionDate = DateTime.Parse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture);
+        }
 
         return response;
     }

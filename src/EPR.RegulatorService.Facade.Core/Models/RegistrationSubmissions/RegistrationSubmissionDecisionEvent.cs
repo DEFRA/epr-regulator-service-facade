@@ -21,4 +21,6 @@ public class RegistrationSubmissionDecisionEvent
     public string? RegistrationReferenceNumber { get; set; }
 
     public DateTime? DecisionDate { get; set; }
+
+    public string? FileId { get; internal set; }
 }

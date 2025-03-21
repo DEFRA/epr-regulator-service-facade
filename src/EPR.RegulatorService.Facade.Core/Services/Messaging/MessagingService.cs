@@ -80,7 +80,7 @@ public class MessagingService : IMessagingService
             emailId = SendEmail(delegatedPerson.Email, _messagingConfig.ToDelegatedPersonApprovedPersonRejected, delegatedPersonParameters);
             emailIds.Add(emailId);
         }
-        
+
         return emailIds;
     }
 
@@ -127,7 +127,7 @@ public class MessagingService : IMessagingService
             { "organisationName", model.OrganisationName },
             { "reasonForRejection", model.RejectionComments },
             { "accountLoginUrl", model.AccountLoginUrl }
-        }; 
+        };
     }
 
     public List<string> DelegatedPersonRejected(ApplicationEmailModel model)
@@ -140,12 +140,12 @@ public class MessagingService : IMessagingService
 
         var emailIds = new List<string>();
 
-        var approvedPersonParameters = GetApprovedPerson(model, delegatedPerson); 
+        var approvedPersonParameters = GetApprovedPerson(model, delegatedPerson);
 
         var emailId = SendEmail(model.ApprovedPerson.Email, _messagingConfig.ToApprovedPersonDelegatedPersonRejected, approvedPersonParameters);
         emailIds.Add(emailId);
 
-        var delegatedPersonParameters = GetDelegatedPerson(model, delegatedPerson); 
+        var delegatedPersonParameters = GetDelegatedPerson(model, delegatedPerson);
 
         emailId = SendEmail(delegatedPerson.Email, _messagingConfig.ToDelegatedPersonDelegatedPersonRejected, delegatedPersonParameters);
         emailIds.Add(emailId);
@@ -163,7 +163,7 @@ public class MessagingService : IMessagingService
         }
 
         var emailIds = new List<string>();
-        
+
         string templateId;
 
         if (type == EventType.RegulatorPoMDecision)
@@ -174,7 +174,7 @@ public class MessagingService : IMessagingService
         {
             templateId = _messagingConfig.RegulatorRegistrationAccepted;
         }
-        
+
         foreach (var userEmail in model.UserEmails)
         {
             var userEmailParameters = new Dictionary<string, object>
@@ -184,7 +184,7 @@ public class MessagingService : IMessagingService
                 { "organisationNumber", model.OrganisationNumber.ToReferenceNumberFormat() },
                 { "submissionPeriod", model.SubmissionPeriod },
                 { "organisationName", model.OrganisationName },
-                { "accountLoginUrl", model.AccountLoginUrl }             
+                { "accountLoginUrl", model.AccountLoginUrl }
             };
 
             var emailId = SendEmail(userEmail.Email, templateId, userEmailParameters);
@@ -241,7 +241,7 @@ public class MessagingService : IMessagingService
     public string? SendRemovedApprovedPersonNotification(AssociatedPersonResults model, string notificationType)
     {
         Dictionary<string, object> parameters = null;
-        
+
         switch (notificationType)
         {
             case "PromotedApprovedUser":
@@ -255,10 +255,10 @@ public class MessagingService : IMessagingService
                     { "companyName", model.CompanyName },
                     { "accountSignInUrl", model.AccountSignInUrl}
                 };
-               ValidateRequiredRemovedApprovedPersonEmailModelParameters(model);
+                ValidateRequiredRemovedApprovedPersonEmailModelParameters(model);
                 break;
-           
-            case "DemotedDelegatedUsed" : 
+
+            case "DemotedDelegatedUsed":
                 parameters = new Dictionary<string, object>
                 {
                     { "email", model.Email },
@@ -269,16 +269,16 @@ public class MessagingService : IMessagingService
                 ValidateDemotedDelegatedPersonParameters(model);
                 break;
         }
-       
-        var response =  _notificationClient.SendEmail(model.Email, model.TemplateId, parameters);
+
+        var response = _notificationClient.SendEmail(model.Email, model.TemplateId, parameters);
 
         return response.id;
     }
-     
+
     public string SendEmailToInvitedNewApprovedPerson(AddRemoveNewApprovedPersonEmailModel model)
     {
         Dictionary<string, object> parameters = null;
-        
+
         parameters = new Dictionary<string, object>
         {
             { "email", model.Email },
@@ -288,37 +288,53 @@ public class MessagingService : IMessagingService
             { "inviteLink", model.InviteLink },
             { "companyName", model.CompanyName }
         };
-        
+
         Validate(model);
-        
-       
-        var response =  _notificationClient.SendEmail(model.Email, _messagingConfig.InviteNewApprovedPersonTemplateId, parameters);
+
+
+        var response = _notificationClient.SendEmail(model.Email, _messagingConfig.InviteNewApprovedPersonTemplateId, parameters);
 
         return response.id;
     }
-     
+
     public void OrganisationRegistrationSubmissionQueried(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model);
-
-        var templateId = 
-            (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId : _messagingConfig.OrganisationRegistrationSubmissionQueriedId;
-
-        SendEventEmail(model.ToEmail, templateId, model.GetParameters);
+        SendRegistrationSubmissionEmail(
+            model,
+            _messagingConfig.OrganisationRegistrationSubmissionQueriedId,
+            _messagingConfig.WelshOrganisationRegistrationSubmissionQueriedId);
     }
 
     public void OrganisationRegistrationSubmissionDecision(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateOrganisationRegistrationSubmissionModel(model); 
+        SendRegistrationSubmissionEmail(
+            model,
+            _messagingConfig.OrganisationRegistrationSubmissionDecisionId,
+            _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId);
+    }
 
-        var templateId = 
-            (bool)model.IsWelsh ? _messagingConfig.WelshOrganisationRegistrationSubmissionDecisionId : _messagingConfig.OrganisationRegistrationSubmissionDecisionId;
+    public void OrganisationRegistrationResubmissionDecision(OrganisationRegistrationSubmissionEmailModel model)
+    {
+        SendRegistrationSubmissionEmail(
+            model,
+            _messagingConfig.OrganisationRegistrationResubmissionDecisionId,
+            _messagingConfig.WelshOrganisationRegistrationResubmissionDecisionId);
+    }
 
+    private void SendRegistrationSubmissionEmail(
+        OrganisationRegistrationSubmissionEmailModel model,
+        string englishTemplateId,
+        string welshTemplateId)
+    {
+        ValidateOrganisationRegistrationSubmissionModel(model);
+
+        var templateId = (bool)model.IsWelsh ? welshTemplateId : englishTemplateId;
         SendEventEmail(model.ToEmail, templateId, model.GetParameters);
-    }  
+    }
+
     private static void ValidateOrganisationRegistrationSubmissionModel(OrganisationRegistrationSubmissionEmailModel model)
     {
-        ValidateStringParameter(model.ToEmail, nameof(model.ToEmail)); 
+        ValidateStringParameter(model.ToEmail, nameof(model.ToEmail));
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
         ValidateStringParameter(model.OrganisationName, nameof(model.OrganisationName));
         ValidateStringParameter(model.Agency, nameof(model.Agency));
@@ -354,7 +370,7 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.AccountLoginUrl, nameof(model.AccountLoginUrl));
         ValidateStringParameter(model.OrganisationNumber, nameof(model.OrganisationNumber));
     }
-    
+
     private static void ValidateRequiredSubmissionEmailModelParameters(SubmissionEmailModel model)
     {
         ValidateStringParameter(model.OrganisationName, nameof(model.OrganisationName));
@@ -369,14 +385,14 @@ public class MessagingService : IMessagingService
         ValidateStringParameter(model.LastName, nameof(model.LastName));
         ValidateStringParameter(model.OrganisationId, nameof(model.OrganisationId));
     }
-    
+
     private static void ValidateUserEmailParameters(UserEmailModel model)
     {
         ValidateStringParameter(model.Email, nameof(model.Email));
         ValidateStringParameter(model.FirstName, nameof(model.FirstName));
         ValidateStringParameter(model.LastName, nameof(model.LastName));
     }
-    
+
     private static void ValidateStringParameter(string parameter, string parameterName)
     {
         if (string.IsNullOrWhiteSpace(parameter))
@@ -396,7 +412,7 @@ public class MessagingService : IMessagingService
         }
         catch (Exception ex)
         {
-            string callingMethodName = (new StackTrace()).GetFrame(1).GetMethod().Name;
+            string callingMethodName = new StackTrace().GetFrame(1).GetMethod().Name;
 
             var organisationNumber = parameters.Single(x => x.Key == "organisationNumber").Value.ToString();
 
@@ -414,11 +430,11 @@ public class MessagingService : IMessagingService
         }
         catch (Exception ex)
         {
-            string callingMethodName = (new StackTrace()).GetFrame(1).GetMethod().Name;
+            string callingMethodName = new StackTrace().GetFrame(1).GetMethod().Name;
 
             var organisationNumber = parameters.Single(x => x.Key == "organisation_number").Value.ToString();
 
-            _logger.LogError(ex, "GOV UK NOTIFY ERROR. Class: {TypeName}, Method: {CallingMethod}, Organisation: {OrgNumber}, Template: {TemplateId}", 
+            _logger.LogError(ex, "GOV UK NOTIFY ERROR. Class: {TypeName}, Method: {CallingMethod}, Organisation: {OrgNumber}, Template: {TemplateId}",
                 this.GetType().Name, callingMethodName, organisationNumber, templateId);
         }
 

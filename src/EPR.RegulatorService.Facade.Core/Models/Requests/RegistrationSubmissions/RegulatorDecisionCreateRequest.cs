@@ -50,4 +50,9 @@ public class RegulatorDecisionCreateRequest
     // required for the welsh email templates
     public bool? IsWelsh { get; init; } = false;
 
+    public bool IsResubmission { get; set; }
+
+    public string? FileId { get; set; }
+
+    public string? ExistingRegRefNumber { get; set; } = string.Empty;
 }
