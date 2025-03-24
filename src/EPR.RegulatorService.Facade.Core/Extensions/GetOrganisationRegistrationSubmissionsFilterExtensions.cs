@@ -1,10 +1,8 @@
 ﻿using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
-using System.Diagnostics.CodeAnalysis;
 using System.Web;
 
 namespace EPR.RegulatorService.Facade.Core.Extensions;
 
-[ExcludeFromCodeCoverage]
 public static class GetOrganisationRegistrationSubmissionsFilterExtensions
 {
     public static string GenerateQueryString(this GetOrganisationRegistrationSubmissionsFilter source)
