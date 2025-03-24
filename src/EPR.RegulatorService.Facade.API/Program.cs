@@ -7,6 +7,7 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,8 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer"
     });
     options.OperationFilter<AddAuthHeaderOperationFilter>();
+    options.OperationFilter<SwashbuckleHeaderFilter>();
+    options.OperationFilter<ExampleRequestsFilter>();
 });
 
 // App

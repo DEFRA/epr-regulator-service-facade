@@ -26,7 +26,7 @@ public partial class OrganisationRegistrationSubmissionService(
     };
 
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
-        GetOrganisationRegistrationSubmissionsCommonDataFilter filter, Guid userId)
+        GetOrganisationRegistrationSubmissionsFilter filter, Guid userId)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
         DateTime? lastSyncTime = null;
@@ -68,7 +68,7 @@ public partial class OrganisationRegistrationSubmissionService(
         }
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
+    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
 
@@ -92,17 +92,20 @@ public partial class OrganisationRegistrationSubmissionService(
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
         RegulatorDecisionCreateRequest request, Guid userId)
     {
-        var regRefNumber =
-            request.Status == RegistrationSubmissionStatus.Granted &&
-            request.CountryName.HasValue &&
-            request.RegistrationSubmissionType.HasValue
-                ? GenerateReferenceNumber(
+        var regRefNumber = string.Empty;
+        if (request.Status == RegistrationSubmissionStatus.Granted)
+        {
+            regRefNumber = request.ExistingRegRefNumber;
+            if (!request.IsResubmission && request.CountryName.HasValue && request.RegistrationSubmissionType.HasValue)
+            {
+                regRefNumber = GenerateReferenceNumber(
                     request.CountryName.Value,
                     request.RegistrationSubmissionType.Value,
                     request.ApplicationReferenceNumber,
                     request.OrganisationAccountManagementId.ToString(),
-                    request.TwoDigitYear)
-                : string.Empty;
+                    request.TwoDigitYear);
+            }
+        }
 
         return await submissionService.CreateSubmissionEvent(
             request.SubmissionId,
@@ -114,7 +117,8 @@ public partial class OrganisationRegistrationSubmissionService(
                 Decision = request.Status.GetRegulatorDecision(),
                 Comments = request.Comments,
                 RegistrationReferenceNumber = regRefNumber,
-                DecisionDate = request.DecisionDate
+                DecisionDate = request.DecisionDate,
+                FileId = request.FileId
             },
             userId
         );

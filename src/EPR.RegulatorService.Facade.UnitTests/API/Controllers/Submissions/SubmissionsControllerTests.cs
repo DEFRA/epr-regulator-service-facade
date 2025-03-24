@@ -9,6 +9,7 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
@@ -589,6 +590,66 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Submissions
             
             // Assert
             result.As<ObjectResult>().Value.Should().BeOfType<ValidationProblemDetails>();
+        }
+
+        [TestMethod]
+        public async Task When_Requesting_Pom_Resubmission_Paycal_details_Without_SubmissionId_Will_Return_BadRequest()
+        {
+            // Arrange
+            _sut.ModelState.AddModelError("SubmissionId", "Invalid");
+
+            // Act
+            var result = await _sut.GetResubmissionPaycalDetails(Guid.Empty, null);
+
+            // Assert
+            result.As<ObjectResult>().Value.Should().BeOfType<ValidationProblemDetails>();
+        }
+
+        [TestMethod]
+        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_Will_Return_NoContent_When_Service_Returns_Null()
+        {
+            // Arrange
+            _mockCommonDataService
+                .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
+                .ReturnsAsync(default(PomResubmissionPaycalParametersDto));
+
+            // Act
+            var result = await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), null);
+
+            // Assert
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [TestMethod]
+        public async Task When_Requesting_Pom_Resubmission_Paycal_Details_With_Valid_Ids_Will_Return_Ok()
+        {
+            // Arrange
+            var response = _fixture.Create<PomResubmissionPaycalParametersDto>();
+            response.ReferenceFieldNotAvailable = false;
+            _mockCommonDataService
+                .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
+                .ReturnsAsync(response);
+
+            // Act
+            var result = await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), Guid.NewGuid());
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [TestMethod]
+        public async Task When_Service_Throws_Exception_Will_Return_InternalServerError()
+        {
+            // Arrange
+            _mockCommonDataService
+                .Setup(x => x.GetPomResubmissionPaycalDetails(It.IsAny<Guid>(), It.IsAny<Guid?>()))
+                .ThrowsAsync(new Exception("Service failure"));
+
+            // Act
+            Func<Task> act = async () => await _sut.GetResubmissionPaycalDetails(Guid.NewGuid(), null);
+
+            // Assert
+            await act.Should().ThrowAsync<Exception>().WithMessage("Service failure");
         }
     }
 }
