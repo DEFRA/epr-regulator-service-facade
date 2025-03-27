@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
+using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
@@ -29,6 +31,7 @@ public static class ServiceCollectionExtension
         services.Configure<MessagingConfig>(configuration.GetSection(MessagingConfig.SectionName));
         services.Configure<BlobStorageConfig>(configuration.GetSection(BlobStorageConfig.SectionName));
         services.Configure<AntivirusApiConfig>(configuration.GetSection(AntivirusApiConfig.SectionName));
+        services.Configure<PrnBackendServiceApiConfig>(configuration.GetSection(PrnBackendServiceApiConfig.SectionName));
     }
 
     private static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
@@ -40,5 +43,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<IAntivirusService, AntivirusService>();
         services.AddScoped<IAntivirusClient, AntivirusClient>();
         services.AddScoped<AntivirusApiAuthorizationHandler>();
+        services.AddScoped<IRegistrationsService, RegistrationsService>();//This Service needs removing when the test is completed. This service is only used for testing
+        services.AddScoped<IPrnBackendServiceClient, PrnBackendServiceClient>();
     }
 }
