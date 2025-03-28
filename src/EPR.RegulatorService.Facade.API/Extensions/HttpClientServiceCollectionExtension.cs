@@ -15,7 +15,6 @@ using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
 
-
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
 [ExcludeFromCodeCoverage]
