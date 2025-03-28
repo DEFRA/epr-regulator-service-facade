@@ -15,7 +15,7 @@ namespace EPR.RegulatorService.Facade.Core.Configs
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class PrnServiceApiConfigEndpoints
 {
-    public string GetAllPrnByOrganisationId { get; set; } = null!;// This endpoint needs removing when the test is completed. This endpoint is only used for testing
 }
