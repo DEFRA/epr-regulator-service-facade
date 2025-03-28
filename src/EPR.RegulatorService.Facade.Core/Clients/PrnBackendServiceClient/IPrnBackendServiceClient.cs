@@ -1,6 +1,4 @@
-﻿namespace EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient
+﻿namespace EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+public interface IPrnBackendServiceClient
 {
-    public interface IPrnBackendServiceClient
-    {
-    }
 }

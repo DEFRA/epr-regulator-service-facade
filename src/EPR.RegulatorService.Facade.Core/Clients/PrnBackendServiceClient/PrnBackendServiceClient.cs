@@ -2,15 +2,14 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
-namespace EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient
+namespace EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+
+[ExcludeFromCodeCoverage]
+public class PrnBackendServiceClient(
+HttpClient httpClient,
+IOptions<PrnBackendServiceApiConfig> options,
+ILogger<PrnBackendServiceClient> logger)
+: IPrnBackendServiceClient
 {
-    [ExcludeFromCodeCoverage]
-    public class PrnBackendServiceClient(
-    HttpClient httpClient,
-    IOptions<PrnBackendServiceApiConfig> options,
-    ILogger<PrnBackendServiceClient> logger)
-    : IPrnBackendServiceClient
-    {
-        private readonly PrnBackendServiceApiConfig _config = options.Value;
-    }
+    private readonly PrnBackendServiceApiConfig _config = options.Value;
 }
