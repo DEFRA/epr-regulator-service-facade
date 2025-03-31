@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +53,10 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<AddAuthHeaderOperationFilter>();
     options.OperationFilter<SwashbuckleHeaderFilter>();
     options.OperationFilter<ExampleRequestsFilter>();
+    options.ExampleFilters();
 });
+
+builder.Services.AddSwaggerExamplesFromAssemblyOf<UpdateTaskStatusRequestExample>();
 
 // App
 var app = builder.Build();

@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -22,6 +23,7 @@ public static class HttpClientServiceCollectionExtension
 {
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)
     {
+        services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IOrganisationRegistrationSubmissionService, OrganisationRegistrationSubmissionService>();
         services.AddTransient<AccountServiceAuthorisationHandler>();
         services.AddTransient<PrnBackendServiceAuthorisationHandler>();

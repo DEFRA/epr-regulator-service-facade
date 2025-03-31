@@ -17,4 +17,7 @@ public class PrnBackendServiceApiConfig
 [ExcludeFromCodeCoverage]
 public class PrnServiceApiConfigEndpoints
 {
+    public string RegulatorRegistrationTaskStatus { get; set; }
+
+    public string RegulatorApplicationTaskStatus { get; set; }
 }
