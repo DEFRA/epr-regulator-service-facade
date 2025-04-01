@@ -31,7 +31,7 @@ public class RegistrationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [SwaggerRequestExample(typeof(UpdateTaskStatusRequestDto), typeof(UpdateTaskStatusRequestExample))]
     [SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(BadRequestExample))]
-    [HttpPut("regulatorRegistrationTaskStatus/{id:int}")]
+    [HttpPatch("regulatorRegistrationTaskStatus/{id:int}")]
     public async Task<IActionResult> UpdateRegulatorRegistrationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
     {
         try
@@ -55,7 +55,7 @@ public class RegistrationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [SwaggerRequestExample(typeof(UpdateTaskStatusRequestDto), typeof(UpdateTaskStatusRequestExample))]
     [SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(BadRequestExample))]
-    [HttpPut("regulatorApplicationTaskStatus/{id:int}")]
+    [HttpPatch("regulatorApplicationTaskStatus/{id:int}")]
     public async Task<IActionResult> UpdateRegulatorApplicationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
     {
         try
