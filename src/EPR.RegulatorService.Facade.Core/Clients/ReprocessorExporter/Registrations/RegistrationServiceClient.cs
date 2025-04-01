@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EPR.RegulatorService.Facade.Core.Clients;
+﻿using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using Microsoft.Extensions.Logging;
@@ -7,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
-[ExcludeFromCodeCoverage]
 public class RegistrationServiceClient(
 HttpClient httpClient,
 IOptions<PrnBackendServiceApiConfig> options,
