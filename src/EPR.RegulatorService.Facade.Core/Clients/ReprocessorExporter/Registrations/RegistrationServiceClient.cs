@@ -1,20 +1,25 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.Core;
+using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
 [ExcludeFromCodeCoverage]
-public class PrnBackendServiceClient(
+public class RegistrationServiceClient(
 HttpClient httpClient,
 IOptions<PrnBackendServiceApiConfig> options,
-ILogger<PrnBackendServiceClient> logger)
-: BaseHttpClient(httpClient), IPrnBackendServiceClient
+ILogger<RegistrationServiceClient> logger)
+: BaseHttpClient(httpClient), IRegistrationServiceClient
 {
     private readonly PrnBackendServiceApiConfig _config = options.Value;
-    private readonly ILogger<PrnBackendServiceClient> _logger = logger;
+    private readonly ILogger<RegistrationServiceClient> _logger = logger;
 
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(int id, UpdateTaskStatusRequestDto request)
     {

@@ -1,20 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.Application;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
+using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Headers;
-using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
-using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -79,7 +79,7 @@ public static class HttpClientServiceCollectionExtension
             })
             .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
 
-        services.AddHttpClient<IPrnBackendServiceClient, PrnBackendServiceClient>((sp, client) =>
+        services.AddHttpClient<IRegistrationServiceClient, RegistrationServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);

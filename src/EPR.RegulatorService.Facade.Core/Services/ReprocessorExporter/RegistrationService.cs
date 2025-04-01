@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
-using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 
-public class RegistrationService(IPrnBackendServiceClient client) : IRegistrationService
+public class RegistrationService(IRegistrationServiceClient client) : IRegistrationService
 {
-    private readonly IPrnBackendServiceClient _client = client;
+    private readonly IRegistrationServiceClient _client = client;
 
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(int id, UpdateTaskStatusRequestDto request)
     {
