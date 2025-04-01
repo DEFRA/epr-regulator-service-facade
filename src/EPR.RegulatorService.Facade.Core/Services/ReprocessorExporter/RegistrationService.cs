@@ -10,7 +10,7 @@ public class RegistrationService(IRegistrationServiceClient client) : IRegistrat
 
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(int id, UpdateTaskStatusRequestDto request)
     {
-        return await _client.UpdateRegulatorApplicationTaskStatus(id, request);
+        return await _client.UpdateRegulatorRegistrationTaskStatus(id, request);
     }
 
     public async Task<bool> UpdateRegulatorApplicationTaskStatus(int id, UpdateTaskStatusRequestDto request)
