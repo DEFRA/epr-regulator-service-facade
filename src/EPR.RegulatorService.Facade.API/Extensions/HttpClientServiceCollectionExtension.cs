@@ -9,7 +9,7 @@ using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Producer;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;

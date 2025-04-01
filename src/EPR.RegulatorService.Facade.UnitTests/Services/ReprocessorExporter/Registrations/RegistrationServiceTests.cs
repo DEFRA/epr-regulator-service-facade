@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Threading.Tasks;
+using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.UnitTests;
+using EPR.RegulatorService.Facade.UnitTests.Services;
+using EPR.RegulatorService.Facade.UnitTests.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace EPR.RegulatorService.Facade.UnitTests.Services.ReprocessorExporter;
+namespace EPR.RegulatorService.Facade.UnitTests.Services.ReprocessorExporter.Registrations;
 
 [TestClass]
 public class RegistrationServiceTests

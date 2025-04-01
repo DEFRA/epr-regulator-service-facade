@@ -4,7 +4,7 @@ using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrati
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
