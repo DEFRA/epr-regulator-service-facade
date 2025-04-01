@@ -157,7 +157,8 @@ public class OrganisationRegistrationDetailsDto
         {
             AccountRoleId = dto.ServiceRoleId,
             AccountRole = dto.ServiceRole,
-            SubmittedOnTime = dto.IsLateSubmission,
+
+            SubmittedOnTime = !dto.IsLateSubmission,
             DecisionDate = convertDateTime(dto.StatusPendingDate ?? dto.RegulatorDecisionDate),
             Email = dto.Email,
             TimeAndDateOfSubmission = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow,
