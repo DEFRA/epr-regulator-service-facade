@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Azure;
 using EPR.RegulatorService.Facade.Core.Constants;
 
 namespace EPR.RegulatorService.Facade.Core.Clients;
@@ -13,10 +11,10 @@ public abstract class BaseHttpClient
     protected readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    protected BaseHttpClient(HttpClient httpClient)
+    protected BaseHttpClient(HttpClient httpClient, JsonSerializerOptions jsonOptions = null)
     {
         _httpClient = httpClient;
-        _jsonOptions = new JsonSerializerOptions
+        _jsonOptions = jsonOptions ?? new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
