@@ -28,7 +28,7 @@ ILogger<RegistrationServiceClient> logger)
         // e.g. regulatorRegistrationTaskStatus/{0}
         var url = string.Format(_config.Endpoints.RegulatorRegistrationTaskStatus, id);
 
-        return await PutAsync(url, request);
+        return await PatchAsync(url, request);
     }
 
     public async Task<bool> UpdateRegulatorApplicationTaskStatus(int id, UpdateTaskStatusRequestDto request)
@@ -38,6 +38,6 @@ ILogger<RegistrationServiceClient> logger)
         // e.g. regulatorApplicationTaskStatus/{0}
         var url = string.Format(_config.Endpoints.RegulatorApplicationTaskStatus, id);
 
-        return await PutAsync(url, request);
+        return await PatchAsync(url, request);
     }
 }

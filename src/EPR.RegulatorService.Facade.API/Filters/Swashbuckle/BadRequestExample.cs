@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 
+[ExcludeFromCodeCoverage]
 public class BadRequestExample : IExamplesProvider<ValidationProblemDetails>
 {
     public ValidationProblemDetails GetExamples()
