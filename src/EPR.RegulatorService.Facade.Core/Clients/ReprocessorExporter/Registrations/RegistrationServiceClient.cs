@@ -24,7 +24,7 @@ ILogger<RegistrationServiceClient> logger)
     {
         _logger.LogInformation("Get registration with materials and tasks");
 
-        var url = string.Format(_config.Endpoints.RegistrationByRegistrationId, id);
+        var url = string.Format($"{_config.Endpoints.RegistrationByRegistrationId}", _config.ApiVersion, id);
 
         return await GetAsync<RegistrationOverviewDto>(url);
     }
@@ -33,7 +33,7 @@ ILogger<RegistrationServiceClient> logger)
     {
         _logger.LogInformation("Get summary info for a material");
 
-        var url = string.Format(_config.Endpoints.RegistrationMaterialByRegistrationMaterialId, id);
+        var url = string.Format($"{_config.Endpoints.RegistrationMaterialByRegistrationMaterialId}", _config.ApiVersion, id);
 
         return await GetAsync<RegistrationMaterialDetailsDto>(url);
     }
@@ -42,7 +42,7 @@ ILogger<RegistrationServiceClient> logger)
     {
         _logger.LogInformation("Updates the outcome of a material registration");
 
-        var url = string.Format(_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId, id);
+        var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
 
         return await PatchAsync(url, request);
     }

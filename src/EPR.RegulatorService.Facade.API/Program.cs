@@ -12,6 +12,8 @@ using EPR.RegulatorService.Facade.API.Helpers;
 using Microsoft.FeatureManagement;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using FluentValidation.AspNetCore;
+using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +63,11 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 // General Config
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddFluentValidation(fv =>
+{
+    fv.RegisterValidatorsFromAssemblyContaining<UpdateMaterialOutcomeRequestDtoValidator>();
+    fv.AutomaticValidationEnabled = false;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
