@@ -9,6 +9,8 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using Swashbuckle.AspNetCore.Filters;
+using FluentValidation;
+using EPR.RegulatorService.Facade.API.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,8 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 // General Config
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateTaskStatusRequestValidator>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

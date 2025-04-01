@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using EPR;
 using EPR.RegulatorService;
@@ -9,22 +10,21 @@ using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 
 [Route("api/[controller]")]
-public class RegistrationsController : ControllerBase
+public class RegistrationsController(IRegistrationService registrationService
+    , IValidator<UpdateTaskStatusRequestDto> updateTaskStatusValidator
+    , ILogger<RegistrationsController> logger) : ControllerBase
 {
-    private readonly IRegistrationService _registrationService;
-    private readonly ILogger<RegistrationsController> _logger;
-
-    public RegistrationsController(IRegistrationService registrationService, ILogger<RegistrationsController> logger)
-    {
-        _registrationService = registrationService;
-        _logger = logger;
-    }
+    private readonly IRegistrationService _registrationService = registrationService;
+    private readonly ILogger<RegistrationsController> _logger = logger;
+    private readonly IValidator<UpdateTaskStatusRequestDto> _updateTaskStatusValidator = updateTaskStatusValidator;
 
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
@@ -36,6 +36,12 @@ public class RegistrationsController : ControllerBase
     {
         try
         {
+            ValidationResult validationResult = await _updateTaskStatusValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return HandleError.Handle(validationResult);
+            }
+
             _logger.LogInformation($"Attempting to update regulator registration task status");
 
             _ = await _registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
@@ -60,6 +66,12 @@ public class RegistrationsController : ControllerBase
     {
         try
         {
+            ValidationResult validationResult = await _updateTaskStatusValidator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+            {
+                return HandleError.Handle(validationResult);
+            }
+
             _logger.LogInformation($"Attempting to update regulator application task status");
 
             _ = await _registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
