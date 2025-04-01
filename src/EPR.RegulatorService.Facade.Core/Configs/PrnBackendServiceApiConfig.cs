@@ -14,7 +14,9 @@ public class PrnBackendServiceApiConfig
     public PrnServiceApiConfigEndpoints Endpoints { get; set; } = null!;
 }
 
-[ExcludeFromCodeCoverage]
 public class PrnServiceApiConfigEndpoints
 {
+    public string RegistrationByRegistrationId { get; set; }
+    public string RegistrationMaterialByRegistrationMaterialId { get; set; }
+    public string UpdateMaterialOutcomeByRegistrationMaterialId { get; set; }
 }

@@ -8,6 +8,10 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
+using EPR.RegulatorService.Facade.API.Helpers;
+using Microsoft.FeatureManagement;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,22 @@ builder.Services.RegisterComponents(builder.Configuration);
 
 // Services & HttpClients
 builder.Services.AddServicesAndHttpClients();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1);
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-Api-Version"));
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddFeatureManagement();
 
 // Logging
 builder.Services.AddLogging();
@@ -52,6 +72,8 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<AddAuthHeaderOperationFilter>();
     options.OperationFilter<SwashbuckleHeaderFilter>();
     options.OperationFilter<ExampleRequestsFilter>();
+    options.DocumentFilter<FeatureEnabledDocumentFilter>();
+    options.OperationFilter<FeatureGateOperationFilter>();
 });
 
 // App

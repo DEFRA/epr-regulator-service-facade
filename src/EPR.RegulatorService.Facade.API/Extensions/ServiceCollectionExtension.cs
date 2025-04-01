@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
-using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
@@ -42,6 +43,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<IAntivirusService, AntivirusService>();
         services.AddScoped<IAntivirusClient, AntivirusClient>();
         services.AddScoped<AntivirusApiAuthorizationHandler>();
-        services.AddScoped<IPrnBackendServiceClient, PrnBackendServiceClient>();
+        services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
+        services.AddScoped<IRegistrationService, RegistrationService>();
     }
 }

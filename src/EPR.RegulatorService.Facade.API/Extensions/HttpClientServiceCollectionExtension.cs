@@ -13,7 +13,7 @@ using Polly.Extensions.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
-using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -77,7 +77,7 @@ public static class HttpClientServiceCollectionExtension
             })
             .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
 
-        services.AddHttpClient<IPrnBackendServiceClient, PrnBackendServiceClient>((sp, client) =>
+        services.AddHttpClient<IRegistrationServiceClient, RegistrationServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);
