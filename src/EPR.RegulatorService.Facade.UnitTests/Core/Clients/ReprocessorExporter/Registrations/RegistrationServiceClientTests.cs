@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.Extensions.Logging;

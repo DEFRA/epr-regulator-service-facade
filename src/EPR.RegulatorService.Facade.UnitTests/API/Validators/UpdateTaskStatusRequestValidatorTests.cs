@@ -1,6 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.API.Validators;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation.TestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

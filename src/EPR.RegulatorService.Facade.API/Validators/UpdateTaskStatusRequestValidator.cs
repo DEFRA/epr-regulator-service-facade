@@ -1,6 +1,6 @@
 ﻿namespace EPR.RegulatorService.Facade.API.Validators;
 
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
 public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStatusRequestDto>

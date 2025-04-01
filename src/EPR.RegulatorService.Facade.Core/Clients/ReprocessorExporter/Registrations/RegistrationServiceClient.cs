@@ -1,11 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using EPR;
-using EPR.RegulatorService;
-using EPR.RegulatorService.Facade;
-using EPR.RegulatorService.Facade.Core;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

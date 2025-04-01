@@ -1,14 +1,9 @@
 using System;
 using System.Net;
-using EPR;
-using EPR.RegulatorService;
-using EPR.RegulatorService.Facade;
-using EPR.RegulatorService.Facade.API;
-using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.Shared;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 using FluentValidation;
 using FluentValidation.Results;

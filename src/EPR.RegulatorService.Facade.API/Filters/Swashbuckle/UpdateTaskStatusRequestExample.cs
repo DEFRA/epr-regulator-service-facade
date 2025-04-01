@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EPR.RegulatorService.Facade.API.Filters.Swashbuckle;

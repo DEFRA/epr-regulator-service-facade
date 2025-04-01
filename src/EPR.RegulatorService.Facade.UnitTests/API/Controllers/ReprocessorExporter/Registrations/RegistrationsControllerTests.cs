@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 using FluentAssertions;
 using FluentAssertions.Execution;

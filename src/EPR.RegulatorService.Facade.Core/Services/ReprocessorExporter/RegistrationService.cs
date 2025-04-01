@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter;
 
