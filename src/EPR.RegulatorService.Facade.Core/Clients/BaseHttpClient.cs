@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Azure;
 using EPR.RegulatorService.Facade.Core.Constants;
 
 namespace EPR.RegulatorService.Facade.Core.Clients;
@@ -22,13 +23,13 @@ public abstract class BaseHttpClient
         };
     }
 
-    protected async Task<T> GetAsync<T>(string url)
+    protected async Task<TResponse> GetAsync<TResponse>(string url)
     {
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<TResponse>(json, _jsonOptions);
     }
 
     protected async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest data)
