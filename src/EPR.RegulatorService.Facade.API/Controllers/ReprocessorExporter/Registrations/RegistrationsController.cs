@@ -4,6 +4,7 @@ using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.API.Shared;
+using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentValidation;
@@ -21,9 +22,6 @@ public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
-    private readonly IRegistrationService _registrationService = registrationService;
-    private readonly ILogger<RegistrationsController> _logger = logger; 
-    private readonly IValidator<UpdateMaterialOutcomeRequestDto> _updateMaterialOutcomeValidator = updateMaterialOutcomeValidator;
 
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -33,9 +31,9 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         try
         {
-            _logger.LogInformation($"Get registration with materials and tasks");
+            logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
 
-            var result = await _registrationService.GetRegistrationByRegistrationId(id);
+            var result = await registrationService.GetRegistrationByRegistrationId(id);
 
             if (result is null)
             {
@@ -46,7 +44,7 @@ public class RegistrationsController(IRegistrationService registrationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get registration with materials and tasks");
+            logger.LogError(ex, "Failed to get registration with materials and tasks");
             return HandleError.Handle(ex);
         }
     }
@@ -59,9 +57,9 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         try
         {
-            _logger.LogInformation($"Get summary info for a material");
+            logger.LogInformation(LogMessages.SummaryInfoMaterial);
 
-            var result = await _registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
+            var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
 
             if (result is null)
             {
@@ -72,7 +70,7 @@ public class RegistrationsController(IRegistrationService registrationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get summary info for a material");
+            logger.LogError(ex, "Failed to get summary info for a material");
             return HandleError.Handle(ex);
         }
     }
@@ -81,25 +79,27 @@ public class RegistrationsController(IRegistrationService registrationService
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [HttpPatch("registrationMaterials/{id:int}/outcome")]
-    public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId([FromRoute] int id, [FromBody] UpdateMaterialOutcomeRequestDto request)
+    public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
+            [FromRoute] int id, 
+            [FromBody] UpdateMaterialOutcomeRequestDto request)
     {
         try
         {
-            ValidationResult validationResult = await _updateMaterialOutcomeValidator.ValidateAsync(request);
+            ValidationResult validationResult = await updateMaterialOutcomeValidator.ValidateAsync(request);
             if (!validationResult.IsValid)
             {
                 return HandleError.Handle(validationResult);
             }
 
-            _logger.LogInformation($"Updates the outcome of a material registration");
+            logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
 
-            _ = await _registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
+            _ = await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
 
             return NoContent();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to update the outcome of a material registration");
+            logger.LogError(ex, "Failed to update the outcome of a material registration");
             return HandleError.Handle(ex);
         }
     }

@@ -9,7 +9,6 @@ namespace EPR.RegulatorService.Facade.API.Helpers;
 
 public class FeatureEnabledDocumentFilter(IFeatureManager featureManager) : IDocumentFilter
 {
-
     public async void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
         var pathsToRemove = new List<string>();
