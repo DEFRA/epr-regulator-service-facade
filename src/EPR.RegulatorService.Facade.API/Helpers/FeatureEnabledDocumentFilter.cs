@@ -7,14 +7,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EPR.RegulatorService.Facade.API.Helpers;
 
-public class FeatureEnabledDocumentFilter : IDocumentFilter
+public class FeatureEnabledDocumentFilter(IFeatureManager featureManager) : IDocumentFilter
 {
-    private readonly IFeatureManager _featureManager;
-
-    public FeatureEnabledDocumentFilter(IFeatureManager featureManager)
-    {
-        _featureManager = featureManager;
-    }
 
     public async void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
@@ -22,7 +16,6 @@ public class FeatureEnabledDocumentFilter : IDocumentFilter
 
         foreach (var path in swaggerDoc.Paths)
         {
-            Console.WriteLine($"Checking path: {path.Key}");
 
             var shouldRemove = await ShouldRemovePath(path.Key, path.Value.Operations, context);
             if (shouldRemove)
@@ -33,7 +26,6 @@ public class FeatureEnabledDocumentFilter : IDocumentFilter
 
         foreach (var path in pathsToRemove)
         {
-            Console.WriteLine($"Removing path '{path}' from Swagger documentation because the feature gate is disabled.");
             swaggerDoc.Paths.Remove(path);
         }
     }
@@ -69,7 +61,6 @@ public class FeatureEnabledDocumentFilter : IDocumentFilter
         var controllerFeaturesEnabled = await AreAllFeaturesEnabled(controllerFeatureGate?.Features ?? Array.Empty<string>());
         if (controllerFeatureGate != null && !controllerFeaturesEnabled)
         {
-            Console.WriteLine($"Controller feature '{string.Join(", ", controllerFeatureGate.Features)}' is disabled.");
             return true;
         }
 
@@ -78,7 +69,6 @@ public class FeatureEnabledDocumentFilter : IDocumentFilter
         var actionFeaturesEnabled = await AreAllFeaturesEnabled(actionFeatureGate?.Features ?? Array.Empty<string>());
         if (actionFeatureGate != null && !actionFeaturesEnabled)
         {
-            Console.WriteLine($"Action feature '{string.Join(", ", actionFeatureGate.Features)}' is disabled.");
             return true;
         }
 
@@ -90,9 +80,8 @@ public class FeatureEnabledDocumentFilter : IDocumentFilter
     {
         foreach (var feature in features)
         {
-            if (!await _featureManager.IsEnabledAsync(feature))
+            if (!await featureManager.IsEnabledAsync(feature))
             {
-                Console.WriteLine($"Feature '{feature}' is disabled.");
                 return false;
             }
         }

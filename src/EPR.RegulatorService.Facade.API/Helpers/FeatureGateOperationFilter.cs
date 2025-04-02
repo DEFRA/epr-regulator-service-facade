@@ -4,15 +4,8 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EPR.RegulatorService.Facade.API.Helpers;
-public class FeatureGateOperationFilter : IOperationFilter
+public class FeatureGateOperationFilter(IFeatureManager featureManager) : IOperationFilter
 {
-    private readonly IFeatureManager _featureManager;
-
-    public FeatureGateOperationFilter(IFeatureManager featureManager)
-    {
-        _featureManager = featureManager;
-    }
-
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         var featureGateAttributes = context.MethodInfo.GetCustomAttributes(typeof(FeatureGateAttribute), false) as FeatureGateAttribute[];
@@ -23,7 +16,7 @@ public class FeatureGateOperationFilter : IOperationFilter
             {
                 foreach (var featureName in featureGateAttribute.Features)
                 {
-                    var featureEnabled = _featureManager.IsEnabledAsync(featureName).Result;
+                    var featureEnabled = featureManager.IsEnabledAsync(featureName).Result;
 
                     if (!featureEnabled)
                     {

@@ -8,7 +8,7 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
     public UpdateMaterialOutcomeRequestDtoValidator()
     {
         RuleFor(x => x.Status)
-            .NotEmpty()
+            .IsInEnum()
             .WithMessage(ValidationMessages.StatusRequired);
 
     }
