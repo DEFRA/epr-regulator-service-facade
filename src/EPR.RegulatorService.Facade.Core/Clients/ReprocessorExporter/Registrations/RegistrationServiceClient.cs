@@ -17,20 +17,20 @@ ILogger<RegistrationServiceClient> logger)
 
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(int id, UpdateTaskStatusRequestDto request)
     {
-        _logger.LogInformation("Attempting to update regulator registration task status using the backend");
+        _logger.LogInformation("Attempting to update regulator registration task status using the backend for Id {Id} and Status {Status}", id, request.Status.ToString());
 
         // e.g. v{0}/regulatorRegistrationTaskStatus/{1}
-        var url = string.Format(_config.Endpoints.RegulatorRegistrationTaskStatus, _config.ApiVersion, id);
+        var url = string.Format(_config.Endpoints.UpdateRegulatorRegistrationTaskStatusById, _config.ApiVersion, id);
 
         return await PatchAsync(url, request);
     }
 
     public async Task<bool> UpdateRegulatorApplicationTaskStatus(int id, UpdateTaskStatusRequestDto request)
     {
-        _logger.LogInformation("Attempting to update regulator application task status using the backend");
+        _logger.LogInformation("Attempting to update regulator application task status using the backend for Id {Id} and Status {Status}", id, request.Status.ToString());
 
         // e.g. v{0}/regulatorApplicationTaskStatus/{1}
-        var url = string.Format(_config.Endpoints.RegulatorApplicationTaskStatus, _config.ApiVersion, id);
+        var url = string.Format(_config.Endpoints.UpdateRegulatorApplicationTaskStatusById, _config.ApiVersion, id);
 
         return await PatchAsync(url, request);
     }

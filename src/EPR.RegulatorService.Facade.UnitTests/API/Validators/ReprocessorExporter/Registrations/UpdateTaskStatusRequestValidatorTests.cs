@@ -28,7 +28,7 @@ public class UpdateTaskStatusRequestValidatorTests
     public void ShouldHaveError_When_StatusIsEmpty()
     {
         // Arrange
-        var model = new UpdateTaskStatusRequestDto { };
+        var model = new UpdateTaskStatusRequestDto { Status = (RegistrationTaskStatus)12345 };
 
         // Act
         var result = _validator.TestValidate(model);
@@ -60,7 +60,7 @@ public class UpdateTaskStatusRequestValidatorTests
         // Arrange
         var model = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete,
+            Status = RegistrationTaskStatus.Completed,
             Comments = new string('a', 201)
         };
 
