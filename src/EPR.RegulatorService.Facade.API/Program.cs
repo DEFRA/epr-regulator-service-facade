@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.HealthChecks;
@@ -10,6 +9,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.FeatureManagement;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
@@ -29,16 +29,11 @@ builder.Services.AddServicesAndHttpClients();
 
 builder.Services.AddApiVersioning(options =>
 {
-    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1);
+    options.DefaultApiVersion = new ApiVersion(1,0);
     options.ReportApiVersions = true;
     options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ApiVersionReader = ApiVersionReader.Combine(
-        new UrlSegmentApiVersionReader(),
-        new HeaderApiVersionReader("X-Api-Version"));
-}).AddApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'V";
-    options.SubstituteApiVersionInUrl = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader()
+        );
 });
 
 builder.Services.AddFeatureManagement();
