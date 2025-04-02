@@ -42,7 +42,7 @@ public class RegistrationsControllerTests
         // Arrange
         var request = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete,
+            Status = RegistrationTaskStatus.Completed,
             Comments = "Valid comments"
         };
 
@@ -143,7 +143,7 @@ public class RegistrationsControllerTests
         // Arrange
         var request = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete,
+            Status = RegistrationTaskStatus.Completed,
             Comments = "Valid comments"
         };
 

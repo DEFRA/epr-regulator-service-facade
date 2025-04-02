@@ -9,20 +9,22 @@ public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStat
 {
     public UpdateTaskStatusRequestValidator()
     {
-
+        // Status: Required
         RuleFor(x => x.Status)
-            .NotEmpty()
+            .IsInEnum()
             .WithMessage(ValidationMessages.StatusRequired);
 
+        // Comments: Max Length 
+        RuleFor(x => x.Comments)
+            .MaximumLength(200)
+            .WithMessage(ValidationMessages.CommentsMaxLengthError);
+
+        // Comments: Optional, Required when Status = 'Queried'
         When(x => x.Status == Core.Enums.RegistrationTaskStatus.Queried, () =>
         {
             RuleFor(x => x.Comments)
                 .NotEmpty()
-                .WithMessage(ValidationMessages.CommentsRequiredIfStatusIsQueried);
+                .WithMessage(ValidationMessages.CommentsRequiredWhenStatusIsQueried);
         });
-
-        RuleFor(x => x.Comments)
-            .MaximumLength(200)
-            .WithMessage(ValidationMessages.CommentsMaxLength);
     }
 }

@@ -77,7 +77,7 @@ public class UpdateTaskStatusRequestValidatorTests
         // Arrange
         var model = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete,
+            Status = RegistrationTaskStatus.Completed,
             Comments = string.Empty
         };
 

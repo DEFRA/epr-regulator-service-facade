@@ -36,7 +36,7 @@ public class RegistrationServiceTests
         // Arrange
         var dto = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete
+            Status = RegistrationTaskStatus.Completed
         };
 
         _clientMock
@@ -58,7 +58,7 @@ public class RegistrationServiceTests
         // Arrange
         var dto = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete
+            Status = RegistrationTaskStatus.Completed
         };
 
         _clientMock
@@ -102,7 +102,7 @@ public class RegistrationServiceTests
         // Arrange
         var dto = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete
+            Status = RegistrationTaskStatus.Completed
         };
 
         _clientMock.Setup(x => x.UpdateRegulatorApplicationTaskStatus(1, dto))

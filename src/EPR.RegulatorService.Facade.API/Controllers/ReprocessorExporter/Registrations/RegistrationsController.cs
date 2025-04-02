@@ -42,7 +42,7 @@ public class RegistrationsController(IRegistrationService registrationService
                 return HandleError.Handle(validationResult);
             }
 
-            _logger.LogInformation($"Attempting to update regulator registration task status");
+            _logger.LogInformation("Attempting to update regulator registration task status");
 
             _ = await _registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
 
@@ -54,7 +54,6 @@ public class RegistrationsController(IRegistrationService registrationService
             return HandleError.Handle(ex);
         }
     }
-
 
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
@@ -72,7 +71,7 @@ public class RegistrationsController(IRegistrationService registrationService
                 return HandleError.Handle(validationResult);
             }
 
-            _logger.LogInformation($"Attempting to update regulator application task status");
+            _logger.LogInformation("Attempting to update regulator application task status");
 
             _ = await _registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
 
