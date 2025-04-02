@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
