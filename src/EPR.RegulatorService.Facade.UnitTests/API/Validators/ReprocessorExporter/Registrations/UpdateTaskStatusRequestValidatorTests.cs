@@ -1,10 +1,17 @@
-﻿using EPR.RegulatorService.Facade.API.Validators;
+﻿using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.UnitTests;
+using EPR.RegulatorService.Facade.UnitTests.API;
+using EPR.RegulatorService.Facade.UnitTests.API.Validators;
+using EPR.RegulatorService.Facade.UnitTests.API.Validators.ReprocessorExporter.Registrations;
 using FluentValidation.TestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EPR.RegulatorService.Facade.UnitTests.API.Validators;
+namespace EPR.RegulatorService.Facade.UnitTests.API.Validators.ReprocessorExporter.Registrations;
 
 [TestClass]
 public class UpdateTaskStatusRequestValidatorTests
@@ -22,7 +29,7 @@ public class UpdateTaskStatusRequestValidatorTests
     {
         // Arrange
         var model = new UpdateTaskStatusRequestDto { };
-        
+
         // Act
         var result = _validator.TestValidate(model);
 
@@ -53,7 +60,7 @@ public class UpdateTaskStatusRequestValidatorTests
         // Arrange
         var model = new UpdateTaskStatusRequestDto
         {
-            Status = RegistrationTaskStatus.Complete, 
+            Status = RegistrationTaskStatus.Complete,
             Comments = new string('a', 201)
         };
 

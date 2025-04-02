@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.Shared;
@@ -8,11 +9,14 @@ using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registration
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement.Mvc;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
-
-[Route("api/[controller]")]
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version.apiVersion}")]
+[FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateTaskStatusRequestDto> updateTaskStatusValidator
     , ILogger<RegistrationsController> logger) : ControllerBase

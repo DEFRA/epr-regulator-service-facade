@@ -19,8 +19,8 @@ ILogger<RegistrationServiceClient> logger)
     {
         _logger.LogInformation("Attempting to update regulator registration task status using the backend");
 
-        // e.g. regulatorRegistrationTaskStatus/{0}
-        var url = string.Format(_config.Endpoints.RegulatorRegistrationTaskStatus, id);
+        // e.g. v{0}/regulatorRegistrationTaskStatus/{1}
+        var url = string.Format(_config.Endpoints.RegulatorRegistrationTaskStatus, _config.ApiVersion, id);
 
         return await PatchAsync(url, request);
     }
@@ -29,8 +29,8 @@ ILogger<RegistrationServiceClient> logger)
     {
         _logger.LogInformation("Attempting to update regulator application task status using the backend");
 
-        // e.g. regulatorApplicationTaskStatus/{0}
-        var url = string.Format(_config.Endpoints.RegulatorApplicationTaskStatus, id);
+        // e.g. v{0}/regulatorApplicationTaskStatus/{1}
+        var url = string.Format(_config.Endpoints.RegulatorApplicationTaskStatus, _config.ApiVersion, id);
 
         return await PatchAsync(url, request);
     }
