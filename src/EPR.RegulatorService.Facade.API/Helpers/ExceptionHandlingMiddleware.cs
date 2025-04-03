@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,12 +11,16 @@ namespace EPR.RegulatorService.Facade.API.Middleware;
 [ExcludeFromCodeCoverage]
 public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
-
     public async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
             await next(httpContext);
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            logger.LogError(httpRequestException, "An HTTP request exception occurred.");
+            await HandleHttpRequestExceptionAsync(httpContext, httpRequestException);
         }
         catch (Exception ex)
         {
@@ -25,46 +29,34 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    private static async Task HandleHttpRequestExceptionAsync(HttpContext context, HttpRequestException ex)
     {
-        var statusCode = (int)HttpStatusCode.InternalServerError;
-        ActionResult response;
-
-        if (ex is HttpRequestException requestException)
-        {
-            response = HandleErrorWithStatusCode(requestException.StatusCode);
-        }
-        else
-        {
-            response = new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        }
+        var statusCode = (int)(ex.StatusCode ?? HttpStatusCode.InternalServerError);
 
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
 
-        switch (response)
+        var errorResponse = new
         {
-            case BadRequestResult:
-                statusCode = (int)HttpStatusCode.BadRequest;
-                break;
-            case NotFoundResult:
-                statusCode = (int)HttpStatusCode.NotFound;
-                break;
-            case ForbidResult:
-                statusCode = (int)HttpStatusCode.Forbidden;
-                break;
-            case StatusCodeResult statusCodeResult:
-                statusCode = statusCodeResult.StatusCode;
-                break;
-            case ObjectResult objectResult:
-                statusCode = objectResult.StatusCode ?? (int)HttpStatusCode.InternalServerError;
-                break;
-            default:
-                statusCode = (int)HttpStatusCode.InternalServerError;
-                break;
-        }
+            title = "An HTTP request error occurred.",
+            status = statusCode,
+            detail = ex.InnerException?.Message
+        };
+
+        await context.Response.WriteAsJsonAsync(errorResponse);
+    }
+
+    private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    {
+        var statusCode = ex switch
+        {
+            HttpRequestException httpRequestException => (int)(httpRequestException.StatusCode ?? HttpStatusCode.InternalServerError),
+            KeyNotFoundException => (int)HttpStatusCode.NotFound,
+            _ => (int)HttpStatusCode.InternalServerError
+        };
 
         context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
 
         var errorResponse = new
         {
@@ -74,21 +66,5 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         };
 
         await context.Response.WriteAsJsonAsync(errorResponse);
-    }
-
-
-    private static ActionResult HandleErrorWithStatusCode(HttpStatusCode? statusCode)
-    {
-        switch (statusCode)
-        {
-            case HttpStatusCode.BadRequest:
-                return new BadRequestResult();
-            case HttpStatusCode.NotFound:
-                return new NotFoundResult();
-            case HttpStatusCode.Forbidden:
-                return new ForbidResult();
-            default:
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-        }
     }
 }
