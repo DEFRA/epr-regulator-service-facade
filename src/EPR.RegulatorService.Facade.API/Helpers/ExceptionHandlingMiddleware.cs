@@ -30,6 +30,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         {
             HttpRequestException httpRequestException => (int)(httpRequestException.StatusCode ?? HttpStatusCode.InternalServerError),
             KeyNotFoundException => (int)HttpStatusCode.NotFound,
+            ArgumentException => (int)HttpStatusCode.BadRequest,
             _ => (int)HttpStatusCode.InternalServerError
         };
 
@@ -45,5 +46,4 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
-
 }
