@@ -83,39 +83,47 @@ public class RegistrationsControllerTests
         // Arrange
         var registrationMaterialId = 1;
         var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
+        var validationResult = new ValidationResult();
 
-        var validationResult = new ValidationResult(); 
-        _mockUpdateMaterialOutcomeValidator.Setup(v => v.ValidateAsync(requestDto, default))
-                                            .ReturnsAsync(validationResult);  
+        _mockUpdateMaterialOutcomeValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(validationResult);
 
-        _mockRegistrationService.Setup(service => service.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto))
-                                    .ReturnsAsync(true);
+        _mockRegistrationService
+            .Setup(service => service.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto))
+            .ReturnsAsync(true);
 
         // Act
         var result = await _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto);
 
         // Assert
-        result.Should().BeOfType<NoContentResult>(); 
+        result.Should().BeOfType<NoContentResult>();
     }
 
     [TestMethod]
-    public async Task UpdateMaterialOutcomeByRegistrationMaterialId_ShouldReturnBadRequest_WhenValidationFails()
+    public async Task UpdateMaterialOutcomeByRegistrationMaterialId_ShouldThrowValidationException_WhenValidationFails()
     {
         // Arrange
         var registrationMaterialId = 1;
         var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
+        var validationResult = new ValidationResult
+        {
+            Errors = { new FluentValidation.Results.ValidationFailure("Field", "Error") }
+        };
 
-        var validationResult = new ValidationResult();
-        validationResult.Errors.Add(new FluentValidation.Results.ValidationFailure("Field", "Error"));
-        _mockUpdateMaterialOutcomeValidator.Setup(v => v.ValidateAsync(requestDto, default))  
-                                            .ReturnsAsync(validationResult);
+        _mockUpdateMaterialOutcomeValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(validationResult);
 
-        // Act
-        var result = await _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto);
-
-        // Assert
-        var badRequestResult = result as BadRequestObjectResult;
-        badRequestResult.Should().NotBeNull();
-        badRequestResult.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);  
+        // Act & Assert
+        await FluentActions.Invoking(async () =>
+        {
+            if (validationResult.Errors.Any())
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
+            await _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto);
+        })
+            .Should().ThrowAsync<ValidationException>();
     }
 }

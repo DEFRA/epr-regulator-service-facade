@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using FluentValidation.AspNetCore;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.API.Middleware;
+using EPR.RegulatorService.Facade.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
