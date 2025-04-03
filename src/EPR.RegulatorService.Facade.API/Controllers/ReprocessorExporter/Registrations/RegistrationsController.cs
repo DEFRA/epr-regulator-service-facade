@@ -78,11 +78,7 @@ public class RegistrationsController(IRegistrationService registrationService
         [FromRoute] int id,
         [FromBody] UpdateMaterialOutcomeRequestDto request)
     {
-        ValidationResult validationResult = await updateMaterialOutcomeValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return HandleError.Handle(validationResult);
-        }
+        await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
 
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
 
