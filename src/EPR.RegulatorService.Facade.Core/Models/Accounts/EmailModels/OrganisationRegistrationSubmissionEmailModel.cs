@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
 {
     public class OrganisationRegistrationSubmissionEmailModel
     {
         public string ToEmail { get; set; } // to email address
-        public string ApplicationNumber { get; set; }  
+        public string ApplicationNumber { get; set; }
 
         public string OrganisationNumber { get; set; } // Reference
 
@@ -17,17 +14,18 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
 
         public string Agency { get; set; }
 
-        public string AgencyEmail { get; set; } 
+        public string AgencyEmail { get; set; }
 
         public string Period { get; set; }
 
         public bool? IsWelsh { get; init; } = false;
 
-        public Dictionary<string, object> GetParameters {
+        public Dictionary<string, object> GetParameters
+        {
             get
             {
                 var parameters = new Dictionary<string, object>
-                { 
+                {
                     { "to_email", this.ToEmail },
                     { "application_number", this.ApplicationNumber },
                     { "organisation_number", this.OrganisationNumber },
@@ -45,11 +43,11 @@ namespace EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels
                 }
                 else
                 {
-                    parameters.Add("agency_email", this.AgencyEmail); 
+                    parameters.Add("agency_email", this.AgencyEmail);
                 }
 
-                return parameters; 
-            } 
+                return parameters;
+            }
         }
     }
 }

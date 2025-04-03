@@ -5,13 +5,12 @@ namespace EPR.RegulatorService.Facade.Core.Helpers.Filters;
 using System;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 [ExcludeFromCodeCoverage]
 public static class OrganisationRegistrationSubmissionsFilters
 {
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> Filter(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable,
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> Filter(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable,
         GetOrganisationRegistrationSubmissionsFilter filters) => queryable
         .FilterByOrganisationName(filters.OrganisationName)
         .FilterByOrganisationRef(filters.OrganisationReference)
@@ -19,8 +18,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         .FilterBySubmissionStatus(filters.Statuses)
         .FilterByRelevantYear(filters.RelevantYears);
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByOrganisationName(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? organisationName)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterByOrganisationName(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? organisationName)
     {
         if (string.IsNullOrWhiteSpace(organisationName)) return queryable;
         var nameParts = organisationName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -36,8 +35,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         return queryable;
     }
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByOrganisationRef(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? organisationRef)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterByOrganisationRef(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? organisationRef)
     {
         if (string.IsNullOrWhiteSpace(organisationRef)) return queryable;
         var nameParts = organisationRef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -47,8 +46,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         return queryable;
     }
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByApplicationRef(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? applicationRef)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterByApplicationRef(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? applicationRef)
     {
         if (string.IsNullOrWhiteSpace(applicationRef)) return queryable;
         var nameParts = applicationRef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -58,8 +57,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         return queryable;
     }
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByRegistrationRef(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? registrationRef)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterByRegistrationRef(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? registrationRef)
     {
         if (string.IsNullOrWhiteSpace(registrationRef)) return queryable;
         var nameParts = registrationRef.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -69,8 +68,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         return queryable;
     }
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByOrganisationType(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? organisationType)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterByOrganisationType(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? organisationType)
     {
         if (string.IsNullOrWhiteSpace(organisationType) || organisationType == "none") return queryable;
         queryable = from q in queryable
@@ -80,8 +79,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         return queryable;
     }
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterBySubmissionStatus(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? submissionStatus)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterBySubmissionStatus(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? submissionStatus)
     {
         if (string.IsNullOrWhiteSpace(submissionStatus) || submissionStatus == "none") return queryable;
         queryable = from q in queryable
@@ -91,8 +90,8 @@ public static class OrganisationRegistrationSubmissionsFilters
         return queryable;
     }
 
-    public static IQueryable<RegistrationSubmissionOrganisationDetailsResponse> FilterByRelevantYear(
-        this IQueryable<RegistrationSubmissionOrganisationDetailsResponse> queryable, string? relevantYear)
+    public static IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> FilterByRelevantYear(
+        this IQueryable<RegistrationSubmissionOrganisationDetailsFacadeResponse> queryable, string? relevantYear)
     {
         if (string.IsNullOrWhiteSpace(relevantYear)) return queryable;
         queryable = from q in queryable

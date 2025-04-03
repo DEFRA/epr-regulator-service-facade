@@ -13,7 +13,7 @@ using Polly.Extensions.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
-
+using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -24,12 +24,15 @@ public static class HttpClientServiceCollectionExtension
     {
         services.AddScoped<IOrganisationRegistrationSubmissionService, OrganisationRegistrationSubmissionService>();
         services.AddTransient<AccountServiceAuthorisationHandler>();
+        services.AddTransient<PrnBackendServiceAuthorisationHandler>();
 
         var settings = services.BuildServiceProvider().GetRequiredService<IOptions<AccountsServiceApiConfig>>().Value;
         var submissionSettings =
             services.BuildServiceProvider().GetRequiredService<IOptions<SubmissionsApiConfig>>().Value;
         var commonDataSettings =
             services.BuildServiceProvider().GetRequiredService<IOptions<CommonDataApiConfig>>().Value;
+        var PrnServiceApiSettings =
+            services.BuildServiceProvider().GetRequiredService<IOptions<PrnBackendServiceApiConfig>>().Value;
         var blobStorageSettings = services.BuildServiceProvider().GetRequiredService<IOptions<BlobStorageConfig>>();
         var antivirusSettings = services.BuildServiceProvider().GetRequiredService<IOptions<AntivirusApiConfig>>().Value;
 
@@ -73,6 +76,14 @@ public static class HttpClientServiceCollectionExtension
                 client.Timeout = TimeSpan.FromSeconds(commonDataSettings.Timeout);
             })
             .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
+
+        services.AddHttpClient<IPrnBackendServiceClient, PrnBackendServiceClient>((sp, client) =>
+        {
+            client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);
+        })
+        .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
+        .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
 
         services.AddHttpClient<IProducerService, ProducerService>((sp, client) =>
             {
