@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
@@ -11,6 +10,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -23,84 +23,71 @@ public class RegistrationsController(IRegistrationService registrationService
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
 
+    [HttpGet("registrations/{id:int}")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpGet("registrations/{id:int}")]
+    [SwaggerOperation(
+            Summary = "get registration with materials and tasks",
+            Description = "attempting to get registration with materials and tasks.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
     {
-        try
-        {
-            logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
+        logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
 
-            var result = await registrationService.GetRegistrationByRegistrationId(id);
+        var result = await registrationService.GetRegistrationByRegistrationId(id);
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to get registration with materials and tasks");
-            return HandleError.Handle(ex);
-        }
+        return Ok(result);
     }
 
+    [HttpGet("registrationMaterials/{id:int}")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [HttpGet("registrationMaterials/{id:int}")]
+    [SwaggerOperation(
+            Summary = "get summary info for a material",
+            Description = "attempting to get summary info for a material.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
     {
-        try
-        {
-            logger.LogInformation(LogMessages.SummaryInfoMaterial);
+        logger.LogInformation(LogMessages.SummaryInfoMaterial);
 
-            var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
+        var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to get summary info for a material");
-            return HandleError.Handle(ex);
-        }
+        return Ok(result);
     }
 
-    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [HttpPatch("registrationMaterials/{id:int}/outcome")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [HttpPatch("registrationMaterials/{id:int}/outcome")]
+    [SwaggerOperation(
+            Summary = "update the outcome of a material registration",
+            Description = "attempting to update the outcome of a material registration.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
-            [FromRoute] int id, 
-            [FromBody] UpdateMaterialOutcomeRequestDto request)
+        [FromRoute] int id,
+        [FromBody] UpdateMaterialOutcomeRequestDto request)
     {
-        try
+        ValidationResult validationResult = await updateMaterialOutcomeValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
         {
-            ValidationResult validationResult = await updateMaterialOutcomeValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
-                return HandleError.Handle(validationResult);
-            }
-
-            logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
-
-            _ = await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
-
-            return NoContent();
+            return HandleError.Handle(validationResult);
         }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update the outcome of a material registration");
-            return HandleError.Handle(ex);
-        }
+
+        logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
+
+        await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
+
+        return NoContent();
     }
 }

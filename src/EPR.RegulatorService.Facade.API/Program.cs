@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using FluentValidation.AspNetCore;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,8 @@ builder.Services.AddSwaggerGen(options =>
 
 // App
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseExceptionHandler(app.Environment.IsDevelopment() ? "/error-development" : "/error");
 

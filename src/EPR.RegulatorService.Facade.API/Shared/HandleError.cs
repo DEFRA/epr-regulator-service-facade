@@ -18,6 +18,17 @@ public static class HandleError
         return new StatusCodeResult(StatusCodes.Status500InternalServerError);
     }
 
+    public static ActionResult Handle(ValidationResult validationResult)
+    {
+        var problemDetails = new ValidationProblemDetails(validationResult.ToDictionary())
+        {
+            Title = "One or more validation errors occurred.",
+            Status = StatusCodes.Status400BadRequest,
+        };
+
+        return new BadRequestObjectResult(problemDetails);
+    }
+
     public static ActionResult HandleErrorWithStatusCode(HttpStatusCode? statusCode)
     {
         switch (statusCode)
@@ -31,16 +42,5 @@ public static class HandleError
             default:
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
-    }
-
-    public static ActionResult Handle(ValidationResult validationResult)
-    {
-        var problemDetails = new ValidationProblemDetails(validationResult.ToDictionary())
-        {
-            Title = "One or more validation errors occurred.",
-            Status = StatusCodes.Status400BadRequest,
-        };
-
-        return new BadRequestObjectResult(problemDetails);
     }
 }

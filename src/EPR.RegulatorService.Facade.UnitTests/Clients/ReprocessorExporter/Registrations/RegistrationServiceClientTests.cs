@@ -46,7 +46,6 @@ public class RegistrationServiceClientTests
 
         _client = new RegistrationServiceClient(httpClient, _mockOptions.Object, _mockLogger.Object);
         _fixture = new Fixture();
-        _fixture.Customize<RegistrationOverviewDto>(c => c.With(x => x.OrganisationName, "TestOrg").With(x => x.Regulator, "TestRegulator"));
     }
 
     [TestMethod]
