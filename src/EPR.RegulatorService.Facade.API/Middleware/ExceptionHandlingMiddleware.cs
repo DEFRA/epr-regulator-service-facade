@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
-using FluentValidation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EPR.RegulatorService.Facade.API.Middleware;
 
@@ -41,7 +43,22 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 
         if (ex is ValidationException validationException)
         {
-            await WriteContextResponseAsJsonAsync(context, validationException);
+            var errors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            var errorResponse = new
+            {
+                status = StatusCodes.Status400BadRequest,
+                title = "One or more validation errors occurred.",
+                detail = validationException.InnerException?.Message,
+                errors
+            };
+
+            await context.Response.WriteAsJsonAsync(errorResponse);
         }
         else
         {
@@ -54,25 +71,5 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 
             await context.Response.WriteAsJsonAsync(errorResponse);
         }
-    }
-
-    private static async Task WriteContextResponseAsJsonAsync(HttpContext context, ValidationException validationException)
-    {
-        var errors = validationException.Errors
-            .GroupBy(e => e.PropertyName)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(e => e.ErrorMessage).ToArray()
-            );
-
-        var errorResponse = new
-        {
-            title = "One or more validation errors occurred.",
-            status = StatusCodes.Status400BadRequest,
-            detail = validationException.InnerException?.Message,
-            errors
-        };
-
-        await context.Response.WriteAsJsonAsync(errorResponse);
     }
 }
