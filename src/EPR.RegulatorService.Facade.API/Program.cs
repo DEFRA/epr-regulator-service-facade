@@ -4,6 +4,7 @@ using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.HealthChecks;
 using EPR.RegulatorService.Facade.API.Helpers;
+using EPR.RegulatorService.Facade.API.Middleware;
 using EPR.RegulatorService.Facade.API.Swagger;
 using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
 using FluentValidation;
@@ -86,6 +87,7 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<UpdateTaskStatusRequestExample
 // App
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseExceptionHandler(app.Environment.IsDevelopment() ? "/error-development" : "/error");
 
 app.UseSwagger();

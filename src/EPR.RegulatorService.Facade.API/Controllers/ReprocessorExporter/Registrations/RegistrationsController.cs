@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
@@ -34,25 +33,13 @@ public class RegistrationsController(IRegistrationService registrationService
     [HttpPatch("regulatorRegistrationTaskStatus/{id:int}")]
     public async Task<IActionResult> UpdateRegulatorRegistrationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
     {
-        try
-        {
-            ValidationResult validationResult = await _updateTaskStatusValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
-                return HandleError.Handle(validationResult);
-            }
+        await _updateTaskStatusValidator.ValidateAndThrowAsync(request);
 
-            _logger.LogInformation("Attempting to update regulator registration task status");
+        _logger.LogInformation("Attempting to update regulator registration task status");
 
-            _ = await _registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
+        _ = await _registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
 
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to update regulator registration task status");
-            return HandleError.Handle(ex);
-        }
+        return NoContent();
     }
 
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -63,24 +50,12 @@ public class RegistrationsController(IRegistrationService registrationService
     [HttpPatch("regulatorApplicationTaskStatus/{id:int}")]
     public async Task<IActionResult> UpdateRegulatorApplicationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
     {
-        try
-        {
-            ValidationResult validationResult = await _updateTaskStatusValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
-                return HandleError.Handle(validationResult);
-            }
+        await _updateTaskStatusValidator.ValidateAndThrowAsync(request);
 
-            _logger.LogInformation("Attempting to update regulator application task status");
+        _logger.LogInformation("Attempting to update regulator application task status");
 
-            _ = await _registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
+        _ = await _registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
 
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to update regulator application task status");
-            return HandleError.Handle(ex);
-        }
+        return NoContent();
     }
 }
