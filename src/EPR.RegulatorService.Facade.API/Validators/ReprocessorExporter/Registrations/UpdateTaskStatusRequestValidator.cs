@@ -1,5 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
@@ -11,7 +12,9 @@ public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStat
     {
         // Status: Required
         RuleFor(x => x.Status)
-            .IsInEnum()
+            .NotNull()
+            .WithMessage(ValidationMessages.StatusRequired)
+            .Must(status => Enum.IsDefined(typeof(RegistrationTaskStatus), status))
             .WithMessage(ValidationMessages.StatusRequired);
 
         // Comments: Max Length 
