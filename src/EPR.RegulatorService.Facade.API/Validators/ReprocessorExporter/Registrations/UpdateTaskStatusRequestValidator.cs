@@ -19,11 +19,11 @@ public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStat
 
         // Comments: Max Length 
         RuleFor(x => x.Comments)
-            .MaximumLength(200)
+            .MaximumLength(500)
             .WithMessage(ValidationMessages.CommentsMaxLengthError);
 
         // Comments: Optional, Required when Status = 'Queried'
-        When(x => x.Status == Core.Enums.RegistrationTaskStatus.Queried, () =>
+        When(x => x.Status == RegistrationTaskStatus.Queried, () =>
         {
             RuleFor(x => x.Comments)
                 .NotEmpty()
