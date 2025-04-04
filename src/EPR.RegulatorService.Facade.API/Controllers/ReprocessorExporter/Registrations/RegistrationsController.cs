@@ -28,7 +28,7 @@ public class RegistrationsController(IRegistrationService registrationService
             Summary = "get registration with materials and tasks",
             Description = "attempting to get registration with materials and tasks.  "
         )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(RegistrationOverviewDto))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
@@ -41,14 +41,14 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrationMaterials/{id:int}")]
-    [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
+    [ProducesResponseType(typeof(RegistrationMaterialDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
             Summary = "get summary info for a material",
             Description = "attempting to get summary info for a material.  "
         )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
