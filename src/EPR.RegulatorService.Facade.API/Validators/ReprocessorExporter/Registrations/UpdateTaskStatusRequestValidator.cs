@@ -19,7 +19,7 @@ public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStat
 
         // Comments: Max Length 
         RuleFor(x => x.Comments)
-            .MaximumLength(500)
+            .MaximumLength(MaxLengths.UpdateTaskStatusRequestComments)
             .WithMessage(ValidationMessages.CommentsMaxLengthError);
 
         // Comments: Optional, Required when Status = 'Queried'

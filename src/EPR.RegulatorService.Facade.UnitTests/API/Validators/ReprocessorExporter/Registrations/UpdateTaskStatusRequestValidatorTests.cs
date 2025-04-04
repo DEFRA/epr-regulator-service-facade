@@ -1,6 +1,7 @@
 ﻿using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
@@ -61,7 +62,7 @@ public class UpdateTaskStatusRequestValidatorTests
         var model = new UpdateTaskStatusRequestDto
         {
             Status = RegistrationTaskStatus.Completed,
-            Comments = new string('a', 201)
+            Comments = new string('a', MaxLengths.UpdateTaskStatusRequestComments + 1)
         };
 
         // Act
