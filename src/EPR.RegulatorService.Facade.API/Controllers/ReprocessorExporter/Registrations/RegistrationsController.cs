@@ -45,7 +45,7 @@ public class RegistrationsController(IRegistrationService registrationService
 
     [HttpPatch("regulatorApplicationTaskStatus/{id:int}")]
     [SwaggerOperation(
-            Summary = "Update regulator application task status",
+            Summary = "Updates a material-specific task status.",
             Description = "Attempting to update regulator application task status."
         )]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
