@@ -11,17 +11,29 @@ using System.Diagnostics.CodeAnalysis;
 namespace EPR.RegulatorService.Facade.API.Middleware
 {
     [ExcludeFromCodeCoverage]
-    public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    public class ExceptionHandlingMiddleware
     {
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        {
+            ArgumentNullException.ThrowIfNull(next, nameof(next));
+            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
+
+            _next = next;
+            _logger = logger;
+        }
+
         public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {
-                await next(httpContext);
+                await _next(httpContext);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An unhandled exception occurred.");
+                _logger.LogError(ex, "An unhandled exception occurred.");
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
@@ -65,7 +77,7 @@ namespace EPR.RegulatorService.Facade.API.Middleware
             {
                 status = StatusCodes.Status400BadRequest,
                 title = "One or more validation errors occurred.",
-                detail = validationException.Message,
+                detail = validationException.InnerException?.Message,
                 errors
             };
         }
@@ -75,7 +87,7 @@ namespace EPR.RegulatorService.Facade.API.Middleware
             {
                 title = "An HTTP request error occurred.",
                 status = (int)HttpStatusCode.InternalServerError,
-                detail = ex?.Message
+                detail = ex?.InnerException?.Message
             };
 
         private static object CreateGenericErrorResponse(Exception ex, int statusCode) =>
@@ -83,7 +95,7 @@ namespace EPR.RegulatorService.Facade.API.Middleware
             {
                 title = "An error occurred while processing your request.",
                 status = statusCode,
-                detail = ex?.Message
+                detail = ex?.InnerException?.Message
             };
     }
 }
