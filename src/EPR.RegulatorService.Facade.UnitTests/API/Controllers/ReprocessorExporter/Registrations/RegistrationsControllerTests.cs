@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using FluentValidation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentValidation.Results;
+using EPR.RegulatorService.Facade.Core.Enums;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Controllers.ReprocessorExporter.Registrations;
 
@@ -104,26 +105,25 @@ public class RegistrationsControllerTests
     public async Task UpdateMaterialOutcomeByRegistrationMaterialId_ShouldThrowValidationException_WhenValidationFails()
     {
         // Arrange
+        var validator = new InlineValidator<UpdateMaterialOutcomeRequestDto>();
+        validator.RuleFor(x => x.Status).Must(_ => false).WithMessage("Validation failed");
+
+        _controller = new RegistrationsController(
+            _mockRegistrationService.Object,
+            validator, 
+            _mockLogger.Object
+        );
+
         var registrationMaterialId = 1;
-        var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
-        var validationResult = new ValidationResult
+        var requestDto = new UpdateMaterialOutcomeRequestDto
         {
-            Errors = { new FluentValidation.Results.ValidationFailure("Field", "Error") }
+            Status = (RegistrationTaskStatus)999 
         };
 
-        _mockUpdateMaterialOutcomeValidator
-            .Setup(v => v.ValidateAsync(requestDto, default))
-            .ReturnsAsync(validationResult);
-
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-        {
-            if (validationResult.Errors.Any())
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-            await _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto);
-        })
-            .Should().ThrowAsync<ValidationException>();
+        await FluentActions.Invoking(() =>
+            _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto)
+        ).Should().ThrowAsync<ValidationException>();
     }
+
 }
