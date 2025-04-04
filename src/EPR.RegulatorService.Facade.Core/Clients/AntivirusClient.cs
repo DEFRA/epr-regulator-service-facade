@@ -33,9 +33,9 @@ namespace EPR.RegulatorService.Facade.Core.Clients
 
                 return response;
             }
-            catch (HttpRequestException exception)
+            catch (HttpRequestException ex)
             {
-                _logger.LogError(exception, "Error sending file to antivirus api");
+                _logger.LogError(ex, "Error sending file to antivirus api");
                 throw;
             }
         }

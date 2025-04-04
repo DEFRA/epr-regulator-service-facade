@@ -1,13 +1,27 @@
+using System.Text.Json.Serialization;
+using Asp.Versioning;
+using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.API.Swagger;
+using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.HealthChecks;
+using EPR.RegulatorService.Facade.API.Helpers;
+using EPR.RegulatorService.Facade.API.Helpers;
+using EPR.RegulatorService.Facade.API.Middlewares;
+using EPR.RegulatorService.Facade.API.Middlewares;
+using EPR.RegulatorService.Facade.API.Swagger;
+using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement;
+using Microsoft.FeatureManagement;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization;
-using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +33,22 @@ builder.Services.RegisterComponents(builder.Configuration);
 
 // Services & HttpClients
 builder.Services.AddServicesAndHttpClients();
+
+// Add API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1);
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader());
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddFeatureManagement();
 
 // Logging
 builder.Services.AddLogging();
@@ -41,6 +71,9 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 // General Config
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateTaskStatusRequestValidator>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -52,12 +85,20 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<AddAuthHeaderOperationFilter>();
     options.OperationFilter<SwashbuckleHeaderFilter>();
     options.OperationFilter<ExampleRequestsFilter>();
+    options.DocumentFilter<FeatureEnabledDocumentFilter>();
+    options.OperationFilter<FeatureGateOperationFilter>();
+    options.ExampleFilters();
+    options.EnableAnnotations();
 });
+
+builder.Services.AddSwaggerExamplesFromAssemblyOf<UpdateTaskStatusRequestExample>();
 
 // App
 var app = builder.Build();
 
+
 app.UseExceptionHandler(app.Environment.IsDevelopment() ? "/error-development" : "/error");
+app.UseMiddleware<CustomExceptionHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();
