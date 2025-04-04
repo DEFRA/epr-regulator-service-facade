@@ -1,9 +1,4 @@
-﻿using EPR;
-using EPR.RegulatorService;
-using EPR.RegulatorService.Facade;
-using EPR.RegulatorService.Facade.Core;
-using EPR.RegulatorService.Facade.Core.Clients;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+﻿using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 

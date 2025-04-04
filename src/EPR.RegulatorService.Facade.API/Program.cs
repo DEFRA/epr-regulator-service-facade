@@ -87,7 +87,7 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 app.UseExceptionHandler(app.Environment.IsDevelopment() ? "/error-development" : "/error");
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<CustomExceptionHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

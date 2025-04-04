@@ -1,17 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Net;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.API.Middlewares;
 
 [ExcludeFromCodeCoverage]
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<CustomExceptionHandlingMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext httpContext)
     {

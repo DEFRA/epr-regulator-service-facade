@@ -17,6 +17,7 @@ public class FeatureEnabledDocumentFilter(IFeatureManager featureManager) : IDoc
         {
 
             var shouldRemove = await ShouldRemovePath(path.Key, path.Value.Operations, context);
+
             if (shouldRemove)
             {
                 pathsToRemove.Add(path.Key);
@@ -73,7 +74,6 @@ public class FeatureEnabledDocumentFilter(IFeatureManager featureManager) : IDoc
 
         return false;
     }
-
 
     private async Task<bool> AreAllFeaturesEnabled(IEnumerable<string> features)
     {

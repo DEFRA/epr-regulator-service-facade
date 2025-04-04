@@ -4,5 +4,6 @@ namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrati
 public class UpdateMaterialOutcomeRequestDto
 {
     public RegistrationTaskStatus Status { get; set; }
+    public string? Comments { get; init; }
 }
 

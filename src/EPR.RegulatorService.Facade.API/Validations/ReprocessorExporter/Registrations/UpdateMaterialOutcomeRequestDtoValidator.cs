@@ -10,6 +10,5 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
         RuleFor(x => x.Status)
             .IsInEnum()
             .WithMessage(ValidationMessages.StatusRequired);
-
     }
 }
