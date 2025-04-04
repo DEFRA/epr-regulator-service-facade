@@ -21,13 +21,10 @@ public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateTaskStatusRequestDto> updateTaskStatusValidator
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
-    private readonly IRegistrationService _registrationService = registrationService;
-    private readonly ILogger<RegistrationsController> _logger = logger;
-    private readonly IValidator<UpdateTaskStatusRequestDto> _updateTaskStatusValidator = updateTaskStatusValidator;
 
     [HttpPatch("regulatorRegistrationTaskStatus/{id:int}")]
     [SwaggerOperation(
-            Summary = "Updates regulator registration task status",
+            Summary = "Updates a registration-level task (no associated material).",
             Description = "Attempting to update regulator registration task status."
         )]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -37,11 +34,11 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(BadRequestExample))]
     public async Task<IActionResult> UpdateRegulatorRegistrationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
     {
-        await _updateTaskStatusValidator.ValidateAndThrowAsync(request);
+        await updateTaskStatusValidator.ValidateAndThrowAsync(request);
 
-        _logger.LogInformation("Attempting to update regulator registration task status");
+        logger.LogInformation("Attempting to update regulator registration task status");
 
-        _ = await _registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
+        _ = await registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
 
         return NoContent();
     }
@@ -58,11 +55,11 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(BadRequestExample))]
     public async Task<IActionResult> UpdateRegulatorApplicationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
     {
-        await _updateTaskStatusValidator.ValidateAndThrowAsync(request);
+        await updateTaskStatusValidator.ValidateAndThrowAsync(request);
 
-        _logger.LogInformation("Attempting to update regulator application task status");
+        logger.LogInformation("Attempting to update regulator application task status");
 
-        _ = await _registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
+        _ = await registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
 
         return NoContent();
     }
