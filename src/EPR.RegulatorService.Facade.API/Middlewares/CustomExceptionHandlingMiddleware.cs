@@ -13,70 +13,55 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
         {
             await next(httpContext);
         }
-        catch (Exception ex)
+        catch (ValidationException ex)
         {
-            logger.LogError(ex, "An unhandled exception occurred.");
-            await HandleExceptionAsync(httpContext, ex);
+            await HandleValidationExceptionAsync(httpContext, ex);
+        }
+        catch (InvalidOperationException ex)
+        {
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.BadRequest, "An invalid operation occurred.");
+        }
+        catch (HttpRequestException ex)
+        {
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.InternalServerError, "An HTTP request exception occurred.");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.NotFound, "The requested resource could not be found.");
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    private async Task HandleValidationExceptionAsync(HttpContext context, ValidationException ex)
     {
-        var statusCode = GetStatusCode(ex);
-        context.Response.StatusCode = statusCode;
+        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         context.Response.ContentType = "application/json";
 
-        var errorResponse = ex switch
+        var errorResponse = new
         {
-            ValidationException validationException => CreateValidationErrorResponse(validationException),
-            HttpRequestException => CreateHttpRequestErrorResponse(ex),
-            _ => CreateGenericErrorResponse(ex, statusCode)
+            status = (int)HttpStatusCode.BadRequest,
+            title = "One or more validation errors occurred.",
+            detail = ex.Message,
+            errors = ex.Errors?.GroupBy(e => e.PropertyName)
+                              .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray())
         };
 
+        logger.LogError(ex, "A validation exception occurred.");
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
 
-    private static int GetStatusCode(Exception ex) =>
-        ex switch
-        {
-            HttpRequestException httpRequestException => (int)(httpRequestException.StatusCode ?? HttpStatusCode.InternalServerError),
-            KeyNotFoundException => (int)HttpStatusCode.NotFound,
-            ArgumentException => (int)HttpStatusCode.BadRequest,
-            ValidationException => (int)HttpStatusCode.BadRequest,
-            _ => (int)HttpStatusCode.InternalServerError
-        };
-
-    private static object CreateValidationErrorResponse(ValidationException validationException)
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex, HttpStatusCode statusCode, string title)
     {
-        var errors = validationException.Errors
-            .GroupBy(e => e.PropertyName)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(e => e.ErrorMessage).ToArray()
-            );
+        context.Response.StatusCode = (int)statusCode;
+        context.Response.ContentType = "application/json";
 
-        return new
+        var errorResponse = new
         {
-            status = StatusCodes.Status400BadRequest,
-            title = "One or more validation errors occurred.",
-            detail = validationException.Message,
-            errors
+            status = (int)statusCode,
+            title = title,
+            detail = ex.Message
         };
+
+        logger.LogError(ex, title);
+        await context.Response.WriteAsJsonAsync(errorResponse);
     }
-
-    private static object CreateHttpRequestErrorResponse(Exception ex) =>
-        new
-        {
-            title = "An HTTP request error occurred.",
-            status = (int)HttpStatusCode.InternalServerError,
-            detail = ex?.Message
-        };
-
-    private static object CreateGenericErrorResponse(Exception ex, int statusCode) =>
-        new
-        {
-            title = "An error occurred while processing your request.",
-            status = statusCode,
-            detail = ex?.Message
-        };
 }

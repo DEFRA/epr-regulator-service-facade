@@ -10,5 +10,9 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
         RuleFor(x => x.Status)
             .IsInEnum()
             .WithMessage(ValidationMessages.StatusRequired);
+
+        RuleFor(x => x.Comments)
+            .MaximumLength(500)
+            .WithMessage(ValidationMessages.CommentsMaxLength);
     }
 }

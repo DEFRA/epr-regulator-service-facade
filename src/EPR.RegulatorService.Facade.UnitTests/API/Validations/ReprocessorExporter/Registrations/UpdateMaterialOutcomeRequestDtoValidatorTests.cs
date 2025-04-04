@@ -37,5 +37,32 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.StatusRequired);
     }
+
+    [TestMethod]
+    public void Validator_ShouldPass_WhenCommentsAreValid()
+    {
+        // Arrange
+        var request = new UpdateMaterialOutcomeRequestDto { Comments = new string('x', 500) };
+
+        // Act
+        var result = _validator.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void Validator_ShouldFail_WhenCommentsExceedMaxLength()
+    {
+        // Arrange
+        var request = new UpdateMaterialOutcomeRequestDto { Comments = new string('x', 501) };
+
+        // Act
+        var result = _validator.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsMaxLength);
+    }
 }
 
