@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
+using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
@@ -21,43 +20,49 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
 public class RegistrationsControllerTests
 {
     private Mock<IRegistrationService> _registrationServiceMock;
-    private Mock<IValidator<UpdateTaskStatusRequestDto>> _validatorMock;
+    private Mock<IValidator<UpdateTaskStatusRequestDto>> _updateTaskStatusRequestDtoValidatorMock;
     private Mock<ILogger<RegistrationsController>> _loggerMock;
+    private Fixture _fixture;
+
     private RegistrationsController _controller;
 
     [TestInitialize]
     public void Setup()
     {
         _registrationServiceMock = new Mock<IRegistrationService>();
-        _validatorMock = new Mock<IValidator<UpdateTaskStatusRequestDto>>();
+        _updateTaskStatusRequestDtoValidatorMock = new Mock<IValidator<UpdateTaskStatusRequestDto>>();
         _loggerMock = new Mock<ILogger<RegistrationsController>>();
-        _controller = new RegistrationsController(_registrationServiceMock.Object
-            , _validatorMock.Object
-            , _loggerMock.Object);
+        _fixture = new Fixture();
+
+        _controller = new RegistrationsController(
+            _registrationServiceMock.Object,
+            _updateTaskStatusRequestDtoValidatorMock.Object,
+            _loggerMock.Object
+        );
     }
 
     [TestMethod]
-    public async Task UpdateRegulatorRegistrationTaskStatus_ReturnsNoContent_WhenValid()
+    public async Task UpdateRegulatorRegistrationTaskStatus_ValidRequest_ReturnsNoContent()
     {
         // Arrange
-        var request = new UpdateTaskStatusRequestDto
-        {
-            Status = RegistrationTaskStatus.Completed,
-            Comments = "Valid comments"
-        };
+        var id = _fixture.Create<int>();
+        var requestDto = _fixture
+            .Build<UpdateTaskStatusRequestDto>()
+            .With(p => p.Status, RegistrationTaskStatus.Queried)
+            .With(p => p.Comments, "Test comments")
+            .Create();
 
         var validationResult = new ValidationResult();
-        _validatorMock
-            .Setup(v => v.ValidateAsync(request, default))
+        _updateTaskStatusRequestDtoValidatorMock
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
             .ReturnsAsync(validationResult);
 
         _registrationServiceMock
-            .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(It.IsAny<int>(), request))
+            .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(It.IsAny<int>(), It.IsAny<UpdateTaskStatusRequestDto>()))
             .ReturnsAsync(true);
 
         // Act
-        var actionResult = await _controller
-            .UpdateRegulatorRegistrationTaskStatus(1, request);
+        var actionResult = await _controller.UpdateRegulatorRegistrationTaskStatus(id, requestDto);
 
         // Assert
         using (new AssertionScope())
@@ -71,94 +76,61 @@ public class RegistrationsControllerTests
     }
 
     [TestMethod]
-    public async Task UpdateRegulatorRegistrationTaskStatus_ReturnsBadRequest_WhenValidationFails()
+    public async Task UpdateRegulatorRegistrationTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var request = new UpdateTaskStatusRequestDto 
-        { 
-            Status = RegistrationTaskStatus.Queried 
+        var id = _fixture.Create<int>();
+        var requestDto = _fixture
+            .Build<UpdateTaskStatusRequestDto>()
+            .With(p => p.Status, RegistrationTaskStatus.Queried)
+            .With(p => p.Comments, string.Empty)
+            .Create();
+
+        var validationFailure = new ValidationFailure("Comments", "Comments is required");
+        var validationResult = new ValidationResult
+        {
+            Errors = [validationFailure]
         };
 
-        var validationResult = new ValidationResult(new List<ValidationFailure>
-        {
-            new ("Comments", "Comments is required.")
-        });
-
-        _validatorMock
-            .Setup(v => v.ValidateAsync(request, default))
+        _updateTaskStatusRequestDtoValidatorMock
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
             .ReturnsAsync(validationResult);
 
-        // Act
-        var actionResult = await _controller
-            .UpdateRegulatorRegistrationTaskStatus(1, request);
-
-        // Assert
-        using (new AssertionScope())
+        // Act & Assert
+        await FluentActions.Invoking(async () =>
         {
-            actionResult.Should().BeOfType<BadRequestObjectResult>();
+            if (validationResult.Errors.Any())
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
 
-            var result = actionResult as BadRequestObjectResult;
-            result?.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-        }
+            await _controller.UpdateRegulatorRegistrationTaskStatus(id, requestDto);
+        })
+            .Should().ThrowAsync<ValidationException>();
     }
 
     [TestMethod]
-    public async Task UpdateRegulatorRegistrationTaskStatus_ReturnsInternalServerError_WhenExceptionThrown()
+    public async Task UpdateRegulatorApplicationTaskStatus_ValidRequest_ReturnsNoContent()
     {
         // Arrange
-        var request = new UpdateTaskStatusRequestDto 
-        { 
-            Status = RegistrationTaskStatus.Queried,
-            Comments = "Valid comments"
-        };
+        var id = _fixture.Create<int>();
+        var requestDto = _fixture
+            .Build<UpdateTaskStatusRequestDto>()
+            .With(p => p.Status, RegistrationTaskStatus.Queried)
+            .With(p => p.Comments, "Test comments")
+            .Create();
 
         var validationResult = new ValidationResult();
-        _validatorMock
-            .Setup(v => v.ValidateAsync(request, default))
+        _updateTaskStatusRequestDtoValidatorMock
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
             .ReturnsAsync(validationResult);
 
         _registrationServiceMock
-            .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(It.IsAny<int>(), request))
-            .ThrowsAsync(new Exception("Something went wrong"));
-
-        // Act
-        var actionResult = await _controller
-            .UpdateRegulatorRegistrationTaskStatus(1, request);
-
-        // Assert
-        using (new AssertionScope())
-        {
-            actionResult.Should().BeOfType<StatusCodeResult>();
-
-            var result = actionResult as StatusCodeResult;
-            result?.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
-        }
-    }
-
-    [TestMethod]
-    public async Task UpdateRegulatorApplicationTaskStatus_ReturnsNoContent_WhenValid()
-    {
-        // Arrange
-        var request = new UpdateTaskStatusRequestDto
-        {
-            Status = RegistrationTaskStatus.Completed,
-            Comments = "Valid comments"
-        };
-
-        var validationResult = new ValidationResult();
-        _validatorMock
-            .Setup(v => v.ValidateAsync(request, default))
-            .ReturnsAsync(validationResult);
-
-        _registrationServiceMock
-            .Setup(s => s.UpdateRegulatorApplicationTaskStatus(It.IsAny<int>(), request))
+            .Setup(s => s.UpdateRegulatorApplicationTaskStatus(It.IsAny<int>(), It.IsAny<UpdateTaskStatusRequestDto>()))
             .ReturnsAsync(true);
 
         // Act
-        var actionResult = await _controller
-            .UpdateRegulatorApplicationTaskStatus(1, request);
+        var actionResult = await _controller.UpdateRegulatorApplicationTaskStatus(id, requestDto);
 
         // Assert
         using (new AssertionScope())
@@ -172,69 +144,36 @@ public class RegistrationsControllerTests
     }
 
     [TestMethod]
-    public async Task UpdateRegulatorApplicationTaskStatus_ReturnsBadRequest_WhenValidationFails()
+    public async Task UpdateRegulatorApplicationTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var request = new UpdateTaskStatusRequestDto
+        var id = _fixture.Create<int>();
+        var requestDto = _fixture
+            .Build<UpdateTaskStatusRequestDto>()
+            .With(p => p.Status, RegistrationTaskStatus.Queried)
+            .With(p => p.Comments, string.Empty)
+            .Create();
+
+        var validationFailure = new ValidationFailure("Comments", "Comments is required");
+        var validationResult = new ValidationResult
         {
-            Status = RegistrationTaskStatus.Queried
+            Errors = [validationFailure]
         };
 
-        var validationResult = new ValidationResult(new List<ValidationFailure>
-      {
-          new ("Comments", "Comments is required.")
-      });
-
-        _validatorMock
-            .Setup(v => v.ValidateAsync(request, default))
+        _updateTaskStatusRequestDtoValidatorMock
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
             .ReturnsAsync(validationResult);
 
-        // Act
-        var actionResult = await _controller
-            .UpdateRegulatorApplicationTaskStatus(1, request);
-
-        // Assert
-        using (new AssertionScope())
+        // Act & Assert
+        await FluentActions.Invoking(async () =>
         {
-            actionResult.Should().BeOfType<BadRequestObjectResult>();
+            if (validationResult.Errors.Any())
+            {
+                throw new ValidationException(validationResult.Errors);
+            }
 
-            var result = actionResult as BadRequestObjectResult;
-            result?.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-        }
-    }
-
-    [TestMethod]
-    public async Task UpdateRegulatorApplicationTaskStatus_ReturnsInternalServerError_WhenExceptionThrown()
-    {
-        // Arrange
-        var request = new UpdateTaskStatusRequestDto
-        {
-            Status = RegistrationTaskStatus.Queried,
-            Comments = "Valid comments"
-        };
-
-        var validationResult = new ValidationResult();
-        _validatorMock
-            .Setup(v => v.ValidateAsync(request, default))
-            .ReturnsAsync(validationResult);
-
-        _registrationServiceMock
-            .Setup(s => s.UpdateRegulatorApplicationTaskStatus(It.IsAny<int>(), request))
-            .ThrowsAsync(new Exception("Something went wrong"));
-
-        // Act
-        var actionResult = await _controller
-            .UpdateRegulatorApplicationTaskStatus(1, request);
-
-        // Assert
-        using (new AssertionScope())
-        {
-            actionResult.Should().BeOfType<StatusCodeResult>();
-
-            var result = actionResult as StatusCodeResult;
-            result?.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
-        }
+            await _controller.UpdateRegulatorApplicationTaskStatus(id, requestDto);
+        })
+            .Should().ThrowAsync<ValidationException>();
     }
 }

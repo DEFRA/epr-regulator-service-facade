@@ -1,16 +1,22 @@
 using System.Text.Json.Serialization;
 using Asp.Versioning;
+using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.HealthChecks;
 using EPR.RegulatorService.Facade.API.Helpers;
-using EPR.RegulatorService.Facade.API.Middleware;
+using EPR.RegulatorService.Facade.API.Helpers;
+using EPR.RegulatorService.Facade.API.Middlewares;
+using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Swagger;
 using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
@@ -34,7 +40,8 @@ builder.Services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1);
     options.ReportApiVersions = true;
     options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader());
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader());
 }).AddApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'V";
@@ -64,6 +71,7 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 // General Config
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateTaskStatusRequestValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -80,6 +88,7 @@ builder.Services.AddSwaggerGen(options =>
     options.DocumentFilter<FeatureEnabledDocumentFilter>();
     options.OperationFilter<FeatureGateOperationFilter>();
     options.ExampleFilters();
+    options.EnableAnnotations();
 });
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<UpdateTaskStatusRequestExample>();
