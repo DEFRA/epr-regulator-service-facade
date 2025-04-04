@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
@@ -12,7 +13,13 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
             .WithMessage(ValidationMessages.StatusRequired);
 
         RuleFor(x => x.Comments)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.CommentsRequired)
+            .When(x => x.Status == RegistrationTaskStatus.Queried);
+
+        RuleFor(x => x.Comments)
             .MaximumLength(500)
-            .WithMessage(ValidationMessages.CommentsMaxLength);
+            .WithMessage(ValidationMessages.CommentsMaxLength)
+            .When(x => !string.IsNullOrEmpty(x.Comments));
     }
 }

@@ -39,10 +39,14 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
     }
 
     [TestMethod]
-    public void Validator_ShouldPass_WhenCommentsAreValid()
+    public void Validator_ShouldPass_WhenCommentsAreValidAndStatusIsNotQueried()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Comments = new string('x', 500) };
+        var request = new UpdateMaterialOutcomeRequestDto
+        {
+            Status = RegistrationTaskStatus.Completed,
+            Comments = new string('x', 500)
+        };
 
         // Act
         var result = _validator.Validate(request);
@@ -64,5 +68,35 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsMaxLength);
     }
-}
 
+    [TestMethod]
+    public void Validator_ShouldFail_WhenCommentsAreRequiredButNotProvided_AndStatusIsQueried()
+    {
+        // Arrange
+        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationTaskStatus.Queried };
+
+        // Act
+        var result = _validator.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsRequired);
+    }
+
+    [TestMethod]
+    public void Validator_ShouldPass_WhenCommentsAreProvidedAndStatusIsQueried()
+    {
+        // Arrange
+        var request = new UpdateMaterialOutcomeRequestDto
+        {
+            Status = RegistrationTaskStatus.Queried,
+            Comments = new string('x', 500)
+        };
+
+        // Act
+        var result = _validator.Validate(request);
+
+        // Assert
+        result.IsValid.Should().BeTrue();
+    }
+}
