@@ -38,7 +38,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await updateTaskStatusValidator.ValidateAndThrowAsync(request);
 
-        logger.LogInformation("Attempting to update regulator registration task status");
+        logger.LogInformation(LogMessages.UpdateRegulatorRegistrationTaskStatus);
 
         _ = await registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
 
@@ -59,7 +59,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await updateTaskStatusValidator.ValidateAndThrowAsync(request);
 
-        logger.LogInformation("Attempting to update regulator application task status");
+        logger.LogInformation(LogMessages.UpdateRegulatorApplicationTaskStatus);
 
         _ = await registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
 
