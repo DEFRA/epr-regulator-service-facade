@@ -1,7 +1,6 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using FluentValidation;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Logging;
 
 namespace EPR.RegulatorService.Facade.API.Middlewares;
 
@@ -46,7 +45,7 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
                               .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray())
         };
 
-        logger.LogError(ex, errorResponse.title);
+        logger.LogError(ex, "A validation exception occurred.");
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
 
@@ -58,7 +57,7 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
         var errorResponse = new
         {
             status = (int)statusCode,
-            title,
+            title = title,
             detail = ex.Message
         };
 

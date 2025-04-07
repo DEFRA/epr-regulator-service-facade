@@ -18,6 +18,8 @@ public class PrnBackendServiceApiConfig
 public class PrnServiceApiConfigEndpoints
 {
     public string UpdateRegulatorRegistrationTaskStatusById { get; set; }
-
     public string UpdateRegulatorApplicationTaskStatusById { get; set; }
+    public string RegistrationByRegistrationId { get; set; }
+    public string RegistrationMaterialByRegistrationMaterialId { get; set; }
+    public string UpdateMaterialOutcomeByRegistrationMaterialId { get; set; }
 }

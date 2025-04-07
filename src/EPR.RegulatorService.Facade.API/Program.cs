@@ -22,6 +22,13 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using EPR.RegulatorService.Facade.API.Helpers;
+using Microsoft.FeatureManagement;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
+using FluentValidation.AspNetCore;
+using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +42,21 @@ builder.Services.RegisterComponents(builder.Configuration);
 builder.Services.AddServicesAndHttpClients();
 
 // Add API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1);
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader());
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddFeatureManagement();
+
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1);
@@ -71,9 +93,11 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 // General Config
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-builder.Services.AddValidatorsFromAssemblyContaining<UpdateTaskStatusRequestValidator>();
-
+builder.Services.AddFluentValidation(fv =>
+{
+    fv.RegisterValidatorsFromAssemblyContaining<UpdateMaterialOutcomeRequestDtoValidator>();
+    fv.AutomaticValidationEnabled = false;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

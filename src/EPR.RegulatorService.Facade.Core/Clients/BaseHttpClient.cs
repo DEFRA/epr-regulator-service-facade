@@ -1,8 +1,9 @@
-﻿using System.Net.Http;
+﻿using EPR.RegulatorService.Facade.Core.Constants;
+using System;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EPR.RegulatorService.Facade.Core.Constants;
 
 namespace EPR.RegulatorService.Facade.Core.Clients;
 
@@ -56,7 +57,7 @@ public abstract class BaseHttpClient
         var response = await _httpClient.PatchAsync(url, content);
         response.EnsureSuccessStatusCode();
 
-        return response.IsSuccessStatusCode; 
+        return response.IsSuccessStatusCode;
     }
 
     protected async Task<bool> DeleteAsync(string url)

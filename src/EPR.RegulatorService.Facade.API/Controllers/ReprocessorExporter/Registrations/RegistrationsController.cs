@@ -1,8 +1,9 @@
-using System.Net;
+﻿using System.Net;
 using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
+using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentValidation;
@@ -19,6 +20,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateTaskStatusRequestDto> updateTaskStatusValidator
+    , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
 
@@ -60,6 +62,70 @@ public class RegistrationsController(IRegistrationService registrationService
         logger.LogInformation("Attempting to update regulator application task status");
 
         _ = await registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
+
+        return NoContent();
+    }
+
+    [HttpGet("registrations/{id:int}")]
+    [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+            Summary = "get registration with materials and tasks",
+            Description = "attempting to get registration with materials and tasks.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(RegistrationOverviewDto))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
+    {
+        logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
+
+        var result = await registrationService.GetRegistrationByRegistrationId(id);
+
+        return Ok(result);
+    }
+
+    [HttpGet("registrationMaterials/{id:int}")]
+    [ProducesResponseType(typeof(RegistrationMaterialDetailsDto), 200)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+            Summary = "get summary info for a material",
+            Description = "attempting to get summary info for a material.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.SummaryInfoMaterial);
+
+        var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
+
+        return Ok(result);
+    }
+
+    [HttpPatch("registrationMaterials/{id:int}/outcome")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [SwaggerOperation(
+            Summary = "update the outcome of a material registration",
+            Description = "attempting to update the outcome of a material registration.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
+        [FromRoute] int id,
+        [FromBody] UpdateMaterialOutcomeRequestDto request)
+    {
+        await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
+
+        logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
+
+        await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
 
         return NoContent();
     }

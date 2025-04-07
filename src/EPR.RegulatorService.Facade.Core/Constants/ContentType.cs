@@ -1,4 +1,4 @@
-namespace EPR.RegulatorService.Facade.Core.Constants;
+﻿namespace EPR.RegulatorService.Facade.Core.Constants;
 
 public static class ContentType
 {
