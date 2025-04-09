@@ -9,7 +9,6 @@ using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Swagger;
-using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

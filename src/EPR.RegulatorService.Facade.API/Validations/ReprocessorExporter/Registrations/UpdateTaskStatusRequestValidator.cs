@@ -1,10 +1,14 @@
-﻿using EPR.RegulatorService.Facade.API.Constants;
-using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
+﻿using EPR;
+using EPR.RegulatorService;
+using EPR.RegulatorService.Facade;
+using EPR.RegulatorService.Facade.API;
+using EPR.RegulatorService.Facade.API.Constants;
+using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
-namespace EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
+namespace EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 
 public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStatusRequestDto>
 {

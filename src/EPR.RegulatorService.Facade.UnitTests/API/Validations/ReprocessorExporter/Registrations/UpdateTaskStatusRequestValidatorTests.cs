@@ -2,17 +2,16 @@
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.API.Constants;
-using EPR.RegulatorService.Facade.API.Validators.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.UnitTests;
 using EPR.RegulatorService.Facade.UnitTests.API;
-using EPR.RegulatorService.Facade.UnitTests.API.Validators;
-using EPR.RegulatorService.Facade.UnitTests.API.Validators.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.UnitTests.API.Validations.ReprocessorExporter.Registrations;
 using FluentValidation.TestHelper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EPR.RegulatorService.Facade.UnitTests.API.Validators.ReprocessorExporter.Registrations;
+namespace EPR.RegulatorService.Facade.UnitTests.API.Validations.ReprocessorExporter.Registrations;
 
 [TestClass]
 public class UpdateTaskStatusRequestValidatorTests
