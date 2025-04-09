@@ -16,7 +16,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version.apiVersion}")]
+[Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateTaskStatusRequestDto> updateTaskStatusValidator
