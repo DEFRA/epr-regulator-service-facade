@@ -117,7 +117,7 @@ public class RegistrationsControllerTests
         var registrationMaterialId = 1;
         var requestDto = new UpdateMaterialOutcomeRequestDto
         {
-            Status = (RegistrationTaskStatus)999 
+            Status = (ApplicationStatus)999 
         };
 
         // Act & Assert

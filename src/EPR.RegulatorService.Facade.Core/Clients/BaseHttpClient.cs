@@ -1,9 +1,13 @@
-﻿using EPR.RegulatorService.Facade.Core.Constants;
-using System;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Helpers.Converter;
 
 namespace EPR.RegulatorService.Facade.Core.Clients;
 
@@ -20,6 +24,22 @@ public abstract class BaseHttpClient
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
+
+        RegisterEnumConverters();
+    }
+
+    private void RegisterEnumConverters()
+    {
+        var enumTypes = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => t.IsEnum || (Nullable.GetUnderlyingType(t) != null && Nullable.GetUnderlyingType(t).IsEnum))
+            .ToList();
+
+        foreach (var enumType in enumTypes)
+        {
+            var converterType = typeof(CustomEnumConverter<>).MakeGenericType(enumType);
+            var converter = (JsonConverter)Activator.CreateInstance(converterType);
+            _jsonOptions.Converters.Add(converter);
+        }
     }
 
     protected async Task<TResponse> GetAsync<TResponse>(string url)

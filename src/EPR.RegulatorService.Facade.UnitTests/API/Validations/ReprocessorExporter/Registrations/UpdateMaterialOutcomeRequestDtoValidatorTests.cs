@@ -15,7 +15,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
     public void Validator_ShouldPass_WhenStatusIsValid()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationTaskStatus.Completed };
+        var request = new UpdateMaterialOutcomeRequestDto { Status = ApplicationStatus.Granted };
 
         // Act
         var result = _validator.Validate(request);
@@ -28,7 +28,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
     public void Validator_ShouldFail_WhenStatusIsInvalid()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Status = (RegistrationTaskStatus)999 };
+        var request = new UpdateMaterialOutcomeRequestDto { Status = (ApplicationStatus)999 };
 
         // Act
         var result = _validator.Validate(request);
@@ -44,7 +44,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
         // Arrange
         var request = new UpdateMaterialOutcomeRequestDto
         {
-            Status = RegistrationTaskStatus.Completed,
+            Status = ApplicationStatus.Granted,
             Comments = new string('x', 500)
         };
 
@@ -70,10 +70,10 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
     }
 
     [TestMethod]
-    public void Validator_ShouldFail_WhenCommentsAreRequiredButNotProvided_AndStatusIsQueried()
+    public void Validator_ShouldFail_WhenCommentsAreRequiredButNotProvided_AndStatusIsRefused()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationTaskStatus.Queried };
+        var request = new UpdateMaterialOutcomeRequestDto { Status = ApplicationStatus.Refused };
 
         // Act
         var result = _validator.Validate(request);
@@ -89,7 +89,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
         // Arrange
         var request = new UpdateMaterialOutcomeRequestDto
         {
-            Status = RegistrationTaskStatus.Queried,
+            Status = ApplicationStatus.Refused,
             Comments = new string('x', 500)
         };
 

@@ -13,13 +13,13 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
             .WithMessage(ValidationMessages.StatusRequired);
 
         RuleFor(x => x.Comments)
-            .NotEmpty()
-            .WithMessage(ValidationMessages.CommentsRequired)
-            .When(x => x.Status == RegistrationTaskStatus.Queried);
-
-        RuleFor(x => x.Comments)
             .MaximumLength(500)
             .WithMessage(ValidationMessages.CommentsMaxLength)
             .When(x => !string.IsNullOrEmpty(x.Comments));
+
+        RuleFor(x => x.Comments)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.CommentsRequired)
+            .When(x => x.Status == ApplicationStatus.Refused);
     }
 }

@@ -2,9 +2,9 @@
 
 public enum RegistrationTaskStatus
 {
-    NotStarted,
-    Started,
-    Completed,
-    CannotStartYet,
-    Queried
+    NotStarted = 1,
+    Started = 2,
+    Completed = 3,
+    CannotStartYet = 4,
+    Queried = 5
 }
