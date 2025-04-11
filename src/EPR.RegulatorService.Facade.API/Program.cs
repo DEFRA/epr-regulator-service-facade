@@ -8,6 +8,13 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
+using EPR.RegulatorService.Facade.API.Helpers;
+using Microsoft.FeatureManagement;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
+using FluentValidation.AspNetCore;
+using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +26,21 @@ builder.Services.RegisterComponents(builder.Configuration);
 
 // Services & HttpClients
 builder.Services.AddServicesAndHttpClients();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1);
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader());
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'V";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddFeatureManagement();
 
 // Logging
 builder.Services.AddLogging();
@@ -41,6 +63,11 @@ builder.Services.AddAuthorizationBuilder().AddPolicy("AuthUser", policy);
 // General Config
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddFluentValidation(fv =>
+{
+    fv.RegisterValidatorsFromAssemblyContaining<UpdateMaterialOutcomeRequestDtoValidator>();
+    fv.AutomaticValidationEnabled = false;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -52,12 +79,15 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<AddAuthHeaderOperationFilter>();
     options.OperationFilter<SwashbuckleHeaderFilter>();
     options.OperationFilter<ExampleRequestsFilter>();
+    options.DocumentFilter<FeatureEnabledDocumentFilter>();
+    options.OperationFilter<FeatureGateOperationFilter>();
 });
 
 // App
 var app = builder.Build();
 
 app.UseExceptionHandler(app.Environment.IsDevelopment() ? "/error-development" : "/error");
+app.UseMiddleware<CustomExceptionHandlingMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

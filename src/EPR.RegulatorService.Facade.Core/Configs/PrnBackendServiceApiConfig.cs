@@ -10,11 +10,14 @@ public class PrnBackendServiceApiConfig
     public string BaseUrl { get; set; } = null!;
     public int Timeout { get; set; }
     public string ClientId { get; set; } = string.Empty;
+    public int ApiVersion { get; set; }
     public int ServiceRetryCount { get; set; }
     public PrnServiceApiConfigEndpoints Endpoints { get; set; } = null!;
 }
 
-[ExcludeFromCodeCoverage]
 public class PrnServiceApiConfigEndpoints
 {
+    public string RegistrationByRegistrationId { get; set; }
+    public string RegistrationMaterialByRegistrationMaterialId { get; set; }
+    public string UpdateMaterialOutcomeByRegistrationMaterialId { get; set; }
 }
