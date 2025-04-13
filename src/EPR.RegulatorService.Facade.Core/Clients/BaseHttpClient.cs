@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -36,17 +37,23 @@ public abstract class BaseHttpClient
         });
     }
 
-    protected async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest data)
+    protected async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data)
     {
         var content = CreateJsonContent(data);
         var response = await _httpClient.PostAsync(url, content);
+
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<TResponse>(new JsonSerializerOptions
+        if (response.StatusCode == HttpStatusCode.NoContent)
+            return default;
+
+        var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-        });
+        };
+
+        return await response.Content.ReadFromJsonAsync<TResponse>(options);
     }
 
     protected async Task<TResponse> PutAsync<TRequest, TResponse>(string url, TRequest data)

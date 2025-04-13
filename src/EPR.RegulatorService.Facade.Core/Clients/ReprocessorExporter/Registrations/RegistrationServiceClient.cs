@@ -44,6 +44,6 @@ ILogger<RegistrationServiceClient> logger)
 
         var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
 
-        return await PatchAsync(url, request);
+        return await PostAsync<UpdateMaterialOutcomeRequestDto,bool>(url, request);
     }
 }

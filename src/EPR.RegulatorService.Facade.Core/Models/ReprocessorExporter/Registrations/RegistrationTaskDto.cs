@@ -3,7 +3,7 @@
 namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 public class RegistrationTaskDto
 {
-    public int Id { get; init; }
+    public int? Id { get; init; }
 
     public RegistrationTaskType TaskName { get; init; }
 
