@@ -1,9 +1,12 @@
-﻿using EPR.RegulatorService.Facade.Core.Constants;
-using System;
+﻿using System;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using EPR.RegulatorService.Facade.Core.Constants;
 
 namespace EPR.RegulatorService.Facade.Core.Clients;
 
@@ -27,18 +30,30 @@ public abstract class BaseHttpClient
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
 
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<TResponse>(json, _jsonOptions);
+        return await response.Content.ReadFromJsonAsync<TResponse>(new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        });
     }
 
-    protected async Task<TResponse> PostAsync<TRequest, TResponse>(string url, TRequest data)
+    protected async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data)
     {
         var content = CreateJsonContent(data);
         var response = await _httpClient.PostAsync(url, content);
+
         response.EnsureSuccessStatusCode();
 
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<TResponse>(json, _jsonOptions);
+        if (response.StatusCode == HttpStatusCode.NoContent)
+            return default;
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+        };
+
+        return await response.Content.ReadFromJsonAsync<TResponse>(options);
     }
 
     protected async Task<TResponse> PutAsync<TRequest, TResponse>(string url, TRequest data)

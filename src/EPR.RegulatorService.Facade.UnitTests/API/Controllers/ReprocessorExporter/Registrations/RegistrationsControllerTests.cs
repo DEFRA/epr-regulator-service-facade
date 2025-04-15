@@ -12,6 +12,8 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using Moq;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
@@ -258,7 +260,7 @@ public class RegistrationsControllerTests
         var registrationMaterialId = 1;
         var requestDto = new UpdateMaterialOutcomeRequestDto
         {
-            Status = (RegistrationTaskStatus)999
+            Status = (RegistrationMaterialStatus)999 
         };
 
         // Act & Assert

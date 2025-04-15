@@ -1,6 +1,7 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentAssertions;
 
@@ -15,7 +16,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
     public void Validator_ShouldPass_WhenStatusIsValid()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationTaskStatus.Completed };
+        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationMaterialStatus.Granted };
 
         // Act
         var result = _validator.Validate(request);
@@ -28,14 +29,14 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
     public void Validator_ShouldFail_WhenStatusIsInvalid()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Status = (RegistrationTaskStatus)999 };
+        var request = new UpdateMaterialOutcomeRequestDto { Status = (RegistrationMaterialStatus)999 };
 
         // Act
         var result = _validator.Validate(request);
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.StatusRequired);
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.InvalidRegistrationStatus);
     }
 
     [TestMethod]
@@ -44,7 +45,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
         // Arrange
         var request = new UpdateMaterialOutcomeRequestDto
         {
-            Status = RegistrationTaskStatus.Completed,
+            Status = RegistrationMaterialStatus.Granted,
             Comments = new string('x', 500)
         };
 
@@ -66,21 +67,21 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsMaxLengthError);
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.RegistrationCommentsMaxLength);
     }
 
     [TestMethod]
-    public void Validator_ShouldFail_WhenCommentsAreRequiredButNotProvided_AndStatusIsQueried()
+    public void Validator_ShouldFail_WhenCommentsAreRequiredButNotProvided_AndStatusIsRefused()
     {
         // Arrange
-        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationTaskStatus.Queried };
+        var request = new UpdateMaterialOutcomeRequestDto { Status = RegistrationMaterialStatus.Refused };
 
         // Act
         var result = _validator.Validate(request);
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsRequiredWhenStatusIsQueried);
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.RegistrationCommentsRequired);
     }
 
     [TestMethod]
@@ -89,7 +90,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
         // Arrange
         var request = new UpdateMaterialOutcomeRequestDto
         {
-            Status = RegistrationTaskStatus.Queried,
+            Status = RegistrationMaterialStatus.Refused,
             Comments = new string('x', 500)
         };
 

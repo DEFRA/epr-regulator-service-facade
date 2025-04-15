@@ -4,7 +4,7 @@ using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.API;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
@@ -17,21 +17,21 @@ public class UpdateTaskStatusRequestValidator : AbstractValidator<UpdateTaskStat
         // Status: Required
         RuleFor(x => x.Status)
             .NotNull()
-            .WithMessage(ValidationMessages.StatusRequired)
+            .WithMessage(ValidationMessages.InvalidRegistrationStatus)
             .Must(status => Enum.IsDefined(typeof(RegistrationTaskStatus), status))
-            .WithMessage(ValidationMessages.StatusRequired);
+            .WithMessage(ValidationMessages.InvalidRegistrationStatus);
 
         // Comments: Max Length 
         RuleFor(x => x.Comments)
             .MaximumLength(MaxLengths.UpdateTaskStatusRequestComments)
-            .WithMessage(ValidationMessages.CommentsMaxLengthError);
+            .WithMessage(ValidationMessages.RegistrationCommentsMaxLength);
 
         // Comments: Optional, Required when Status = 'Queried'
         When(x => x.Status == RegistrationTaskStatus.Queried, () =>
         {
             RuleFor(x => x.Comments)
                 .NotEmpty()
-                .WithMessage(ValidationMessages.CommentsRequiredWhenStatusIsQueried);
+                .WithMessage(ValidationMessages.RegistrationCommentsRequired);
         });
     }
 }

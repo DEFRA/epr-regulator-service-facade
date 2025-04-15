@@ -1,5 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
@@ -10,16 +11,16 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
     {
         RuleFor(x => x.Status)
             .IsInEnum()
-            .WithMessage(ValidationMessages.StatusRequired);
-
-        RuleFor(x => x.Comments)
-            .NotEmpty()
-            .WithMessage(ValidationMessages.CommentsRequiredWhenStatusIsQueried)
-            .When(x => x.Status == RegistrationTaskStatus.Queried);
+            .WithMessage(ValidationMessages.InvalidRegistrationStatus);
 
         RuleFor(x => x.Comments)
             .MaximumLength(500)
-            .WithMessage(ValidationMessages.CommentsMaxLengthError)
+            .WithMessage(ValidationMessages.RegistrationCommentsMaxLength)
             .When(x => !string.IsNullOrEmpty(x.Comments));
+
+        RuleFor(x => x.Comments)
+            .NotEmpty()
+            .WithMessage(ValidationMessages.RegistrationCommentsRequired)
+            .When(x => x.Status == RegistrationMaterialStatus.Refused);
     }
 }

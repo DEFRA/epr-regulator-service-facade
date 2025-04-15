@@ -106,7 +106,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpPatch("registrationMaterials/{id:int}/outcome")]
+    [HttpPost("registrationMaterials/{id:int}/outcome")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
