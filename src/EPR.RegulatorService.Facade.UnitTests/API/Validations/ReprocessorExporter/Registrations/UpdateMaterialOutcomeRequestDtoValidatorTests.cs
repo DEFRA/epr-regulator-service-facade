@@ -35,7 +35,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.StatusRequired);
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.InvalidRegistrationOutcomeStatus);
     }
 
     [TestMethod]
@@ -66,7 +66,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsMaxLength);
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.RegistrationOutcomeCommentsMaxLength);
     }
 
     [TestMethod]
@@ -80,7 +80,7 @@ public class UpdateMaterialOutcomeRequestDtoValidatorTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.CommentsRequired);
+        result.Errors.Should().Contain(x => x.ErrorMessage == ValidationMessages.RegistrationOutcomeCommentsCommentsRequired);
     }
 
     [TestMethod]

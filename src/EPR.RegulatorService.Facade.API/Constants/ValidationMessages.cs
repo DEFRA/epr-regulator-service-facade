@@ -1,7 +1,7 @@
 ﻿namespace EPR.RegulatorService.Facade.API.Constants;
 public static class ValidationMessages
 {
-    public const string StatusRequired = "Status is required.";
-    public const string CommentsMaxLength = "Comments cannot be more than 500 characters.";
-    public const string CommentsRequired = "Comments are required.";
+    public const string InvalidRegistrationOutcomeStatus = "Invalid registration material status.";
+    public const string RegistrationOutcomeCommentsMaxLength = "RegistrationMaterial Comment cannot exceed 500 characters.";
+    public const string RegistrationOutcomeCommentsCommentsRequired = "Comments are required.";
 }

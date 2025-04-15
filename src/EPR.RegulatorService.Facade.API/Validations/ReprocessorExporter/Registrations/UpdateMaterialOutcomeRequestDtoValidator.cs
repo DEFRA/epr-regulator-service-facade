@@ -10,16 +10,16 @@ public class UpdateMaterialOutcomeRequestDtoValidator : AbstractValidator<Update
     {
         RuleFor(x => x.Status)
             .IsInEnum()
-            .WithMessage(ValidationMessages.StatusRequired);
+            .WithMessage(ValidationMessages.InvalidRegistrationOutcomeStatus);
 
         RuleFor(x => x.Comments)
             .MaximumLength(500)
-            .WithMessage(ValidationMessages.CommentsMaxLength)
+            .WithMessage(ValidationMessages.RegistrationOutcomeCommentsMaxLength)
             .When(x => !string.IsNullOrEmpty(x.Comments));
 
         RuleFor(x => x.Comments)
             .NotEmpty()
-            .WithMessage(ValidationMessages.CommentsRequired)
+            .WithMessage(ValidationMessages.RegistrationOutcomeCommentsCommentsRequired)
             .When(x => x.Status == ApplicationStatus.Refused);
     }
 }
