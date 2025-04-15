@@ -97,13 +97,24 @@ public class RegistrationServiceClientTests
     {
         // Arrange
         var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+        };
+        var responseContent = new StringContent(JsonSerializer.Serialize(true, jsonOptions));
+
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = responseContent
+            });
 
         // Act
         var result = await _client.UpdateMaterialOutcomeByRegistrationMaterialId(1, requestDto);
@@ -111,4 +122,5 @@ public class RegistrationServiceClientTests
         // Assert
         result.Should().BeTrue();
     }
+
 }
