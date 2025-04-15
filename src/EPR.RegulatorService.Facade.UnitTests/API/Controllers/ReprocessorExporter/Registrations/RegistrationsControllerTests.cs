@@ -12,6 +12,7 @@ using FluentValidation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentValidation.Results;
 using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Controllers.ReprocessorExporter.Registrations;
 
@@ -117,7 +118,7 @@ public class RegistrationsControllerTests
         var registrationMaterialId = 1;
         var requestDto = new UpdateMaterialOutcomeRequestDto
         {
-            Status = (ApplicationStatus)999 
+            Status = (RegistrationMaterialStatus)999 
         };
 
         // Act & Assert

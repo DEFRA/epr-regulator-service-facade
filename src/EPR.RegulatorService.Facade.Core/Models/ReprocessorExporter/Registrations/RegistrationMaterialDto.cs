@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ public class RegistrationMaterialDto
 
     public DateTime? DeterminationDate { get; set; }
 
-    public ApplicationStatus? Status { get; set; }
+    public RegistrationMaterialStatus? Status { get; set; }
 
     public string? StatusUpdatedByName { get; init; }
 

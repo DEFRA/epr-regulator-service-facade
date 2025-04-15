@@ -1,4 +1,4 @@
-﻿namespace EPR.RegulatorService.Facade.Core.Enums;
+﻿namespace EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 
 public enum RegistrationTaskStatus
 {
