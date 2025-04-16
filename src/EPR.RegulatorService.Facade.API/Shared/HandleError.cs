@@ -1,4 +1,3 @@
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -31,16 +30,5 @@ public static class HandleError
             default:
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
-    }
-
-    public static ActionResult Handle(ValidationResult validationResult)
-    {
-        var problemDetails = new ValidationProblemDetails(validationResult.ToDictionary())
-        {
-            Title = "One or more validation errors occurred.",
-            Status = StatusCodes.Status400BadRequest,
-        };
-
-        return new BadRequestObjectResult(problemDetails);
     }
 }

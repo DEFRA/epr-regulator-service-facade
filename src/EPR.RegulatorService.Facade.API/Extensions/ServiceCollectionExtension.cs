@@ -36,14 +36,13 @@ public static class ServiceCollectionExtension
 
     private static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<INotificationClient>(_ => new NotificationClient(configuration.GetValue<string>("MessagingConfig:ApiKey")));        
+        services.AddSingleton<INotificationClient>(_ => new NotificationClient(configuration.GetValue<string>("MessagingConfig:ApiKey")));
         services.AddSingleton<IMessagingService, MessagingService>();
         services.AddSingleton<IServiceRolesLookupService, ServiceRolesLookupService>();
         services.AddSingleton<IBlobStorageService, BlobStorageService>();
         services.AddScoped<IAntivirusService, AntivirusService>();
         services.AddScoped<IAntivirusClient, AntivirusClient>();
         services.AddScoped<AntivirusApiAuthorizationHandler>();
-        services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
         services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
         services.AddScoped<IRegistrationService, RegistrationService>();
     }
