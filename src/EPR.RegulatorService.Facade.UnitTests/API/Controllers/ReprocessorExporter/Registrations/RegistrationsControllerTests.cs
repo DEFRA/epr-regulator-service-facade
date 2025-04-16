@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
@@ -12,7 +11,6 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using Moq;
 
@@ -22,24 +20,27 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
 public class RegistrationsControllerTests
 {
     private Mock<IRegistrationService> _mockRegistrationService = null!;
-    private Mock<IValidator<UpdateTaskStatusRequestDto>> _mockUpdateTaskStatusRequestDtoValidator;
+    private Mock<IValidator<UpdateRegulatorRegistrationTaskDto>> _mockRegulatorRegistrationValidator = null!;
+    private Mock<IValidator<UpdateRegulatorApplicationTaskDto>> _mockRegulatorApplicationValidator = null!;
     private Mock<IValidator<UpdateMaterialOutcomeRequestDto>> _mockUpdateMaterialOutcomeValidator = null!;
     private Mock<ILogger<RegistrationsController>> _mockLogger = null!;
     private Fixture _fixture = null!;
     private RegistrationsController _controller;
 
     [TestInitialize]
-    public void Setup()
+    public void TestInitialize()
     {
         _mockRegistrationService = new Mock<IRegistrationService>();
-        _mockUpdateTaskStatusRequestDtoValidator = new Mock<IValidator<UpdateTaskStatusRequestDto>>();
+        _mockRegulatorRegistrationValidator = new Mock<IValidator<UpdateRegulatorRegistrationTaskDto>>();
+        _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateRegulatorApplicationTaskDto>>();
         _mockUpdateMaterialOutcomeValidator = new Mock<IValidator<UpdateMaterialOutcomeRequestDto>>();
         _mockLogger = new Mock<ILogger<RegistrationsController>>();
         _fixture = new Fixture();
 
         _controller = new RegistrationsController(
             _mockRegistrationService.Object,
-            _mockUpdateTaskStatusRequestDtoValidator.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,
             _mockLogger.Object
         );
@@ -49,33 +50,23 @@ public class RegistrationsControllerTests
     public async Task UpdateRegulatorRegistrationTaskStatus_ValidRequest_ReturnsNoContent()
     {
         // Arrange
-        var id = _fixture.Create<int>();
-        var requestDto = _fixture
-            .Build<UpdateTaskStatusRequestDto>()
-            .With(p => p.Status, RegistrationTaskStatus.Queried)
-            .With(p => p.Comments, "Test comments")
-            .Create();
-
-        var validationResult = new ValidationResult();
-        _mockUpdateTaskStatusRequestDtoValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
-            .ReturnsAsync(validationResult);
+        var request = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
+        _mockRegulatorRegistrationValidator
+            .Setup(v => v.ValidateAndThrowAsync(request, default))
+            .Returns(Task.CompletedTask);
 
         _mockRegistrationService
-            .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(It.IsAny<int>(), It.IsAny<UpdateTaskStatusRequestDto>()))
+            .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(request))
             .ReturnsAsync(true);
 
         // Act
-        var actionResult = await _controller.UpdateRegulatorRegistrationTaskStatus(id, requestDto);
+        var result = await _controller.UpdateRegulatorRegistrationTaskStatus(request);
 
         // Assert
         using (new AssertionScope())
         {
-            actionResult.Should().BeOfType<NoContentResult>();
-
-            var result = actionResult as NoContentResult;
-            result?.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
+            result.Should().BeOfType<NoContentResult>();
+            ((NoContentResult)result).StatusCode.Should().Be((int)HttpStatusCode.NoContent);
         }
     }
 
@@ -83,33 +74,14 @@ public class RegistrationsControllerTests
     public async Task UpdateRegulatorRegistrationTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var id = _fixture.Create<int>();
-        var requestDto = _fixture
-            .Build<UpdateTaskStatusRequestDto>()
-            .With(p => p.Status, RegistrationTaskStatus.Queried)
-            .With(p => p.Comments, string.Empty)
-            .Create();
-
-        var validationFailure = new ValidationFailure("Comments", "Comments is required");
-        var validationResult = new ValidationResult
-        {
-            Errors = [validationFailure]
-        };
-
-        _mockUpdateTaskStatusRequestDtoValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
-            .ReturnsAsync(validationResult);
+        var request = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
+        var failures = new[] { new ValidationFailure("Field", "Error message") };
+        _mockRegulatorRegistrationValidator
+            .Setup(v => v.ValidateAndThrowAsync(request, default))
+            .ThrowsAsync(new ValidationException(failures));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-        {
-            if (validationResult.Errors.Any())
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
-            await _controller.UpdateRegulatorRegistrationTaskStatus(id, requestDto);
-        })
+        await FluentActions.Invoking(() => _controller.UpdateRegulatorRegistrationTaskStatus(request))
             .Should().ThrowAsync<ValidationException>();
     }
 
@@ -117,70 +89,37 @@ public class RegistrationsControllerTests
     public async Task UpdateRegulatorApplicationTaskStatus_ValidRequest_ReturnsNoContent()
     {
         // Arrange
-        var id = _fixture.Create<int>();
-        var requestDto = _fixture
-            .Build<UpdateTaskStatusRequestDto>()
-            .With(p => p.Status, RegistrationTaskStatus.Queried)
-            .With(p => p.Comments, "Test comments")
-            .Create();
-
-        var validationResult = new ValidationResult();
-        _mockUpdateTaskStatusRequestDtoValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
-            .ReturnsAsync(validationResult);
+        var request = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
+        _mockRegulatorApplicationValidator
+            .Setup(v => v.ValidateAndThrowAsync(request, default))
+            .Returns(Task.CompletedTask);
 
         _mockRegistrationService
-            .Setup(s => s.UpdateRegulatorApplicationTaskStatus(It.IsAny<int>(), It.IsAny<UpdateTaskStatusRequestDto>()))
+            .Setup(s => s.UpdateRegulatorApplicationTaskStatus(request))
             .ReturnsAsync(true);
 
         // Act
-        var actionResult = await _controller.UpdateRegulatorApplicationTaskStatus(id, requestDto);
+        var result = await _controller.UpdateRegulatorApplicationTaskStatus(request);
 
         // Assert
-        using (new AssertionScope())
-        {
-            actionResult.Should().BeOfType<NoContentResult>();
-
-            var result = actionResult as NoContentResult;
-            result?.Should().NotBeNull();
-            result?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
-        }
+        result.Should().BeOfType<NoContentResult>();
     }
 
     [TestMethod]
     public async Task UpdateRegulatorApplicationTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var id = _fixture.Create<int>();
-        var requestDto = _fixture
-            .Build<UpdateTaskStatusRequestDto>()
-            .With(p => p.Status, RegistrationTaskStatus.Queried)
-            .With(p => p.Comments, string.Empty)
-            .Create();
+        var request = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
+        var failures = new[] { new ValidationFailure("Field", "Error") };
 
-        var validationFailure = new ValidationFailure("Comments", "Comments is required");
-        var validationResult = new ValidationResult
-        {
-            Errors = [validationFailure]
-        };
-
-        _mockUpdateTaskStatusRequestDtoValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<UpdateTaskStatusRequestDto>(), default))
-            .ReturnsAsync(validationResult);
+        _mockRegulatorApplicationValidator
+            .Setup(v => v.ValidateAndThrowAsync(request, default))
+            .ThrowsAsync(new ValidationException(failures));
 
         // Act & Assert
-        await FluentActions.Invoking(async () =>
-        {
-            if (validationResult.Errors.Any())
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
-            await _controller.UpdateRegulatorApplicationTaskStatus(id, requestDto);
-        })
+        await FluentActions.Invoking(() => _controller.UpdateRegulatorApplicationTaskStatus(request))
             .Should().ThrowAsync<ValidationException>();
     }
-
     [TestMethod]
     public async Task GetRegistrationByRegistrationId_ShouldReturnExpectedResult()
     {
@@ -246,13 +185,13 @@ public class RegistrationsControllerTests
     public async Task UpdateMaterialOutcomeByRegistrationMaterialId_ShouldThrowValidationException_WhenValidationFails()
     {
         // Arrange
-        var statusValidator = new InlineValidator<UpdateTaskStatusRequestDto>();
         var validator = new InlineValidator<UpdateMaterialOutcomeRequestDto>();
         validator.RuleFor(x => x.Status).Must(_ => false).WithMessage("Validation failed");
 
         _controller = new RegistrationsController(
             _mockRegistrationService.Object,
-            statusValidator,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object, 
             validator,
             _mockLogger.Object
         );
@@ -260,7 +199,7 @@ public class RegistrationsControllerTests
         var registrationMaterialId = 1;
         var requestDto = new UpdateMaterialOutcomeRequestDto
         {
-            Status = (RegistrationMaterialStatus)999 
+            Status = (RegistrationMaterialStatus)999
         };
 
         // Act & Assert
@@ -268,5 +207,4 @@ public class RegistrationsControllerTests
             _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto)
         ).Should().ThrowAsync<ValidationException>();
     }
-
 }

@@ -28,12 +28,12 @@ public class RegistrationServiceTests
     public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
     {
         // Arrange
-        var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
-        _mockClient.Setup(client => client.UpdateRegulatorApplicationTaskStatus(1, requestDto))
+        var requestDto = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
+        _mockClient.Setup(client => client.UpdateRegulatorApplicationTaskStatus(requestDto))
                    .ReturnsAsync(true);
 
         // Act
-        var result = await _service.UpdateRegulatorApplicationTaskStatus(1, requestDto);
+        var result = await _service.UpdateRegulatorApplicationTaskStatus(requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -43,12 +43,12 @@ public class RegistrationServiceTests
     public async Task UpdateRegulatorRegistrationTaskStatus_ShouldReturnExpectedResult()
     {
         // Arrange
-        var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
-        _mockClient.Setup(client => client.UpdateRegulatorRegistrationTaskStatus(1, requestDto))
+        var requestDto = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
+        _mockClient.Setup(client => client.UpdateRegulatorRegistrationTaskStatus(requestDto))
                    .ReturnsAsync(true);
 
         // Act
-        var result = await _service.UpdateRegulatorRegistrationTaskStatus(1, requestDto);
+        var result = await _service.UpdateRegulatorRegistrationTaskStatus(requestDto);
 
         // Assert
         result.Should().BeTrue();

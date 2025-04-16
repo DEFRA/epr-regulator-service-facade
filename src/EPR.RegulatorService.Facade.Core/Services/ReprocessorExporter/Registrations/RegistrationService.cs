@@ -12,14 +12,14 @@ namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registra
 
 public class RegistrationService(IRegistrationServiceClient registrationServiceClient) : IRegistrationService
 {
-    public async Task<bool> UpdateRegulatorRegistrationTaskStatus(int id, UpdateTaskStatusRequestDto request)
+    public async Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request)
     {
-        return await registrationServiceClient.UpdateRegulatorRegistrationTaskStatus(id, request);
+        return await registrationServiceClient.UpdateRegulatorRegistrationTaskStatus(request);
     }
 
-    public async Task<bool> UpdateRegulatorApplicationTaskStatus(int id, UpdateTaskStatusRequestDto request)
+    public async Task<bool> UpdateRegulatorApplicationTaskStatus(UpdateRegulatorApplicationTaskDto request)
     {
-        return await registrationServiceClient.UpdateRegulatorApplicationTaskStatus(id, request);
+        return await registrationServiceClient.UpdateRegulatorApplicationTaskStatus(request);
     }
 
     public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(int id)

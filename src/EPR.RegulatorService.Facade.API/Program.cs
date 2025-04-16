@@ -9,7 +9,6 @@ using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Swagger;
-using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -110,11 +109,8 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<ExampleRequestsFilter>();
     options.DocumentFilter<FeatureEnabledDocumentFilter>();
     options.OperationFilter<FeatureGateOperationFilter>();
-    options.ExampleFilters();
     options.EnableAnnotations();
 });
-
-builder.Services.AddSwaggerExamplesFromAssemblyOf<UpdateTaskStatusRequestExample>();
 
 // App
 var app = builder.Build();

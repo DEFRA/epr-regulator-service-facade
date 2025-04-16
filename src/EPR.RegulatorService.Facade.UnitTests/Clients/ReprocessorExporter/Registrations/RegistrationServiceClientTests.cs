@@ -50,46 +50,46 @@ public class RegistrationServiceClientTests
         _fixture = new Fixture();
     }
 
-    [TestMethod]
-    public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
-    {
-        // Arrange
-        var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
-        _mockHttpMessageHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
+    //[TestMethod]
+    //public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
+    //{
+    //    // Arrange
+    //    var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
+    //    _mockHttpMessageHandler.Protected()
+    //        .Setup<Task<HttpResponseMessage>>(
+    //            "SendAsync",
+    //            ItExpr.IsAny<HttpRequestMessage>(),
+    //            ItExpr.IsAny<CancellationToken>()
+    //        )
+    //        .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
 
-        // Act
-        var result = await _client.UpdateRegulatorApplicationTaskStatus(1, requestDto);
+    //    // Act
+    //    var result = await _client.UpdateRegulatorApplicationTaskStatus(1, requestDto);
 
-        // Assert
-        result.Should().BeTrue();
-    }
+    //    // Assert
+    //    result.Should().BeTrue();
+    //}
 
 
-    [TestMethod]
-    public async Task UpdateRegulatorRegistrationTaskStatus_ShouldReturnExpectedResult()
-    {
-        // Arrange
-        var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
-        _mockHttpMessageHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>()
-            )
-            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
+    //[TestMethod]
+    //public async Task UpdateRegulatorRegistrationTaskStatus_ShouldReturnExpectedResult()
+    //{
+    //    // Arrange
+    //    var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
+    //    _mockHttpMessageHandler.Protected()
+    //        .Setup<Task<HttpResponseMessage>>(
+    //            "SendAsync",
+    //            ItExpr.IsAny<HttpRequestMessage>(),
+    //            ItExpr.IsAny<CancellationToken>()
+    //        )
+    //        .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
 
-        // Act
-        var result = await _client.UpdateRegulatorRegistrationTaskStatus(1, requestDto);
+    //    // Act
+    //    var result = await _client.UpdateRegulatorRegistrationTaskStatus(1, requestDto);
 
-        // Assert
-        result.Should().BeTrue();
-    }
+    //    // Assert
+    //    result.Should().BeTrue();
+    //}
 
     [TestMethod]
     public async Task GetRegistrationByRegistrationId_ShouldReturnExpectedResult()

@@ -15,28 +15,19 @@ ILogger<RegistrationServiceClient> logger)
 {
     private readonly PrnBackendServiceApiConfig _config = options.Value;
 
-    public async Task<bool> UpdateRegulatorRegistrationTaskStatus(int id, UpdateTaskStatusRequestDto request)
+    public async Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request)
     {
-        logger.LogInformation("Attempting to update regulator registration task status using the backend for Id {Id} and Status {Status}", id, request.Status.ToString());
-
-        // e.g. v{0}/regulatorRegistrationTaskStatus/{1}
-        var url = string.Format(_config.Endpoints.UpdateRegulatorRegistrationTaskStatusById, _config.ApiVersion, id);
-
-        return await PatchAsync(url, request);
+        logger.LogInformation(LogMessages.UpdateRegistrationTaskStatus, request.Status.ToString());
+        var url = string.Format(_config.Endpoints.UpdateRegulatorRegistrationTaskStatusById, _config.ApiVersion);
+        return await PostAsync<UpdateRegulatorRegistrationTaskDto, bool>(url, request);
     }
 
-    public async Task<bool> UpdateRegulatorApplicationTaskStatus(int id, UpdateTaskStatusRequestDto request)
+    public async Task<bool> UpdateRegulatorApplicationTaskStatus(UpdateRegulatorApplicationTaskDto request)
     {
-        logger.LogInformation("Attempting to update regulator application task status using the backend for Id {Id} and Status {Status}", id, request.Status.ToString());
-
-        // e.g. v{0}/regulatorApplicationTaskStatus/{1}
-        var url = string.Format(_config.Endpoints.UpdateRegulatorApplicationTaskStatusById, _config.ApiVersion, id);
-
-        return await PatchAsync(url, request);
+        logger.LogInformation(LogMessages.UpdateApplicationTaskStatus, request.Status.ToString());
+        var url = string.Format(_config.Endpoints.UpdateRegulatorApplicationTaskStatusById, _config.ApiVersion);
+        return await PostAsync<UpdateRegulatorApplicationTaskDto, bool>(url, request);
     }
-
-
-
 
     public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(int id)
     {

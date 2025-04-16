@@ -7,4 +7,6 @@ public static class LogMessages
     public const string RegistrationMaterialsTasks = "Attempting to get registration with materials and tasks";
     public const string SummaryInfoMaterial = "Attempting to get summary info for a material";
     public const string OutcomeMaterialRegistration = "Attempting to update the outcome of a material registration";
+    public const string UpdateRegistrationTaskStatus = "Attempting to update regulator registration task status using the backend for Status {Status}";
+    public const string UpdateApplicationTaskStatus = "Attempting to update regulator application task status using the backend for Status {Status}";
 }

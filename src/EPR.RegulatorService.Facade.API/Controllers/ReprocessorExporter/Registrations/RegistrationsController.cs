@@ -2,7 +2,6 @@
 using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -10,7 +9,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using Swashbuckle.AspNetCore.Filters;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -19,12 +17,13 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class RegistrationsController(IRegistrationService registrationService
-    , IValidator<UpdateTaskStatusRequestDto> updateTaskStatusValidator
+    , IValidator<UpdateRegulatorRegistrationTaskDto> updateRegulatorRegistrationTaskValidator
+    , IValidator<UpdateRegulatorApplicationTaskDto> updateRegulatorApplicationTaskValidator
     , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
 
-    [HttpPatch("regulatorRegistrationTaskStatus/{id:int}")]
+    [HttpPost("regulatorRegistrationTaskStatus")]
     [SwaggerOperation(
             Summary = "Updates a registration-level task (no associated material).",
             Description = "Attempting to update regulator registration task status."
@@ -32,20 +31,21 @@ public class RegistrationsController(IRegistrationService registrationService
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [SwaggerRequestExample(typeof(UpdateTaskStatusRequestDto), typeof(UpdateTaskStatusRequestExample))]
-    [SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(BadRequestExample))]
-    public async Task<IActionResult> UpdateRegulatorRegistrationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> UpdateRegulatorRegistrationTaskStatus([FromBody] UpdateRegulatorRegistrationTaskDto request)
     {
-        await updateTaskStatusValidator.ValidateAndThrowAsync(request);
+        await updateRegulatorRegistrationTaskValidator.ValidateAndThrowAsync(request);
 
         logger.LogInformation(LogMessages.UpdateRegulatorRegistrationTaskStatus);
 
-        _ = await registrationService.UpdateRegulatorRegistrationTaskStatus(id, request);
+        _ = await registrationService.UpdateRegulatorRegistrationTaskStatus(request);
 
         return NoContent();
     }
 
-    [HttpPatch("regulatorApplicationTaskStatus/{id:int}")]
+    [HttpPost("regulatorApplicationTaskStatus")]
     [SwaggerOperation(
             Summary = "Updates a material-specific task status.",
             Description = "Attempting to update regulator application task status."
@@ -53,15 +53,16 @@ public class RegistrationsController(IRegistrationService registrationService
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [SwaggerRequestExample(typeof(UpdateTaskStatusRequestDto), typeof(UpdateTaskStatusRequestExample))]
-    [SwaggerResponseExample((int)HttpStatusCode.BadRequest, typeof(BadRequestExample))]
-    public async Task<IActionResult> UpdateRegulatorApplicationTaskStatus([FromRoute] int id, [FromBody] UpdateTaskStatusRequestDto request)
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> UpdateRegulatorApplicationTaskStatus([FromBody] UpdateRegulatorApplicationTaskDto request)
     {
-        await updateTaskStatusValidator.ValidateAndThrowAsync(request);
+        await updateRegulatorApplicationTaskValidator.ValidateAndThrowAsync(request);
 
         logger.LogInformation(LogMessages.UpdateRegulatorApplicationTaskStatus);
 
-        _ = await registrationService.UpdateRegulatorApplicationTaskStatus(id, request);
+        _ = await registrationService.UpdateRegulatorApplicationTaskStatus(request);
 
         return NoContent();
     }
