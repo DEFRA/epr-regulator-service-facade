@@ -1,5 +1,4 @@
-﻿using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
+﻿using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using System;
 using System.Collections.Generic;
 
@@ -16,9 +15,9 @@ public class RegistrationMaterialDto
 
     public RegistrationMaterialStatus? Status { get; set; }
 
-    public string? StatusUpdatedByName { get; init; }
+    public string? StatusUpdatedBy { get; init; }
 
-    public DateTime? StatusUpdatedAt { get; init; }
+    public DateTime? StatusUpdatedDate { get; init; }
 
     public string? RegistrationReferenceNumber { get; init; }
 

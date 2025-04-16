@@ -15,7 +15,6 @@ public class FeatureEnabledDocumentFilter(IFeatureManager featureManager) : IDoc
 
         foreach (var path in swaggerDoc.Paths)
         {
-
             var shouldRemove = await ShouldRemovePath(path.Key, path.Value.Operations, context);
 
             if (shouldRemove)

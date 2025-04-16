@@ -68,7 +68,6 @@ public class RegistrationsController(IRegistrationService registrationService
 
     [HttpGet("registrations/{id:int}")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
             Summary = "get registration with materials and tasks",
@@ -80,15 +79,12 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
     {
         logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
-
         var result = await registrationService.GetRegistrationByRegistrationId(id);
-
         return Ok(result);
     }
 
     [HttpGet("registrationMaterials/{id:int}")]
     [ProducesResponseType(typeof(RegistrationMaterialDetailsDto), 200)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
             Summary = "get summary info for a material",
@@ -100,9 +96,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
-
         var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
-
         return Ok(result);
     }
 
@@ -122,11 +116,8 @@ public class RegistrationsController(IRegistrationService registrationService
         [FromBody] UpdateMaterialOutcomeRequestDto request)
     {
         await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
-
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
-
         await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
-
         return NoContent();
     }
 }
