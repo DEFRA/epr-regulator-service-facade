@@ -28,7 +28,6 @@ public class RegistrationsController(IRegistrationService registrationService
             Description = "attempting to get registration with materials and tasks.  "
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(RegistrationOverviewDto))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
     {
@@ -45,7 +44,6 @@ public class RegistrationsController(IRegistrationService registrationService
             Description = "attempting to get summary info for a material.  "
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
     {
