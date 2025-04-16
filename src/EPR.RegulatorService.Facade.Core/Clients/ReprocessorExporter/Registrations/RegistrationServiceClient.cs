@@ -23,27 +23,21 @@ ILogger<RegistrationServiceClient> logger)
     public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(int id)
     {
         logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
-
         var url = string.Format($"{_config.Endpoints.RegistrationByRegistrationId}", _config.ApiVersion, id);
-
         return await GetAsync<RegistrationOverviewDto>(url);
     }
 
     public async Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(int id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
-
         var url = string.Format($"{_config.Endpoints.RegistrationMaterialByRegistrationMaterialId}", _config.ApiVersion, id);
-
         return await GetAsync<RegistrationMaterialDetailsDto>(url);
     }
 
     public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request)
     {
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
-
         var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
-
         return await PostAsync<UpdateMaterialOutcomeRequestDto,bool>(url, request);
     }
 }
