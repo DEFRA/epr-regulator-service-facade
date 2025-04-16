@@ -38,8 +38,8 @@ public class RegistrationServiceClientTests
             ServiceRetryCount = 3,
             Endpoints = new PrnServiceApiConfigEndpoints
             {
-                UpdateRegulatorApplicationTaskStatusById = "v{0}/regulatorApplicationTaskStatus/{1}",
-                UpdateRegulatorRegistrationTaskStatusById = "v{0}/regulatorRegistrationTaskStatus/{1}",
+                UpdateRegulatorApplicationTaskStatusById = "v{0}/regulatorApplicationTaskStatus",
+                UpdateRegulatorRegistrationTaskStatusById = "v{0}/regulatorRegistrationTaskStatus",
                 RegistrationByRegistrationId = "registrations/{0}",
                 RegistrationMaterialByRegistrationMaterialId = "materials/{0}",
                 UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}"
@@ -50,46 +50,50 @@ public class RegistrationServiceClientTests
         _fixture = new Fixture();
     }
 
-    //[TestMethod]
-    //public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
-    //{
-    //    // Arrange
-    //    var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
-    //    _mockHttpMessageHandler.Protected()
-    //        .Setup<Task<HttpResponseMessage>>(
-    //            "SendAsync",
-    //            ItExpr.IsAny<HttpRequestMessage>(),
-    //            ItExpr.IsAny<CancellationToken>()
-    //        )
-    //        .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
+    [TestMethod]
+    public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("regulatorApplicationTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
 
-    //    // Act
-    //    var result = await _client.UpdateRegulatorApplicationTaskStatus(1, requestDto);
+        // Act
+        var result = await _client.UpdateRegulatorApplicationTaskStatus(requestDto);
 
-    //    // Assert
-    //    result.Should().BeTrue();
-    //}
+        // Assert
+        result.Should().BeTrue();
+    }
 
+    [TestMethod]
+    public async Task UpdateRegulatorRegistrationTaskStatus_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("regulatorRegistrationTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
 
-    //[TestMethod]
-    //public async Task UpdateRegulatorRegistrationTaskStatus_ShouldReturnExpectedResult()
-    //{
-    //    // Arrange
-    //    var requestDto = _fixture.Create<UpdateTaskStatusRequestDto>();
-    //    _mockHttpMessageHandler.Protected()
-    //        .Setup<Task<HttpResponseMessage>>(
-    //            "SendAsync",
-    //            ItExpr.IsAny<HttpRequestMessage>(),
-    //            ItExpr.IsAny<CancellationToken>()
-    //        )
-    //        .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.NoContent });
+        // Act
+        var result = await _client.UpdateRegulatorRegistrationTaskStatus(requestDto);
 
-    //    // Act
-    //    var result = await _client.UpdateRegulatorRegistrationTaskStatus(1, requestDto);
+        // Assert
+        result.Should().BeTrue();
+    }
 
-    //    // Assert
-    //    result.Should().BeTrue();
-    //}
 
     [TestMethod]
     public async Task GetRegistrationByRegistrationId_ShouldReturnExpectedResult()

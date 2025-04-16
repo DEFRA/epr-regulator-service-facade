@@ -51,9 +51,11 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var request = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
+        var validationResult = new ValidationResult();
+
         _mockRegulatorRegistrationValidator
-            .Setup(v => v.ValidateAndThrowAsync(request, default))
-            .Returns(Task.CompletedTask);
+            .Setup(v => v.ValidateAsync(request, default))
+            .ReturnsAsync(validationResult);
 
         _mockRegistrationService
             .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(request))
@@ -74,15 +76,34 @@ public class RegistrationsControllerTests
     public async Task UpdateRegulatorRegistrationTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var request = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
-        var failures = new[] { new ValidationFailure("Field", "Error message") };
-        _mockRegulatorRegistrationValidator
-            .Setup(v => v.ValidateAndThrowAsync(request, default))
-            .ThrowsAsync(new ValidationException(failures));
+        var validator = new InlineValidator<UpdateRegulatorRegistrationTaskDto>();
+        validator.RuleFor(x => x.RegistrationId).NotEmpty().WithMessage("RegistrationId is required");
+        validator.RuleFor(x => x.TaskName).NotEmpty().WithMessage("TaskName is required");
+        validator.RuleFor(x => x.Status).IsInEnum().WithMessage("Status is required");
+        validator.RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
+
+        _controller = new RegistrationsController(
+            _mockRegistrationService.Object,
+            validator,
+            _mockRegulatorApplicationValidator.Object,
+            _mockUpdateMaterialOutcomeValidator.Object,
+            _mockLogger.Object
+        );
+
+        var invalidRequest = new UpdateRegulatorRegistrationTaskDto
+        {
+            RegistrationId = 0,
+            TaskName = "",
+            Status = 0,
+            Comments = "Test",
+            UserName = ""
+        };
 
         // Act & Assert
-        await FluentActions.Invoking(() => _controller.UpdateRegulatorRegistrationTaskStatus(request))
-            .Should().ThrowAsync<ValidationException>();
+        await FluentActions.Invoking(() =>
+            _controller.UpdateRegulatorRegistrationTaskStatus(invalidRequest)
+        ).Should().ThrowAsync<ValidationException>()
+         .WithMessage("*is required*");
     }
 
     [TestMethod]
@@ -90,9 +111,11 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var request = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
+        var validationResult = new ValidationResult();
+
         _mockRegulatorApplicationValidator
-            .Setup(v => v.ValidateAndThrowAsync(request, default))
-            .Returns(Task.CompletedTask);
+            .Setup(v => v.ValidateAsync(request, default))
+            .ReturnsAsync(validationResult);
 
         _mockRegistrationService
             .Setup(s => s.UpdateRegulatorApplicationTaskStatus(request))
@@ -109,17 +132,36 @@ public class RegistrationsControllerTests
     public async Task UpdateRegulatorApplicationTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var request = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
-        var failures = new[] { new ValidationFailure("Field", "Error") };
+        var validator = new InlineValidator<UpdateRegulatorApplicationTaskDto>();
+        validator.RuleFor(x => x.RegistrationMaterialId).NotEmpty().WithMessage("RegistrationMaterialId is required");
+        validator.RuleFor(x => x.TaskName).NotEmpty().WithMessage("TaskName is required");
+        validator.RuleFor(x => x.Status).IsInEnum().WithMessage("Status is required");
+        validator.RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
 
-        _mockRegulatorApplicationValidator
-            .Setup(v => v.ValidateAndThrowAsync(request, default))
-            .ThrowsAsync(new ValidationException(failures));
+        _controller = new RegistrationsController(
+            _mockRegistrationService.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            validator,
+            _mockUpdateMaterialOutcomeValidator.Object,
+            _mockLogger.Object
+        );
+
+        var invalidRequest = new UpdateRegulatorApplicationTaskDto
+        {
+            RegistrationMaterialId = 0,  
+            TaskName = "",               
+            Status = 0,                  
+            Comments = "Testing",
+            UserName = ""                
+        };
 
         // Act & Assert
-        await FluentActions.Invoking(() => _controller.UpdateRegulatorApplicationTaskStatus(request))
-            .Should().ThrowAsync<ValidationException>();
+        await FluentActions.Invoking(() =>
+            _controller.UpdateRegulatorApplicationTaskStatus(invalidRequest)
+        ).Should().ThrowAsync<ValidationException>()
+         .WithMessage("*is required*");
     }
+
     [TestMethod]
     public async Task GetRegistrationByRegistrationId_ShouldReturnExpectedResult()
     {
