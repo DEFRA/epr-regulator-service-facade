@@ -35,7 +35,7 @@ public class FeatureEnabledDocumentFilterTests
     }
 
     [TestMethod]
-    public void Apply_RemovesPaths_WhenActionFeatureIsDisabled()
+    public void Apply_WhenActionFeatureIsDisabled_RemovesPaths()
     {
         // Arrange
         var swaggerDoc = new OpenApiDocument
@@ -80,7 +80,7 @@ public class FeatureEnabledDocumentFilterTests
     }
 
     [TestMethod]
-    public void Apply_DoesNotRemovePaths_WhenActionFeatureIsEnabled()
+    public void Apply_WhenActionFeatureIsEnabled_DoesNotRemovePaths()
     {
         // Arrange
         var swaggerDoc = new OpenApiDocument
@@ -125,7 +125,7 @@ public class FeatureEnabledDocumentFilterTests
     }
 
     [TestMethod]
-    public void Apply_RemovesPaths_WhenControllerFeatureIsDisabled()
+    public void Apply_WhenControllerFeatureIsDisabled_RemovesPaths()
     {
         // Arrange
         var swaggerDoc = new OpenApiDocument
@@ -170,7 +170,7 @@ public class FeatureEnabledDocumentFilterTests
     }
 
     [TestMethod]
-    public void Apply_DoesNotRemovePaths_WhenNoFeatureGateAttributes()
+    public void Apply_WhenNoFeatureGateAttributes_DoesNotRemovePaths()
     {
         // Arrange
         var swaggerDoc = new OpenApiDocument
@@ -213,7 +213,7 @@ public class FeatureEnabledDocumentFilterTests
     }
 
     [TestMethod]
-    public void Apply_DoesNotRemovePaths_WhenAllFeaturesAreEnabled()
+    public void Apply_WhenAllFeaturesAreEnabled_DoesNotRemovePaths()
     {
         // Arrange
         var swaggerDoc = new OpenApiDocument

@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Validations.ReprocessorExporter.Registrations;
 
-
 [TestClass]
 public class UpdateRegulatorRegistrationTaskDtoValidatorTests
 {

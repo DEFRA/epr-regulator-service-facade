@@ -1,6 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentAssertions;

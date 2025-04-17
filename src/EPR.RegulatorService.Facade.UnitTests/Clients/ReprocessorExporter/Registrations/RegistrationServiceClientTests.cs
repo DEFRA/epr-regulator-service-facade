@@ -94,7 +94,6 @@ public class RegistrationServiceClientTests
         result.Should().BeTrue();
     }
 
-
     [TestMethod]
     public async Task GetRegistrationByRegistrationId_ShouldReturnExpectedResult()
     {
