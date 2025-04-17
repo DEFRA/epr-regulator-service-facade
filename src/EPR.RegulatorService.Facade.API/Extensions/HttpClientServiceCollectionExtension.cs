@@ -13,7 +13,7 @@ using Polly.Extensions.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
-using EPR.RegulatorService.Facade.Core.Clients.PrnBackendServiceClient;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -37,10 +37,10 @@ public static class HttpClientServiceCollectionExtension
         var antivirusSettings = services.BuildServiceProvider().GetRequiredService<IOptions<AntivirusApiConfig>>().Value;
 
         services.AddHttpClient<IApplicationService, ApplicationService>((sp, client) =>
-            {
-                client.BaseAddress = new Uri(settings.BaseUrl);
-                client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
-            })
+        {
+            client.BaseAddress = new Uri(settings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
+        })
             .AddHttpMessageHandler<AccountServiceAuthorisationHandler>()
             .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
@@ -49,13 +49,13 @@ public static class HttpClientServiceCollectionExtension
             });
 
         services.AddHttpClient<IRegulatorOrganisationService, RegulatorOrganisationService>((serviceProvider, client) =>
-            {
-                client.DefaultRequestHeaders.Accept.Clear();
+        {
+            client.DefaultRequestHeaders.Accept.Clear();
 
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                client.BaseAddress = new Uri(settings.BaseUrl);
-            })
+            client.BaseAddress = new Uri(settings.BaseUrl);
+        })
             .AddHttpMessageHandler<AccountServiceAuthorisationHandler>()
             .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
@@ -71,13 +71,13 @@ public static class HttpClientServiceCollectionExtension
             .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
 
         services.AddHttpClient<ICommonDataService, CommonDataService>((sp, client) =>
-            {
-                client.BaseAddress = new Uri(commonDataSettings.BaseUrl);
-                client.Timeout = TimeSpan.FromSeconds(commonDataSettings.Timeout);
-            })
+        {
+            client.BaseAddress = new Uri(commonDataSettings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(commonDataSettings.Timeout);
+        })
             .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
 
-        services.AddHttpClient<IPrnBackendServiceClient, PrnBackendServiceClient>((sp, client) =>
+        services.AddHttpClient<IRegistrationServiceClient, RegistrationServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);
@@ -86,10 +86,10 @@ public static class HttpClientServiceCollectionExtension
         .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
 
         services.AddHttpClient<IProducerService, ProducerService>((sp, client) =>
-            {
-                client.BaseAddress = new Uri(settings.BaseUrl);
-                client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
-            })
+        {
+            client.BaseAddress = new Uri(settings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
+        })
             .AddHttpMessageHandler<AccountServiceAuthorisationHandler>()
             .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
