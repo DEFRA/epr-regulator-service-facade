@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 public abstract class UpdateRegulatorTaskBaseDto
 {
-    [Required]
     public required string TaskName { get; set; }
     [Required]
     public required RegistrationTaskStatus Status { get; set; }
