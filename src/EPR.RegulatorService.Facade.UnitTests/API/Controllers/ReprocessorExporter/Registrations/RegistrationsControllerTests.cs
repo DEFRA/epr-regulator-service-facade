@@ -271,7 +271,7 @@ public class RegistrationsControllerTests
             .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _controller.GetWasteLicenceByMaterialId(id);
+        var result = await _controller.GetWasteLicenceByRegistrationMaterialId(id);
 
         // Assert
         using (new AssertionScope())
