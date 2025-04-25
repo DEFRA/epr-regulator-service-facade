@@ -258,12 +258,12 @@ public class RegistrationsControllerTests
         var expectedDto = new RegistrationMaterialWasteLicenceDto
         {
             PermitType = "TypeA",
-            Number = new[] { "123", "456" },
+            LicenceNumbers = new[] { "123", "456" },
             CapacityTonne = 100.5m,
-            Period = "2025",
+            CapacityPeriod = "2025",
             MaximumReprocessingCapacityTonne = 200.0m,
             MaximumReprocessingPeriod = "2026",
-            Material = "Plastic"
+            MaterialName = "Plastic"
         };
 
         _mockRegistrationService
