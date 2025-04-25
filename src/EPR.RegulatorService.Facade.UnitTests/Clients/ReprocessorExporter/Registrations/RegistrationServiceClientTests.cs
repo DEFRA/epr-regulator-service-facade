@@ -42,7 +42,10 @@ public class RegistrationServiceClientTests
                 UpdateRegulatorRegistrationTaskStatusById = "v{0}/regulatorRegistrationTaskStatus",
                 RegistrationByRegistrationId = "registrations/{0}",
                 RegistrationMaterialByRegistrationMaterialId = "materials/{0}",
-                UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}"
+                UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}",
+                WasteLicensesByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/wasteLicenses",
+                ReprocessingInputsOutputsByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/reprocessingInputsOutputs",
+                SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan"
             }
         });
 
