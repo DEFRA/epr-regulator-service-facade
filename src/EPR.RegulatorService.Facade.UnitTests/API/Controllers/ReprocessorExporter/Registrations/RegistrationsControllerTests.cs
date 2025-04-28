@@ -282,4 +282,109 @@ public class RegistrationsControllerTests
             okResult.Value.Should().BeEquivalentTo(expectedDto);
         }
     }
+
+    [TestMethod]
+    public async Task GetReprocessingIOByRegistrationMaterialId_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetReprocessingIOByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeEquivalentTo(expectedDto);
+        }
+    }
+
+    [TestMethod]
+    public async Task GetReprocessingIOByRegistrationMaterialId_ServiceThrowsException_ReturnsInternalServerError()
+    {
+        // Arrange
+        var id = 1;
+
+        _mockRegistrationService
+            .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetReprocessingIOByRegistrationMaterialId(id)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Service error");
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetSamplingPlanByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeEquivalentTo(expectedDto);
+        }
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ServiceThrowsException_ReturnsInternalServerError()
+    {
+        // Arrange
+        var id = 1;
+
+        _mockRegistrationService
+            .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetSamplingPlanByRegistrationMaterialId(id)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Service error");
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ServiceReturnsNull_ReturnsOkWithNull()
+    {
+        // Arrange
+        var id = 1;
+
+        _mockRegistrationService
+            .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
+            .ReturnsAsync((RegistrationMaterialSamplingPlanDto?)null);
+
+        // Act
+        var result = await _controller.GetSamplingPlanByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeNull();
+        }
+    }
 }
