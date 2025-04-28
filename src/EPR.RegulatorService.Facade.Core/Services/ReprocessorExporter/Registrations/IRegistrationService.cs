@@ -11,6 +11,6 @@ public interface IRegistrationService
     Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(int id);
     Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request);
     Task<RegistrationMaterialWasteLicenceDto?> GetWasteLicenceByRegistrationMaterialId(int id);
-    Task<RegistrationMaterialReprocessingIODetailsDto> GetReprocessingInputsOutputsByRegistrationMaterialId(int id);
+    Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id);
     Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id);
 }

@@ -57,11 +57,11 @@ ILogger<RegistrationServiceClient> logger)
         return await GetAsync<RegistrationMaterialWasteLicenceDto>(url);
     }
 
-    public async Task<RegistrationMaterialReprocessingIODetailsDto> GetReprocessingInputsOutputsByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id)
     {
-        logger.LogInformation(LogMessages.ReprocessingInputsOutputsRegistrationMaterial, id);
-        var url = string.Format($"{_config.Endpoints.ReprocessingInputsOutputsByRegistrationMaterialId}", _config.ApiVersion, id);
-        return await GetAsync<RegistrationMaterialReprocessingIODetailsDto>(url);
+        logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
+        var url = string.Format($"{_config.Endpoints.ReprocessingIOByRegistrationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationMaterialReprocessingIODto>(url);
     }
 
     public async Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id)

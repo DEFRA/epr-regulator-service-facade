@@ -6,7 +6,6 @@ using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -43,9 +42,9 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await registrationServiceClient.GetWasteLicenceByRegistrationMaterialId(id);
     }
 
-    public async Task<RegistrationMaterialReprocessingIODetailsDto> GetReprocessingInputsOutputsByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id)
     {
-        return await registrationServiceClient.GetReprocessingInputsOutputsByRegistrationMaterialId(id);
+        return await registrationServiceClient.GetReprocessingIOByRegistrationMaterialId(id);
     }
 
     public async Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id)

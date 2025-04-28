@@ -136,18 +136,18 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrationMaterials/{id:int}/reprocessingIO")]
-    [ProducesResponseType(typeof(RegistrationMaterialReprocessingIODetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RegistrationMaterialReprocessingIODto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "Show reprocessing inputs, outputs, and process description",
         Description = "Retrieve reprocessing inputs, outputs, and process description for a specific material."
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODetailsDto))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetReprocessingInputsOutputsByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(int id)
     {
-        logger.LogInformation(LogMessages.ReprocessingInputsOutputsRegistrationMaterial, id);
-        var result = await registrationService.GetReprocessingInputsOutputsByRegistrationMaterialId(id);
+        logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
+        var result = await registrationService.GetReprocessingIOByRegistrationMaterialId(id);
         return Ok(result);
     }
 
