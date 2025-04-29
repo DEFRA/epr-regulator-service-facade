@@ -50,11 +50,11 @@ ILogger<RegistrationServiceClient> logger)
         return await PostAsync<UpdateMaterialOutcomeRequestDto, bool>(url, request);
     }
 
-    public async Task<RegistrationMaterialWasteLicenceDto> GetWasteLicenceByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)
     {
         logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
         var url = string.Format($"{_config.Endpoints.WasteLicensesByRegistrationMaterialId}", _config.ApiVersion, id);
-        return await GetAsync<RegistrationMaterialWasteLicenceDto>(url);
+        return await GetAsync<RegistrationMaterialWasteLicencesDto>(url);
     }
 
     public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id)

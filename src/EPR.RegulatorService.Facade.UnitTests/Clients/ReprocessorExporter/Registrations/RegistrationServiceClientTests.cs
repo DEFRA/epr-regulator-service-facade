@@ -177,7 +177,7 @@ public class RegistrationServiceClientTests
     {
         // Arrange
         var id = 1;
-        var expectedDto = _fixture.Create<RegistrationMaterialWasteLicenceDto>();
+        var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
         var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
 

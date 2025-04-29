@@ -104,7 +104,7 @@ public class RegistrationServiceTests
     {
         // Arrange
         var id = 1;
-        var expectedDto = _fixture.Create<RegistrationMaterialWasteLicenceDto>();
+        var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
         _mockClient.Setup(client => client.GetWasteLicenceByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
 

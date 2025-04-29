@@ -37,7 +37,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await registrationServiceClient.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
     }
 
-    public async Task<RegistrationMaterialWasteLicenceDto> GetWasteLicenceByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)
     {
         return await registrationServiceClient.GetWasteLicenceByRegistrationMaterialId(id);
     }

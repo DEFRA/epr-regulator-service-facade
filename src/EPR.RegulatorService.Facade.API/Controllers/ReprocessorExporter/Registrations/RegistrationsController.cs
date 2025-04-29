@@ -120,13 +120,13 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrationMaterials/{id:int}/wasteLicences")]
-    [ProducesResponseType(typeof(RegistrationMaterialWasteLicenceDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RegistrationMaterialWasteLicencesDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "Show waste permit and exemption details for a material",
         Description = "Retrieve waste permit and exemption details for a specific material."
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicenceDto))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicencesDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(int id)
     {

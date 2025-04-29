@@ -1,6 +1,6 @@
 ﻿namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations
 {
-    public class RegistrationMaterialWasteLicenceDto
+    public class RegistrationMaterialWasteLicencesDto
     {
         public required string PermitType { get; set; }
         public string[] LicenceNumbers { get; set; }

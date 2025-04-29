@@ -255,7 +255,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var id = 1;
-        var expectedDto = new RegistrationMaterialWasteLicenceDto
+        var expectedDto = new RegistrationMaterialWasteLicencesDto
         {
             PermitType = "TypeA",
             LicenceNumbers = new[] { "123", "456" },
