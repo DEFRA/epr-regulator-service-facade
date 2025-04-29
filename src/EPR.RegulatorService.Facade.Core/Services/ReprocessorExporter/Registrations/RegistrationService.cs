@@ -36,4 +36,23 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
     {
         return await registrationServiceClient.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
     }
+
+    public async Task<SiteAddressDetailsDto> GetSiteAddressByRegistrationId(int id)
+    {
+        var registrationSiteAddress = await registrationServiceClient.GetSiteAddressByRegistrationId(id);
+        var nationName = "Endland";//get nation name from backend account microservice
+
+        return new SiteAddressDetailsDto
+        {
+            NationName = nationName,
+            SiteAddress = registrationSiteAddress.SiteAddress,
+            GridReference = registrationSiteAddress.GridReference,
+            LegalCorrespondenceAddress = registrationSiteAddress.LegalCorrespondenceAddress
+        };
+    }
+
+    public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
+    {
+        return await registrationServiceClient.GetAuthorisedMaterialByRegistrationId(id);
+    }
 }

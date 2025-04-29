@@ -98,6 +98,73 @@ public class RegistrationServiceTests
         // Assert
         result.Should().BeTrue();
     }
+
+    [TestMethod]
+    public async Task GetSiteAddressByRegistrationId_ShouldReturnMappedDto()
+    {
+        // Arrange
+        var registrationId = 1;
+        var clientResponse = _fixture.Create<RegistrationSiteAddressDto>();
+        _mockClient.Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
+                   .ReturnsAsync(clientResponse);
+
+        // Act
+        var result = await _service.GetSiteAddressByRegistrationId(registrationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.SiteAddress.Should().BeEquivalentTo(clientResponse.SiteAddress);
+        result.GridReference.Should().Be(clientResponse.GridReference);
+        result.LegalCorrespondenceAddress.Should().BeEquivalentTo(clientResponse.LegalCorrespondenceAddress);
+        result.NationName.Should().Be("Endland"); // hardcoded for now
+    }
+
+    [TestMethod]
+    public async Task GetSiteAddressByRegistrationId_ShouldCallClientExactlyOnce()
+    {
+        // Arrange
+        var registrationId = 5;
+        var clientResponse = _fixture.Create<RegistrationSiteAddressDto>();
+        _mockClient.Setup(c => c.GetSiteAddressByRegistrationId(registrationId)).ReturnsAsync(clientResponse);
+
+        // Act
+        await _service.GetSiteAddressByRegistrationId(registrationId);
+
+        // Assert
+        _mockClient.Verify(c => c.GetSiteAddressByRegistrationId(registrationId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task GetAuthorisedMaterialByRegistrationId_ShouldReturnExpectedDto()
+    {
+        // Arrange
+        var registrationId = 10;
+        var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
+        _mockClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetAuthorisedMaterialByRegistrationId(registrationId);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetAuthorisedMaterialByRegistrationId_ShouldCallClientExactlyOnce()
+    {
+        // Arrange
+        var registrationId = 42;
+        var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
+        _mockClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        await _service.GetAuthorisedMaterialByRegistrationId(registrationId);
+
+        // Assert
+        _mockClient.Verify(client => client.GetAuthorisedMaterialByRegistrationId(registrationId), Times.Once);
+    }
 }
 
 

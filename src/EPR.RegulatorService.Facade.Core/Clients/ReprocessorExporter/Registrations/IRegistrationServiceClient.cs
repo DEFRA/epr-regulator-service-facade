@@ -9,4 +9,6 @@ public interface IRegistrationServiceClient
     Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(int id);
     Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(int id);
     Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request);
+    Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id);
+    Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id);
 }

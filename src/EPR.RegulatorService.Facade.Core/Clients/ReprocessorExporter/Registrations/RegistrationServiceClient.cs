@@ -49,4 +49,18 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
         return await PostAsync<UpdateMaterialOutcomeRequestDto,bool>(url, request);
     }
+
+    public async Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id)
+    {
+        logger.LogInformation(LogMessages.SummaryInfoMaterial);
+        var url = string.Format($"{_config.Endpoints.SiteAddressByRegistrationId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationSiteAddressDto>(url);
+    }
+
+    public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
+    {
+        logger.LogInformation(LogMessages.SummaryInfoMaterial);
+        var url = string.Format($"{_config.Endpoints.AuthorisedMaterialByRegistrationId}", _config.ApiVersion, id);
+        return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
+    }
 }
