@@ -119,7 +119,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return NoContent();
     }
 
-    [HttpGet("registration/{id:int}/siteAddress")]
+    [HttpGet("registrations/{id:int}/siteAddress")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -135,7 +135,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registration/{id:int}/authorisedMaterial")]
+    [HttpGet("registrations/{id:int}/authorisedMaterial")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(

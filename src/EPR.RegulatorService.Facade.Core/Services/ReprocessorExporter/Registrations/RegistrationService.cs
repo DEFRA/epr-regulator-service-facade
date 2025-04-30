@@ -3,6 +3,7 @@ using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services;
@@ -10,7 +11,7 @@ using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registration
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 
-public class RegistrationService(IRegistrationServiceClient registrationServiceClient) : IRegistrationService
+public class RegistrationService(IRegistrationServiceClient registrationServiceClient, IAccountServiceClient accountServiceClient) : IRegistrationService
 {
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request)
     {
@@ -40,7 +41,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
     public async Task<SiteAddressDetailsDto> GetSiteAddressByRegistrationId(int id)
     {
         var registrationSiteAddress = await registrationServiceClient.GetSiteAddressByRegistrationId(id);
-        var nationName = "Endland";//get nation name from backend account microservice
+        var nationName = await accountServiceClient.GetNationNameById(registrationSiteAddress.NationId);
 
         return new SiteAddressDetailsDto
         {
