@@ -1,5 +1,4 @@
-﻿using AutoFixture;
-using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
+﻿using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Configs;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
