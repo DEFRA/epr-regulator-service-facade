@@ -52,14 +52,14 @@ ILogger<RegistrationServiceClient> logger)
 
     public async Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.SummaryInfoMaterial);
+        logger.LogInformation(LogMessages.SiteAddressDetails);
         var url = string.Format($"{_config.Endpoints.SiteAddressByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<RegistrationSiteAddressDto>(url);
     }
 
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.SummaryInfoMaterial);
+        logger.LogInformation(LogMessages.AuthorisedMaterial);
         var url = string.Format($"{_config.Endpoints.AuthorisedMaterialByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
     }

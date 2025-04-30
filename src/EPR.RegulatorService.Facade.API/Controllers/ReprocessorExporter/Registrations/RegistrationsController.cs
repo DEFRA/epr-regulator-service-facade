@@ -130,7 +130,7 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetSiteAddressByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
+        logger.LogInformation(LogMessages.SiteAddressDetails);
         var result = await registrationService.GetSiteAddressByRegistrationId(id);
         return Ok(result);
     }
@@ -140,13 +140,13 @@ public class RegistrationsController(IRegistrationService registrationService
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
     Summary = "get materials authorised details",
-    Description = "attempting to get materials authorised details.  "
+    Description = "attempting to get authorised materials details.  "
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns materials authorised details.", typeof(MaterialsAuthorisedOnSiteDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
+        logger.LogInformation(LogMessages.AuthorisedMaterial);
         var result = await registrationService.GetAuthorisedMaterialByRegistrationId(id);
         return Ok(result);
     }
