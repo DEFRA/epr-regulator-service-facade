@@ -45,6 +45,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
 
         return new SiteAddressDetailsDto
         {
+            RegistrationId = registrationSiteAddress.RegistrationId,
             NationName = nationName,
             SiteAddress = registrationSiteAddress.SiteAddress,
             GridReference = registrationSiteAddress.GridReference,
