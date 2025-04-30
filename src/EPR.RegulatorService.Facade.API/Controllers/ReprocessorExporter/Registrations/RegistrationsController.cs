@@ -135,7 +135,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrations/{id:int}/authorisedMaterial")]
+    [HttpGet("registrations/{id:int}/authorisedMaterials")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(

@@ -1,4 +1,5 @@
 ﻿namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+
 public class MaterialsAuthorisedOnSiteDto
 {
     public int RegistrationId { get; init; }
