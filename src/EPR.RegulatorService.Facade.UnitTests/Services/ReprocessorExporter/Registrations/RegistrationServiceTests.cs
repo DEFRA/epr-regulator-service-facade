@@ -146,9 +146,4 @@ public class RegistrationServiceTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
-
-
-
 }
-
-
