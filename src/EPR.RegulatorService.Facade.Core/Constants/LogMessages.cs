@@ -9,4 +9,7 @@ public static class LogMessages
     public const string OutcomeMaterialRegistration = "Attempting to update the outcome of a material registration";
     public const string UpdateRegistrationTaskStatus = "Attempting to update regulator registration task status using the backend for Status {Status}";
     public const string UpdateApplicationTaskStatus = "Attempting to update regulator application task status using the backend for Status {Status}";
+    public const string WasteLicencesRegistrationMaterial = "Retrieving waste permit and exemption details for registration material with ID {id}.";
+    public const string ReprocessingIORegistrationMaterial = "Fetching reprocessing inputs, outputs, and process details for registration material ID: {id}.";
+    public const string SamplingPlanRegistrationMaterial = "Fetching sampling plan details for registration material ID: {id}.";
 }

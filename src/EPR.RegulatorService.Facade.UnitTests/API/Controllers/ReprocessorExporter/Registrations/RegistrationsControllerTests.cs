@@ -1,7 +1,6 @@
-﻿using System.Net;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
@@ -11,8 +10,9 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using Moq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -148,11 +148,11 @@ public class RegistrationsControllerTests
 
         var invalidRequest = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 0,  
-            TaskName = "",               
-            Status = 0,                  
+            RegistrationMaterialId = 0,
+            TaskName = "",
+            Status = 0,
             Comments = "Testing",
-            UserName = ""                
+            UserName = ""
         };
 
         // Act & Assert
@@ -233,7 +233,7 @@ public class RegistrationsControllerTests
         _controller = new RegistrationsController(
             _mockRegistrationService.Object,
             _mockRegulatorRegistrationValidator.Object,
-            _mockRegulatorApplicationValidator.Object, 
+            _mockRegulatorApplicationValidator.Object,
             validator,
             _mockLogger.Object
         );
@@ -248,5 +248,143 @@ public class RegistrationsControllerTests
         await FluentActions.Invoking(() =>
             _controller.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto)
         ).Should().ThrowAsync<ValidationException>();
+    }
+
+    [TestMethod]
+    public async Task GetWasteLicenceByMaterialId_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = new RegistrationMaterialWasteLicencesDto
+        {
+            PermitType = "TypeA",
+            LicenceNumbers = new[] { "123", "456" },
+            CapacityTonne = 100.5m,
+            CapacityPeriod = "2025",
+            MaximumReprocessingCapacityTonne = 200.0m,
+            MaximumReprocessingPeriod = "2026",
+            MaterialName = "Plastic"
+        };
+
+        _mockRegistrationService
+            .Setup(service => service.GetWasteLicenceByRegistrationMaterialId(id))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetWasteLicenceByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeEquivalentTo(expectedDto);
+        }
+    }
+
+    [TestMethod]
+    public async Task GetReprocessingIOByRegistrationMaterialId_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetReprocessingIOByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeEquivalentTo(expectedDto);
+        }
+    }
+
+    [TestMethod]
+    public async Task GetReprocessingIOByRegistrationMaterialId_ServiceThrowsException_ReturnsInternalServerError()
+    {
+        // Arrange
+        var id = 1;
+
+        _mockRegistrationService
+            .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetReprocessingIOByRegistrationMaterialId(id)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Service error");
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ValidRequest_ReturnsExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetSamplingPlanByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeEquivalentTo(expectedDto);
+        }
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ServiceThrowsException_ReturnsInternalServerError()
+    {
+        // Arrange
+        var id = 1;
+
+        _mockRegistrationService
+            .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetSamplingPlanByRegistrationMaterialId(id)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Service error");
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ServiceReturnsNull_ReturnsOkWithNull()
+    {
+        // Arrange
+        var id = 1;
+
+        _mockRegistrationService
+            .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
+            .ReturnsAsync((RegistrationMaterialSamplingPlanDto?)null);
+
+        // Act
+        var result = await _controller.GetSamplingPlanByRegistrationMaterialId(id);
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+            okResult.Value.Should().BeNull();
+        }
     }
 }

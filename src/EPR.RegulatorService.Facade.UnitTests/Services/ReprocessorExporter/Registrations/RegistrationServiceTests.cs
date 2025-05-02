@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using Moq;
+using System;
+using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Services.ReprocessorExporter.Registrations;
 
@@ -98,6 +98,52 @@ public class RegistrationServiceTests
         // Assert
         result.Should().BeTrue();
     }
+
+    [TestMethod]
+    public async Task GetWasteLicenceByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
+        _mockClient.Setup(client => client.GetWasteLicenceByRegistrationMaterialId(id))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetWasteLicenceByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetReprocessingIOByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
+        _mockClient.Setup(client => client.GetReprocessingIOByRegistrationMaterialId(id))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetReprocessingIOByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
+        _mockClient.Setup(client => client.GetSamplingPlanByRegistrationMaterialId(id))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetSamplingPlanByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
 }
-
-

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Asp.Versioning;
+﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
@@ -8,6 +7,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -117,5 +117,53 @@ public class RegistrationsController(IRegistrationService registrationService
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
         await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
         return NoContent();
+    }
+
+    [HttpGet("registrationMaterials/{id:int}/wasteLicences")]
+    [ProducesResponseType(typeof(RegistrationMaterialWasteLicencesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "Show waste permit and exemption details for a material",
+        Description = "Retrieve waste permit and exemption details for a specific material."
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicencesDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
+        var result = await registrationService.GetWasteLicenceByRegistrationMaterialId(id);
+        return Ok(result);
+    }
+
+    [HttpGet("registrationMaterials/{id:int}/reprocessingIO")]
+    [ProducesResponseType(typeof(RegistrationMaterialReprocessingIODto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "Show reprocessing inputs, outputs, and process description",
+        Description = "Retrieve reprocessing inputs, outputs, and process description for a specific material."
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
+        var result = await registrationService.GetReprocessingIOByRegistrationMaterialId(id);
+        return Ok(result);
+    }
+
+    [HttpGet("registrationMaterials/{id:int}/samplingPlan")]
+    [ProducesResponseType(typeof(RegistrationMaterialSamplingPlanDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "Get sampling plan for a material",
+        Description = "Retrieve sampling plan associated with a material."
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns sampling plan for a material.", typeof(RegistrationMaterialSamplingPlanDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
+        var result = await registrationService.GetSamplingPlanByRegistrationMaterialId(id);
+        return Ok(result);
     }
 }
