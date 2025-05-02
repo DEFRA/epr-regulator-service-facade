@@ -47,7 +47,28 @@ ILogger<RegistrationServiceClient> logger)
     {
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
         var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
-        return await PostAsync<UpdateMaterialOutcomeRequestDto,bool>(url, request);
+        return await PostAsync<UpdateMaterialOutcomeRequestDto, bool>(url, request);
+    }
+
+    public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
+        var url = string.Format($"{_config.Endpoints.WasteLicensesByRegistrationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationMaterialWasteLicencesDto>(url);
+    }
+
+    public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
+        var url = string.Format($"{_config.Endpoints.ReprocessingIOByRegistrationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationMaterialReprocessingIODto>(url);
+    }
+
+    public async Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
+        var url = string.Format($"{_config.Endpoints.SamplingPlanByRegistrationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationMaterialSamplingPlanDto>(url);
     }
 
     public async Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id)

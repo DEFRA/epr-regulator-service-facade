@@ -43,7 +43,10 @@ public class RegistrationServiceClientTests
                 UpdateRegulatorRegistrationTaskStatusById = "v{0}/regulatorRegistrationTaskStatus",
                 RegistrationByRegistrationId = "registrations/{0}",
                 RegistrationMaterialByRegistrationMaterialId = "materials/{0}",
-                UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}"
+                UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}",
+                WasteLicensesByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/wasteLicenses",
+                ReprocessingIOByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/reprocessingInputsOutputs",
+                SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan"
             }
         });
 
@@ -169,6 +172,86 @@ public class RegistrationServiceClientTests
         // Assert
         result.Should().BeTrue();
     }
+
+    [TestMethod]
+    public async Task GetWasteLicenceByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"registrationMaterials/{id}/wasteLicenses")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetWasteLicenceByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetReprocessingIOByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"registrationMaterials/{id}/reprocessingInputsOutputs")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetReprocessingIOByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"registrationMaterials/{id}/samplingPlan")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetSamplingPlanByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+
 
     [TestMethod]
     public async Task GetSiteAddressByRegistrationId_ShouldReturnExpectedResult()
