@@ -32,7 +32,8 @@ public class OrganisationRegistrationSubmissionsController(
             }
             else if (request.IsResubmission 
                     && (string.IsNullOrWhiteSpace(request.ExistingRegRefNumber)
-                    || string.IsNullOrWhiteSpace(request.FileId)))
+                        || 
+                        (string.IsNullOrWhiteSpace(request.FileId)) && request.Status != Core.Enums.RegistrationSubmissionStatus.Cancelled))
             {
                 if (string.IsNullOrWhiteSpace(request.ExistingRegRefNumber))
                     ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "ExistingRegRefNumber is required for resubmission");
@@ -42,9 +43,9 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem(ModelState);
             }
 
-            var serviceResult =
-                await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
-                    GetUserId(request.UserId));
+                var serviceResult =
+                    await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
+                        GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
             {
