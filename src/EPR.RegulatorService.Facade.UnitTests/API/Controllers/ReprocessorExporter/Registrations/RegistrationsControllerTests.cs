@@ -387,4 +387,78 @@ public class RegistrationsControllerTests
             okResult.Value.Should().BeNull();
         }
     }
+
+    [TestMethod]
+    public async Task GetSiteAddressByRegistrationId_ShouldReturnOk_WithExpectedResult()
+    {
+        // Arrange
+        var registrationId = 1;
+        var expectedDto = _fixture.Create<SiteAddressDetailsDto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetSiteAddressByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetSiteAddressByRegistrationId(registrationId);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSiteAddressByRegistrationId_ShouldThrowException_WhenServiceFails()
+    {
+        // Arrange
+        var registrationId = 1;
+        _mockRegistrationService
+            .Setup(service => service.GetSiteAddressByRegistrationId(registrationId))
+            .ThrowsAsync(new Exception("Unexpected error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetSiteAddressByRegistrationId(registrationId)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Unexpected error");
+    }
+
+    [TestMethod]
+    public async Task GetAuthorisedMaterialByRegistrationId_ShouldReturnOk_WithExpectedResult()
+    {
+        // Arrange
+        var registrationId = 2;
+        var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetAuthorisedMaterialByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetAuthorisedMaterialByRegistrationId(registrationId);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetAuthorisedMaterialByRegistrationId_ShouldThrowException_WhenServiceFails()
+    {
+        // Arrange
+        var registrationId = 2;
+        _mockRegistrationService
+            .Setup(service => service.GetAuthorisedMaterialByRegistrationId(registrationId))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetAuthorisedMaterialByRegistrationId(registrationId)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Service error");
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
@@ -45,5 +46,6 @@ public static class ServiceCollectionExtension
         services.AddScoped<AntivirusApiAuthorizationHandler>();
         services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
         services.AddScoped<IRegistrationService, RegistrationService>();
+        services.AddScoped<IAccountServiceClient, AccountServiceClient>();
     }
 }

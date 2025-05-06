@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -84,6 +85,14 @@ public static class HttpClientServiceCollectionExtension
         })
         .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
         .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
+
+        services.AddHttpClient<IAccountServiceClient, AccountServiceClient>((sp, client) =>
+        {
+            client.BaseAddress = new Uri(settings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
+        })
+        .AddHttpMessageHandler<AccountServiceAuthorisationHandler>()
+        .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount));
 
         services.AddHttpClient<IProducerService, ProducerService>((sp, client) =>
         {

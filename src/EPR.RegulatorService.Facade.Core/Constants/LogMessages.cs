@@ -12,4 +12,6 @@ public static class LogMessages
     public const string WasteLicencesRegistrationMaterial = "Retrieving waste permit and exemption details for registration material with ID {id}.";
     public const string ReprocessingIORegistrationMaterial = "Fetching reprocessing inputs, outputs, and process details for registration material ID: {id}.";
     public const string SamplingPlanRegistrationMaterial = "Fetching sampling plan details for registration material ID: {id}.";
+    public const string SiteAddressDetails = "Attempting to get site address details.";
+    public const string AuthorisedMaterial = "Attempting to get authorised materials details.";
 }

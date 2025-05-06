@@ -25,4 +25,6 @@ public class PrnServiceApiConfigEndpoints
     public string WasteLicensesByRegistrationMaterialId { get; set; }
     public string ReprocessingIOByRegistrationMaterialId { get; set; }
     public string SamplingPlanByRegistrationMaterialId { get; set; }
+    public string SiteAddressByRegistrationId { get; set; }
+    public string AuthorisedMaterialByRegistrationId { get; set; }
 }
