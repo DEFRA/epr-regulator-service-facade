@@ -19,15 +19,15 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
         }
         catch (InvalidOperationException ex)
         {
-            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.BadRequest, "An invalid operation occurred.");
+            await HandleExceptionAsync(httpContext, ex, "An invalid operation occurred.");
         }
         catch (HttpRequestException ex)
         {
-            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.InternalServerError, "An HTTP request exception occurred.");
+            await HandleExceptionAsync(httpContext, ex, "An HTTP request exception occurred.");
         }
         catch (KeyNotFoundException ex)
         {
-            await HandleExceptionAsync(httpContext, ex, HttpStatusCode.NotFound, "The requested resource could not be found.");
+            await HandleExceptionAsync(httpContext, ex, "The requested resource could not be found.");
         }
     }
 
@@ -49,14 +49,15 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
 
-    private async Task HandleExceptionAsync(HttpContext context, Exception ex, HttpStatusCode statusCode, string title)
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex, string title)
     {
-        context.Response.StatusCode = (int)statusCode;
+        var statusCode = GetStatusCode(ex);
+        context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
 
         var errorResponse = new
         {
-            status = (int)statusCode,
+            status = statusCode,
             title = title,
             detail = ex.Message
         };
@@ -64,4 +65,15 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
         logger.LogError(ex, title);
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
+
+    private static int GetStatusCode(Exception ex) =>
+        ex switch
+        {
+            HttpRequestException httpRequestException => (int)(httpRequestException.StatusCode ?? HttpStatusCode.InternalServerError),
+            KeyNotFoundException => (int)HttpStatusCode.NotFound,
+            InvalidOperationException => (int)HttpStatusCode.BadRequest,
+            ArgumentException => (int)HttpStatusCode.BadRequest,
+            ValidationException => (int)HttpStatusCode.BadRequest,
+            _ => (int)HttpStatusCode.InternalServerError
+        };
 }
