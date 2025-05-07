@@ -20,6 +20,14 @@ RUN dotnet publish "EPR.RegulatorService.Facade.API.csproj" -c Release -o /home/
 
 FROM base AS final
 
+# Install tzdata
+USER root
+RUN apk add --no-cache tzdata
+ 
+# Add internationalisation support
+USER root
+RUN apk add --no-cache icu-libs icu-data-full libintl
+
 # Switch to the non-root user
 USER dotnet
 
