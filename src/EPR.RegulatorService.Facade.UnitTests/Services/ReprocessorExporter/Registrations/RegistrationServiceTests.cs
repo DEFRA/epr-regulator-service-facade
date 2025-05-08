@@ -15,6 +15,7 @@ public class RegistrationServiceTests
 {
     private Mock<IRegistrationServiceClient> _mockRegistrationServiceClient = null!;
     private Mock<IAccountServiceClient> _mockAccountsServiceClient = null!;
+    private Mock<IPaymentServiceClient> _mockPaymentServiceClient = null!;
     private RegistrationService _service = null!;
     private Fixture _fixture = null!;
 
@@ -23,7 +24,7 @@ public class RegistrationServiceTests
     {
         _mockRegistrationServiceClient = new Mock<IRegistrationServiceClient>();
         _mockAccountsServiceClient = new Mock<IAccountServiceClient>();
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object);
+        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
         _fixture = new Fixture();
     }
 
@@ -150,7 +151,7 @@ public class RegistrationServiceTests
             .Setup(client => client.GetNationNameById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationName);
 
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object);
+        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         var result = await _service.GetSiteAddressByRegistrationId(registrationId);
@@ -179,7 +180,7 @@ public class RegistrationServiceTests
             .Setup(client => client.GetNationNameById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationName);
 
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object);
+        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         await _service.GetSiteAddressByRegistrationId(registrationId);

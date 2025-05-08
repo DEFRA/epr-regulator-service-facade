@@ -84,4 +84,11 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format($"{_config.Endpoints.AuthorisedMaterialByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
     }
+
+    public async Task<RegistrationFeeContextDto> GetRegistrationFeeByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.RegistrationFeeDetails);
+        var url = string.Format($"{_config.Endpoints.RegistrationFeeByRegistrationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationFeeContextDto>(url);
+    }
 }

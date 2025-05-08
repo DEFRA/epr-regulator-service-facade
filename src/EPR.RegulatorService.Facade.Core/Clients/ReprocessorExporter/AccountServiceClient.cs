@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
+
 public class AccountServiceClient(
 HttpClient httpClient,
 IOptions<AccountsServiceApiConfig> options,
@@ -36,6 +37,18 @@ ILogger<AccountServiceClient> logger)
         }
 
         var url = string.Format($"{_config.Endpoints.GetNationNameById}", id);
+        return await GetAsync<string>(url);
+    }
+    public async Task<string> GetOrganisationNameById(int id)
+    {
+        logger.LogInformation(LogMessages.SiteAddressDetails);
+
+        if (!IsNationServiceReady)//will be deleted when ready
+        {
+            return "Green Ltd";
+        }
+
+        var url = string.Format($"{_config.Endpoints.GetOrganisationNameById}", id);
         return await GetAsync<string>(url);
     }
 }

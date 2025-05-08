@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 
-public class RegistrationService(IRegistrationServiceClient registrationServiceClient, IAccountServiceClient accountServiceClient) : IRegistrationService
+public class RegistrationService(IRegistrationServiceClient registrationServiceClient, IAccountServiceClient accountServiceClient, IPaymentServiceClient paymentServiceClient) : IRegistrationService
 {
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request)
     {
@@ -71,5 +71,31 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
     {
         return await registrationServiceClient.GetAuthorisedMaterialByRegistrationId(id);
+    }
+
+    public async Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
+    {
+        var registrationFee = await registrationServiceClient.GetRegistrationFeeByRegistrationMaterialId(id);
+        var organisationName = await accountServiceClient.GetOrganisationNameById(id);
+        var nationName = await accountServiceClient.GetNationNameById(registrationFee.NationId);
+        var registrationPaymentFeeRequest = new RegistrationPaymentFeeRequestDto
+        {
+            Material = registrationFee.MaterialName,
+            Regulator = nationName,
+            SubmittedDate = registrationFee.CreatedDate,
+            RequestorType = registrationFee.ApplicationType.ToString(),
+            Reference = registrationFee.Reference
+        };
+        var paymentFee = await paymentServiceClient.GetRegistrationPaymentFee(registrationPaymentFeeRequest);
+        return new PaymentFeeDetailsDto
+        {
+            OrganisationName = organisationName,
+            SiteAddress = registrationFee.SiteAddress,
+            ReferenceNumber = registrationFee.Reference,
+            MaterialName = registrationFee.MaterialName,
+            ApplicationType = registrationFee.ApplicationType,
+            SubmittedDate = registrationFee.CreatedDate,
+            FeeAmount = paymentFee
+        };
     }
 }
