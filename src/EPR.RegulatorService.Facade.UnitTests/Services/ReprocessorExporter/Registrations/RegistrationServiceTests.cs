@@ -24,6 +24,7 @@ public class RegistrationServiceTests
     {
         _mockRegistrationServiceClient = new Mock<IRegistrationServiceClient>();
         _mockAccountsServiceClient = new Mock<IAccountServiceClient>();
+        _mockPaymentServiceClient = new Mock<IPaymentServiceClient>();
         _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
         _fixture = new Fixture();
     }
@@ -238,4 +239,101 @@ public class RegistrationServiceTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
+
+    [TestMethod]
+    public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldReturnMappedDto()
+    {
+        // Arrange
+        var id = 1;
+        var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
+        var organisationName = "Test Org";
+        var nationName = "Scotland";
+        var paymentFee = 150.75m;
+
+        _mockRegistrationServiceClient
+            .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
+            .ReturnsAsync(registrationFeeRequestInfo);
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationNameById(id))
+            .ReturnsAsync(organisationName);
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetNationNameById(registrationFeeRequestInfo.NationId))
+            .ReturnsAsync(nationName);
+
+        _mockPaymentServiceClient
+            .Setup(client => client.GetRegistrationPaymentFee(
+                registrationFeeRequestInfo.MaterialName,
+                nationName,
+                registrationFeeRequestInfo.CreatedDate,
+                registrationFeeRequestInfo.ApplicationType.ToString(),
+                registrationFeeRequestInfo.Reference))
+            .ReturnsAsync(paymentFee);
+
+        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+
+        // Act
+        var result = await _service.GetPaymentFeeDetailsByRegistrationMaterialId(id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.RegistrationMaterialId.Should().Be(id);
+        result.OrganisationName.Should().Be(organisationName);
+        result.SiteAddress.Should().BeEquivalentTo(registrationFeeRequestInfo.SiteAddress);
+        result.ReferenceNumber.Should().Be(registrationFeeRequestInfo.Reference);
+        result.MaterialName.Should().Be(registrationFeeRequestInfo.MaterialName);
+        result.ApplicationType.Should().Be(registrationFeeRequestInfo.ApplicationType);
+        result.SubmittedDate.Should().Be(registrationFeeRequestInfo.CreatedDate);
+        result.FeeAmount.Should().Be(paymentFee);
+    }
+
+    [TestMethod]
+    public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldCallClientsExactlyOnce()
+    {
+        // Arrange
+        var id = 2;
+        var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
+        var organisationName = "Org Name";
+        var nationName = "Northern Ireland";
+        var paymentFee = 200.00m;
+
+        _mockRegistrationServiceClient
+            .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
+            .ReturnsAsync(registrationFeeRequestInfo);
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationNameById(id))
+            .ReturnsAsync(organisationName);
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetNationNameById(registrationFeeRequestInfo.NationId))
+            .ReturnsAsync(nationName);
+
+        _mockPaymentServiceClient
+            .Setup(client => client.GetRegistrationPaymentFee(
+                registrationFeeRequestInfo.MaterialName,
+                nationName,
+                registrationFeeRequestInfo.CreatedDate,
+                registrationFeeRequestInfo.ApplicationType.ToString(),
+                registrationFeeRequestInfo.Reference))
+            .ReturnsAsync(paymentFee);
+
+        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+
+        // Act
+        await _service.GetPaymentFeeDetailsByRegistrationMaterialId(id);
+
+        // Assert
+        _mockRegistrationServiceClient.Verify(c => c.GetRegistrationFeeRequestByRegistrationMaterialId(id), Times.Once);
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationNameById(id), Times.Once);
+        _mockAccountsServiceClient.Verify(c => c.GetNationNameById(registrationFeeRequestInfo.NationId), Times.Once);
+        _mockPaymentServiceClient.Verify(c => c.GetRegistrationPaymentFee(
+            registrationFeeRequestInfo.MaterialName,
+            nationName,
+            registrationFeeRequestInfo.CreatedDate,
+            registrationFeeRequestInfo.ApplicationType.ToString(),
+            registrationFeeRequestInfo.Reference), Times.Once);
+    }
+
 }

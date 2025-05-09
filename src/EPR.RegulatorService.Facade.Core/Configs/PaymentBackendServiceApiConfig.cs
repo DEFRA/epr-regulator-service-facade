@@ -10,6 +10,7 @@ public class PaymentBackendServiceApiConfig
     public string BaseUrl { get; set; } = null!;
     public int Timeout { get; set; }
     public string ClientId { get; set; } = string.Empty;
+    public int ApiVersion { get; set; }
     public int ServiceRetryCount { get; set; }
     public PaymentServiceApiConfigEndpoints Endpoints { get; set; } = null!;
 }

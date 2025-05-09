@@ -19,36 +19,29 @@ ILogger<AccountServiceClient> logger)
 : BaseHttpClient(httpClient), IAccountServiceClient
 {
     private readonly AccountsServiceApiConfig _config = options.Value;
-    private bool IsNationServiceReady => false;//will be deleted when ready
     public async Task<string> GetNationNameById(int id)
     {
-        logger.LogInformation(LogMessages.SiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
 
-        if (!IsNationServiceReady)//will be deleted when ready
+        return id switch
         {
-            return id switch
-            {
-                1 => "England",
-                2 => "Northern Ireland",
-                3 => "Scotland",
-                4 => "Wales",
-                _ => "Unknown Nation"
-            };
-        }
+            1 => "England",
+            2 => "Northern Ireland",
+            3 => "Scotland",
+            4 => "Wales",
+            _ => "Unknown Nation"
+        };
 
-        var url = string.Format($"{_config.Endpoints.GetNationNameById}", id);
-        return await GetAsync<string>(url);
+        //var url = string.Format($"{_config.Endpoints.GetNationNameById}", id);
+        //return await GetAsync<string>(url);
     }
     public async Task<string> GetOrganisationNameById(int id)
     {
-        logger.LogInformation(LogMessages.SiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingOrganisationName);
 
-        if (!IsNationServiceReady)//will be deleted when ready
-        {
-            return "Green Ltd";
-        }
+        return "Green Ltd";
 
-        var url = string.Format($"{_config.Endpoints.GetOrganisationNameById}", id);
-        return await GetAsync<string>(url);
+        //var url = string.Format($"{_config.Endpoints.GetOrganisationNameById}", id);
+        //return await GetAsync<string>(url);
     }
 }

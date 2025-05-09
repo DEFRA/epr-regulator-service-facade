@@ -53,4 +53,18 @@ public class AccountServiceClientTests
         // Assert
         result.Should().Be(expected);
     }
+
+    [TestMethod]
+    public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
+    {
+        // Arrange
+        var id = 1;
+        var expectedName = "Green Ltd";
+
+        // Act
+        var result = await _client.GetOrganisationNameById(id);
+
+        // Assert
+        result.Should().Be(expectedName);
+    }
 }

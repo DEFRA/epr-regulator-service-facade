@@ -73,21 +73,21 @@ ILogger<RegistrationServiceClient> logger)
 
     public async Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.SiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var url = string.Format($"{_config.Endpoints.SiteAddressByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<RegistrationSiteAddressDto>(url);
     }
 
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.AuthorisedMaterial);
+        logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
         var url = string.Format($"{_config.Endpoints.AuthorisedMaterialByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
     }
 
-    public async Task<RegistrationFeeContextDto> GetRegistrationFeeByRegistrationMaterialId(int id)
+    public async Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(int id)
     {
-        logger.LogInformation(LogMessages.RegistrationFeeDetails);
+        logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
         var url = string.Format($"{_config.Endpoints.RegistrationFeeByRegistrationMaterialId}", _config.ApiVersion, id);
         return await GetAsync<RegistrationFeeContextDto>(url);
     }

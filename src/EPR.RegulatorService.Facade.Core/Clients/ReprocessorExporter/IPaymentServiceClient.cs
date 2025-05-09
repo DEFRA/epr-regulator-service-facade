@@ -1,7 +1,6 @@
-﻿using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+﻿namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 
-namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 public interface IPaymentServiceClient
 {
-    Task<decimal> GetRegistrationPaymentFee(RegistrationPaymentFeeRequestDto request);
+    Task<decimal> GetRegistrationPaymentFee(string materialName, string nationName, DateTime submittedDate, string requestorType, string reference);
 }

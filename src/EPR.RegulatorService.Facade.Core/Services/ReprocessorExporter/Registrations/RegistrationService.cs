@@ -75,26 +75,23 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
 
     public async Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
     {
-        var registrationFee = await registrationServiceClient.GetRegistrationFeeByRegistrationMaterialId(id);
+        var registrationFeeRequestInfos = await registrationServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
         var organisationName = await accountServiceClient.GetOrganisationNameById(id);
-        var nationName = await accountServiceClient.GetNationNameById(registrationFee.NationId);
-        var registrationPaymentFeeRequest = new RegistrationPaymentFeeRequestDto
-        {
-            Material = registrationFee.MaterialName,
-            Regulator = nationName,
-            SubmittedDate = registrationFee.CreatedDate,
-            RequestorType = registrationFee.ApplicationType.ToString(),
-            Reference = registrationFee.Reference
-        };
-        var paymentFee = await paymentServiceClient.GetRegistrationPaymentFee(registrationPaymentFeeRequest);
+        var nationName = await accountServiceClient.GetNationNameById(registrationFeeRequestInfos.NationId);
+        var paymentFee = await paymentServiceClient.GetRegistrationPaymentFee(registrationFeeRequestInfos.MaterialName, 
+                                                                              nationName,
+                                                                              registrationFeeRequestInfos.CreatedDate,
+                                                                              registrationFeeRequestInfos.ApplicationType.ToString(),
+                                                                              registrationFeeRequestInfos.Reference);
         return new PaymentFeeDetailsDto
         {
+            RegistrationMaterialId = id,
             OrganisationName = organisationName,
-            SiteAddress = registrationFee.SiteAddress,
-            ReferenceNumber = registrationFee.Reference,
-            MaterialName = registrationFee.MaterialName,
-            ApplicationType = registrationFee.ApplicationType,
-            SubmittedDate = registrationFee.CreatedDate,
+            SiteAddress = registrationFeeRequestInfos.SiteAddress,
+            ReferenceNumber = registrationFeeRequestInfos.Reference,
+            MaterialName = registrationFeeRequestInfos.MaterialName,
+            ApplicationType = registrationFeeRequestInfos.ApplicationType,
+            SubmittedDate = registrationFeeRequestInfos.CreatedDate,
             FeeAmount = paymentFee
         };
     }

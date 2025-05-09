@@ -178,7 +178,7 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetSiteAddressByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.SiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var result = await registrationService.GetSiteAddressByRegistrationId(id);
         return Ok(result);
     }
@@ -194,7 +194,7 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.AuthorisedMaterial);
+        logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
         var result = await registrationService.GetAuthorisedMaterialByRegistrationId(id);
         return Ok(result);
     }

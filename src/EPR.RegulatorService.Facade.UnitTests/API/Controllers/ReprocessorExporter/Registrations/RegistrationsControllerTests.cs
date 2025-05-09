@@ -461,4 +461,41 @@ public class RegistrationsControllerTests
         ).Should().ThrowAsync<Exception>()
          .WithMessage("Service error");
     }
+
+    [TestMethod]
+    public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldReturnOk_WithExpectedResult()
+    {
+        // Arrange
+        var registrationMaterialId = 2;
+        var expectedDto = _fixture.Create<PaymentFeeDetailsDto>();
+
+        _mockRegistrationService
+            .Setup(service => service.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldThrowException_WhenServiceFails()
+    {
+        // Arrange
+        var registrationMaterialId = 2;
+        _mockRegistrationService
+            .Setup(service => service.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId)
+        ).Should().ThrowAsync<Exception>()
+         .WithMessage("Service error");
+    }
 }
