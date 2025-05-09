@@ -123,8 +123,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             OrganisationRegistrationSubmissionSummaryResponse item,
             string decision)
         {
-            item.ResubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(decision);
-            item.ResubmissionStatus = item.ResubmissionStatus switch
+            var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(decision);
+            item.ResubmissionStatus = resubmissionStatus switch
             {
                 RegistrationSubmissionStatus.Granted => RegistrationSubmissionStatus.Accepted,
                 RegistrationSubmissionStatus.Refused => RegistrationSubmissionStatus.Rejected,
@@ -156,14 +156,18 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 {
                     //To avoid checking magic strings, assign the decision first & check on the enum
                     //and then re-assign as resubmission uses different status
-                    item.ResubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    if (item.ResubmissionStatus == RegistrationSubmissionStatus.Granted)
+                    var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
                     {
                         item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
                     }
-                    else if (item.ResubmissionStatus == RegistrationSubmissionStatus.Refused)
+                    else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
                     {
                         item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
+                    }
+                    else
+                    {
+                        item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
                     }
 
                     item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
