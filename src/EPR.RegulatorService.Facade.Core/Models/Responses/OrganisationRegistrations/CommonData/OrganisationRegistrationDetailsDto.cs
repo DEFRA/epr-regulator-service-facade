@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 
@@ -84,13 +85,17 @@ public class OrganisationRegistrationDetailsDto
     {
         static DateTime? convertDateTime(string dateTimeString)
         {
-            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime tempDate)
-                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, out tempDate))
+
+            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime tempDate)
+                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out tempDate))
             {
                 return null;
             }
 
-            return tempDate;
+            TimeZoneInfo gmtZone = TimeZoneInfo.FindSystemTimeZoneById(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Etc/GMT");
+            DateTime test = DateTime.SpecifyKind(tempDate, DateTimeKind.Utc);
+
+            return TimeZoneInfo.ConvertTimeFromUtc(test, gmtZone);
         }
 
         if (dto is null) return null;
