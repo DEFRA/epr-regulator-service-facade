@@ -279,13 +279,11 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
-
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
             OrganisationType = RegistrationSubmissionOrganisationType.small
-
         };
 
         _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
@@ -318,7 +316,11 @@ public class OrganisationRegistrationSubmissionServiceTests
             RegistrationReferenceNumber = "REGREF456",
             OrganisationType = RegistrationSubmissionOrganisationType.small,
             IsResubmission = true,
-            SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails(),
+            SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails
+            {
+                RegistrationDate = DateTime.UtcNow,
+                ResubmissionDate = DateTime.UtcNow
+            },
             ResubmissionStatus = RegistrationSubmissionStatus.Granted
         };
         _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
