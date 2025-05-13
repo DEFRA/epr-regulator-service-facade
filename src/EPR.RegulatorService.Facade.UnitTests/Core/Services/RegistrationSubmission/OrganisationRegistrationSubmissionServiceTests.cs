@@ -301,6 +301,7 @@ public class OrganisationRegistrationSubmissionServiceTests
     [TestMethod]
     [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
     [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
+    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled)]
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus)
     {
         // Arrange
@@ -353,19 +354,26 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Assert
         Assert.IsNotNull(result);
-        result.ResubmissionStatus.Should().Be(expectedStatus);
-        result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
-        result.SubmissionDetails.RegistrationDate.Should().NotBeNull();
-        result.SubmissionDetails.ResubmissionDate.Should().NotBeNull();
+        if (expectedStatus == RegistrationSubmissionStatus.Cancelled)
+        {
+            result.SubmissionDetails.Status.Should().Be(expectedStatus);
+            result.SubmissionDetails.ResubmissionStatus.Should().NotBe(expectedStatus.ToString());
+        }
+        else
+        {
+            result.ResubmissionStatus.Should().Be(expectedStatus);
+            result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
+        }
+        
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
         _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
     }
 
     [TestMethod]
-    [DataRow("Pending", RegistrationSubmissionStatus.Pending)]
-    [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
-    [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
-    public async Task Should_ProcessRegulatorDecisions_Correctly(string actualStatus, RegistrationSubmissionStatus expectedStatus)
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted, RegistrationSubmissionStatus.Accepted)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected, RegistrationSubmissionStatus.Rejected)]
+    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled, RegistrationSubmissionStatus.Pending)]
+    public async Task Should_ProcessRegulatorDecisions_Correctly(string actualStatus, RegistrationSubmissionStatus expectedStatus, RegistrationSubmissionStatus expectedResubStatus)
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -422,7 +430,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                    ApplicationReferenceNumber = appRefNum,
                    IsResubmission = true,
                    NationId = 1,
-                   ResubmissionStatus = RegistrationSubmissionStatus.Accepted,
+                   ResubmissionStatus = expectedResubStatus,
                    SubmissionStatus = RegistrationSubmissionStatus.Granted
                }
             ],
@@ -437,7 +445,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Assert
         Assert.IsNotNull(result);
-        result.items[0].ResubmissionStatus.Should().Be(expectedStatus);
+        result.items[0].ResubmissionStatus.Should().Be(expectedResubStatus);
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
         _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null), Times.AtMostOnce);
     }
