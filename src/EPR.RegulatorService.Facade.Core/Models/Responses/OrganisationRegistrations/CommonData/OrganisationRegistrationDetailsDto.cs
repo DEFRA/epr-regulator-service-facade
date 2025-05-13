@@ -92,10 +92,10 @@ public class OrganisationRegistrationDetailsDto
                 return null;
             }
 
-            TimeZoneInfo gmtZone = TimeZoneInfo.FindSystemTimeZoneById(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Etc/GMT");
-            DateTime test = DateTime.SpecifyKind(tempDate, DateTimeKind.Utc);
+            //TimeZoneInfo gmtZone = TimeZoneInfo.FindSystemTimeZoneById(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Etc/GMT");
+            DateTime utcDateTime = DateTime.SpecifyKind(tempDate, DateTimeKind.Utc);
 
-            return TimeZoneInfo.ConvertTimeFromUtc(test, gmtZone);
+            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Europe/London"));
         }
 
         if (dto is null) return null;
