@@ -1,6 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentAssertions;
@@ -33,7 +32,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
         public async Task SendFile_ShouldCallVirusScanFileWithCorrectParameters()
         {
             // Arrange
-            var submissionType = SubmissionType.Producer;
+            var storageContainerName = "pom_Test";            
             var fileId = Guid.NewGuid();
             var fileName = "testfile.txt";
             var fileStream = new MemoryStream();
@@ -45,7 +44,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
                 Key = fileId,
                 Extension = ".txt",
                 FileName = "testfile",
-                Collection = "pom_Test",
+                Collection = storageContainerName,
                 UserId = userId,
                 UserEmail = email,
                 PersistFile = true,
@@ -65,7 +64,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
             ), fileName, fileStream)).ReturnsAsync(response);
 
             // Act
-            var result = await _antivirusService.SendFile(submissionType, fileId, fileName, fileStream, userId, email);
+            var result = await _antivirusService.SendFile(storageContainerName, fileId, fileName, fileStream, userId, email);
 
             // Assert
             result.Should().Be(response);
@@ -76,7 +75,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
         public async Task SendFile_ShouldThrowException_WhenVirusScanFileFails()
         {
             // Arrange
-            var submissionType = SubmissionType.Producer; // Replace with a valid enum value
+            var storageContainerName = "Producer"; // Replace with a valid enum value
             var fileId = Guid.NewGuid();
             var fileName = "testfile.txt";
             var fileStream = new MemoryStream();
@@ -87,7 +86,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
                 .ThrowsAsync(new HttpRequestException("Virus scan failed"));
 
             // Act
-            Func<Task> act = async () => await _antivirusService.SendFile(submissionType, fileId, fileName, fileStream, userId, email);
+            Func<Task> act = async () => await _antivirusService.SendFile(storageContainerName, fileId, fileName, fileStream, userId, email);
 
             // Assert
             await act.Should().ThrowAsync<HttpRequestException>().WithMessage("Virus scan failed");

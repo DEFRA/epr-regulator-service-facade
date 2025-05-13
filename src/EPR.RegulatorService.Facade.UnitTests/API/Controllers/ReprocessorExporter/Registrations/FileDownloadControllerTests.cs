@@ -1,42 +1,36 @@
-﻿using System.Net;
-using System.Security.Claims;
-using EPR.RegulatorService.Facade.API.Controllers;
+﻿using System.Security.Claims;
+using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Exceptions;
-using EPR.RegulatorService.Facade.Core.Models.Requests;
-using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
-using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
+namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations
 {
     [TestClass]
     public class FileDownloadControllerTests : Controller
-    {
-        private const string SubmissionsServiceError = "There was an error communicating with the submissions API.";
+    {        
         private const string BlobStorageServiceError = "Error occurred during download from blob storage";
         private const string FileInfectedError = "The file was found but it was flagged as infected. It will not be downloaded.";
-        private readonly Mock<IBlobStorageService> _mockBlobStorageService = new();        
-        private readonly Mock<IAntivirusService> _mockAntiVirusService = new();
-        private readonly Mock<ISubmissionService> _mockSubmissionService = new();
+        private readonly Mock<IBlobStorageService> _mockBlobStorageService = new();
+        private readonly Mock<IAntivirusService> _mockAntiVirusService = new();        
         private readonly Mock<IOptions<BlobStorageConfig>> _mockBlobStorageConfig = new();
         private readonly Mock<IOptions<AntivirusApiConfig>> _mockAntivirusApiConfig = new();
+        private Mock<ILogger<FileDownloadController>> _mockLogger = null!;
         private readonly string _blobName = Guid.NewGuid().ToString();
-        private FileDownloadRequest _fileDownloadRequest;
+        private FileDownloadRequestDto _fileDownloadRequest;
         private FileDownloadController _sut;
         private HttpResponseMessage _cleanAntiVirusResponse;
         private HttpResponseMessage _maliciousAntiVirusResponse;
-        private HttpResponseMessage _failedSubmissionResponse;
-        private HttpResponseMessage _passedSubmissionResponse;
         private const string RegistrationContainerName = "test-container";
-        private readonly BlobStorageConfig _blobStorageConfig = new()
+        private readonly BlobStorageConfig _blobStorageConfig = new()        
         {
             PomContainerName = "pom-test-container",
             RegistrationContainerName = RegistrationContainerName
@@ -46,7 +40,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
             CollectionSuffix = "test-suffix",
             PersistFile = true
         };
-        
+
 
         [TestInitialize]
         public void Setup()
@@ -57,23 +51,17 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
             }, "Test"));
             _mockBlobStorageConfig.Setup(x => x.Value).Returns(_blobStorageConfig);
             _mockAntivirusApiConfig.Setup(x => x.Value).Returns(_antivirusApiConfig);
-
-            _sut = new FileDownloadController(_mockBlobStorageService.Object,
-                _mockSubmissionService.Object,
-                _mockAntiVirusService.Object,
-                _mockBlobStorageConfig.Object,
-                _mockAntivirusApiConfig.Object);
+            _mockLogger = new Mock<ILogger<FileDownloadController>>();
+            _sut = new FileDownloadController(_mockBlobStorageService.Object, _mockAntiVirusService.Object, _mockLogger.Object);
             _sut.ControllerContext = new ControllerContext();
             _sut.ControllerContext.HttpContext = new DefaultHttpContext() { User = user };
-            
 
-            _fileDownloadRequest = new FileDownloadRequest()
+
+            _fileDownloadRequest = new FileDownloadRequestDto()
             {
-                SubmissionType = SubmissionType.Registration,
                 BlobName = _blobName,
                 FileName = "TestFile.csv",
-                FileId = Guid.NewGuid(),
-                SubmissionId = Guid.NewGuid()
+                FileId = Guid.NewGuid()
             };
 
             _cleanAntiVirusResponse = new HttpResponseMessage()
@@ -85,16 +73,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
             {
                 Content = new StringContent("Content-Scan: Malicious")
             };
-
-            _failedSubmissionResponse = new HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.Forbidden
-            };
-
-            _passedSubmissionResponse = new HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.OK
-            };
         }
 
         [TestMethod]
@@ -102,7 +80,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         {
             // Arrange
             _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, _blobName))
+                .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), _blobName))
                 .Throws(new BlobStorageServiceException(BlobStorageServiceError));
 
             // Act and Assert
@@ -138,35 +116,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         }
 
         [TestMethod]
-        public async Task Should_return_BadRequestObjectResult_when_SubmissionsServiceFails()
-        {
-            // Arrange
-            _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, _blobName))
-                .ReturnsAsync(new MemoryStream());
-
-            _mockAntiVirusService.Setup(x => x.SendFile(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()))
-                .ReturnsAsync(_cleanAntiVirusResponse);
-
-            _mockSubmissionService.Setup(x =>
-                x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<FileDownloadCheckEvent>(), It.IsAny<Guid>()))
-                .ReturnsAsync(_failedSubmissionResponse);
-
-            // Act
-            var result = await _sut.DownloadFile(_fileDownloadRequest) as BadRequestObjectResult;
-
-            // Assert
-            result.Should().BeOfType<BadRequestObjectResult>();
-            result.Value.Should().Be(SubmissionsServiceError);
-        }
-
-        [TestMethod]
         public async Task Should_return_ForbiddenObjectResult_when_AntiVirusServiceReturnsMalicious()
         {
             // Arrange
@@ -183,10 +132,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                     It.IsAny<string>()))
                 .ReturnsAsync(_maliciousAntiVirusResponse);
 
-            _mockSubmissionService.Setup(x =>
-                    x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<FileDownloadCheckEvent>(), It.IsAny<Guid>()))
-                .ReturnsAsync(_passedSubmissionResponse);
-
             // Act
             var result = await _sut.DownloadFile(_fileDownloadRequest);
 
@@ -201,7 +146,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         {
             // Arrange
             _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, _blobName))
+                .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), _blobName))
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
@@ -212,10 +157,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                     It.IsAny<Guid>(),
                     It.IsAny<string>()))
                 .ReturnsAsync(_cleanAntiVirusResponse);
-
-            _mockSubmissionService.Setup(x =>
-                    x.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<FileDownloadCheckEvent>(), It.IsAny<Guid>()))
-                .ReturnsAsync(_passedSubmissionResponse);
 
             // Act
             var result = await _sut.DownloadFile(_fileDownloadRequest) as FileContentResult;

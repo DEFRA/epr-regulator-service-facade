@@ -14,4 +14,5 @@ public static class LogMessages
     public const string SamplingPlanRegistrationMaterial = "Fetching sampling plan details for registration material ID: {id}.";
     public const string SiteAddressDetails = "Attempting to get site address details.";
     public const string AuthorisedMaterial = "Attempting to get authorised materials details.";
+    public const string RegulatorRegistrationDownloadFile = "Attempting to download a file for registrations.";
 }
