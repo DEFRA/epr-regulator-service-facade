@@ -30,6 +30,17 @@ public class OrganisationRegistrationSubmissionsController(
             {
                 return ValidationProblem();
             }
+            else if (request.IsResubmission 
+                    && (string.IsNullOrWhiteSpace(request.ExistingRegRefNumber)
+                    || string.IsNullOrWhiteSpace(request.FileId)))
+            {
+                if (string.IsNullOrWhiteSpace(request.ExistingRegRefNumber))
+                    ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "ExistingRegRefNumber is required for resubmission");
+                if(string.IsNullOrWhiteSpace(request.FileId))
+                    ModelState.AddModelError(nameof(request.ExistingRegRefNumber), "FileId is required for resubmission");
+
+                return ValidationProblem(ModelState);
+            }
 
             var serviceResult =
                 await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
@@ -200,8 +211,15 @@ public class OrganisationRegistrationSubmissionsController(
             switch (request.Status)
             {
                 case Core.Enums.RegistrationSubmissionStatus.Refused:
-                case Core.Enums.RegistrationSubmissionStatus.Granted:
-                    messagingService.OrganisationRegistrationSubmissionDecision(model); //Send same email
+                case Core.Enums.RegistrationSubmissionStatus.Granted: // Same email for both accept and reject
+                    if (request.IsResubmission)
+                    {
+                        messagingService.OrganisationRegistrationResubmissionDecision(model);
+                    }
+                    else
+                    {
+                        messagingService.OrganisationRegistrationSubmissionDecision(model);
+                    }
                     break;
                 case Core.Enums.RegistrationSubmissionStatus.Queried:
                     messagingService.OrganisationRegistrationSubmissionQueried(model);

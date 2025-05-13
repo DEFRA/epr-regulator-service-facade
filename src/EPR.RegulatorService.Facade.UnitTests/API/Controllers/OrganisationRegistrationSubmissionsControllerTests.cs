@@ -128,7 +128,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    public async Task CreateRegulatorSubmissionDecisionEvent_Should_Fetach_UserId_from_HttpContext_When_Input_Reuqest_UserId_Is_Null()
+    public async Task CreateRegulatorSubmissionDecisionEvent_Should_Fetch_UserId_from_HttpContext_When_Input_Request_UserId_Is_Null()
     {
         // Arrange
         var request = new RegulatorDecisionCreateRequest
@@ -343,7 +343,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsResponse).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsFacadeResponse).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
@@ -361,7 +361,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
-            .ReturnsAsync(new RegistrationSubmissionOrganisationDetailsResponse()).Verifiable();
+            .ReturnsAsync(new RegistrationSubmissionOrganisationDetailsFacadeResponse()).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
@@ -373,8 +373,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
 
-
-
     [TestMethod()]
     public async Task GetRegistrationSubmissionListTest_Should_Return_Problem_WhenModelIsInvalid()
     {
@@ -382,7 +380,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _sut.ModelState.AddModelError("PageNumber", "PageNumber is required");
 
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
                     .ReturnsAsync(new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>());
 
         // Act
@@ -404,7 +402,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         // Arrange
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
                     .Throws(new InvalidDataException("Invalid"));
 
         // Act
@@ -421,7 +419,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         var expectedResult = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>();
         var filter = new GetOrganisationRegistrationSubmissionsFilter();
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>()))
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>()))
                     .ReturnsAsync(expectedResult);
 
         // Act
@@ -443,7 +441,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         SetupMockWithMockService();
 
-        _registrationSubmissionServiceMock.Setup(x => x.HandleGetRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>(), It.IsAny<Guid>())).ThrowsAsync(expectedException);
+        _registrationSubmissionServiceMock.Setup(x => x.HandleGetRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>(), It.IsAny<Guid>())).ThrowsAsync(expectedException);
 
         var result = await _sut.GetRegistrationSubmissionList(parameter);
 
@@ -496,6 +494,28 @@ public class OrganisationRegistrationSubmissionsControllerTests
         Assert.IsNotNull(result);
         result.Value.Should().BeOfType<ProblemDetails>();
         result.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
+    }
+
+    [TestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow(" ")]
+    public async Task Should_Return_Problem_When_RegRefNumber_Is_Invalid_For_Resubmission(string existingRegRefNum)
+    {
+        // Arrange
+        var request = _fixture.Create<RegulatorDecisionCreateRequest>();
+        request.IsResubmission = true;
+        request.ExistingRegRefNumber = existingRegRefNum;
+        _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceMock.Object, _ctlLoggerMock.Object, _messageServiceMock.Object);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        Assert.IsNotNull(result);
+        var problemDetails = result.Value as ValidationProblemDetails;
+        problemDetails.Should().NotBeNull();
+        problemDetails.Errors.First().Value[0].Should().Be("ExistingRegRefNumber is required for resubmission");
     }
 
     [TestMethod]
@@ -663,7 +683,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new OrganisationRegistrationSubmissionSummaryResponse
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending
                     }
                 ]
@@ -685,7 +705,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.IsNull(item.RegulatorCommentDate, "No matching events means RegulatorCommentDate remains null.");
+        Assert.IsNull(item.RegulatorDecisionDate, "No matching events means RegulatorDecisionDate remains null.");
         Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus, "SubmissionStatus should remain unchanged.");
     }
 
@@ -701,7 +721,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new OrganisationRegistrationSubmissionSummaryResponse
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending,
                         RegistrationReferenceNumber = "OLD_REF"
                     }
@@ -725,7 +745,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(now, item.RegulatorCommentDate, "RegulatorCommentDate should update to event's Created.");
+        Assert.AreEqual(now, item.RegulatorDecisionDate, "RegulatorDecisionDate should update to event's Created.");
         Assert.AreEqual("NEW_REF", item.RegistrationReferenceNumber, "RegistrationReferenceNumber should update from event.");
         Assert.AreEqual(now.AddDays(-1), item.StatusPendingDate, "StatusPendingDate should match DecisionDate from event.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "SubmissionStatus should match event's Decision.");
@@ -746,7 +766,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new OrganisationRegistrationSubmissionSummaryResponse
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = existingDate,
+                        RegulatorDecisionDate = existingDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending,
                         RegistrationReferenceNumber = "OLD_REF"
                     }
@@ -782,7 +802,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var item = requestedList.items[0];
         // The older event should not have changed anything
         // The newer event should take precedence
-        Assert.AreEqual(newDate, item.RegulatorCommentDate, "Should update to the newer event's Created date.");
+        Assert.AreEqual(newDate, item.RegulatorDecisionDate, "Should update to the newer event's Created date.");
         Assert.AreEqual("NEW_REF", item.RegistrationReferenceNumber, "Should update to the newer event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Cancelled, item.SubmissionStatus, "Should update to the newer event's Decision.");
     }
@@ -799,7 +819,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new OrganisationRegistrationSubmissionSummaryResponse
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 ]
@@ -819,7 +839,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(commentDate, item.ProducerCommentDate, "ProducerCommentDate should match the event's Created date.");
+        Assert.AreEqual(commentDate, item.SubmissionDate, "SubmissionDate should match the event's Created date.");
         // RegulatorCommentDate is null, ProducerCommentDate > null condition is irrelevant, but code sets SubmissionStatus to Updated if ProducerCommentDate > RegulatorCommentDate
         // Since RegulatorCommentDate is null, we can consider ProducerCommentDate > null logically true for this code's logic.
         Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus, "SubmissionStatus should change to Updated due to producer comment.");
@@ -839,7 +859,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new OrganisationRegistrationSubmissionSummaryResponse
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
+                        RegulatorDecisionDate = regulatorDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 ]
@@ -859,8 +879,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.ProducerCommentDate, "ProducerCommentDate should match the event.");
-        // Since ProducerCommentDate > RegulatorCommentDate, SubmissionStatus should become Updated.
+        Assert.AreEqual(producerDate, item.SubmissionDate, "SubmissionDate should match the event.");
+        // Since SubmissionDate > RegulatorDecisionDate, SubmissionStatus should become Updated.
         Assert.AreEqual(RegistrationSubmissionStatus.Updated, item.SubmissionStatus, "Status should update to Updated.");
     }
 
@@ -878,7 +898,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new OrganisationRegistrationSubmissionSummaryResponse
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
+                        RegulatorDecisionDate = regulatorDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 ]
@@ -899,7 +919,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.ProducerCommentDate, "Should set ProducerCommentDate to the event's Created date.");
+        Assert.AreEqual(producerDate, item.SubmissionDate, "Should set SubmissionDate to the event's Created date.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "No status update as ProducerCommentDate < RegulatorCommentDate.");
     }
 
@@ -948,7 +968,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         // Assert
         var item = requestedList.items[0];
         // Should reflect the later event
-        Assert.AreEqual(later, item.RegulatorCommentDate, "Should use the later event's Created date.");
+        Assert.AreEqual(later, item.RegulatorDecisionDate, "Should use the later event's Created date.");
         Assert.AreEqual("REF2", item.RegistrationReferenceNumber, "Should use the later event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Refused, item.SubmissionStatus, "Should reflect the later event's Decision.");
     }
@@ -968,7 +988,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
                     new ()
                     {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
+                        RegulatorDecisionDate = regulatorDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Granted
                     }
                 ]
@@ -985,9 +1005,9 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         // Assert
         var item = requestedList.items[0];
-        // The code sets ProducerCommentDate to each cosmos date it finds in turn. The last one processed wins.
-        Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the last (newest) ProducerCommentDate.");
-        // Since ProducerCommentDate < RegulatorCommentDate, no status update.
+        // The code sets SubmissionDate to each cosmos date it finds in turn. The last one processed wins.
+        Assert.AreEqual(newerComment, item.SubmissionDate, "Should have the last (newest) SubmissionDate.");
+        // Since SubmissionDate < RegulatorDecisionDate, no status update.
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer ProducerCommentDate still older than RegulatorCommentDate.");
     }
 
@@ -1092,6 +1112,153 @@ public class OrganisationRegistrationSubmissionsControllerTests
             ), Times.AtMostOnce);
     }
 
+    #region SendEventEmail (Indirect testing)
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_ValidRequest_Granted_SendsEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Granted)
+            .With(r => r.IsResubmission, false) // Testing normal submission
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_ValidRequest_Rejected_SendsEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Refused)
+            .With(r => r.IsResubmission, false) // Testing normal submission
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Granted_SendsResubmissionEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Granted)
+            .With(r => r.IsResubmission, true)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationResubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Resubmission_Refused_SendsResubmissionEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Refused)
+            .With(r => r.IsResubmission, true)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationResubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Queried_SendsQueriedEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Queried)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+
+        _messageServiceMock.Verify(m =>
+            m.OrganisationRegistrationSubmissionQueried(It.IsAny<OrganisationRegistrationSubmissionEmailModel>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task CreateRegulatorSubmissionDecisionEvent_Cancelled_DoesNotSendEmail()
+    {
+        // Arrange
+        SetupMockWithMockService();
+
+        var request = _fixture.Build<RegulatorDecisionCreateRequest>()
+            .With(r => r.Status, RegistrationSubmissionStatus.Cancelled)
+            .Create();
+
+        _registrationSubmissionServiceMock
+            .Setup(s => s.HandleCreateRegulatorDecisionSubmissionEvent(It.IsAny<RegulatorDecisionCreateRequest>(), It.IsAny<Guid>()))
+            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.Created));
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request);
+
+        // Assert
+        result.Should().BeOfType<CreatedResult>();
+
+        _messageServiceMock.VerifyNoOtherCalls(); // Ensure no email is sent
+    }
+
+    #endregion
+
     // Include the actual MergeCosmosUpdates code here or reference it from the tested class
     // If in a different class, just ensure access is internal or public for testing.
     private static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> requestedList)
@@ -1107,9 +1274,9 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
             foreach (var cosmosItem in regulatorDecisions)
             {
-                if (item.RegulatorCommentDate is null || cosmosItem.Created > item.RegulatorCommentDate)
+                if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
                 {
-                    item.RegulatorCommentDate = cosmosItem.Created;
+                    item.RegulatorDecisionDate = cosmosItem.Created;
                     item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber ?? item.RegistrationReferenceNumber;
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
@@ -1118,8 +1285,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
             foreach (var cosmosDate in producerComments)
             {
-                item.ProducerCommentDate = cosmosDate;
-                if (item.RegulatorCommentDate is null || cosmosDate > item.RegulatorCommentDate)
+                item.SubmissionDate = cosmosDate;
+                if (item.RegulatorDecisionDate is null || cosmosDate > item.RegulatorDecisionDate)
                 {
                     item.SubmissionStatus = RegistrationSubmissionStatus.Updated;
                 }

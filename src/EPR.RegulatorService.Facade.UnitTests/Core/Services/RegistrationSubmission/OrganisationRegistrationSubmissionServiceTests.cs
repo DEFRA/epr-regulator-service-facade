@@ -13,6 +13,9 @@ using Moq;
 using Newtonsoft.Json;
 using static EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.OrganisationRegistrationSubmissionService;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
+using FluentAssertions;
+using System.Net;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -123,7 +126,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -197,7 +200,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             Statuses = "Test Status"
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -253,7 +256,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         };
 
         _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsCommonDataFilter>())).ReturnsAsync(organisationRegistrationSubmissionSummaryResponse);
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionList(It.IsAny<GetOrganisationRegistrationSubmissionsFilter>())).ReturnsAsync(organisationRegistrationSubmissionSummaryResponse);
         _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null))
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
@@ -274,7 +277,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -297,6 +300,153 @@ public class OrganisationRegistrationSubmissionServiceTests
         _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
     }
 
+    [TestMethod]
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
+    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled)]
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus)
+    {
+        // Arrange
+        var appRefNum = "APPREF123";
+        var submissionId = Guid.NewGuid();
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        {
+
+            OrganisationReference = "ORGREF1234567890",
+            OrganisationName = "Test Organisation",
+            ApplicationReferenceNumber = appRefNum,
+            RegistrationReferenceNumber = "REGREF456",
+            OrganisationType = RegistrationSubmissionOrganisationType.small,
+            IsResubmission = true,
+            SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails(),
+            ResubmissionStatus = RegistrationSubmissionStatus.Granted
+        };
+        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+            .ReturnsAsync(response).Verifiable();
+
+        var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
+        var submissionLastSyncTimeResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(submissionEventsLastSync))
+
+        };
+        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
+
+        var deltaRegistrationDecisions = Enumerable.Range(0, 1).Select(x => _fixture.Build<AbstractCosmosSubmissionEvent>()
+           .Create()).ToList();
+        deltaRegistrationDecisions[0].AppReferenceNumber = appRefNum;
+        deltaRegistrationDecisions[0].Type = "RegulatorRegistrationDecision";
+        deltaRegistrationDecisions[0].Decision = actualStatus;
+        var deltaRegistrationDecisionsResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(deltaRegistrationDecisions))
+
+        };
+        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .ReturnsAsync(deltaRegistrationDecisionsResponse);
+
+        //Act
+        var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+
+        //Assert
+        Assert.IsNotNull(result);
+        if (expectedStatus == RegistrationSubmissionStatus.Cancelled)
+        {
+            result.SubmissionDetails.Status.Should().Be(expectedStatus);
+            result.SubmissionDetails.ResubmissionStatus.Should().NotBe(expectedStatus.ToString());
+        }
+        else
+        {
+            result.ResubmissionStatus.Should().Be(expectedStatus);
+            result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
+        }
+        
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
+    }
+
+    [TestMethod]
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted, RegistrationSubmissionStatus.Accepted)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected, RegistrationSubmissionStatus.Rejected)]
+    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled, RegistrationSubmissionStatus.Pending)]
+    public async Task Should_ProcessRegulatorDecisions_Correctly(string actualStatus, RegistrationSubmissionStatus expectedStatus, RegistrationSubmissionStatus expectedResubStatus)
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var appRefNum = "APPREF123";
+
+        var filter = new GetOrganisationRegistrationSubmissionsFilter
+        {
+            ApplicationReferenceNumbers = null,
+            NationId = 1,
+            OrganisationName = null,
+            OrganisationReference = null,
+            OrganisationType = "",
+            PageNumber = 1,
+            PageSize = 20,
+            RelevantYears = "",
+            ResubmissionStatuses = actualStatus,
+            Statuses = null
+        };
+
+        var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
+        var submissionLastSyncTimeResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(submissionEventsLastSync))
+
+        };
+        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
+
+        var deltaRegistrationDecisions = Enumerable.Range(0, 1).Select(x => _fixture.Build<AbstractCosmosSubmissionEvent>()
+           .Create()).ToList();
+
+        deltaRegistrationDecisions[0].AppReferenceNumber = appRefNum;
+        deltaRegistrationDecisions[0].Type = "RegulatorRegistrationDecision";
+        deltaRegistrationDecisions[0].Decision = actualStatus;
+        deltaRegistrationDecisions[0].Created = DateTime.UtcNow;
+
+        var deltaRegistrationDecisionsResponse = new HttpResponseMessage
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(JsonConvert.SerializeObject(deltaRegistrationDecisions))
+
+        };
+        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null))
+            .ReturnsAsync(deltaRegistrationDecisionsResponse);
+
+
+        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
+        {
+            currentPage = 1,
+            items =
+            [
+               new OrganisationRegistrationSubmissionSummaryResponse
+               {
+                   ApplicationReferenceNumber = appRefNum,
+                   IsResubmission = true,
+                   NationId = 1,
+                   ResubmissionStatus = expectedResubStatus,
+                   SubmissionStatus = RegistrationSubmissionStatus.Granted
+               }
+            ],
+            pageSize = 20,
+            totalItems = 1
+        };
+
+        _commonDataServiceMock.Setup(m => m.GetOrganisationRegistrationSubmissionList(filter)).ReturnsAsync(requestedList);
+
+        //Act
+        var result = await _sut.HandleGetRegistrationSubmissionList(filter, userId);
+
+        //Assert
+        Assert.IsNotNull(result);
+        result.items[0].ResubmissionStatus.Should().Be(expectedResubStatus);
+        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionList(filter), Times.AtMostOnce);
+        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), null), Times.AtMostOnce);
+    }
 
     [TestMethod]
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_With_lastSyncTime_True()
@@ -305,7 +455,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -363,7 +513,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsResponse
+        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -423,27 +573,12 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
-    public async Task Should_return_valid_ReferenceNumber_with_null_year()
+    public async Task Should_throw_with_null_year()
     {
         //Arrange  
-        string year = (DateTime.Now.Year % 100).ToString("D2");
-        string orgId = "123456";
-        string appRefNumber = string.Empty;
-
-        // Act 
-        var result = _sut.GenerateReferenceNumber(
-            CountryName.Eng,
-            RegistrationSubmissionType.Producer,
-            appRefNumber,
-            orgId,
-            null);
-
-        // Assert  
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 15);
-        Assert.IsTrue(result.StartsWith('R'));
-        Assert.IsTrue(result.StartsWith($"R{year}"));
-        Assert.IsTrue(result.StartsWith($"R{year}EP"));
+        // Act
+        Assert.ThrowsException<ArgumentNullException>(() =>
+        _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, "123456"));
     }
 
     [TestMethod]
@@ -459,7 +594,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             RegistrationSubmissionType.Exporter,
             appRefNumber,
             orgId,
-            null,
+            year,
             MaterialType.Steel);
 
         // Assert  
@@ -485,7 +620,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             RegistrationSubmissionType.Reprocessor,
             appRefNumber,
             orgId,
-            null,
+            year,
             MaterialType.Plastic);
 
         // Assert  
@@ -514,7 +649,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending
                     }
                 }
@@ -536,7 +671,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.IsNull(item.RegulatorCommentDate, "No matching events means RegulatorCommentDate remains null.");
+        Assert.IsNull(item.RegulatorDecisionDate, "No matching events means RegulatorCommentDate remains null.");
         Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus, "SubmissionStatus should remain unchanged.");
     }
 
@@ -551,7 +686,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
+                        RegulatorDecisionDate = null,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending,
                         RegistrationReferenceNumber = "OLD_REF"
                     }
@@ -575,7 +710,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert
         var item = requestedList.items[0];
-        Assert.AreEqual(now, item.RegulatorCommentDate, "RegulatorCommentDate should update to event's Created.");
+        Assert.AreEqual(now, item.RegulatorDecisionDate, "RegulatorCommentDate should update to event's Created.");
         Assert.AreEqual("NEW_REF", item.RegistrationReferenceNumber, "RegistrationReferenceNumber should update from event.");
         Assert.AreEqual(now.AddDays(-1), item.StatusPendingDate, "StatusPendingDate should match DecisionDate from event.");
         Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "SubmissionStatus should match event's Decision.");
@@ -595,7 +730,7 @@ public class OrganisationRegistrationSubmissionServiceTests
                 {
                     new() {
                         ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = existingDate,
+                        RegulatorDecisionDate = existingDate,
                         SubmissionStatus = RegistrationSubmissionStatus.Pending,
                         RegistrationReferenceNumber = "OLD_REF"
                     }
@@ -631,122 +766,9 @@ public class OrganisationRegistrationSubmissionServiceTests
         var item = requestedList.items[0];
         // The older event should not have changed anything
         // The newer event should take precedence
-        Assert.AreEqual(newDate, item.RegulatorCommentDate, "Should update to the newer event's Created date.");
+        Assert.AreEqual(newDate, item.RegulatorDecisionDate, "Should update to the newer event's Created date.");
         Assert.AreEqual("NEW_REF", item.RegistrationReferenceNumber, "Should update to the newer event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Cancelled, item.SubmissionStatus, "Should update to the newer event's Decision.");
-    }
-
-    [TestMethod]
-    public void ProducerCommentsWithoutRegulatorCommentDate()
-    {
-        // Arrange
-        var commentDate = DateTime.UtcNow;
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = null,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Created = commentDate,
-                    Type = "RegistrationApplicationSubmitted"
-                }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.AreEqual(commentDate, item.ProducerCommentDate, "ProducerCommentDate should match the event's Created date.");
-        // RegulatorCommentDate is null, ProducerCommentDate > null condition is irrelevant, but code sets SubmissionStatus to Updated if ProducerCommentDate > RegulatorCommentDate
-        // Since RegulatorCommentDate is null, we can consider ProducerCommentDate > null logically true for this code's logic.
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "SubmissionStatus should change to Updated due to producer comment.");
-    }
-
-    [TestMethod]
-    public void ProducerCommentsWhenRegulatorCommentDateNotNullAndProducerLater()
-    {
-        // Arrange
-        var regulatorDate = DateTime.UtcNow.AddHours(-2);
-        var producerDate = DateTime.UtcNow;
-
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Created = producerDate,
-                    Type = "RegistrationApplicationSubmitted"
-                }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.ProducerCommentDate, "ProducerCommentDate should match the event.");
-        // Since ProducerCommentDate > RegulatorCommentDate, SubmissionStatus should become Updated.
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Status should update to Updated.");
-    }
-
-    [TestMethod]
-    public void ProducerCommentsWhenRegulatorCommentDateNewerThanProducer()
-    {
-        // Arrange
-        var regulatorDate = DateTime.UtcNow;
-        var producerDate = DateTime.UtcNow.AddHours(-1); // older comment
-
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
-        {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
-        };
-
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
-            {
-                // Producer comment is older than Regulator comment, no status update
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Created = producerDate,
-                    Type = "RegistrationApplicationSubmitted"
-                }
-            };
-
-        // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
-
-        // Assert
-        var item = requestedList.items[0];
-        Assert.AreEqual(producerDate, item.ProducerCommentDate, "Should set ProducerCommentDate to the event's Created date.");
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "No status update as ProducerCommentDate < RegulatorCommentDate.");
     }
 
     [TestMethod]
@@ -793,46 +815,82 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Assert
         var item = requestedList.items[0];
         // Should reflect the later event
-        Assert.AreEqual(later, item.RegulatorCommentDate, "Should use the later event's Created date.");
+        Assert.AreEqual(later, item.RegulatorDecisionDate, "Should use the later event's Created date.");
         Assert.AreEqual("REF2", item.RegistrationReferenceNumber, "Should use the later event's RegistrationReferenceNumber.");
         Assert.AreEqual(RegistrationSubmissionStatus.Refused, item.SubmissionStatus, "Should reflect the later event's Decision.");
     }
 
     [TestMethod]
-    public void MultipleProducerCommentsUseTheLatestOneForProducerCommentDateOnly()
+    public async Task ShouldCreateRegulatorDecisionSubmissionEvent()
     {
         // Arrange
-        var olderComment = DateTime.UtcNow.AddHours(-2);
-        var newerComment = DateTime.UtcNow.AddHours(-1);
-        var regulatorDate = DateTime.UtcNow;
-
-        var requestedList = new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
+        var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var request = new RegulatorDecisionCreateRequest
         {
-            items = new List<OrganisationRegistrationSubmissionSummaryResponse>
-                {
-                    new() {
-                        ApplicationReferenceNumber = "APP123",
-                        RegulatorCommentDate = regulatorDate,
-                        SubmissionStatus = RegistrationSubmissionStatus.Granted
-                    }
-                }
+            SubmissionId = submissionId,
+            Status = RegistrationSubmissionStatus.Granted,
+            ApplicationReferenceNumber = "PEPR12345678",
+            CountryName = CountryName.Eng,
+            RegistrationSubmissionType = RegistrationSubmissionType.Producer,
+            OrganisationAccountManagementId = "123456",
+            TwoDigitYear = "25"
         };
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
 
-        var deltaRegistrationDecisionsResponse = new List<AbstractCosmosSubmissionEvent>
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
+            .ReturnsAsync(handlerResponse)
+            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) =>
             {
-                new() { AppReferenceNumber = "APP123", Created = olderComment, Type = "RegistrationApplicationSubmitted" },
-                new() { AppReferenceNumber = "APP123", Created = newerComment, Type = "RegistrationApplicationSubmitted" }
-            };
+                reqEvent.RegistrationReferenceNumber.Should().StartWith("R25EP123456");
+            });
 
         // Act
-        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
+        var result = await _sut.HandleCreateRegulatorDecisionSubmissionEvent(request, userId);
 
         // Assert
-        var item = requestedList.items[0];
-        // The code sets ProducerCommentDate to each cosmos date it finds in turn. The last one processed wins.
-        Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the last (newest) ProducerCommentDate.");
-        // Since ProducerCommentDate < RegulatorCommentDate, no status update.
-        Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus, "Should remain Granted as newer ProducerCommentDate still older than RegulatorCommentDate.");
+        Assert.IsNotNull(result);
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
+    }
+
+    [TestMethod]
+    public async Task ShouldCreateRegulatorDecisionSubmissionEventForResubmission()
+    {
+        // Arrange
+        var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var request = new RegulatorDecisionCreateRequest
+        {
+            SubmissionId = submissionId,
+            Status = RegistrationSubmissionStatus.Granted,
+            IsResubmission = true,
+            ExistingRegRefNumber = "R25EP123456"
+        };
+        var handlerResponse =
+                _fixture
+                    .Build<HttpResponseMessage>()
+                    .With(x => x.StatusCode, HttpStatusCode.Created)
+                    .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+                    .Create();
+
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()))
+            .ReturnsAsync(handlerResponse)
+            .Callback<Guid, RegistrationSubmissionDecisionEvent, Guid>((subId, reqEvent, userId) =>
+            {
+                reqEvent.RegistrationReferenceNumber.Should().StartWith("R25EP123456");
+            });
+
+        // Act
+        var result = await _sut.HandleCreateRegulatorDecisionSubmissionEvent(request, userId);
+
+        // Assert
+        Assert.IsNotNull(result);
+        result.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [TestClass]
@@ -921,65 +979,6 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         [TestMethod]
-        public void ProducerSubmissionUpdatesProducerCommentDate()
-        {
-            // Arrange
-            var commentTime = DateTime.UtcNow;
-            var item = CreateDefaultItem("APP123", RegistrationSubmissionStatus.Pending);
-
-            var events = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Type = "RegistrationApplicationSubmitted",
-                    Created = commentTime,
-                    Comments = "Producer Comment"
-                }
-            };
-
-            // Act
-            MergeCosmosUpdates(events, item);
-
-            // Assert
-            Assert.AreEqual(commentTime, item.ProducerCommentDate, "ProducerCommentDate should be updated.");
-            Assert.AreEqual("Producer Comment", item.ProducerComments, "Comments should be updated.");
-            // Since RegulatorDecisionDate is null, no final update check applies.
-            Assert.AreEqual(RegistrationSubmissionStatus.Pending, item.SubmissionStatus);
-        }
-
-        [TestMethod]
-        public void MultipleProducerComments_TakesLatestProducerCommentDate()
-        {
-            // Arrange
-            var olderComment = DateTime.UtcNow.AddHours(-2);
-            var newerComment = DateTime.UtcNow.AddHours(-1);
-            var item = CreateDefaultItem("APP123", RegistrationSubmissionStatus.Pending);
-
-            var events = new List<AbstractCosmosSubmissionEvent>
-            {
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Type = "RegistrationApplicationSubmitted",
-                    Created = olderComment,
-                    Comments = "Old comment"
-                },
-                new() {
-                    AppReferenceNumber = "APP123",
-                    Type = "RegistrationApplicationSubmitted",
-                    Created = newerComment,
-                    Comments = "New comment"
-                }
-            };
-
-            // Act
-            MergeCosmosUpdates(events, item);
-
-            // Assert
-            Assert.AreEqual(newerComment, item.ProducerCommentDate, "Should have the newest ProducerCommentDate.");
-            Assert.AreEqual("New comment", item.ProducerComments, "Should have the latest comment.");
-        }
-
-        [TestMethod]
         public void ProducerAndRegulatorDecisions_ProducerLater_Doesnt_UpdatesToUpdatedStatus()
         {
             // Arrange
@@ -1008,7 +1007,6 @@ public class OrganisationRegistrationSubmissionServiceTests
             MergeCosmosUpdates(events, item);
 
             // Assert
-            Assert.AreEqual(producerTime, item.ProducerCommentDate);
             Assert.AreEqual(regulatorTime, item.RegulatorDecisionDate);
             // ProducerCommentDate > RegulatorDecisionDate triggers Updated
             Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus);
@@ -1045,7 +1043,6 @@ public class OrganisationRegistrationSubmissionServiceTests
             MergeCosmosUpdates(events, item);
 
             // Assert
-            Assert.AreEqual(producerTime, item.ProducerCommentDate);
             Assert.AreEqual(regulatorTime, item.RegulatorDecisionDate);
             // ProducerCommentDate NOT > RegulatorDecisionDate, no update
             Assert.AreEqual(RegistrationSubmissionStatus.Granted, item.SubmissionStatus);
@@ -1084,9 +1081,9 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         // Helper: Create a default item with minimal setup
-        private RegistrationSubmissionOrganisationDetailsResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
+        private RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
         {
-            return new RegistrationSubmissionOrganisationDetailsResponse
+            return new RegistrationSubmissionOrganisationDetailsFacadeResponse
             {
                 ApplicationReferenceNumber = appRef,
                 SubmissionStatus = initialStatus,

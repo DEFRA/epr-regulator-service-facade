@@ -30,4 +30,8 @@ public class PomSubmissionSummaryResponse
     public int NationId { get; set; }
     public string PomFileName { get; set; }
     public string PomBlobName { get; set; }
+
+    public int MemberCount { get; set; } = 0;
+
+    public string ReferenceNumber { get; set; } = string.Empty;
 }

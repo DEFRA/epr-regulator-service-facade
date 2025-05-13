@@ -36,5 +36,6 @@ namespace EPR.RegulatorService.Facade.Core.Configs
         public string RegulatorRemoveApprovedUser { get; set; } = null!;
         
         public string AddRemoveApprovedUser { get; set; } = null!;
+        public string GetNationNameById { get; set; } = null!;
     }
 }

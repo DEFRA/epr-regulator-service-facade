@@ -27,12 +27,12 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
         {
             string refNumber;
 
-            if (string.IsNullOrEmpty(twoDigitYear))
+            if (string.IsNullOrWhiteSpace(twoDigitYear))
             {
-                twoDigitYear = (DateTime.Now.Year % 100).ToString("D2");
+                throw new ArgumentNullException(nameof(twoDigitYear));
             }
 
-            if (string.IsNullOrEmpty(organisationId))
+            if (string.IsNullOrWhiteSpace(organisationId))
             {
                 throw new ArgumentNullException(nameof(organisationId));
             }
@@ -80,67 +80,105 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber)
                                   && x.AppReferenceNumber.Equals(item?.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created);
                 var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderBy(x => x.Created).ToList();
-                var producerComments = cosmosItems.Where(x => x.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase)).Select(x => x.Created);
 
-                foreach (var cosmosItem in regulatorDecisions)
-                {
-                    if (item.RegulatorCommentDate is null || cosmosItem.Created > item.RegulatorCommentDate)
-                    {
-                        item.RegulatorCommentDate = cosmosItem.Created;
-                        item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
-                        item.StatusPendingDate = cosmosItem.DecisionDate;
-                        item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    }
-                }
-                foreach (var cosmosDate in producerComments)
-                {
-                    item.ProducerCommentDate = cosmosDate;
-                }
+                ProcessRegulatorDecisions(item, regulatorDecisions);
             }
         }
 
-        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsResponse item)
+        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsFacadeResponse item)
         {
             var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
                                                                 .OrderBy(x => x.Created);
+            var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderByDescending(x => x.Created );
 
-            foreach (var cosmosItem in cosmosItems)
+            foreach (var decision in regulatorDecisions)
             {
-                if (cosmosItem.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase))
-                {
-                    AssignRegulatorDetails(item, cosmosItem);
-                }
-                else if (cosmosItem.Type.Equals("RegistrationApplicationSubmitted", StringComparison.OrdinalIgnoreCase))
-                {
-                    AssignProducerDetails(item, cosmosItem);
-                }
+                AssignRegulatorDetails(item, decision);
             }
         }
 
-        public static void AssignProducerDetails(RegistrationSubmissionOrganisationDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
+        private static void ProcessRegulatorDecisions(
+            OrganisationRegistrationSubmissionSummaryResponse item,
+            List<AbstractCosmosSubmissionEvent> regulatorDecisions)
         {
-            if (item.ProducerCommentDate is null || cosmosItem.Created >= item.ProducerCommentDate)
+            foreach (var cosmosItem in regulatorDecisions)
             {
-                item.ProducerComments = cosmosItem.Comments;
-                item.ProducerCommentDate = cosmosItem.Created;
-            }
-            else
-            {
-                item.ProducerComments += $"<br/>{cosmosItem.Comments}";
+                if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
+                {
+                    if (item.IsResubmission)
+                    {
+                        ProcessResubmissionDecision(item, cosmosItem.Decision);
+                    }
+                    else
+                    {
+                        ProcessStandardDecision(item, cosmosItem);
+                    }
+
+                    item.RegulatorDecisionDate = cosmosItem.Created;
+                }
             }
         }
 
-        private static void AssignRegulatorDetails(RegistrationSubmissionOrganisationDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
+        private static void ProcessResubmissionDecision(
+            OrganisationRegistrationSubmissionSummaryResponse item,
+            string decision)
+        {
+            var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(decision);
+            item.ResubmissionStatus = resubmissionStatus switch
+            {
+                RegistrationSubmissionStatus.Granted => RegistrationSubmissionStatus.Accepted,
+                RegistrationSubmissionStatus.Refused => RegistrationSubmissionStatus.Rejected,
+                _ => item.ResubmissionStatus
+            };
+        }
+
+        private static void ProcessStandardDecision(
+            OrganisationRegistrationSubmissionSummaryResponse item,
+            AbstractCosmosSubmissionEvent cosmosItem)
+        {
+            item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+            item.StatusPendingDate = cosmosItem.DecisionDate;
+            if (!string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber))
+            {
+                item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
+            }
+        }
+
+        private static void AssignRegulatorDetails(RegistrationSubmissionOrganisationDetailsFacadeResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
         {
             if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
             {
                 item.RegulatorComments = cosmosItem.Comments;
                 item.RegulatorDecisionDate = cosmosItem.Created;
-                item.StatusPendingDate = cosmosItem.DecisionDate;
-                item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                item.SubmissionDetails.Status = item.SubmissionStatus;
                 item.SubmissionDetails.DecisionDate = cosmosItem.DecisionDate ?? cosmosItem.Created;
-                item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
+
+                if (item.IsResubmission)
+                {
+                    //To avoid checking magic strings, assign the decision first & check on the enum
+                    //and then re-assign as resubmission uses different status
+                    var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
+                    {
+                        item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
+                    }
+                    else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
+                    {
+                        item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
+                    }
+                    else
+                    {
+                        item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
+                    }
+
+                    item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                }
+                else
+                {
+                    item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    item.StatusPendingDate = cosmosItem.DecisionDate;
+                    item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
+                    item.SubmissionDetails.Status = item.SubmissionStatus;
+                }
             }
             else
             {
@@ -148,7 +186,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
 
-        public static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsCommonDataFilter filter)
+        public static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsFilter filter)
         {
             filter.ApplicationReferenceNumbers = string.Join(" ",
                 statuses
@@ -172,6 +210,8 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             public string RegistrationReferenceNumber { get; set; }
             public Guid SubmissionId { get; set; }
             public string Type { get; set; }
+
+            public string FileId { get; set; }
         }
 
         private async Task<List<AbstractCosmosSubmissionEvent>> GetDeltaSubmissionEvents(DateTime? lastSyncTime, Guid userId, Guid? SubmissionId = null)
