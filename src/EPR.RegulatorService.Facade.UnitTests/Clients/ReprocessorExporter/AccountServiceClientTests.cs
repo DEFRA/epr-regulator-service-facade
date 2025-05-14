@@ -32,7 +32,7 @@ public class AccountServiceClientTests
         {
             Endpoints = new AccountsServiceEndpoints
             {
-                GetNationNameById = "regulators/GetNationNameById/{0}"
+                GetNationDetailsById = "regulators/GetNationNameById/{0}"
             }
         });
 

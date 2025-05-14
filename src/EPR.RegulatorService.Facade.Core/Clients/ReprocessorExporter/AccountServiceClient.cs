@@ -33,7 +33,7 @@ ILogger<AccountServiceClient> logger)
             _ => new NationDetailsResponseDto { Name = "Unknown Nation", NationCode = "" }
         };
 
-        //var url = string.Format($"{_config.Endpoints.GetNationNameById}", id);
+        //var url = string.Format($"{_config.Endpoints.GetNationDetailsById}", id);
         //return await GetAsync<string>(url);
     }
     public async Task<string> GetOrganisationNameById(int id)
