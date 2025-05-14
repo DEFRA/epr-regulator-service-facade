@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
@@ -336,4 +337,72 @@ public class RegistrationServiceTests
             registrationFeeRequestInfo.Reference), Times.Once);
     }
 
+    [TestMethod]
+    public async Task SaveOfflinePayment_ShouldReturnTrue_WhenClientCallSucceeds()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var requestDto = _fixture.Create<OfflinePaymentRequestDto>();
+
+        var expectedDto = new SaveOfflinePaymentRequestDto
+        {
+            Amount = requestDto.Amount,
+            PaymentReference = requestDto.PaymentReference,
+            PaymentDate = requestDto.PaymentDate,
+            PaymentMethod = requestDto.PaymentMethod,
+            Regulator = requestDto.Regulator,
+            UserId = userId,
+            Description = ReprocessorExporterConstants.OfflinePaymentRegistrationDescription,
+            Comments = ReprocessorExporterConstants.OfflinePaymentRegistrationComment
+        };
+
+        _mockPaymentServiceClient
+            .Setup(client => client.SaveOfflinePayment(It.Is<SaveOfflinePaymentRequestDto>(dto =>
+                dto.Amount == expectedDto.Amount &&
+                dto.PaymentReference == expectedDto.PaymentReference &&
+                dto.PaymentDate == expectedDto.PaymentDate &&
+                dto.PaymentMethod == expectedDto.PaymentMethod &&
+                dto.Regulator == expectedDto.Regulator &&
+                dto.UserId == expectedDto.UserId &&
+                dto.Description == expectedDto.Description &&
+                dto.Comments == expectedDto.Comments
+            )))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveOfflinePayment(userId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnTrue_WhenClientCallSucceeds()
+    {
+        // Arrange
+        var id = 1;
+        var userId = Guid.NewGuid();
+        var requestDto = _fixture.Create<MarkAsDulyMadeRequestDto>();
+
+        var expectedDto = new MarkAsDulyMadeWithUserIdDto
+        {
+            DulyMadeDate = requestDto.DulyMadeDate,
+            DeterminationDate = requestDto.DeterminationDate,
+            UserId = userId
+        };
+
+        _mockRegistrationServiceClient
+            .Setup(client => client.MarkAsDulyMadeByRegistrationMaterialId(id, It.Is<MarkAsDulyMadeWithUserIdDto>(dto =>
+                dto.DulyMadeDate == expectedDto.DulyMadeDate &&
+                dto.DeterminationDate == expectedDto.DeterminationDate &&
+                dto.UserId == expectedDto.UserId
+            )))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.MarkAsDulyMadeByRegistrationMaterialId(id, userId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
 }

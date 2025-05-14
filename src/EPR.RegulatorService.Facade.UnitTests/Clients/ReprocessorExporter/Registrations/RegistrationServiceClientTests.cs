@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -46,7 +45,9 @@ public class RegistrationServiceClientTests
                 UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}",
                 WasteLicensesByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/wasteLicenses",
                 ReprocessingIOByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/reprocessingInputsOutputs",
-                SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan"
+                SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan",
+                RegistrationFeeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/paymentFees",
+                MarkAsDulyMadeByRegistrationMaterialId = "api/{0}/registrationMaterials/{1}/markAsDulyMade"
             }
         });
 
@@ -315,4 +316,65 @@ public class RegistrationServiceClientTests
         result.Should().BeEquivalentTo(expectedDto);
     }
 
+    [TestMethod]
+    public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<MarkAsDulyMadeWithUserIdDto>();
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+        };
+        var responseContent = new StringContent(JsonSerializer.Serialize(true, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = responseContent
+            });
+
+        // Act
+        var result = await _client.MarkAsDulyMadeByRegistrationMaterialId(1, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task GetRegistrationFeeRequestByRegistrationMaterialId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var expectedDto = _fixture.Create<RegistrationFeeContextDto>();
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+        };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = responseContent
+            });
+
+        // Act
+        var result = await _client.GetRegistrationFeeRequestByRegistrationMaterialId(1);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
 }

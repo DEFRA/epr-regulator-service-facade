@@ -1,5 +1,7 @@
 ﻿using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -52,5 +54,18 @@ public class PaymentServiceClientTests
 
         // Assert
         result.Should().Be(2921.00m);
+    }
+
+    [TestMethod]
+    public async Task SaveOfflinePayment_ShouldReturnTrue_WhenCalled()
+    {
+        // Arrange
+        var requestDto = new SaveOfflinePaymentRequestDto();
+
+        // Act
+        var result = await _client.SaveOfflinePayment(requestDto);
+
+        // Assert
+        result.Should().BeTrue(); 
     }
 }

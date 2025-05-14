@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using Azure.Core;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
@@ -7,11 +8,13 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
@@ -32,6 +35,11 @@ public class RegistrationsControllerTests
     [TestInitialize]
     public void TestInitialize()
     {
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new[] {
+                new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Email, "testuser@test.com"),
+            }, "Test"));
+
         _mockRegistrationService = new Mock<IRegistrationService>();
         _mockRegulatorRegistrationValidator = new Mock<IValidator<UpdateRegulatorRegistrationTaskDto>>();
         _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateRegulatorApplicationTaskDto>>();
@@ -50,6 +58,9 @@ public class RegistrationsControllerTests
             _mockMarkAsDulyMadeRequestValidator.Object,
             _mockLogger.Object
         );
+
+        _controller.ControllerContext = new ControllerContext();
+        _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = user };
     }
 
     [TestMethod]
@@ -510,4 +521,98 @@ public class RegistrationsControllerTests
         ).Should().ThrowAsync<Exception>()
          .WithMessage("Service error");
     }
+
+    [TestMethod]
+    public async Task SaveOfflinePayment_ShouldReturnNoContent_WhenValidRequest()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<OfflinePaymentRequestDto>();
+
+        _mockOfflinePaymentRequestValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(new ValidationResult());
+
+        _mockRegistrationService
+            .Setup(s => s.SaveOfflinePayment(It.IsAny<Guid>(), requestDto))
+            .ReturnsAsync(true); 
+
+        // Act
+        var result = await _controller.SaveOfflinePayment(requestDto);
+
+        // Assert
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [TestMethod]
+    public async Task SaveOfflinePayment_ShouldThrowValidationException_WhenValidationFails()
+    {
+        // Arrange
+        var validator = new InlineValidator<OfflinePaymentRequestDto>();
+        validator.RuleFor(x => x.Amount).Must(_ => false).WithMessage("Invalid");
+
+        _controller = new RegistrationsController(
+            _mockRegistrationService.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
+            _mockUpdateMaterialOutcomeValidator.Object,
+            validator,
+            _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockLogger.Object
+        );
+
+        var requestDto = new OfflinePaymentRequestDto();
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.SaveOfflinePayment(requestDto)
+        ).Should().ThrowAsync<ValidationException>();
+    }
+
+    [TestMethod]
+    public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnNoContent_WhenValidRequest()
+    {
+        // Arrange
+        var materialId = 1;
+        var requestDto = _fixture.Create<MarkAsDulyMadeRequestDto>();
+
+        _mockMarkAsDulyMadeRequestValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(new ValidationResult());
+
+        _mockRegistrationService
+            .Setup(s => s.MarkAsDulyMadeByRegistrationMaterialId(materialId, It.IsAny<Guid>(), requestDto))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.MarkAsDulyMadeByRegistrationMaterialId(materialId, requestDto);
+
+        // Assert
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [TestMethod]
+    public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldThrowValidationException_WhenValidationFails()
+    {
+        // Arrange
+        var validator = new InlineValidator<MarkAsDulyMadeRequestDto>();
+        validator.RuleFor(x => x.DeterminationDate).Must(_ => false).WithMessage("Invalid");
+
+        _controller = new RegistrationsController(
+            _mockRegistrationService.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
+            _mockUpdateMaterialOutcomeValidator.Object,
+            _mockOfflinePaymentRequestValidator.Object,
+            validator,
+            _mockLogger.Object
+        );
+
+        var requestDto = new MarkAsDulyMadeRequestDto();
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.MarkAsDulyMadeByRegistrationMaterialId(1, requestDto)
+        ).Should().ThrowAsync<ValidationException>();
+    }
+
 }
