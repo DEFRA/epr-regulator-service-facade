@@ -142,15 +142,15 @@ public class RegistrationServiceTests
         // Arrange
         var registrationId = 1;
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
-        var nationName = "England";
+        var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
 
         _mockRegistrationServiceClient
             .Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
             .ReturnsAsync(registrationSiteAddress);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetNationNameById(registrationSiteAddress.NationId))
-            .ReturnsAsync(nationName);
+            .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
+            .ReturnsAsync(nationDetails);
 
         _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -162,7 +162,7 @@ public class RegistrationServiceTests
         result.SiteAddress.Should().BeEquivalentTo(registrationSiteAddress.SiteAddress);
         result.GridReference.Should().Be(registrationSiteAddress.GridReference);
         result.LegalCorrespondenceAddress.Should().BeEquivalentTo(registrationSiteAddress.LegalCorrespondenceAddress);
-        result.NationName.Should().Be(nationName);
+        result.NationName.Should().Be(nationDetails.Name);
     }
 
     [TestMethod]
@@ -171,15 +171,15 @@ public class RegistrationServiceTests
         // Arrange
         var registrationId = 2;
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
-        var nationName = "Wales";
+        var nationDetails = new NationDetailsResponseDto { Name = "Wales", NationCode = "GB-WLS" };
 
         _mockRegistrationServiceClient
             .Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
             .ReturnsAsync(registrationSiteAddress);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetNationNameById(registrationSiteAddress.NationId))
-            .ReturnsAsync(nationName);
+            .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
+            .ReturnsAsync(nationDetails);
 
         _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -188,7 +188,7 @@ public class RegistrationServiceTests
 
         // Assert
         _mockRegistrationServiceClient.Verify(c => c.GetSiteAddressByRegistrationId(registrationId), Times.Once);
-        _mockAccountsServiceClient.Verify(c => c.GetNationNameById(registrationSiteAddress.NationId), Times.Once);
+        _mockAccountsServiceClient.Verify(c => c.GetNationDetailsById(registrationSiteAddress.NationId), Times.Once);
     }
 
 
@@ -247,7 +247,7 @@ public class RegistrationServiceTests
         var id = 1;
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
         var organisationName = "Test Org";
-        var nationName = "Scotland";
+        var nationDetails = new NationDetailsResponseDto { Name = "Scotland", NationCode = "GB-SCT" };
         var paymentFee = 150.75m;
 
         _mockRegistrationServiceClient
@@ -255,17 +255,17 @@ public class RegistrationServiceTests
             .ReturnsAsync(registrationFeeRequestInfo);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetOrganisationNameById(id))
+            .Setup(client => client.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId))
             .ReturnsAsync(organisationName);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetNationNameById(registrationFeeRequestInfo.NationId))
-            .ReturnsAsync(nationName);
+            .Setup(client => client.GetNationDetailsById(registrationFeeRequestInfo.NationId))
+            .ReturnsAsync(nationDetails);
 
         _mockPaymentServiceClient
             .Setup(client => client.GetRegistrationPaymentFee(
                 registrationFeeRequestInfo.MaterialName,
-                nationName,
+                nationDetails.NationCode,
                 registrationFeeRequestInfo.CreatedDate,
                 registrationFeeRequestInfo.ApplicationType.ToString(),
                 registrationFeeRequestInfo.Reference))
@@ -295,7 +295,7 @@ public class RegistrationServiceTests
         var id = 2;
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
         var organisationName = "Org Name";
-        var nationName = "Northern Ireland";
+        var nationDetails = new NationDetailsResponseDto { Name = "Northern Ireland", NationCode = "GB-NIR" };
         var paymentFee = 200.00m;
 
         _mockRegistrationServiceClient
@@ -303,17 +303,17 @@ public class RegistrationServiceTests
             .ReturnsAsync(registrationFeeRequestInfo);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetOrganisationNameById(id))
+            .Setup(client => client.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId))
             .ReturnsAsync(organisationName);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetNationNameById(registrationFeeRequestInfo.NationId))
-            .ReturnsAsync(nationName);
+            .Setup(client => client.GetNationDetailsById(registrationFeeRequestInfo.NationId))
+            .ReturnsAsync(nationDetails);
 
         _mockPaymentServiceClient
             .Setup(client => client.GetRegistrationPaymentFee(
                 registrationFeeRequestInfo.MaterialName,
-                nationName,
+                nationDetails.NationCode,
                 registrationFeeRequestInfo.CreatedDate,
                 registrationFeeRequestInfo.ApplicationType.ToString(),
                 registrationFeeRequestInfo.Reference))
@@ -326,11 +326,11 @@ public class RegistrationServiceTests
 
         // Assert
         _mockRegistrationServiceClient.Verify(c => c.GetRegistrationFeeRequestByRegistrationMaterialId(id), Times.Once);
-        _mockAccountsServiceClient.Verify(c => c.GetOrganisationNameById(id), Times.Once);
-        _mockAccountsServiceClient.Verify(c => c.GetNationNameById(registrationFeeRequestInfo.NationId), Times.Once);
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId), Times.Once);
+        _mockAccountsServiceClient.Verify(c => c.GetNationDetailsById(registrationFeeRequestInfo.NationId), Times.Once);
         _mockPaymentServiceClient.Verify(c => c.GetRegistrationPaymentFee(
             registrationFeeRequestInfo.MaterialName,
-            nationName,
+            nationDetails.NationCode,
             registrationFeeRequestInfo.CreatedDate,
             registrationFeeRequestInfo.ApplicationType.ToString(),
             registrationFeeRequestInfo.Reference), Times.Once);

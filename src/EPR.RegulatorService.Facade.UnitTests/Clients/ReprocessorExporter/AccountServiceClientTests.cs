@@ -48,10 +48,10 @@ public class AccountServiceClientTests
     public async Task GetNationNameById_WhenServiceNotReady_ReturnsHardcodedValue(int nationId, string expected)
     {
         // Act
-        var result = await _client.GetNationNameById(nationId);
+        var result = await _client.GetNationDetailsById(nationId);
 
         // Assert
-        result.Should().Be(expected);
+        result.Name.Should().Be(expected);
     }
 
     [TestMethod]
