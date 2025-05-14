@@ -15,4 +15,5 @@ public interface IRegistrationServiceClient
     Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id); 
     Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id);
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(int id);
+    Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, MarkAsDulyMadeWithUserIdDto request);
 }

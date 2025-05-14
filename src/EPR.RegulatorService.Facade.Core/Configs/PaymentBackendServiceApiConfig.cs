@@ -19,4 +19,5 @@ public class PaymentBackendServiceApiConfig
 public class PaymentServiceApiConfigEndpoints
 {
     public string GetRegistrationPaymentFee { get; set; }
+    public string SaveOfflinePayment { get; set; }
 }

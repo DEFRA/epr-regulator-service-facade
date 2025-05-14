@@ -21,8 +21,10 @@ public class RegistrationsControllerTests
 {
     private Mock<IRegistrationService> _mockRegistrationService = null!;
     private Mock<IValidator<UpdateRegulatorRegistrationTaskDto>> _mockRegulatorRegistrationValidator = null!;
-    private Mock<IValidator<UpdateRegulatorApplicationTaskDto>> _mockRegulatorApplicationValidator = null!;
+    private Mock<IValidator<UpdateRegulatorApplicationTaskDto>> _mockRegulatorApplicationValidator = null!; 
     private Mock<IValidator<UpdateMaterialOutcomeRequestDto>> _mockUpdateMaterialOutcomeValidator = null!;
+    private Mock<IValidator<OfflinePaymentRequestDto>> _mockOfflinePaymentRequestValidator = null!;
+    private Mock<IValidator<MarkAsDulyMadeRequestDto>> _mockMarkAsDulyMadeRequestValidator = null!;
     private Mock<ILogger<RegistrationsController>> _mockLogger = null!;
     private Fixture _fixture = null!;
     private RegistrationsController _controller;
@@ -34,6 +36,8 @@ public class RegistrationsControllerTests
         _mockRegulatorRegistrationValidator = new Mock<IValidator<UpdateRegulatorRegistrationTaskDto>>();
         _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateRegulatorApplicationTaskDto>>();
         _mockUpdateMaterialOutcomeValidator = new Mock<IValidator<UpdateMaterialOutcomeRequestDto>>();
+        _mockOfflinePaymentRequestValidator = new Mock<IValidator<OfflinePaymentRequestDto>>();
+        _mockMarkAsDulyMadeRequestValidator = new Mock<IValidator<MarkAsDulyMadeRequestDto>>();
         _mockLogger = new Mock<ILogger<RegistrationsController>>();
         _fixture = new Fixture();
 
@@ -42,6 +46,8 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,
+            _mockOfflinePaymentRequestValidator.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
             _mockLogger.Object
         );
     }
@@ -87,6 +93,8 @@ public class RegistrationsControllerTests
             validator,
             _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,
+            _mockOfflinePaymentRequestValidator.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
             _mockLogger.Object
         );
 
@@ -143,6 +151,8 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             validator,
             _mockUpdateMaterialOutcomeValidator.Object,
+            _mockOfflinePaymentRequestValidator.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
             _mockLogger.Object
         );
 
@@ -235,6 +245,8 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             validator,
+            _mockOfflinePaymentRequestValidator.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
             _mockLogger.Object
         );
 

@@ -91,4 +91,11 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format($"{_config.Endpoints.RegistrationFeeByRegistrationMaterialId}", _config.ApiVersion, id);
         return await GetAsync<RegistrationFeeContextDto>(url);
     }
+
+    public async Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, MarkAsDulyMadeWithUserIdDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingMarkAsDulyMade);
+        var url = string.Format(_config.Endpoints.MarkAsDulyMadeByRegistrationMaterialId, _config.ApiVersion, id);
+        return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
+    }
 }

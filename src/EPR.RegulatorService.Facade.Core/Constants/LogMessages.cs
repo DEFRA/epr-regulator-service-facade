@@ -17,4 +17,6 @@ public static class LogMessages
     public const string AttemptingRegistrationPaymentFee = "Attempting to get payment fee.";
     public const string AttemptingRegistrationFeeDetails = "Attempting to get registration fee details.";
     public const string AttemptingOrganisationName = "Attempting to get organisation name.";
+    public const string SaveOfflinePayment = "Save offline payment";
+    public const string AttemptingMarkAsDulyMade = "Attempting to mark a registration material as duly made.";
 }

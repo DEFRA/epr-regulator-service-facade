@@ -3,6 +3,7 @@
 namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 public class PaymentFeeDetailsDto
 {
+    public int RegistrationId { get; set; }
     public int RegistrationMaterialId { get; set; }
     public string OrganisationName { get; set; }
     public string SiteAddress { get; set; }
@@ -11,4 +12,5 @@ public class PaymentFeeDetailsDto
     public DateTime SubmittedDate { get; set; }
     public decimal FeeAmount { get; set; }
     public ApplicationOrganisationType ApplicationType { get; init; }
+    public string Regulator { get; set; }
 }
