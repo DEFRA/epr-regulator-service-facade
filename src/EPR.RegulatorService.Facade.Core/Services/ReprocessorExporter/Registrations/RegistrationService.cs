@@ -36,7 +36,14 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
 
     public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request)
     {
-        return await registrationServiceClient.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
+        var referenceNumber = await GenerateRegistrationAccreditationReference(id);
+        var outcomeRequest = new UpdateMaterialOutcomeWithReferenceDto 
+        { 
+            Comments = request.Comments,
+            Status = request.Status,
+            RegistrationReferenceNumber = referenceNumber 
+        };
+        return await registrationServiceClient.UpdateMaterialOutcomeByRegistrationMaterialId(id, outcomeRequest);
     }
 
     public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)
@@ -90,7 +97,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
             RegistrationMaterialId = id,
             OrganisationName = organisationName,
             SiteAddress = registrationFeeRequestInfos.SiteAddress,
-            ReferenceNumber = registrationFeeRequestInfos.Reference,
+            ApplicationReferenceNumber = registrationFeeRequestInfos.Reference,
             MaterialName = registrationFeeRequestInfos.MaterialName,
             SubmittedDate = registrationFeeRequestInfos.CreatedDate,
             FeeAmount = paymentFee,
@@ -122,9 +129,19 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         {
             DulyMadeDate = request.DulyMadeDate,
             DeterminationDate = request.DeterminationDate,
-            UserId = userId
+            DulyMadeBy = userId
         };
 
         return await registrationServiceClient.MarkAsDulyMadeByRegistrationMaterialId(id, markAsDulyMadeRequest);
+    }
+
+    private async Task<string> GenerateRegistrationAccreditationReference(int id)
+    {
+        var referenceInfos = await registrationServiceClient.GetRegistrationAccreditationReference(id);
+        var nationDetails = await accountServiceClient.GetNationDetailsById(referenceInfos.NationId);
+        var countryCode = nationDetails.Name.First().ToString().ToUpper();
+        var orgTypeInitial = referenceInfos.ApplicationType.First().ToString().ToUpper();
+
+        return $"{referenceInfos.RegistrationType}{referenceInfos.RelevantYear}{countryCode}{orgTypeInitial}{referenceInfos.OrgCode}{referenceInfos.RandomDigits}{referenceInfos.MaterialCode}";
     }
 }

@@ -43,11 +43,18 @@ ILogger<RegistrationServiceClient> logger)
         return await GetAsync<RegistrationMaterialDetailsDto>(url);
     }
 
-    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request)
+    public async Task<RegistrationAccreditationReferenceDto> GetRegistrationAccreditationReference(int id)
+    {
+        logger.LogInformation(LogMessages.RegistrationAccreditationReference, id);
+        var url = string.Format($"{_config.Endpoints.RegistrationAccreditationReference}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationAccreditationReferenceDto>(url);
+    }
+
+    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeWithReferenceDto request)
     {
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
         var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
-        return await PostAsync<UpdateMaterialOutcomeRequestDto, bool>(url, request);
+        return await PostAsync<UpdateMaterialOutcomeWithReferenceDto, bool>(url, request);
     }
 
     public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)

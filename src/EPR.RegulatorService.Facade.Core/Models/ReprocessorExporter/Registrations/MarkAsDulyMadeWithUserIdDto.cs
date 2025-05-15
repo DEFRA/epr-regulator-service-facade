@@ -6,5 +6,5 @@ public class MarkAsDulyMadeWithUserIdDto
 {
     public DateTime DulyMadeDate { get; set; }
     public DateTime DeterminationDate { get; set; }
-    public Guid UserId { get; set; }
+    public Guid DulyMadeBy { get; set; }
 }

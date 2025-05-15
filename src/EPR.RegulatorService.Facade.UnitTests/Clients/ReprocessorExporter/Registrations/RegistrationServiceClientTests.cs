@@ -47,7 +47,8 @@ public class RegistrationServiceClientTests
                 ReprocessingIOByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/reprocessingInputsOutputs",
                 SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan",
                 RegistrationFeeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/paymentFees",
-                MarkAsDulyMadeByRegistrationMaterialId = "api/{0}/registrationMaterials/{1}/markAsDulyMade"
+                MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
+                RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference"
             }
         });
 
@@ -144,10 +145,36 @@ public class RegistrationServiceClientTests
     }
 
     [TestMethod]
+    public async Task GetRegistrationAccreditationReference_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = 1;
+        var expectedDto = _fixture.Create<RegistrationAccreditationReferenceDto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"registrationMaterials/{id}/RegistrationAccreditationReference")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetRegistrationAccreditationReference(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
     public async Task UpdateMaterialOutcomeByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
+        var requestDto = _fixture.Create<UpdateMaterialOutcomeWithReferenceDto>();
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

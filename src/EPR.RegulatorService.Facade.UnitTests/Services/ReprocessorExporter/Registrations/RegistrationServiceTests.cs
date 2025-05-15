@@ -95,8 +95,45 @@ public class RegistrationServiceTests
     {
         // Arrange
         var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
-        _mockRegistrationServiceClient.Setup(client => client.UpdateMaterialOutcomeByRegistrationMaterialId(1, requestDto))
-                   .ReturnsAsync(true);
+
+        var referenceDto = new RegistrationAccreditationReferenceDto
+        {
+            RegistrationType = "R",
+            RelevantYear = "25",
+            NationId = 100,
+            ApplicationType = "Reprocessor",
+            OrgCode = "ORG123",
+            RandomDigits = "4567",
+            MaterialCode = "PL"
+        };
+
+        var nationDetails = new NationDetailsResponseDto
+        {
+            Name = "England",
+            NationCode = "GB-ENG"
+        };
+
+        var expectedReference = "R25ERORG1234567PL";
+
+        var expectedDto = new UpdateMaterialOutcomeWithReferenceDto
+        {
+            Comments = requestDto.Comments,
+            Status = requestDto.Status,
+            RegistrationReferenceNumber = expectedReference
+        };
+
+        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationAccreditationReference(1))
+            .ReturnsAsync(referenceDto);
+
+        _mockAccountsServiceClient.Setup(client => client.GetNationDetailsById(referenceDto.NationId))
+            .ReturnsAsync(nationDetails);
+
+        _mockRegistrationServiceClient.Setup(client =>
+            client.UpdateMaterialOutcomeByRegistrationMaterialId(1, It.Is<UpdateMaterialOutcomeWithReferenceDto>(
+                x => x.Comments == expectedDto.Comments &&
+                     x.Status == expectedDto.Status &&
+                     x.RegistrationReferenceNumber == expectedDto.RegistrationReferenceNumber)))
+            .ReturnsAsync(true);
 
         // Act
         var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(1, requestDto);
@@ -282,7 +319,7 @@ public class RegistrationServiceTests
         result.RegistrationMaterialId.Should().Be(id);
         result.OrganisationName.Should().Be(organisationName);
         result.SiteAddress.Should().BeEquivalentTo(registrationFeeRequestInfo.SiteAddress);
-        result.ReferenceNumber.Should().Be(registrationFeeRequestInfo.Reference);
+        result.ApplicationReferenceNumber.Should().Be(registrationFeeRequestInfo.Reference);
         result.MaterialName.Should().Be(registrationFeeRequestInfo.MaterialName);
         result.ApplicationType.Should().Be(registrationFeeRequestInfo.ApplicationType);
         result.SubmittedDate.Should().Be(registrationFeeRequestInfo.CreatedDate);
@@ -388,14 +425,14 @@ public class RegistrationServiceTests
         {
             DulyMadeDate = requestDto.DulyMadeDate,
             DeterminationDate = requestDto.DeterminationDate,
-            UserId = userId
+            DulyMadeBy = userId
         };
 
         _mockRegistrationServiceClient
             .Setup(client => client.MarkAsDulyMadeByRegistrationMaterialId(id, It.Is<MarkAsDulyMadeWithUserIdDto>(dto =>
                 dto.DulyMadeDate == expectedDto.DulyMadeDate &&
                 dto.DeterminationDate == expectedDto.DeterminationDate &&
-                dto.UserId == expectedDto.UserId
+                dto.DulyMadeBy == expectedDto.DulyMadeBy
             )))
             .ReturnsAsync(true);
 
