@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Runtime.InteropServices;
+using TimeZoneConverter;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 
@@ -86,15 +86,28 @@ public class OrganisationRegistrationDetailsDto
         static DateTime? convertDateTime(string dateTimeString)
         {
 
-            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime tempDate)
-                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out tempDate))
+            if (!DateTime.TryParseExact(
+                       dateTimeString,
+                       "yyyy-MM-ddTHH:mm:ss.fffffffZ",
+                       CultureInfo.InvariantCulture,
+                       DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                       out DateTime tempDate)
+                   && !DateTime.TryParse(
+                       dateTimeString,
+                       CultureInfo.InvariantCulture,
+                       DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                       out tempDate))
             {
                 return null;
             }
 
-            DateTime utcDateTime = DateTime.SpecifyKind(tempDate, DateTimeKind.Utc);
+            // Ensure tempDate is explicitly marked as UTC (even if already parsed with UTC kind)
+            var utcDateTime = DateTime.SpecifyKind(tempDate, DateTimeKind.Utc);
 
-            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Europe/London"));
+            // Use TimeZoneConverter for resilient cross-platform conversion
+            var londonTimeZone = TZConvert.GetTimeZoneInfo("Europe/London");
+
+            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, londonTimeZone);
         }
 
         if (dto is null) return null;
