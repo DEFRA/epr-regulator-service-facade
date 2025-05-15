@@ -1,5 +1,6 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
@@ -50,9 +51,11 @@ public class FileDownloadController : ControllerBase
         // send FileDownloadRequest to Trade antivirus API for checking
         var userId = User.UserId();
         var email = User.Email();
-        var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
 
-        var antiVirusContainer = GetContainerName(request.SubmissionType.GetDisplayName<SubmissionType>());
+        var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
+        var suffix = _antivirusApiConfig?.CollectionSuffix;
+
+        var antiVirusContainer = AntiVirus.GetContainerName(request.SubmissionType.GetDisplayName<SubmissionType>(), suffix);
         var antiVirusResponse = await _antivirusService.SendFile(antiVirusContainer, request.FileId, truncatedFileName, stream, userId, email);
         var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 

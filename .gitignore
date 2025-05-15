@@ -374,3 +374,4 @@ src/certs/kainos-chain.p7b
 **/appsettings.development.json
 src/EPR.RegulatorService.Facade.API/.vshistory/
 /src/EPR.RegulatorService.Facade.API/appsettings.Development.json
+/src/EPR.RegulatorService.Facade.UnitTests/API/Controllers/ReprocessorExporter/Registrations/FileDownloadControllerPocTests.cs

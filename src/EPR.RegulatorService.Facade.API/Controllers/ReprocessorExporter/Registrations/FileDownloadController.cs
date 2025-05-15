@@ -1,12 +1,17 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.API.Helpers;
+using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Enums;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -19,12 +24,16 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
     public class FileDownloadController(
         IBlobStorageService blobStorageService,
         IAntivirusService antivirusService,
+        IOptions<BlobStorageConfig> blobStorageConfig,
+        IOptions<AntivirusApiConfig> antivirusApiConfig,
         ILogger<FileDownloadController> logger) : ControllerBase
     {
         private readonly IBlobStorageService _blobStorageService = blobStorageService;
         private readonly IAntivirusService _antivirusService = antivirusService;
+        private readonly BlobStorageConfig _blobStorageConfig = blobStorageConfig.Value;
+        private readonly AntivirusApiConfig _antivirusApiConfig = antivirusApiConfig.Value;
 
-        [HttpPost("regulatorRegistrationDownloadFile")]
+        [HttpPost("Registration/file-download")]
         [SwaggerOperation(
             Summary = "Downloads a file from Azure blob storage.",
             Description = "Attempting to download a file from Azure blob storage."
@@ -32,14 +41,17 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
         public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequestDto request)
         {
             logger.LogInformation(LogMessages.RegulatorRegistrationDownloadFile, request.FileName);
-            var stream = await _blobStorageService.DownloadFileStreamAsync("test-container", request.BlobName);
+            var stream = await _blobStorageService.DownloadFileStreamAsync(_blobStorageConfig.ReprocessorExporterRegistrationContainerName,
+                                                                            request.BlobName);
 
             // send FileDownloadRequest to Trade antivirus API for checking
             var userId = User.UserId();
             var email = User.Email();
             var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
-            
-            var antiVirusResponse = await _antivirusService.SendFile("test-container", request.FileId, truncatedFileName, stream, userId, email);
+            var suffix = _antivirusApiConfig?.CollectionSuffix;
+
+            var antiVirusContainer = AntiVirus.GetContainerName(SubmissionType.Registration.GetDisplayName<SubmissionType>(), suffix);
+            var antiVirusResponse = await _antivirusService.SendFile(antiVirusContainer, request.FileId, truncatedFileName, stream, userId, email);
             var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 
             // if clean, return file

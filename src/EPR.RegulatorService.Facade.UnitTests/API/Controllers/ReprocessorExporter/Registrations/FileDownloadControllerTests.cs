@@ -30,7 +30,8 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
         private HttpResponseMessage _cleanAntiVirusResponse;
         private HttpResponseMessage _maliciousAntiVirusResponse;
         private const string RegistrationContainerName = "test-container";
-        private readonly BlobStorageConfig _blobStorageConfig = new()        
+ 
+        private readonly BlobStorageConfig _blobStorageConfig = new()     
         {
             PomContainerName = "pom-test-container",
             RegistrationContainerName = RegistrationContainerName
@@ -41,6 +42,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
             PersistFile = true
         };
 
+        IOptions<BlobStorageConfig> blobStorageConfigSettings;
+        IOptions<AntivirusApiConfig> antivirusApiConfigSettings;
+
 
         [TestInitialize]
         public void Setup()
@@ -49,10 +53,14 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
                 new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Email, "testuser@test.com"),
             }, "Test"));
+
             _mockBlobStorageConfig.Setup(x => x.Value).Returns(_blobStorageConfig);
             _mockAntivirusApiConfig.Setup(x => x.Value).Returns(_antivirusApiConfig);
+            blobStorageConfigSettings = Options.Create(_blobStorageConfig);
+            antivirusApiConfigSettings = Options.Create(_antivirusApiConfig);
             _mockLogger = new Mock<ILogger<FileDownloadController>>();
-            _sut = new FileDownloadController(_mockBlobStorageService.Object, _mockAntiVirusService.Object, _mockLogger.Object);
+
+            _sut = new FileDownloadController(_mockBlobStorageService.Object, _mockAntiVirusService.Object, blobStorageConfigSettings, antivirusApiConfigSettings, _mockLogger.Object);
             _sut.ControllerContext = new ControllerContext();
             _sut.ControllerContext.HttpContext = new DefaultHttpContext() { User = user };
 
