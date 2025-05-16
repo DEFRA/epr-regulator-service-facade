@@ -6,12 +6,10 @@ namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrati
 {
     public class FileDownloadRequestDto
     {
-        [NotDefault]
+        [Required]
         public Guid FileId { get; set; }
 
         [Required]
-        public string BlobName { get; set; }
-
         public string FileName { get; set; }
     }
 }

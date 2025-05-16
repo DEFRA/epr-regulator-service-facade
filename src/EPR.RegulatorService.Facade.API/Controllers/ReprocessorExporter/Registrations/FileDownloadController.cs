@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
@@ -34,24 +35,40 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
         private readonly AntivirusApiConfig _antivirusApiConfig = antivirusApiConfig.Value;
 
         [HttpPost("Registration/file-download")]
+        [ProducesResponseType(typeof(FileContentResult), 200)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden, "If the file being downloaded is infected with a virus.", typeof(ObjectResult))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
         [SwaggerOperation(
             Summary = "Downloads a file from Azure blob storage.",
             Description = "Attempting to download a file from Azure blob storage."
         )]
         public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequestDto request)
         {
-            logger.LogInformation(LogMessages.RegulatorRegistrationDownloadFile, request.FileName);
+            logger.LogInformation(LogMessages.RegulatorRegistrationDownloadFile);
+
             var stream = await _blobStorageService.DownloadFileStreamAsync(_blobStorageConfig.ReprocessorExporterRegistrationContainerName,
-                                                                            request.BlobName);
+                                                                            request.FileId.ToString());
 
             // send FileDownloadRequest to Trade antivirus API for checking
             var userId = User.UserId();
             var email = User.Email();
             var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
-            var suffix = _antivirusApiConfig?.CollectionSuffix;
+            var suffix = _antivirusApiConfig.CollectionSuffix;
 
             var antiVirusContainer = AntiVirus.GetContainerName(SubmissionType.Registration.GetDisplayName<SubmissionType>(), suffix);
-            var antiVirusResponse = await _antivirusService.SendFile(antiVirusContainer, request.FileId, truncatedFileName, stream, userId, email);
+
+            var fileDetails = new FileDetails
+            {
+                Key = request.FileId,
+                Extension = Path.GetExtension(request.FileName),
+                FileName = Path.GetFileNameWithoutExtension(request.FileName),
+                Collection = antiVirusContainer,
+                UserId = userId,
+                UserEmail = email,
+                PersistFile = _antivirusApiConfig.PersistFile
+            };
+
+            var antiVirusResponse = await _antivirusService.SendFile(fileDetails, truncatedFileName, stream);
             var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 
             // if clean, return file

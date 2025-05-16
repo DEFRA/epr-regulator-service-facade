@@ -3,6 +3,7 @@ using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrati
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Exceptions;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentAssertions;
@@ -34,11 +35,12 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
         private readonly BlobStorageConfig _blobStorageConfig = new()     
         {
             PomContainerName = "pom-test-container",
-            RegistrationContainerName = RegistrationContainerName
+            RegistrationContainerName = RegistrationContainerName,
+            ReprocessorExporterRegistrationContainerName = RegistrationContainerName,
         };
         private readonly AntivirusApiConfig _antivirusApiConfig = new()
         {
-            CollectionSuffix = "test-suffix",
+            CollectionSuffix = "test-suffix",            
             PersistFile = true
         };
 
@@ -66,8 +68,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
 
 
             _fileDownloadRequest = new FileDownloadRequestDto()
-            {
-                BlobName = _blobName,
+            {                
                 FileName = "TestFile.csv",
                 FileId = Guid.NewGuid()
             };
@@ -88,7 +89,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
         {
             // Arrange
             _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), _blobName))
+                .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new BlobStorageServiceException(BlobStorageServiceError));
 
             // Act and Assert
@@ -104,16 +105,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
         {
             // Arrange
             _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, _blobName))
+                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, It.IsAny<string>()))
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
+                It.IsAny<FileDetails>(),
                 It.IsAny<string>(),
-                It.IsAny<Guid>(),
-                It.IsAny<string>(),
-                It.IsAny<MemoryStream>(),
-                It.IsAny<Guid>(),
-                It.IsAny<string>()))
+                It.IsAny<MemoryStream>()))                                
                 .Throws<HttpRequestException>();
 
             // Act and Assert
@@ -128,16 +126,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
         {
             // Arrange
             _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, _blobName))
+                .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, It.IsAny<string>()))
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()))
+                It.IsAny<FileDetails>(),
+                It.IsAny<string>(),
+                It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_maliciousAntiVirusResponse);
 
             // Act
@@ -154,16 +149,13 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
         {
             // Arrange
             _mockBlobStorageService
-                .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), _blobName))
+                .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
+                    It.IsAny<FileDetails>(),                    
                     It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()))
+                    It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_cleanAntiVirusResponse);
 
             // Act

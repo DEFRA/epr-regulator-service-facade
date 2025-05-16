@@ -8,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
+using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
@@ -53,10 +54,22 @@ public class FileDownloadController : ControllerBase
         var email = User.Email();
 
         var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
-        var suffix = _antivirusApiConfig?.CollectionSuffix;
+        var suffix = _antivirusApiConfig.CollectionSuffix;
 
         var antiVirusContainer = AntiVirus.GetContainerName(request.SubmissionType.GetDisplayName<SubmissionType>(), suffix);
-        var antiVirusResponse = await _antivirusService.SendFile(antiVirusContainer, request.FileId, truncatedFileName, stream, userId, email);
+
+        var fileDetails = new FileDetails
+        {
+            Key = request.FileId,
+            Extension = Path.GetExtension(request.FileName),
+            FileName = Path.GetFileNameWithoutExtension(request.FileName),
+            Collection = antiVirusContainer,
+            UserId = userId,
+            UserEmail = email,
+            PersistFile = _antivirusApiConfig.PersistFile
+        };
+
+        var antiVirusResponse = await _antivirusService.SendFile(fileDetails, truncatedFileName, stream);        
         var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 
         // Create a new submissions event for the download attempt

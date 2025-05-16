@@ -6,6 +6,7 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Exceptions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
+using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
@@ -28,7 +29,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
         private readonly Mock<ISubmissionService> _mockSubmissionService = new();
         private readonly Mock<IOptions<BlobStorageConfig>> _mockBlobStorageConfig = new();
         private readonly Mock<IOptions<AntivirusApiConfig>> _mockAntivirusApiConfig = new();
-        private readonly string _blobName = Guid.NewGuid().ToString();
+        private readonly string _blobName = new Guid("34f0251a-fc7b-4792-8bb3-684d38eb9e0c").ToString();
         private FileDownloadRequest _fileDownloadRequest;
         private FileDownloadController _sut;
         private HttpResponseMessage _cleanAntiVirusResponse;
@@ -122,12 +123,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
+                It.IsAny<FileDetails>(),
                 It.IsAny<string>(),
-                It.IsAny<Guid>(),
-                It.IsAny<string>(),
-                It.IsAny<MemoryStream>(),
-                It.IsAny<Guid>(),
-                It.IsAny<string>()))
+                It.IsAny<MemoryStream>()))
                 .Throws<HttpRequestException>();
 
             // Act and Assert
@@ -145,13 +143,10 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, _blobName))
                 .ReturnsAsync(new MemoryStream());
 
-            _mockAntiVirusService.Setup(x => x.SendFile(
+            _mockAntiVirusService.Setup(x => x.SendFile(                    
+                    It.IsAny<FileDetails>(),
                     It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()))
+                    It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_cleanAntiVirusResponse);
 
             _mockSubmissionService.Setup(x =>
@@ -175,12 +170,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
+                    It.IsAny<FileDetails>(),
                     It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()))
+                    It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_maliciousAntiVirusResponse);
 
             _mockSubmissionService.Setup(x =>
@@ -205,12 +197,9 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
+                    It.IsAny<FileDetails>(),
                     It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MemoryStream>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>()))
+                    It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_cleanAntiVirusResponse);
 
             _mockSubmissionService.Setup(x =>
