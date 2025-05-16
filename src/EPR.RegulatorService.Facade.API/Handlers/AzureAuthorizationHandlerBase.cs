@@ -1,8 +1,10 @@
 ﻿using Azure.Core;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 
 namespace EPR.RegulatorService.Facade.API.Handlers;
 
+[ExcludeFromCodeCoverage]
 public abstract class AzureAuthorizationHandlerBase : DelegatingHandler
 {
     private readonly TokenRequestContext _tokenRequestContext;
