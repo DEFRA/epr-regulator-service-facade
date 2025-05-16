@@ -12,6 +12,12 @@ public static class LogMessages
     public const string WasteLicencesRegistrationMaterial = "Retrieving waste permit and exemption details for registration material with ID {id}.";
     public const string ReprocessingIORegistrationMaterial = "Fetching reprocessing inputs, outputs, and process details for registration material ID: {id}.";
     public const string SamplingPlanRegistrationMaterial = "Fetching sampling plan details for registration material ID: {id}.";
-    public const string SiteAddressDetails = "Attempting to get site address details.";
-    public const string AuthorisedMaterial = "Attempting to get authorised materials details.";
+    public const string AttemptingSiteAddressDetails = "Attempting to get site address details.";
+    public const string AttemptingAuthorisedMaterial = "Attempting to get authorised materials details.";
+    public const string AttemptingRegistrationPaymentFee = "Attempting to get payment fee.";
+    public const string AttemptingRegistrationFeeDetails = "Attempting to get registration fee details.";
+    public const string AttemptingOrganisationName = "Attempting to get organisation name.";
+    public const string SaveOfflinePayment = "Save offline payment";
+    public const string AttemptingMarkAsDulyMade = "Attempting to mark a registration material as duly made.";
+    public const string RegistrationAccreditationReference = "Retrieving registration or Accreditation reference number informations with ID {id}.";
 }

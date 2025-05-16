@@ -14,5 +14,6 @@ public class RegistrationMaterialDto
     public string? StatusUpdatedBy { get; init; }
     public DateTime? StatusUpdatedDate { get; init; }
     public string? RegistrationReferenceNumber { get; init; }
+    public string? ApplicationReferenceNumber { get; init; }
     public List<RegistrationTaskDto> Tasks { get; set; } = [];
 }
