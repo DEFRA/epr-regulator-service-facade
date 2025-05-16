@@ -171,7 +171,7 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrations/{id:int}/siteAddress")]
-    [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
+    [ProducesResponseType(typeof(SiteAddressDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "get site address details",
@@ -187,7 +187,7 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrations/{id:int}/authorisedMaterials")]
-    [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
+    [ProducesResponseType(typeof(MaterialsAuthorisedOnSiteDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
     Summary = "get materials authorised details",
@@ -203,7 +203,7 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrationMaterials/{id:int}/paymentFees")]
-    [ProducesResponseType(typeof(RegistrationMaterialSamplingPlanDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
     Summary = "Get sampling plan for a material",
