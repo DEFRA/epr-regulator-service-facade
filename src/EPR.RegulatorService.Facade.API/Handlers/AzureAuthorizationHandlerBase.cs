@@ -13,20 +13,21 @@ public abstract class AzureAuthorizationHandlerBase : DelegatingHandler
 
     protected AzureAuthorizationHandlerBase(string serviceClientId, TokenCredential credential, string scheme = Microsoft.Identity.Web.Constants.Bearer)
     {
-        if (string.IsNullOrEmpty(serviceClientId))
+        if (!string.IsNullOrEmpty(serviceClientId))
         {
-            return;
+            _tokenRequestContext = new TokenRequestContext(new[] { serviceClientId });
+            _credential = credential;
+            _scheme = scheme;
         }
-
-        _tokenRequestContext = new TokenRequestContext(new[] { serviceClientId });
-        _credential = credential;
-        _scheme = scheme;
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var tokenResult = await _credential.GetTokenAsync(_tokenRequestContext, cancellationToken);
-        request.Headers.Authorization = new AuthenticationHeaderValue(_scheme, tokenResult.Token);
+        if (_credential != null)
+        {
+            var tokenResult = await _credential.GetTokenAsync(_tokenRequestContext, cancellationToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue(_scheme, tokenResult.Token);
+        }
         return await base.SendAsync(request, cancellationToken);
     }
 }

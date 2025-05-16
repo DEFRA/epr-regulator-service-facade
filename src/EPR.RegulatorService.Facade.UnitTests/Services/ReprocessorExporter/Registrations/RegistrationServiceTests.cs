@@ -306,7 +306,7 @@ public class RegistrationServiceTests
                 nationDetails.NationCode,
                 registrationFeeRequestInfo.CreatedDate,
                 registrationFeeRequestInfo.ApplicationType.ToString(),
-                registrationFeeRequestInfo.Reference))
+                registrationFeeRequestInfo.PaymentReference))
             .ReturnsAsync(paymentFee);
 
         _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
@@ -319,7 +319,7 @@ public class RegistrationServiceTests
         result.RegistrationMaterialId.Should().Be(id);
         result.OrganisationName.Should().Be(organisationName);
         result.SiteAddress.Should().BeEquivalentTo(registrationFeeRequestInfo.SiteAddress);
-        result.ApplicationReferenceNumber.Should().Be(registrationFeeRequestInfo.Reference);
+        result.ApplicationReferenceNumber.Should().Be(registrationFeeRequestInfo.PaymentReference);
         result.MaterialName.Should().Be(registrationFeeRequestInfo.MaterialName);
         result.ApplicationType.Should().Be(registrationFeeRequestInfo.ApplicationType);
         result.SubmittedDate.Should().Be(registrationFeeRequestInfo.CreatedDate);
@@ -354,7 +354,7 @@ public class RegistrationServiceTests
                 nationDetails.NationCode,
                 registrationFeeRequestInfo.CreatedDate,
                 registrationFeeRequestInfo.ApplicationType.ToString(),
-                registrationFeeRequestInfo.Reference))
+                registrationFeeRequestInfo.PaymentReference))
             .ReturnsAsync(paymentFee);
 
         _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
@@ -371,7 +371,7 @@ public class RegistrationServiceTests
             nationDetails.NationCode,
             registrationFeeRequestInfo.CreatedDate,
             registrationFeeRequestInfo.ApplicationType.ToString(),
-            registrationFeeRequestInfo.Reference), Times.Once);
+            registrationFeeRequestInfo.PaymentReference), Times.Once);
     }
 
     [TestMethod]

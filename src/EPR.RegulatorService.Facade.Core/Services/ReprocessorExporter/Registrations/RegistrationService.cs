@@ -90,14 +90,14 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
                                                                               nationDetails.NationCode,
                                                                               registrationFeeRequestInfos.CreatedDate,
                                                                               registrationFeeRequestInfos.ApplicationType.ToString(),
-                                                                              registrationFeeRequestInfos.Reference);
+                                                                              registrationFeeRequestInfos.PaymentReference);
         return new PaymentFeeDetailsDto
         {
             RegistrationId = registrationFeeRequestInfos.RegistrationId,
             RegistrationMaterialId = id,
             OrganisationName = organisationName,
             SiteAddress = registrationFeeRequestInfos.SiteAddress,
-            ApplicationReferenceNumber = registrationFeeRequestInfos.Reference,
+            ApplicationReferenceNumber = registrationFeeRequestInfos.PaymentReference,
             MaterialName = registrationFeeRequestInfos.MaterialName,
             SubmittedDate = registrationFeeRequestInfos.CreatedDate,
             FeeAmount = paymentFee,

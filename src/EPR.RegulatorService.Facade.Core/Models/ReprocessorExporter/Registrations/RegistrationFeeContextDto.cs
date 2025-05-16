@@ -9,7 +9,7 @@ public class RegistrationFeeContextDto
     public int OrganisationId { get; set; }
     public int NationId { get; set; }
     public string MaterialName { get; set; }
-    public string Reference { get; set; }
+    public string PaymentReference { get; set; }
     public ApplicationOrganisationType ApplicationType { get; init; }
     public string SiteAddress { get; set; } 
     public DateTime CreatedDate { get; set; }
