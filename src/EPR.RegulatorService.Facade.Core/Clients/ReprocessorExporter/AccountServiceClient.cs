@@ -36,6 +36,7 @@ ILogger<AccountServiceClient> logger)
         //var url = string.Format($"{_config.Endpoints.GetNationDetailsById}", id);
         //return await GetAsync<string>(url);
     }
+
     public async Task<string> GetOrganisationNameById(int id)
     {
         logger.LogInformation(LogMessages.AttemptingOrganisationName);
