@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
+using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -19,6 +20,8 @@ public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateRegulatorRegistrationTaskDto> updateRegulatorRegistrationTaskValidator
     , IValidator<UpdateRegulatorApplicationTaskDto> updateRegulatorApplicationTaskValidator
     , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
+    , IValidator<OfflinePaymentRequestDto> offlinePaymentRequestDtoValidator
+    , IValidator<MarkAsDulyMadeRequestDto> markAsDulyMadeRequestDtoValidator
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
 
@@ -168,7 +171,7 @@ public class RegistrationsController(IRegistrationService registrationService
     }
 
     [HttpGet("registrations/{id:int}/siteAddress")]
-    [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
+    [ProducesResponseType(typeof(SiteAddressDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "get site address details",
@@ -178,13 +181,13 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetSiteAddressByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.SiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var result = await registrationService.GetSiteAddressByRegistrationId(id);
         return Ok(result);
     }
 
     [HttpGet("registrations/{id:int}/authorisedMaterials")]
-    [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
+    [ProducesResponseType(typeof(MaterialsAuthorisedOnSiteDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
     Summary = "get materials authorised details",
@@ -194,8 +197,64 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.AuthorisedMaterial);
+        logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
         var result = await registrationService.GetAuthorisedMaterialByRegistrationId(id);
         return Ok(result);
+    }
+
+    [HttpGet("registrationMaterials/{id:int}/paymentFees")]
+    [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+    Summary = "Get registration fee details.",
+    Description = "Attempting to get registration fee details."
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns registration fee details.", typeof(PaymentFeeDetailsDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
+        var result = await registrationService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
+        return Ok(result);
+    }
+
+    [HttpPost("registrationMaterials/offlinePayment")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
+    [SwaggerOperation(
+            Summary = "Saves a new offline payment",
+            Description = "Save a new offline payment with mandatory payment request data.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> SaveOfflinePayment([FromBody] OfflinePaymentRequestDto request)
+    {
+        await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
+        logger.LogInformation(LogMessages.SaveOfflinePayment);
+        await registrationService.SaveOfflinePayment(User.UserId(), request);
+        return NoContent();
+    }
+
+    [HttpPost("registrationMaterials/{id:int}/markAsDulyMade")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
+    [SwaggerOperation(
+            Summary = "Mark a registration material as duly made”",
+            Description = "Attempting to mark a registration material as duly made. "
+        )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> MarkAsDulyMadeByRegistrationMaterialId(
+        [FromRoute] int id, 
+        [FromBody] MarkAsDulyMadeRequestDto request)
+    {
+        await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
+        logger.LogInformation(LogMessages.AttemptingMarkAsDulyMade);
+        await registrationService.MarkAsDulyMadeByRegistrationMaterialId(id, User.UserId(), request);
+        return NoContent();
     }
 }

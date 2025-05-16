@@ -32,7 +32,7 @@ public class AccountServiceClientTests
         {
             Endpoints = new AccountsServiceEndpoints
             {
-                GetNationNameById = "regulators/GetNationNameById/{0}"
+                GetNationDetailsById = "regulators/GetNationNameById/{0}"
             }
         });
 
@@ -48,9 +48,23 @@ public class AccountServiceClientTests
     public async Task GetNationNameById_WhenServiceNotReady_ReturnsHardcodedValue(int nationId, string expected)
     {
         // Act
-        var result = await _client.GetNationNameById(nationId);
+        var result = await _client.GetNationDetailsById(nationId);
 
         // Assert
-        result.Should().Be(expected);
+        result.Name.Should().Be(expected);
+    }
+
+    [TestMethod]
+    public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
+    {
+        // Arrange
+        var id = 1;
+        var expectedName = "Green Ltd";
+
+        // Act
+        var result = await _client.GetOrganisationNameById(id);
+
+        // Assert
+        result.Should().Be(expectedName);
     }
 }

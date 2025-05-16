@@ -26,6 +26,7 @@ public static class HttpClientServiceCollectionExtension
         services.AddScoped<IOrganisationRegistrationSubmissionService, OrganisationRegistrationSubmissionService>();
         services.AddTransient<AccountServiceAuthorisationHandler>();
         services.AddTransient<PrnBackendServiceAuthorisationHandler>();
+        services.AddTransient<PaymentBackendServiceAuthorisationHandler>();
 
         var settings = services.BuildServiceProvider().GetRequiredService<IOptions<AccountsServiceApiConfig>>().Value;
         var submissionSettings =
@@ -36,6 +37,8 @@ public static class HttpClientServiceCollectionExtension
             services.BuildServiceProvider().GetRequiredService<IOptions<PrnBackendServiceApiConfig>>().Value;
         var blobStorageSettings = services.BuildServiceProvider().GetRequiredService<IOptions<BlobStorageConfig>>();
         var antivirusSettings = services.BuildServiceProvider().GetRequiredService<IOptions<AntivirusApiConfig>>().Value;
+        var paymentServiceApiSettings =
+            services.BuildServiceProvider().GetRequiredService<IOptions<PaymentBackendServiceApiConfig>>().Value;
 
         services.AddHttpClient<IApplicationService, ApplicationService>((sp, client) =>
         {
@@ -85,6 +88,14 @@ public static class HttpClientServiceCollectionExtension
         })
         .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
         .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
+
+        services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>((sp, client) =>
+        {
+            client.BaseAddress = new Uri(paymentServiceApiSettings.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(paymentServiceApiSettings.Timeout);
+        })
+        .AddHttpMessageHandler<PaymentBackendServiceAuthorisationHandler>()
+        .AddPolicyHandler(GetRetryPolicy(paymentServiceApiSettings.ServiceRetryCount));
 
         services.AddHttpClient<IAccountServiceClient, AccountServiceClient>((sp, client) =>
         {

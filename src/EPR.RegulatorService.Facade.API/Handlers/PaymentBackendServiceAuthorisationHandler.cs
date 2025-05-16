@@ -6,12 +6,13 @@ using System.Diagnostics.CodeAnalysis;
 namespace EPR.RegulatorService.Facade.API.Handlers;
 
 [ExcludeFromCodeCoverage]
-public class PrnBackendServiceAuthorisationHandler : AzureAuthorizationHandlerBase
+public class PaymentBackendServiceAuthorisationHandler : AzureAuthorizationHandlerBase
 {
-    public PrnBackendServiceAuthorisationHandler(IOptions<PrnBackendServiceApiConfig> options)
+    public PaymentBackendServiceAuthorisationHandler(IOptions<PaymentBackendServiceApiConfig> options)
         : base(
             options.Value.ClientId,
             new DefaultAzureCredential())
     {
     }
 }
+

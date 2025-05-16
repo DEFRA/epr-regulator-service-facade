@@ -33,6 +33,7 @@ public static class ServiceCollectionExtension
         services.Configure<BlobStorageConfig>(configuration.GetSection(BlobStorageConfig.SectionName));
         services.Configure<AntivirusApiConfig>(configuration.GetSection(AntivirusApiConfig.SectionName));
         services.Configure<PrnBackendServiceApiConfig>(configuration.GetSection(PrnBackendServiceApiConfig.SectionName));
+        services.Configure<PaymentBackendServiceApiConfig>(configuration.GetSection(PaymentBackendServiceApiConfig.SectionName));
     }
 
     private static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
@@ -47,5 +48,6 @@ public static class ServiceCollectionExtension
         services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IAccountServiceClient, AccountServiceClient>();
+        services.AddScoped<IPaymentServiceClient, PaymentServiceClient>();
     }
 }
