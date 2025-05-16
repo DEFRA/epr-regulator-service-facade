@@ -206,14 +206,14 @@ public class RegistrationsController(IRegistrationService registrationService
     [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-    Summary = "Get sampling plan for a material",
-    Description = "Retrieve sampling plan associated with a material."
+    Summary = "Get registration fee details.",
+    Description = "Attempting to get registration fee details."
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns sampling plan for a material.", typeof(PaymentFeeDetailsDto))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns registration fee details.", typeof(PaymentFeeDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
     {
-        logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
+        logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
         var result = await registrationService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
         return Ok(result);
     }
