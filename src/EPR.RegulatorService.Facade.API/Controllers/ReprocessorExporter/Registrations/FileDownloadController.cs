@@ -34,7 +34,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
         private readonly BlobStorageConfig _blobStorageConfig = blobStorageConfig.Value;
         private readonly AntivirusApiConfig _antivirusApiConfig = antivirusApiConfig.Value;
 
-        [HttpPost("Registration/file-download")]
+        [HttpPost("registrations/file-download")]
         [ProducesResponseType(typeof(FileContentResult), 200)]
         [SwaggerResponse(StatusCodes.Status403Forbidden, "If the file being downloaded is infected with a virus.", typeof(ObjectResult))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
@@ -47,7 +47,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
             logger.LogInformation(LogMessages.RegulatorRegistrationDownloadFile);
 
             var stream = await _blobStorageService.DownloadFileStreamAsync(_blobStorageConfig.ReprocessorExporterRegistrationContainerName,
-                                                                            request.FileId.ToString());
+                                                                            request.FileName.ToString());
 
             // send FileDownloadRequest to Trade antivirus API for checking
             var userId = User.UserId();
