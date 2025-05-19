@@ -106,10 +106,4 @@ public class FileDownloadController : ControllerBase
             submissionType == SubmissionType.Producer
                 ? _options.PomContainerName
                 : _options.RegistrationContainerName;
-
-    private string GetContainerName(string submissionType)
-    {
-        var suffix = _antivirusApiConfig?.CollectionSuffix;
-        return suffix is null ? submissionType : submissionType + suffix;
-    }
 }
