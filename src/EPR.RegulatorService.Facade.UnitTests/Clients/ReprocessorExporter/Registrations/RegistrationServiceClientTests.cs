@@ -46,7 +46,8 @@ public class RegistrationServiceClientTests
                 UpdateMaterialOutcomeByRegistrationMaterialId = "update/material/{0}",
                 WasteLicensesByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/wasteLicenses",
                 ReprocessingIOByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/reprocessingInputsOutputs",
-                SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan"
+                SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan",
+                AccreditationsByRegistrationId = "api/v{0}/registrations/{1}/accreditations"
             }
         });
 
