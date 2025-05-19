@@ -84,4 +84,12 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format($"{_config.Endpoints.AuthorisedMaterialByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
     }
+
+    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
+        ////var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);
+        var url = string.Format($"{_config.Endpoints.RegistrationByRegistrationId}", _config.ApiVersion, 2);
+        return await GetAsync<RegistrationOverviewDto>(url);
+    }
 }

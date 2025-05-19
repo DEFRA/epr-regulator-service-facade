@@ -237,4 +237,20 @@ public class RegistrationServiceTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
+
+    [TestMethod]
+    public async Task GetAccreditationsByRegistrationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationOverviewDto>();
+        _mockRegistrationServiceClient.Setup(client => client.GetAccreditationsByRegistrationId(id))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetAccreditationsByRegistrationId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
 }

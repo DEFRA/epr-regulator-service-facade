@@ -72,4 +72,9 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
     {
         return await registrationServiceClient.GetAuthorisedMaterialByRegistrationId(id);
     }
+
+    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id)
+    {
+        return await registrationServiceClient.GetAccreditationsByRegistrationId(id);
+    }
 }

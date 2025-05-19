@@ -15,4 +15,5 @@ public interface IRegistrationService
     Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id);
     Task<SiteAddressDetailsDto> GetSiteAddressByRegistrationId(int id);
     Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id);
+    Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id);
 }
