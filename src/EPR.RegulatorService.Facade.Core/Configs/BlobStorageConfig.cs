@@ -16,4 +16,7 @@ public class BlobStorageConfig
 
     [Required]
     public string RegistrationContainerName { get; set; }
+
+    [Required]
+    public string ReprocessorExporterRegistrationContainerName { get; set; }
 }
