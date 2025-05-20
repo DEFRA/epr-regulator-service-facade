@@ -47,7 +47,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
             logger.LogInformation(LogMessages.RegulatorRegistrationDownloadFile);
 
             var stream = await _blobStorageService.DownloadFileStreamAsync(_blobStorageConfig.ReprocessorExporterRegistrationContainerName,
-                                                                            request.FileName.ToString());
+                                                                            request.FileName);
 
             // send FileDownloadRequest to Trade antivirus API for checking
             var userId = User.UserId();
