@@ -1,9 +1,9 @@
-﻿using EPR.RegulatorService.Facade.Core.Enums;
+﻿using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 
 namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
 {
     public interface IAntivirusService
-    {
-        Task<HttpResponseMessage> SendFile(SubmissionType submissionType, Guid fileId, string fileName, MemoryStream fileStream, Guid userId, string email);
+    {        
+        Task<HttpResponseMessage> SendFile(FileDetails fileDetails, string fileName, MemoryStream fileStream);
     }
 }

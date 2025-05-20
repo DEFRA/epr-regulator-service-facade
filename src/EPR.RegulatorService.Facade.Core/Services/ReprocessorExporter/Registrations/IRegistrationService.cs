@@ -14,5 +14,8 @@ public interface IRegistrationService
     Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id);
     Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id);
     Task<SiteAddressDetailsDto> GetSiteAddressByRegistrationId(int id);
-    Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id);
+    Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id); 
+    Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(int id);
+    Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
+    Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, Guid userId, MarkAsDulyMadeRequestDto request);
 }

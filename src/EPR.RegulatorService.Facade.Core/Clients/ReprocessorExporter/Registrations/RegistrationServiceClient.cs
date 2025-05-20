@@ -43,11 +43,18 @@ ILogger<RegistrationServiceClient> logger)
         return await GetAsync<RegistrationMaterialDetailsDto>(url);
     }
 
-    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request)
+    public async Task<RegistrationAccreditationReferenceDto> GetRegistrationAccreditationReference(int id)
+    {
+        logger.LogInformation(LogMessages.RegistrationAccreditationReference, id);
+        var url = string.Format($"{_config.Endpoints.RegistrationAccreditationReference}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationAccreditationReferenceDto>(url);
+    }
+
+    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeWithReferenceDto request)
     {
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
         var url = string.Format($"{_config.Endpoints.UpdateMaterialOutcomeByRegistrationMaterialId}", _config.ApiVersion, id);
-        return await PostAsync<UpdateMaterialOutcomeRequestDto, bool>(url, request);
+        return await PostAsync<UpdateMaterialOutcomeWithReferenceDto, bool>(url, request);
     }
 
     public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)
@@ -73,15 +80,29 @@ ILogger<RegistrationServiceClient> logger)
 
     public async Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.SiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var url = string.Format($"{_config.Endpoints.SiteAddressByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<RegistrationSiteAddressDto>(url);
     }
 
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
     {
-        logger.LogInformation(LogMessages.AuthorisedMaterial);
+        logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
         var url = string.Format($"{_config.Endpoints.AuthorisedMaterialByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
+    }
+
+    public async Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(int id)
+    {
+        logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
+        var url = string.Format($"{_config.Endpoints.RegistrationFeeByRegistrationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationFeeContextDto>(url);
+    }
+
+    public async Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, MarkAsDulyMadeWithUserIdDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingMarkAsDulyMade);
+        var url = string.Format(_config.Endpoints.MarkAsDulyMadeByRegistrationMaterialId, _config.ApiVersion, id);
+        return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
     }
 }
