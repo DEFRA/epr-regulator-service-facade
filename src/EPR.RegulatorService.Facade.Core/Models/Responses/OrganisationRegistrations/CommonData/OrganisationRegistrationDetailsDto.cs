@@ -89,10 +89,7 @@ public class OrganisationRegistrationDetailsDto
             {
                 return null;
             }
-
-            DateTime utcDateTime = DateTime.SpecifyKind(tempDate, DateTimeKind.Utc);
-
-            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Europe/London"));
+            return tempDate;
         }
 
         if (dto is null) return null;
