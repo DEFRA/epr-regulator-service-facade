@@ -47,7 +47,7 @@ public class RegistrationServiceClientTests
                 WasteLicensesByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/wasteLicenses",
                 ReprocessingIOByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/reprocessingInputsOutputs",
                 SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan",
-                AccreditationsByRegistrationId = "api/v{0}/registrations/{1}/accreditations"
+                AccreditationsByRegistrationId = "api/v{0}/registrations/{1}/accreditations/{2}"
             }
         });
 
@@ -332,7 +332,7 @@ public class RegistrationServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
 
         // Act
-        var result = await _client.GetAccreditationsByRegistrationId(Guid.NewGuid());
+        var result = await _client.GetAccreditationsByRegistrationId(Guid.NewGuid(), 2024);
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);

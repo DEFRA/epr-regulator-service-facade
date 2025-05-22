@@ -85,11 +85,10 @@ ILogger<RegistrationServiceClient> logger)
         return await GetAsync<MaterialsAuthorisedOnSiteDto>(url);
     }
 
-    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id)
+    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
-        ////var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);
-        var url = string.Format($"{_config.Endpoints.RegistrationByRegistrationId}", _config.ApiVersion, 2);
+        var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id, year);
         return await GetAsync<RegistrationOverviewDto>(url);
     }
 }

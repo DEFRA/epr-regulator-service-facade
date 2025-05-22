@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
+using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
@@ -16,7 +17,7 @@ public class AccreditationsController(
     IRegistrationService registrationService,
     ILogger<AccreditationsController> logger) : ControllerBase
 {
-    [HttpGet("registrations/{id:Guid}/accreditations")]
+    [HttpGet("registrations/{id:Guid}/accreditations/{year:int}")]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(
@@ -25,11 +26,10 @@ public class AccreditationsController(
         )]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetAccreditationsByRegistrationId(Guid id)
+    public async Task<IActionResult> GetAccreditationsByRegistrationId(Guid id, int year)
     {
-        logger.LogInformation("Get accreditation data for the given registration: {id}", id);
-        var accreditations = await registrationService.GetAccreditationsByRegistrationId(id);
-
+        logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
+        var accreditations = await registrationService.GetAccreditationsByRegistrationId(id, year);
         return Ok(accreditations);
     }
 }
