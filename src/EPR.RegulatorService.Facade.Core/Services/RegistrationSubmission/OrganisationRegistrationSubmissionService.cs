@@ -68,7 +68,11 @@ public partial class OrganisationRegistrationSubmissionService(
         }
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
+    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+        Guid submissionId,
+        Guid userId,
+        int lateFeeCutOffDay,
+        int lateFeeCutOffMonth)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
 
@@ -79,7 +83,7 @@ public partial class OrganisationRegistrationSubmissionService(
             deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
         }
 
-        var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
+        var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
         if (deltaRegistrationDecisionsResponse.Count > 0 && requestedItem is not null)
         {
