@@ -274,8 +274,10 @@ public class OrganisationRegistrationSubmissionServiceTests
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails()
     {
         // Arrage
-
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
 
         var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
@@ -288,16 +290,35 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth))
             .ReturnsAsync(response).Verifiable();
 
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId,
+            userId,
+            lateFeeCutOffDay,
+            lateFeeCutOffMonth);
 
         //Assert
         Assert.IsNotNull(result);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.Never);
     }
 
     [TestMethod]
@@ -309,6 +330,10 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Arrange
         var appRefNum = "APPREF123";
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
+
         var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
 
@@ -321,7 +346,11 @@ public class OrganisationRegistrationSubmissionServiceTests
             SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails(),
             ResubmissionStatus = RegistrationSubmissionStatus.Granted
         };
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth))
             .ReturnsAsync(response).Verifiable();
 
         var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
@@ -348,7 +377,11 @@ public class OrganisationRegistrationSubmissionServiceTests
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
         //Act
-        var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId,
+            userId,
+            lateFeeCutOffDay,
+            lateFeeCutOffMonth);
 
         //Assert
         Assert.IsNotNull(result);
@@ -362,9 +395,20 @@ public class OrganisationRegistrationSubmissionServiceTests
             result.ResubmissionStatus.Should().Be(expectedStatus);
             result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
         }
-        
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
+
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.AtMostOnce);
     }
 
     [TestMethod]
@@ -454,6 +498,9 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Arrage
 
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
 
         var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
@@ -487,20 +534,47 @@ public class OrganisationRegistrationSubmissionServiceTests
         };
 
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth))
             .ReturnsAsync(response).Verifiable();
-        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
-        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()))
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetSubmissionLastSyncTime())
+            .ReturnsAsync(submissionLastSyncTimeResponse);
+
+        _submissionsServiceMock.Setup(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>()))
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
 
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId,
+            userId,
+            lateFeeCutOffDay,
+            lateFeeCutOffMonth);
 
         //Assert
         Assert.IsNotNull(result);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtLeastOnce);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.AtLeastOnce);
     }
 
 
@@ -510,8 +584,10 @@ public class OrganisationRegistrationSubmissionServiceTests
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_And_Assign_RegulatorDetails(string type)
     {
         // Arrage
-
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
 
         var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
         {
@@ -542,6 +618,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             SubmissionId = submissionId,
             Type = type
         }).ToList();
+
         var submissionLastSyncTimeResponse = new HttpResponseMessage
         {
             StatusCode = System.Net.HttpStatusCode.OK,
@@ -556,20 +633,44 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth))
             .ReturnsAsync(response).Verifiable();
+
         _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
-        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()))
+
+        _submissionsServiceMock.Setup(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>()))
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
-
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId,
+            userId,
+            lateFeeCutOffDay,
+            lateFeeCutOffMonth);
 
         //Assert
         Assert.IsNotNull(result);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtLeastOnce);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.AtLeastOnce);
     }
 
     [TestMethod]

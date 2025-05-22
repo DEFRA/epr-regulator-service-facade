@@ -303,10 +303,14 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public async Task Should_Return_ValidationProblem_When_Call_GetRegistrationSubmissionDetails_With_ModelState_Is_Invalid(string keyName, string errorMessage)
     {
         // Arrange
+        var submissionId = Guid.Empty;
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
+
         _sut.ModelState.AddModelError(keyName, errorMessage);
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(Guid.Empty) as ObjectResult;
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth) as ObjectResult;
 
         // Assert
         Assert.IsNotNull(result);
@@ -320,38 +324,60 @@ public class OrganisationRegistrationSubmissionsControllerTests
         // Arrange 
 
         var submissionId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
 
         var exception = new Exception("Test exception");
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ThrowsAsync(exception).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth)).ThrowsAsync(exception).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
         var objectResult = (ObjectResult)result;
         objectResult?.StatusCode.Should().Be(500);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetOrganisationRegistrationSubmissionDetails(
+                It.IsAny<Guid>(),
+                It.IsAny<int>(),
+                It.IsAny<int>())
+            , Times.AtMostOnce());
     }
 
     [TestMethod]
     public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
     {
-        // Arrange 
+        // Arrange
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
 
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsFacadeResponse).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth))
+            .ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsFacadeResponse).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
         var statusCodeResult = result as NotFoundResult;
         statusCodeResult?.StatusCode.Should().Be(404);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetOrganisationRegistrationSubmissionDetails(
+                It.IsAny<Guid>(),
+                It.IsAny<int>(),
+                It.IsAny<int>())
+            , Times.AtMostOnce());
     }
 
     [TestMethod]
@@ -359,17 +385,28 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         // Arrange
         var submissionId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth))
             .ReturnsAsync(new RegistrationSubmissionOrganisationDetailsFacadeResponse()).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
         // Assert
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth)
+            , Times.AtMostOnce);
     }
 
 
