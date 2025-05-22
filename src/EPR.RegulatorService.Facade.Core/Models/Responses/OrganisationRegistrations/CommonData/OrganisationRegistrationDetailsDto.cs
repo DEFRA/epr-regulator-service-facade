@@ -84,12 +84,11 @@ public class OrganisationRegistrationDetailsDto
     {
         static DateTime? convertDateTime(string dateTimeString)
         {
-            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime tempDate)
-                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, out tempDate))
+            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime tempDate)
+                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out tempDate))
             {
                 return null;
             }
-
             return tempDate;
         }
 
@@ -189,8 +188,8 @@ public class OrganisationRegistrationDetailsDto
             SubmittedByUserId = dto.SubmittedUserId,
             SubmissionPeriod = dto.SubmissionPeriod,
             ResubmissionStatus = dto.ResubmissionStatus,
-            RegistrationDate = dto.RegistrationDate,
-            ResubmissionDate = dto.ResubmissionDate,
+            RegistrationDate = convertDateTime(dto.RegistrationDate),
+            ResubmissionDate = convertDateTime(dto.ResubmissionDate),
             ResubmissionFileId = dto.ResubmissionFileId,
             IsResubmission = dto.IsResubmission
         };
