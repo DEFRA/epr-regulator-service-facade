@@ -27,6 +27,8 @@ public class PrnServiceApiConfigEndpoints
     public string SamplingPlanByRegistrationMaterialId { get; set; }
     public string SiteAddressByRegistrationId { get; set; }
     public string AuthorisedMaterialByRegistrationId { get; set; }
+    public string RegistrationFeeByRegistrationMaterialId { get; set; }
+    public string MarkAsDulyMadeByRegistrationMaterialId { get; set; }
+    public string RegistrationAccreditationReference { get; set; }
     public string AccreditationsByRegistrationId { get; set; }
-
 }
