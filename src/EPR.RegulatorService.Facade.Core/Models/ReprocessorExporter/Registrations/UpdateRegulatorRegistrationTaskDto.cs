@@ -5,5 +5,5 @@ namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrati
 public class UpdateRegulatorRegistrationTaskDto: UpdateRegulatorTaskBaseDto
 {
     [Required]
-    public required int RegistrationId { get; set; }
+    public required Guid RegistrationId { get; set; }
 }
