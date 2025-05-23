@@ -111,7 +111,7 @@ public class RegistrationsControllerTests
 
         var invalidRequest = new UpdateRegulatorRegistrationTaskDto
         {
-            RegistrationId = 0,
+            RegistrationId = Guid.NewGuid(),
             TaskName = "",
             Status = 0,
             Comments = "Test",
@@ -169,7 +169,7 @@ public class RegistrationsControllerTests
 
         var invalidRequest = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 0,
+            RegistrationMaterialId = Guid.NewGuid(),
             TaskName = "",
             Status = 0,
             Comments = "Testing",
@@ -188,7 +188,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
-        var registrationId = 1;
+        var registrationId = Guid.NewGuid();
         _mockRegistrationService.Setup(service => service.GetRegistrationByRegistrationId(registrationId))
                                     .ReturnsAsync(expectedDto);
 
@@ -207,7 +207,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationMaterialDetailsDto>();
-        var registrationMaterialId = 1;
+        var registrationMaterialId = Guid.NewGuid();
         _mockRegistrationService.Setup(service => service.GetRegistrationMaterialByRegistrationMaterialId(registrationMaterialId))
                                     .ReturnsAsync(expectedDto);
 
@@ -225,7 +225,7 @@ public class RegistrationsControllerTests
     public async Task UpdateMaterialOutcomeByRegistrationMaterialId_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var registrationMaterialId = 1;
+        var registrationMaterialId = Guid.NewGuid();
         var requestDto = _fixture.Create<UpdateMaterialOutcomeRequestDto>();
         var validationResult = new ValidationResult();
 
@@ -261,7 +261,7 @@ public class RegistrationsControllerTests
             _mockLogger.Object
         );
 
-        var registrationMaterialId = 1;
+        var registrationMaterialId = Guid.NewGuid();
         var requestDto = new UpdateMaterialOutcomeRequestDto
         {
             Status = (RegistrationMaterialStatus)999
@@ -277,7 +277,7 @@ public class RegistrationsControllerTests
     public async Task GetWasteLicenceByMaterialId_ValidRequest_ReturnsExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedDto = new RegistrationMaterialWasteLicencesDto
         {
             PermitType = "TypeA",
@@ -310,7 +310,7 @@ public class RegistrationsControllerTests
     public async Task GetReprocessingIOByRegistrationMaterialId_ValidRequest_ReturnsExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
 
         _mockRegistrationService
@@ -334,7 +334,7 @@ public class RegistrationsControllerTests
     public async Task GetReprocessingIOByRegistrationMaterialId_ServiceThrowsException_ReturnsInternalServerError()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
 
         _mockRegistrationService
             .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
@@ -351,7 +351,7 @@ public class RegistrationsControllerTests
     public async Task GetSamplingPlanByRegistrationMaterialId_ValidRequest_ReturnsExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
 
         _mockRegistrationService
@@ -375,7 +375,7 @@ public class RegistrationsControllerTests
     public async Task GetSamplingPlanByRegistrationMaterialId_ServiceThrowsException_ReturnsInternalServerError()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
 
         _mockRegistrationService
             .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
@@ -392,7 +392,7 @@ public class RegistrationsControllerTests
     public async Task GetSamplingPlanByRegistrationMaterialId_ServiceReturnsNull_ReturnsOkWithNull()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
 
         _mockRegistrationService
             .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
@@ -415,7 +415,7 @@ public class RegistrationsControllerTests
     public async Task GetSiteAddressByRegistrationId_ShouldReturnOk_WithExpectedResult()
     {
         // Arrange
-        var registrationId = 1;
+        var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<SiteAddressDetailsDto>();
 
         _mockRegistrationService
@@ -436,7 +436,7 @@ public class RegistrationsControllerTests
     public async Task GetSiteAddressByRegistrationId_ShouldThrowException_WhenServiceFails()
     {
         // Arrange
-        var registrationId = 1;
+        var registrationId = Guid.NewGuid();
         _mockRegistrationService
             .Setup(service => service.GetSiteAddressByRegistrationId(registrationId))
             .ThrowsAsync(new Exception("Unexpected error"));
@@ -452,7 +452,7 @@ public class RegistrationsControllerTests
     public async Task GetAuthorisedMaterialByRegistrationId_ShouldReturnOk_WithExpectedResult()
     {
         // Arrange
-        var registrationId = 2;
+        var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
 
         _mockRegistrationService
@@ -473,7 +473,7 @@ public class RegistrationsControllerTests
     public async Task GetAuthorisedMaterialByRegistrationId_ShouldThrowException_WhenServiceFails()
     {
         // Arrange
-        var registrationId = 2;
+        var registrationId = Guid.NewGuid();
         _mockRegistrationService
             .Setup(service => service.GetAuthorisedMaterialByRegistrationId(registrationId))
             .ThrowsAsync(new Exception("Service error"));
@@ -489,7 +489,7 @@ public class RegistrationsControllerTests
     public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldReturnOk_WithExpectedResult()
     {
         // Arrange
-        var registrationMaterialId = 2;
+        var registrationMaterialId = Guid.NewGuid();
         var expectedDto = _fixture.Create<PaymentFeeDetailsDto>();
 
         _mockRegistrationService
@@ -510,7 +510,7 @@ public class RegistrationsControllerTests
     public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldThrowException_WhenServiceFails()
     {
         // Arrange
-        var registrationMaterialId = 2;
+        var registrationMaterialId = Guid.NewGuid();
         _mockRegistrationService
             .Setup(service => service.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId))
             .ThrowsAsync(new Exception("Service error"));
@@ -572,7 +572,7 @@ public class RegistrationsControllerTests
     public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var materialId = 1;
+        var materialId = Guid.NewGuid();
         var requestDto = _fixture.Create<MarkAsDulyMadeRequestDto>();
 
         _mockMarkAsDulyMadeRequestValidator
@@ -611,7 +611,7 @@ public class RegistrationsControllerTests
 
         // Act & Assert
         await FluentActions.Invoking(() =>
-            _controller.MarkAsDulyMadeByRegistrationMaterialId(1, requestDto)
+            _controller.MarkAsDulyMadeByRegistrationMaterialId(Guid.NewGuid(), requestDto)
         ).Should().ThrowAsync<ValidationException>();
     }
 
