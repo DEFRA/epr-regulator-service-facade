@@ -1,4 +1,5 @@
-﻿using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+﻿using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
@@ -18,4 +19,5 @@ public interface IRegistrationServiceClient
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(int id);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, MarkAsDulyMadeWithUserIdDto request);
     Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int year);
+    Task<AccreditationSummaryDto> GetSamplingPlansByAccreditationId(Guid id, int accreditationId);
 }

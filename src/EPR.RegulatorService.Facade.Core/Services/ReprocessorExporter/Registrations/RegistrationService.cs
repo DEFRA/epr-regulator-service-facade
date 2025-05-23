@@ -5,6 +5,7 @@ using EPR.RegulatorService.Facade.Core;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -148,5 +149,10 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
     public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int year)
     {
         return await registrationServiceClient.GetAccreditationsByRegistrationId(id, year);
+    }
+
+    public async Task<AccreditationSummaryDto> GetSamplingPlansByAccreditationId(Guid id, int accreditationId)
+    {
+        return await registrationServiceClient.GetSamplingPlansByAccreditationId(id,  accreditationId);
     }
 }

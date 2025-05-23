@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
@@ -47,5 +48,43 @@ public class AccreditationsControllerTests
         okResult.Should().NotBeNull();
         okResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
         okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByAccreditationId_ShouldReturnOKResult()
+    {
+        //Arrange
+        var expectedDto = _fixture.Create<AccreditationSummaryDto>();
+        var id = Guid.NewGuid();
+        var accreditationId = 5001;
+        _mockRegistrationService.Setup(service => service.GetSamplingPlansByAccreditationId(id, accreditationId)).ReturnsAsync(expectedDto);
+
+        //Act
+        var result = await _controller.GetSamplingPlansByAccreditationId(id , accreditationId);
+
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByAccreditationId_ShouldNotReturnRegistrationOverDto()
+    {
+        //Arrange
+        var actualDto = _fixture.Create<RegistrationOverviewDto>();
+        var id = Guid.NewGuid();
+        var accreditationId = 1;
+        _mockRegistrationService.Setup(service => service.GetSamplingPlansByAccreditationId(id, accreditationId)).Should().NotBeOfType<RegistrationOverviewDto>();
+
+        //Act
+        var result = await _controller.GetSamplingPlansByAccreditationId(id, accreditationId);
+
+        var obResult = result as ObjectResult;
+        obResult.Should().NotBeNull();
+        obResult.Should().NotBeSameAs(actualDto);
+
+        obResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        obResult.Value.Should().NotBeSameAs(actualDto);
     }
 }

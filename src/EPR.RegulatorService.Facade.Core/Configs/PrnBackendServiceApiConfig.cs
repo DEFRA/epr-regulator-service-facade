@@ -31,4 +31,5 @@ public class PrnServiceApiConfigEndpoints
     public string MarkAsDulyMadeByRegistrationMaterialId { get; set; }
     public string RegistrationAccreditationReference { get; set; }
     public string AccreditationsByRegistrationId { get; set; }
+    public string SamplingPlansByAccreditationId { get; set; }
 }

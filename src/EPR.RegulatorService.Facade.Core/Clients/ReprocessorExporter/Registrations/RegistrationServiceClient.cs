@@ -1,6 +1,7 @@
 ﻿using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -111,5 +112,12 @@ ILogger<RegistrationServiceClient> logger)
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
         var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id, year);
         return await GetAsync<RegistrationOverviewDto>(url);
+    }
+
+    public async Task<AccreditationSummaryDto> GetSamplingPlansByAccreditationId(Guid id, int accreditationId)
+    {
+        logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
+        var url = string.Format(_config.Endpoints.SamplingPlansByAccreditationId, id, accreditationId);
+        return await GetAsync<AccreditationSummaryDto>(url);
     }
 }

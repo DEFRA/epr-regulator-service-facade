@@ -32,4 +32,21 @@ public class AccreditationsController(
         var accreditations = await registrationService.GetAccreditationsByRegistrationId(id, year);
         return Ok(accreditations);
     }
+
+    [HttpGet("registrations/{id:Guid}/accreditations/{accreditationId:int}")]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+            Summary = "get sampling data for a given accreditation and registration id.",
+            Description = "Returns all sampling data of an accreditation for a given site registration, including material-level and site-level tasks.  "
+        )]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetSamplingPlansByAccreditationId(Guid id, int accreditationId)
+    {
+        logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
+        var samplingPlans = await registrationService.GetSamplingPlansByAccreditationId(id, accreditationId);
+
+        return Ok(samplingPlans);
+    }
 }

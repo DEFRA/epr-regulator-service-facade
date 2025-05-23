@@ -1,4 +1,5 @@
-﻿using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+﻿using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -19,4 +20,5 @@ public interface IRegistrationService
     Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, Guid userId, MarkAsDulyMadeRequestDto request);
     Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int year);
+    Task<AccreditationSummaryDto> GetSamplingPlansByAccreditationId(Guid id, int accreditationId);
 }
