@@ -24,17 +24,19 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await registrationServiceClient.UpdateRegulatorApplicationTaskStatus(request);
     }
 
-    public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(int id)
+    public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(Guid id)
     {
-        return await registrationServiceClient.GetRegistrationByRegistrationId(id);
+        var result = await registrationServiceClient.GetRegistrationByRegistrationId(id);
+        result.OrganisationName = await accountServiceClient.GetOrganisationNameById(result.OrganisationId);
+        return result;
     }
 
-    public async Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(Guid id)
     {
         return await registrationServiceClient.GetRegistrationMaterialByRegistrationMaterialId(id);
     }
 
-    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(int id, UpdateMaterialOutcomeRequestDto request)
+    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(Guid id, UpdateMaterialOutcomeRequestDto request)
     {
         var referenceNumber = await GenerateRegistrationAccreditationReference(id);
         var outcomeRequest = new UpdateMaterialOutcomeWithReferenceDto 
@@ -46,22 +48,22 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await registrationServiceClient.UpdateMaterialOutcomeByRegistrationMaterialId(id, outcomeRequest);
     }
 
-    public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         return await registrationServiceClient.GetWasteLicenceByRegistrationMaterialId(id);
     }
 
-    public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         return await registrationServiceClient.GetReprocessingIOByRegistrationMaterialId(id);
     }
 
-    public async Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(int id)
+    public async Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         return await registrationServiceClient.GetSamplingPlanByRegistrationMaterialId(id);
     }
 
-    public async Task<SiteAddressDetailsDto> GetSiteAddressByRegistrationId(int id)
+    public async Task<SiteAddressDetailsDto> GetSiteAddressByRegistrationId(Guid id)
     {
         var registrationSiteAddress = await registrationServiceClient.GetSiteAddressByRegistrationId(id);
         var nationDetails = await accountServiceClient.GetNationDetailsById(registrationSiteAddress.NationId);
@@ -76,12 +78,12 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         };
     }
 
-    public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id)
+    public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
         return await registrationServiceClient.GetAuthorisedMaterialByRegistrationId(id);
     }
 
-    public async Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
+    public async Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         var registrationFeeRequestInfos = await registrationServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
         var organisationName = await accountServiceClient.GetOrganisationNameById(registrationFeeRequestInfos.OrganisationId);
@@ -123,7 +125,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await paymentServiceClient.SaveOfflinePayment(offlinePaymentRequest);
     }
 
-    public async Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, Guid userId, MarkAsDulyMadeRequestDto request)
+    public async Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request)
     {
         var markAsDulyMadeRequest = new MarkAsDulyMadeWithUserIdDto
         {
@@ -135,7 +137,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await registrationServiceClient.MarkAsDulyMadeByRegistrationMaterialId(id, markAsDulyMadeRequest);
     }
 
-    private async Task<string> GenerateRegistrationAccreditationReference(int id)
+    private async Task<string> GenerateRegistrationAccreditationReference(Guid id)
     {
         var referenceInfos = await registrationServiceClient.GetRegistrationAccreditationReference(id);
         var nationDetails = await accountServiceClient.GetNationDetailsById(referenceInfos.NationId);

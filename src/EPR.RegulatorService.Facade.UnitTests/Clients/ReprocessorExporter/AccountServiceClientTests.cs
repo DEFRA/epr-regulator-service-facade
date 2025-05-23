@@ -58,7 +58,7 @@ public class AccountServiceClientTests
     public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedName = "Green Ltd";
 
         // Act
