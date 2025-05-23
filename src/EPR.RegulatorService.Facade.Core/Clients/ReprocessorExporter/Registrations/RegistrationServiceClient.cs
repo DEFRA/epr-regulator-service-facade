@@ -105,4 +105,15 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format(_config.Endpoints.MarkAsDulyMadeByRegistrationMaterialId, _config.ApiVersion, id);
         return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
     }
+
+    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int? year)
+    {
+        logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
+        var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);
+        if (year != null)
+        {
+            url = $"{url}?{year}";
+        }
+        return await GetAsync<RegistrationOverviewDto>(url);
+    }
 }
