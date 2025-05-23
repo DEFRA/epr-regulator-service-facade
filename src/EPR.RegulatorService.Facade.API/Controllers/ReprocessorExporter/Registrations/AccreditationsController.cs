@@ -17,7 +17,7 @@ public class AccreditationsController(
     IRegistrationService registrationService,
     ILogger<AccreditationsController> logger) : ControllerBase
 {
-    [HttpGet("registrations/{id:Guid}/accreditations/{year:int}")]
+    [HttpGet("registrations/{id:Guid}/accreditations")]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(
@@ -26,7 +26,7 @@ public class AccreditationsController(
         )]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetAccreditationsByRegistrationId(Guid id, int year)
+    public async Task<IActionResult> GetAccreditationsByRegistrationId(Guid id, [FromQuery] int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
         var accreditations = await registrationService.GetAccreditationsByRegistrationId(id, year);

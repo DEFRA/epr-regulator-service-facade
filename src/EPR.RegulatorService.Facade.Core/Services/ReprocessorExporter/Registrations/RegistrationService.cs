@@ -147,7 +147,7 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return $"{referenceInfos.RegistrationType}{referenceInfos.RelevantYear}{countryCode}{orgTypeInitial}{referenceInfos.OrgCode}{referenceInfos.RandomDigits}{referenceInfos.MaterialCode}";
     }
 
-    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int year)
+    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int? year)
     {
         return await registrationServiceClient.GetAccreditationsByRegistrationId(id, year);
     }

@@ -17,5 +17,5 @@ public interface IRegistrationServiceClient
     Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id);
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(Guid id);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, MarkAsDulyMadeWithUserIdDto request);
-    Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int year);
+    Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int? year);
 }
