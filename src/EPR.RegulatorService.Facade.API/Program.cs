@@ -19,7 +19,6 @@ using Microsoft.FeatureManagement;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using EPR.RegulatorService.Facade.API.Helpers;
 using Microsoft.FeatureManagement;
 using Microsoft.AspNetCore.Mvc;

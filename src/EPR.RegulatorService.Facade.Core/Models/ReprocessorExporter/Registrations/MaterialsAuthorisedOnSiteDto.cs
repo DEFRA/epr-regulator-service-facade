@@ -2,7 +2,7 @@
 
 public class MaterialsAuthorisedOnSiteDto
 {
-    public int RegistrationId { get; init; }
+    public Guid RegistrationId { get; init; }
     public string OrganisationName { get; init; }
     public string SiteAddress { get; init; }
     public List<MaterialsAuthorisedOnSiteInfoDto> MaterialsAuthorisation { get; set; } = [];

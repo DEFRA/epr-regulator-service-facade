@@ -78,7 +78,7 @@ public class RegistrationsController(IRegistrationService registrationService
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(RegistrationOverviewDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
+    public async Task<IActionResult> GetRegistrationByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
         var result = await registrationService.GetRegistrationByRegistrationId(id);
@@ -94,7 +94,7 @@ public class RegistrationsController(IRegistrationService registrationService
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
         var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
@@ -113,7 +113,7 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
-        [FromRoute] int id,
+        [FromRoute] Guid id,
         [FromBody] UpdateMaterialOutcomeRequestDto request)
     {
         await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
@@ -131,7 +131,7 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicencesDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
         var result = await registrationService.GetWasteLicenceByRegistrationMaterialId(id);
@@ -147,7 +147,7 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
         var result = await registrationService.GetReprocessingIOByRegistrationMaterialId(id);
@@ -163,7 +163,7 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns sampling plan for a material.", typeof(RegistrationMaterialSamplingPlanDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
         var result = await registrationService.GetSamplingPlanByRegistrationMaterialId(id);
@@ -179,7 +179,7 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns site address details.", typeof(SiteAddressDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetSiteAddressByRegistrationId(int id)
+    public async Task<IActionResult> GetSiteAddressByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var result = await registrationService.GetSiteAddressByRegistrationId(id);
@@ -195,7 +195,7 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns materials authorised details.", typeof(MaterialsAuthorisedOnSiteDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(int id)
+    public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
         var result = await registrationService.GetAuthorisedMaterialByRegistrationId(id);
@@ -211,7 +211,7 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration fee details.", typeof(PaymentFeeDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
         var result = await registrationService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
@@ -249,7 +249,7 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> MarkAsDulyMadeByRegistrationMaterialId(
-        [FromRoute] int id, 
+        [FromRoute] Guid id, 
         [FromBody] MarkAsDulyMadeRequestDto request)
     {
         await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
