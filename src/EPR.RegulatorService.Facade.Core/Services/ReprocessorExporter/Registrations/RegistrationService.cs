@@ -26,7 +26,9 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
 
     public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(Guid id)
     {
-        return await registrationServiceClient.GetRegistrationByRegistrationId(id);
+        var result = await registrationServiceClient.GetRegistrationByRegistrationId(id);
+        result.OrganisationName = await accountServiceClient.GetOrganisationNameById(result.OrganisationId);
+        return result;
     }
 
     public async Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(Guid id)

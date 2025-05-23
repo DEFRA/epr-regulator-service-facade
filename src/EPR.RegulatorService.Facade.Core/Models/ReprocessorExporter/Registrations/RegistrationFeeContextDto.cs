@@ -6,7 +6,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrati
 public class RegistrationFeeContextDto
 {
     public Guid RegistrationId { get; set; }
-    public int OrganisationId { get; set; }
+    public Guid OrganisationId { get; set; }
     public int NationId { get; set; }
     public string MaterialName { get; set; }
     public string ApplicationReferenceNumber { get; set; }
