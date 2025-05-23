@@ -69,7 +69,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return NoContent();
     }
 
-    [HttpGet("registrations/{id:int}")]
+    [HttpGet("registrations/{id}")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -85,7 +85,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}")]
+    [HttpGet("registrationMaterials/{id}")]
     [ProducesResponseType(typeof(RegistrationMaterialDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -101,7 +101,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpPost("registrationMaterials/{id:int}/outcome")]
+    [HttpPost("registrationMaterials/{id}/outcome")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -122,7 +122,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return NoContent();
     }
 
-    [HttpGet("registrationMaterials/{id:int}/wasteLicences")]
+    [HttpGet("registrationMaterials/{id}/wasteLicences")]
     [ProducesResponseType(typeof(RegistrationMaterialWasteLicencesDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -138,7 +138,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}/reprocessingIO")]
+    [HttpGet("registrationMaterials/{id}/reprocessingIO")]
     [ProducesResponseType(typeof(RegistrationMaterialReprocessingIODto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -154,7 +154,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}/samplingPlan")]
+    [HttpGet("registrationMaterials/{id}/samplingPlan")]
     [ProducesResponseType(typeof(RegistrationMaterialSamplingPlanDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -170,7 +170,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrations/{id:int}/siteAddress")]
+    [HttpGet("registrations/{id}/siteAddress")]
     [ProducesResponseType(typeof(SiteAddressDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -186,7 +186,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrations/{id:int}/authorisedMaterials")]
+    [HttpGet("registrations/{id}/authorisedMaterials")]
     [ProducesResponseType(typeof(MaterialsAuthorisedOnSiteDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -202,7 +202,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}/paymentFees")]
+    [HttpGet("registrationMaterials/{id}/paymentFees")]
     [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -237,7 +237,7 @@ public class RegistrationsController(IRegistrationService registrationService
         return NoContent();
     }
 
-    [HttpPost("registrationMaterials/{id:int}/markAsDulyMade")]
+    [HttpPost("registrationMaterials/{id}/markAsDulyMade")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
