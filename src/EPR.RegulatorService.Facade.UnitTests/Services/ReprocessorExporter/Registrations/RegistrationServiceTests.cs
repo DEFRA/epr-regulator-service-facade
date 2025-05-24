@@ -65,11 +65,11 @@ public class RegistrationServiceTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationByRegistrationId(1))
+        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
                    .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _service.GetRegistrationByRegistrationId(1);
+        var result = await _service.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -80,11 +80,11 @@ public class RegistrationServiceTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationMaterialDetailsDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationMaterialByRegistrationMaterialId(1))
+        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationMaterialByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
                    .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _service.GetRegistrationMaterialByRegistrationMaterialId(1);
+        var result = await _service.GetRegistrationMaterialByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -122,21 +122,21 @@ public class RegistrationServiceTests
             RegistrationReferenceNumber = expectedReference
         };
 
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationAccreditationReference(1))
+        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationAccreditationReference(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
             .ReturnsAsync(referenceDto);
 
         _mockAccountsServiceClient.Setup(client => client.GetNationDetailsById(referenceDto.NationId))
             .ReturnsAsync(nationDetails);
 
         _mockRegistrationServiceClient.Setup(client =>
-            client.UpdateMaterialOutcomeByRegistrationMaterialId(1, It.Is<UpdateMaterialOutcomeWithReferenceDto>(
+            client.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), It.Is<UpdateMaterialOutcomeWithReferenceDto>(
                 x => x.Comments == expectedDto.Comments &&
                      x.Status == expectedDto.Status &&
                      x.RegistrationReferenceNumber == expectedDto.RegistrationReferenceNumber)))
             .ReturnsAsync(true);
 
         // Act
-        var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(1, requestDto);
+        var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -146,7 +146,7 @@ public class RegistrationServiceTests
     public async Task GetWasteLicenceByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
         _mockRegistrationServiceClient.Setup(client => client.GetWasteLicenceByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
@@ -162,7 +162,7 @@ public class RegistrationServiceTests
     public async Task GetReprocessingIOByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
         _mockRegistrationServiceClient.Setup(client => client.GetReprocessingIOByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
@@ -178,7 +178,7 @@ public class RegistrationServiceTests
     public async Task GetSiteAddressByRegistrationId_ShouldReturnMappedDto()
     {
         // Arrange
-        var registrationId = 1;
+        var registrationId = Guid.NewGuid();
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
         var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
 
@@ -207,7 +207,7 @@ public class RegistrationServiceTests
     public async Task GetSiteAddressByRegistrationId_ShouldCallClientsExactlyOnce()
     {
         // Arrange
-        var registrationId = 2;
+        var registrationId = Guid.NewGuid();
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
         var nationDetails = new NationDetailsResponseDto { Name = "Wales", NationCode = "GB-WLS" };
 
@@ -234,7 +234,7 @@ public class RegistrationServiceTests
     public async Task GetAuthorisedMaterialByRegistrationId_ShouldReturnExpectedDto()
     {
         // Arrange
-        var registrationId = 10;
+        var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
         _mockRegistrationServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
                    .ReturnsAsync(expectedDto);
@@ -250,7 +250,7 @@ public class RegistrationServiceTests
     public async Task GetAuthorisedMaterialByRegistrationId_ShouldCallClientExactlyOnce()
     {
         // Arrange
-        var registrationId = 42;
+        var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
         _mockRegistrationServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
                    .ReturnsAsync(expectedDto);
@@ -266,7 +266,7 @@ public class RegistrationServiceTests
     public async Task GetSamplingPlanByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
         _mockRegistrationServiceClient.Setup(client => client.GetSamplingPlanByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
@@ -282,7 +282,7 @@ public class RegistrationServiceTests
     public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldReturnMappedDto()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
         var organisationName = "Test Org";
         var nationDetails = new NationDetailsResponseDto { Name = "Scotland", NationCode = "GB-SCT" };
@@ -330,7 +330,7 @@ public class RegistrationServiceTests
     public async Task GetPaymentFeeDetailsByRegistrationMaterialId_ShouldCallClientsExactlyOnce()
     {
         // Arrange
-        var id = 2;
+        var id = Guid.NewGuid();
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
         var organisationName = "Org Name";
         var nationDetails = new NationDetailsResponseDto { Name = "Northern Ireland", NationCode = "GB-NIR" };
@@ -417,7 +417,7 @@ public class RegistrationServiceTests
     public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnTrue_WhenClientCallSucceeds()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var requestDto = _fixture.Create<MarkAsDulyMadeRequestDto>();
 
