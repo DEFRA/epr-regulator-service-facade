@@ -13,12 +13,12 @@ using System.Text.Json;
 namespace EPR.RegulatorService.Facade.UnitTests.Clients.ReprocessorExporter.Registrations;
 
 [TestClass]
-public class RegistrationServiceClientTests
+public class ReprocessorExporterServiceClientTests
 {
     private Mock<HttpMessageHandler> _mockHttpMessageHandler = null!;
     private Mock<IOptions<PrnBackendServiceApiConfig>> _mockOptions = null!;
-    private Mock<ILogger<RegistrationServiceClient>> _mockLogger = null!;
-    private RegistrationServiceClient _client = null!;
+    private Mock<ILogger<ReprocessorExporterServiceClient>> _mockLogger = null!;
+    private ReprocessorExporterServiceClient _client = null!;
     private Fixture _fixture = null!;
 
     [TestInitialize]
@@ -28,7 +28,7 @@ public class RegistrationServiceClientTests
         var httpClient = new HttpClient(_mockHttpMessageHandler.Object) { BaseAddress = new Uri("https://mock-api.com/") };
 
         _mockOptions = new Mock<IOptions<PrnBackendServiceApiConfig>>();
-        _mockLogger = new Mock<ILogger<RegistrationServiceClient>>();
+        _mockLogger = new Mock<ILogger<ReprocessorExporterServiceClient>>();
         _mockOptions.Setup(opt => opt.Value).Returns(new PrnBackendServiceApiConfig
         {
             BaseUrl = "https://mock-api.com",
@@ -53,7 +53,7 @@ public class RegistrationServiceClientTests
             }
         });
 
-        _client = new RegistrationServiceClient(httpClient, _mockOptions.Object, _mockLogger.Object);
+        _client = new ReprocessorExporterServiceClient(httpClient, _mockOptions.Object, _mockLogger.Object);
         _fixture = new Fixture();
     }
 
@@ -422,7 +422,7 @@ public class RegistrationServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
 
         // Act
-        var result = await _client.GetRegistrationByIdWithAccreditations(Guid.NewGuid(), 2024);
+        var result = await _client.GetRegistrationByIdWithAccreditationsAsync(Guid.NewGuid(), 2024);
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);

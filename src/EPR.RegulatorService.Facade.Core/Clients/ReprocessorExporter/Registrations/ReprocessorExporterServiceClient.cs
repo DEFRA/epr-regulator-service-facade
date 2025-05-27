@@ -7,11 +7,11 @@ using Microsoft.Extensions.Options;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
-public class RegistrationServiceClient(
+public class ReprocessorExporterServiceClient(
 HttpClient httpClient,
 IOptions<PrnBackendServiceApiConfig> options,
-ILogger<RegistrationServiceClient> logger)
-: BaseHttpClient(httpClient), IRegistrationServiceClient
+ILogger<ReprocessorExporterServiceClient> logger)
+: BaseHttpClient(httpClient), IReprocessorExporterServiceClient
 {
     private readonly PrnBackendServiceApiConfig _config = options.Value;
 
@@ -106,7 +106,7 @@ ILogger<RegistrationServiceClient> logger)
         return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
     }
 
-    public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditations(Guid id, int? year)
+    public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
         var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);

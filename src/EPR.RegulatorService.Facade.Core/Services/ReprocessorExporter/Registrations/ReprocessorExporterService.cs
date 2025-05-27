@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 
-public class RegistrationService(IRegistrationServiceClient registrationServiceClient, IAccountServiceClient accountServiceClient, IPaymentServiceClient paymentServiceClient) : IRegistrationService
+public class ReprocessorExporterService(IReprocessorExporterServiceClient registrationServiceClient, IAccountServiceClient accountServiceClient, IPaymentServiceClient paymentServiceClient) : IReprocessorExporterService
 {
     public async Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request)
     {
@@ -147,8 +147,8 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return $"{referenceInfos.RegistrationType}{referenceInfos.RelevantYear}{countryCode}{orgTypeInitial}{referenceInfos.OrgCode}{referenceInfos.RandomDigits}{referenceInfos.MaterialCode}";
     }
 
-    public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditations(Guid id, int? year)
+    public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year)
     {
-        return await registrationServiceClient.GetRegistrationByIdWithAccreditations(id, year);
+        return await registrationServiceClient.GetRegistrationByIdWithAccreditationsAsync(id, year);
     }
 }

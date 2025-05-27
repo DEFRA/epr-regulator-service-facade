@@ -14,7 +14,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class AccreditationsController(
-    IRegistrationService registrationService,
+    IReprocessorExporterService registrationService,
     ILogger<AccreditationsController> logger) : ControllerBase
 {
     [HttpGet("registrations/{id:Guid}/accreditations")]
@@ -26,10 +26,10 @@ public class AccreditationsController(
         )]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetRegistrationByIdWithAccreditations(Guid id, [FromQuery] int? year)
+    public async Task<IActionResult> GetRegistrationByIdWithAccreditationsAsync(Guid id, [FromQuery] int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
-        var accreditations = await registrationService.GetRegistrationByIdWithAccreditations(id, year);
+        var accreditations = await registrationService.GetRegistrationByIdWithAccreditationsAsync(id, year);
         return Ok(accreditations);
     }
 }

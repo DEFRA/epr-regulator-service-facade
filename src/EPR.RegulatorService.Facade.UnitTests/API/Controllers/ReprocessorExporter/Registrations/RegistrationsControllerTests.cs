@@ -22,7 +22,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
 [TestClass]
 public class RegistrationsControllerTests
 {
-    private Mock<IRegistrationService> _mockRegistrationService = null!;
+    private Mock<IReprocessorExporterService> _mockRegistrationService = null!;
     private Mock<IValidator<UpdateRegulatorRegistrationTaskDto>> _mockRegulatorRegistrationValidator = null!;
     private Mock<IValidator<UpdateRegulatorApplicationTaskDto>> _mockRegulatorApplicationValidator = null!; 
     private Mock<IValidator<UpdateMaterialOutcomeRequestDto>> _mockUpdateMaterialOutcomeValidator = null!;
@@ -40,7 +40,7 @@ public class RegistrationsControllerTests
                 new Claim(ClaimTypes.Email, "testuser@test.com"),
             }, "Test"));
 
-        _mockRegistrationService = new Mock<IRegistrationService>();
+        _mockRegistrationService = new Mock<IReprocessorExporterService>();
         _mockRegulatorRegistrationValidator = new Mock<IValidator<UpdateRegulatorRegistrationTaskDto>>();
         _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateRegulatorApplicationTaskDto>>();
         _mockUpdateMaterialOutcomeValidator = new Mock<IValidator<UpdateMaterialOutcomeRequestDto>>();
