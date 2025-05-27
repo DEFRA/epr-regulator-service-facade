@@ -36,11 +36,11 @@ public class AccreditationsControllerTests
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
         var id = Guid.NewGuid();
-        _mockRegistrationService.Setup(service => service.GetAccreditationsByRegistrationId(id, 2025))
+        _mockRegistrationService.Setup(service => service.GetRegistrationByIdWithAccreditations(id, 2025))
                                     .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _controller.GetAccreditationsByRegistrationId(id ,2025);
+        var result = await _controller.GetRegistrationByIdWithAccreditations(id ,2025);
 
         // Assert
         var okResult = result as OkObjectResult;

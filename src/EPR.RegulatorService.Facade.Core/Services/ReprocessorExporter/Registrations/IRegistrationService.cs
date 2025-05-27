@@ -18,5 +18,5 @@ public interface IRegistrationService
     Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id);
     Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request);
-    Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int? year);
+    Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditations(Guid id, int? year);
 }

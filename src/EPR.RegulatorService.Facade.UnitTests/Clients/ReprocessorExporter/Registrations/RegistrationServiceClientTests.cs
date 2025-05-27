@@ -422,7 +422,7 @@ public class RegistrationServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
 
         // Act
-        var result = await _client.GetAccreditationsByRegistrationId(Guid.NewGuid(), 2024);
+        var result = await _client.GetRegistrationByIdWithAccreditations(Guid.NewGuid(), 2024);
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);

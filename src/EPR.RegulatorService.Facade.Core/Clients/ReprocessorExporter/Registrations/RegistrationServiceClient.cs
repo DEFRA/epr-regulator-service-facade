@@ -106,7 +106,7 @@ ILogger<RegistrationServiceClient> logger)
         return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
     }
 
-    public async Task<RegistrationOverviewDto> GetAccreditationsByRegistrationId(Guid id, int? year)
+    public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditations(Guid id, int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
         var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);

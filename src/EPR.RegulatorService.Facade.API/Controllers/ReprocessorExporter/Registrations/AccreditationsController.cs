@@ -26,10 +26,10 @@ public class AccreditationsController(
         )]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetAccreditationsByRegistrationId(Guid id, [FromQuery] int? year)
+    public async Task<IActionResult> GetRegistrationByIdWithAccreditations(Guid id, [FromQuery] int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
-        var accreditations = await registrationService.GetAccreditationsByRegistrationId(id, year);
+        var accreditations = await registrationService.GetRegistrationByIdWithAccreditations(id, year);
         return Ok(accreditations);
     }
 }
