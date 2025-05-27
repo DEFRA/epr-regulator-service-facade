@@ -49,7 +49,7 @@ public class RegistrationServiceClientTests
                 RegistrationFeeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/paymentFees",
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
-                AccreditationsByRegistrationId = "api/v{0}/registrations/{1}/accreditations/{2}"
+                AccreditationsByRegistrationId = "api/v{0}/registrations/{1}/accreditations"
             }
         });
 

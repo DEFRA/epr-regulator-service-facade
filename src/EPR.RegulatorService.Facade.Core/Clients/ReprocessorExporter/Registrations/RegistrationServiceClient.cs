@@ -112,7 +112,7 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);
         if (year != null)
         {
-            url = $"{url}?{year}";
+            url = $"{url}?year={year}";
         }
         return await GetAsync<RegistrationOverviewDto>(url);
     }
