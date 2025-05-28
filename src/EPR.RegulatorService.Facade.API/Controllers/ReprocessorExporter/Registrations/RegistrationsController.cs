@@ -16,7 +16,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
-public class RegistrationsController(IRegistrationService registrationService
+public class RegistrationsController(IReprocessorExporterService reprocessorExporterService
     , IValidator<UpdateRegulatorRegistrationTaskDto> updateRegulatorRegistrationTaskValidator
     , IValidator<UpdateRegulatorApplicationTaskDto> updateRegulatorApplicationTaskValidator
     , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
@@ -42,7 +42,7 @@ public class RegistrationsController(IRegistrationService registrationService
 
         logger.LogInformation(LogMessages.UpdateRegulatorRegistrationTaskStatus);
 
-        _ = await registrationService.UpdateRegulatorRegistrationTaskStatus(request);
+        _ = await reprocessorExporterService.UpdateRegulatorRegistrationTaskStatus(request);
 
         return NoContent();
     }
@@ -64,7 +64,7 @@ public class RegistrationsController(IRegistrationService registrationService
 
         logger.LogInformation(LogMessages.UpdateRegulatorApplicationTaskStatus);
 
-        _ = await registrationService.UpdateRegulatorApplicationTaskStatus(request);
+        _ = await reprocessorExporterService.UpdateRegulatorApplicationTaskStatus(request);
 
         return NoContent();
     }
@@ -81,7 +81,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetRegistrationByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
-        var result = await registrationService.GetRegistrationByRegistrationId(id);
+        var result = await reprocessorExporterService.GetRegistrationByRegistrationId(id);
         return Ok(result);
     }
 
@@ -97,7 +97,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
-        var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetRegistrationMaterialByRegistrationMaterialId(id);
         return Ok(result);
     }
 
@@ -118,7 +118,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
-        await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
+        await reprocessorExporterService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
         return NoContent();
     }
 
@@ -134,7 +134,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
-        var result = await registrationService.GetWasteLicenceByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetWasteLicenceByRegistrationMaterialId(id);
         return Ok(result);
     }
 
@@ -150,7 +150,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
-        var result = await registrationService.GetReprocessingIOByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetReprocessingIOByRegistrationMaterialId(id);
         return Ok(result);
     }
 
@@ -166,7 +166,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
-        var result = await registrationService.GetSamplingPlanByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetSamplingPlanByRegistrationMaterialId(id);
         return Ok(result);
     }
 
@@ -182,7 +182,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetSiteAddressByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
-        var result = await registrationService.GetSiteAddressByRegistrationId(id);
+        var result = await reprocessorExporterService.GetSiteAddressByRegistrationId(id);
         return Ok(result);
     }
 
@@ -198,7 +198,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
-        var result = await registrationService.GetAuthorisedMaterialByRegistrationId(id);
+        var result = await reprocessorExporterService.GetAuthorisedMaterialByRegistrationId(id);
         return Ok(result);
     }
 
@@ -214,7 +214,7 @@ public class RegistrationsController(IRegistrationService registrationService
     public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
-        var result = await registrationService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
         return Ok(result);
     }
 
@@ -233,7 +233,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.SaveOfflinePayment);
-        await registrationService.SaveOfflinePayment(User.UserId(), request);
+        await reprocessorExporterService.SaveOfflinePayment(User.UserId(), request);
         return NoContent();
     }
 
@@ -254,7 +254,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.AttemptingMarkAsDulyMade);
-        await registrationService.MarkAsDulyMadeByRegistrationMaterialId(id, User.UserId(), request);
+        await reprocessorExporterService.MarkAsDulyMadeByRegistrationMaterialId(id, User.UserId(), request);
         return NoContent();
     }
 }

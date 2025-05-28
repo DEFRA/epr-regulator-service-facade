@@ -82,7 +82,7 @@ public static class HttpClientServiceCollectionExtension
         })
             .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
 
-        services.AddHttpClient<IRegistrationServiceClient, RegistrationServiceClient>((sp, client) =>
+        services.AddHttpClient<IReprocessorExporterServiceClient, ReprocessorExporterServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);

@@ -5,6 +5,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrati
 public class RegistrationTaskDto
 {
     public Guid? Id { get; init; }
-    public string TaskName { get; init; }
-    public RegistrationTaskStatus Status { get; init; }
+    public required string TaskName { get; set; }
+    public required string Status { get; set; }
+    public int? Year { get; set; }
 }
