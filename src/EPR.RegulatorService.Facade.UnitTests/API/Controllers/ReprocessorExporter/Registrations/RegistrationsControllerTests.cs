@@ -650,7 +650,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var validator = new InlineValidator<QueryNoteRequestDto>();
-        validator.RuleFor(x => x.Note).NotEmpty().WithMessage("The Query Notes field is required.");
+        validator.RuleFor(x => x.Notes).NotEmpty().WithMessage("The Query Notes field is required.");
 
         _controller = new RegistrationsController(
             _mockRegistrationService.Object,
@@ -698,7 +698,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var validator = new InlineValidator<QueryNoteRequestDto>();
-        validator.RuleFor(x => x.Note).NotEmpty().WithMessage("The Query Notes field is required.");
+        validator.RuleFor(x => x.Notes).NotEmpty().WithMessage("The Query Notes field is required.");
 
         _controller = new RegistrationsController(
             _mockRegistrationService.Object,

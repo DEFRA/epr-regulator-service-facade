@@ -2,7 +2,7 @@
 
 public class QueryNoteRequestDto
 {
-    public String Note { get; set; }
+    public String Notes { get; set; }
 
     public Guid CreatedBy { get; set; }
 }

@@ -17,7 +17,7 @@ public class QueryNoteRequestDtoValidatorTests
         // Arrange
         var request = new QueryNoteRequestDto
         {
-            Note = "New Notes",
+            Notes = "New Notes",
         };
 
         // Act
