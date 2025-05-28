@@ -1,16 +1,18 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EPR.RegulatorService.Facade.API.Handlers;
+﻿using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
+using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
 using Notify.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -49,5 +51,7 @@ public static class ServiceCollectionExtension
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IAccountServiceClient, AccountServiceClient>();
         services.AddScoped<IPaymentServiceClient, PaymentServiceClient>();
+        services.AddScoped<IAccreditationServiceClient, AccreditationServiceClient>();
+        services.AddScoped<IAccreditationService, AccreditationService>();
     }
 }

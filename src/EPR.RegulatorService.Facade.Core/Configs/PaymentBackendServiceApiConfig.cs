@@ -20,4 +20,5 @@ public class PaymentServiceApiConfigEndpoints
 {
     public string GetRegistrationPaymentFee { get; set; }
     public string SaveOfflinePayment { get; set; }
+    public string GetAccreditationPaymentFee { get; set; }
 }

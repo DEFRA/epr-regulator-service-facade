@@ -23,6 +23,17 @@ ILogger<PaymentServiceClient> logger)
         //return await GetAsync<decimal>(url);
     }
 
+    
+    public async Task<decimal> GetAccreditationPaymentFee(string materialName, string regulator, DateTime submittedDate, string requestorType, string reference)
+    {
+        logger.LogInformation(LogMessages.AttemptingAccreditationPaymentFee);
+        return 3000.00M;
+
+        //var url = string.Format($"{_config.Endpoints.GetAccreditationPaymentFee}", _config.ApiVersion, materialName, regulator, submittedDate, requestorType, reference);
+        //return await GetAsync<decimal>(url);
+    }
+
+
     public async Task<bool> SaveOfflinePayment(SaveOfflinePaymentRequestDto request)
     {
         logger.LogInformation(LogMessages.SaveOfflinePayment);

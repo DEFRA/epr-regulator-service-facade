@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
+using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Accreditations;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -88,6 +89,16 @@ public static class HttpClientServiceCollectionExtension
         })
         .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
         .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
+
+
+        services.AddHttpClient<IAccreditationServiceClient, AccreditationServiceClient>((sp, client) =>
+            {
+                client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);
+            })
+            .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
+            .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
+        
 
         services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>((sp, client) =>
         {
