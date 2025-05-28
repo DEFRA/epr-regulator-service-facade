@@ -8,7 +8,6 @@ public class AccreditationMarkAsDulyMadeRequestDtoValidator : AbstractValidator<
 {
     public AccreditationMarkAsDulyMadeRequestDtoValidator()
     {
-
         RuleFor(x => x.DulyMadeDate)
         .Cascade(CascadeMode.Stop)
         .NotEmpty().WithMessage(ValidationMessages.InvalidDulyMadeDate);

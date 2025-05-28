@@ -6,5 +6,4 @@ public class AccreditationPaymentFeeDetailsDto : PaymentFeeDetailsDto
 {
     [Required]
     public Guid AccreditationId { get; set; }
-
 }

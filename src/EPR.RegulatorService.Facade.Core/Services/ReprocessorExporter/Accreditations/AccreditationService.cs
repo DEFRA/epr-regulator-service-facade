@@ -28,9 +28,7 @@ public class AccreditationService(IAccreditationServiceClient accreditationServi
         return new AccreditationPaymentFeeDetailsDto
         {
             RegistrationId = accreditationFeeRequestInfos.RegistrationId,
-
             AccreditationId = accreditationFeeRequestInfos.AccreditationId,
-
             RegistrationMaterialId = id,
             OrganisationName = organisationName,
             SiteAddress = accreditationFeeRequestInfos.SiteAddress,
@@ -42,7 +40,6 @@ public class AccreditationService(IAccreditationServiceClient accreditationServi
             Regulator = nationDetails.NationCode
         };
     }
-
 
     public async Task<bool> MarkAccreditationMaterialStatusAsDulyMade(Guid userId, AccreditationMarkAsDulyMadeRequestDto request)
     {
@@ -68,10 +65,8 @@ public class AccreditationService(IAccreditationServiceClient accreditationServi
             TaskStatus = request.TaskStatus,
             Comments = request.Comments,
             UpdatedByUserId = userId
-
         };
 
         return await accreditationServiceClient.UpdateAccreditationMaterialTaskStatus(updateAccreditationMaterialTaskStatusWithUserIdDto);
     }
-
 }

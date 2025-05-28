@@ -4,7 +4,6 @@ using AutoFixture;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -49,7 +48,6 @@ public class AccreditationServiceClientTests
         _fixture = new Fixture();
     }
 
-
     [TestMethod]
     public async Task GetAccreditationFeeRequestByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
@@ -80,7 +78,6 @@ public class AccreditationServiceClientTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
-
 
     [TestMethod]
     public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnExpectedResult()
@@ -113,7 +110,6 @@ public class AccreditationServiceClientTests
         result.Should().BeTrue();
     }
 
-
     [TestMethod]
     public async Task UpdateAccreditationMaterialTaskStatus_ShouldReturnExpectedResult()
     {
@@ -137,6 +133,4 @@ public class AccreditationServiceClientTests
         // Assert
         result.Should().BeTrue();
     }
-
-
 }

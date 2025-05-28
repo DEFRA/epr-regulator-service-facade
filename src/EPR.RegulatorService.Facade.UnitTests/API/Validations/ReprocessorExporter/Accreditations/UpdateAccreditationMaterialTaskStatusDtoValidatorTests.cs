@@ -42,7 +42,6 @@ public class UpdateAccreditationMaterialTaskStatusDtoValidatorTests
             TaskId = 20,
             TaskStatus = (AccreditationTaskStatus)999,
             Comments = ""
-            
         };
 
         // Act
@@ -64,7 +63,6 @@ public class UpdateAccreditationMaterialTaskStatusDtoValidatorTests
             TaskId = 2,
             TaskStatus = AccreditationTaskStatus.Queried,
             Comments = "", // Required when status is Queried
-            
         };
 
         // Act
@@ -107,7 +105,6 @@ public class UpdateAccreditationMaterialTaskStatusDtoValidatorTests
             TaskId = 9,
             TaskStatus = AccreditationTaskStatus.Queried,
             Comments = "" // Should trigger the validation error
-            
         };
 
         // Act

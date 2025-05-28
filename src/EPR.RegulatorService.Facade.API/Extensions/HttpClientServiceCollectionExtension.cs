@@ -90,7 +90,6 @@ public static class HttpClientServiceCollectionExtension
         .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
         .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
 
-
         services.AddHttpClient<IAccreditationServiceClient, AccreditationServiceClient>((sp, client) =>
             {
                 client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
@@ -99,7 +98,6 @@ public static class HttpClientServiceCollectionExtension
             .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
             .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
         
-
         services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(paymentServiceApiSettings.BaseUrl);

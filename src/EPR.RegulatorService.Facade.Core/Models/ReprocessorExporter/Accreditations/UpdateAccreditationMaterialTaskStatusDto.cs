@@ -15,6 +15,5 @@ public class UpdateAccreditationMaterialTaskStatusDto
     public required AccreditationTaskStatus TaskStatus { get; set; }
     [MaxLength(500)]
     public string? Comments { get; set; } = string.Empty;
-
 }
 

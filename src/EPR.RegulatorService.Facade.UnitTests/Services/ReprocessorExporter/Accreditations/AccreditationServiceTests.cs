@@ -79,8 +79,7 @@ public class AccreditationServiceTests
         result.SubmittedDate.Should().Be(accreditationFeeContextDto.CreatedDate);
         result.FeeAmount.Should().Be(paymentFee);
     }
-
-
+    
     [TestMethod]
     public async Task GetPaymentFeeDetailsByAccreditationMaterialId_ShouldThrowsException_WhenServiceFails()
     {
@@ -99,7 +98,6 @@ public class AccreditationServiceTests
                             .WithMessage("Service unavailable");
 
     }
-
 
     [TestMethod]
     public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnTrue_WhenClientCallSucceeds()
@@ -130,7 +128,6 @@ public class AccreditationServiceTests
         result.Should().BeTrue();
     }
 
-
     [TestMethod]
     public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
     {
@@ -158,6 +155,4 @@ public class AccreditationServiceTests
         // Assert
         result.Should().BeTrue();
     }
-
-
 }

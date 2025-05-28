@@ -12,5 +12,4 @@ public static class ValidationMessages
     public const string InvalidAccreditationStatus = "Invalid accreditation material status.";
     public const string AccreditationCommentsMaxLength = "Accreditation Comment cannot exceed 500 characters.";
     public const string AccreditationCommentsRequired = "Comments are required.";
-
 }
