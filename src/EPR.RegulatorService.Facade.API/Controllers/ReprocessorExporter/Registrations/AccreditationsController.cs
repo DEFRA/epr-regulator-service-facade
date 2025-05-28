@@ -14,7 +14,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class AccreditationsController(
-    IReprocessorExporterService registrationService,
+    IReprocessorExporterService reprocessorExporterService,
     ILogger<AccreditationsController> logger) : ControllerBase
 {
     [HttpGet("registrations/{id:Guid}/accreditations")]
@@ -29,7 +29,7 @@ public class AccreditationsController(
     public async Task<IActionResult> GetRegistrationByIdWithAccreditationsAsync(Guid id, [FromQuery] int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
-        var accreditations = await registrationService.GetRegistrationByIdWithAccreditationsAsync(id, year);
+        var accreditations = await reprocessorExporterService.GetRegistrationByIdWithAccreditationsAsync(id, year);
         return Ok(accreditations);
     }
 }

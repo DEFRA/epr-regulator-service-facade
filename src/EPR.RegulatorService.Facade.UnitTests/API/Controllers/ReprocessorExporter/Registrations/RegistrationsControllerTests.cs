@@ -22,7 +22,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
 [TestClass]
 public class RegistrationsControllerTests
 {
-    private Mock<IReprocessorExporterService> _mockRegistrationService = null!;
+    private Mock<IReprocessorExporterService> _mockReprocessorExporterService = null!;
     private Mock<IValidator<UpdateRegulatorRegistrationTaskDto>> _mockRegulatorRegistrationValidator = null!;
     private Mock<IValidator<UpdateRegulatorApplicationTaskDto>> _mockRegulatorApplicationValidator = null!; 
     private Mock<IValidator<UpdateMaterialOutcomeRequestDto>> _mockUpdateMaterialOutcomeValidator = null!;
@@ -40,7 +40,7 @@ public class RegistrationsControllerTests
                 new Claim(ClaimTypes.Email, "testuser@test.com"),
             }, "Test"));
 
-        _mockRegistrationService = new Mock<IReprocessorExporterService>();
+        _mockReprocessorExporterService = new Mock<IReprocessorExporterService>();
         _mockRegulatorRegistrationValidator = new Mock<IValidator<UpdateRegulatorRegistrationTaskDto>>();
         _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateRegulatorApplicationTaskDto>>();
         _mockUpdateMaterialOutcomeValidator = new Mock<IValidator<UpdateMaterialOutcomeRequestDto>>();
@@ -50,7 +50,7 @@ public class RegistrationsControllerTests
         _fixture = new Fixture();
 
         _controller = new RegistrationsController(
-            _mockRegistrationService.Object,
+            _mockReprocessorExporterService.Object,
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,
@@ -74,7 +74,7 @@ public class RegistrationsControllerTests
             .Setup(v => v.ValidateAsync(request, default))
             .ReturnsAsync(validationResult);
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(s => s.UpdateRegulatorRegistrationTaskStatus(request))
             .ReturnsAsync(true);
 
@@ -100,7 +100,7 @@ public class RegistrationsControllerTests
         validator.RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
 
         _controller = new RegistrationsController(
-            _mockRegistrationService.Object,
+            _mockReprocessorExporterService.Object,
             validator,
             _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,
@@ -136,7 +136,7 @@ public class RegistrationsControllerTests
             .Setup(v => v.ValidateAsync(request, default))
             .ReturnsAsync(validationResult);
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(s => s.UpdateRegulatorApplicationTaskStatus(request))
             .ReturnsAsync(true);
 
@@ -158,7 +158,7 @@ public class RegistrationsControllerTests
         validator.RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
 
         _controller = new RegistrationsController(
-            _mockRegistrationService.Object,
+            _mockReprocessorExporterService.Object,
             _mockRegulatorRegistrationValidator.Object,
             validator,
             _mockUpdateMaterialOutcomeValidator.Object,
@@ -189,7 +189,7 @@ public class RegistrationsControllerTests
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
         var registrationId = Guid.NewGuid();
-        _mockRegistrationService.Setup(service => service.GetRegistrationByRegistrationId(registrationId))
+        _mockReprocessorExporterService.Setup(service => service.GetRegistrationByRegistrationId(registrationId))
                                     .ReturnsAsync(expectedDto);
 
         // Act
@@ -208,7 +208,7 @@ public class RegistrationsControllerTests
         // Arrange
         var expectedDto = _fixture.Create<RegistrationMaterialDetailsDto>();
         var registrationMaterialId = Guid.NewGuid();
-        _mockRegistrationService.Setup(service => service.GetRegistrationMaterialByRegistrationMaterialId(registrationMaterialId))
+        _mockReprocessorExporterService.Setup(service => service.GetRegistrationMaterialByRegistrationMaterialId(registrationMaterialId))
                                     .ReturnsAsync(expectedDto);
 
         // Act
@@ -233,7 +233,7 @@ public class RegistrationsControllerTests
             .Setup(v => v.ValidateAsync(requestDto, default))
             .ReturnsAsync(validationResult);
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto))
             .ReturnsAsync(true);
 
@@ -252,7 +252,7 @@ public class RegistrationsControllerTests
         validator.RuleFor(x => x.Status).Must(_ => false).WithMessage("Validation failed");
 
         _controller = new RegistrationsController(
-            _mockRegistrationService.Object,
+            _mockReprocessorExporterService.Object,
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             validator,
@@ -289,7 +289,7 @@ public class RegistrationsControllerTests
             MaterialName = "Plastic"
         };
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetWasteLicenceByRegistrationMaterialId(id))
             .ReturnsAsync(expectedDto);
 
@@ -313,7 +313,7 @@ public class RegistrationsControllerTests
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
             .ReturnsAsync(expectedDto);
 
@@ -336,7 +336,7 @@ public class RegistrationsControllerTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetReprocessingIOByRegistrationMaterialId(id))
             .ThrowsAsync(new Exception("Service error"));
 
@@ -354,7 +354,7 @@ public class RegistrationsControllerTests
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
             .ReturnsAsync(expectedDto);
 
@@ -377,7 +377,7 @@ public class RegistrationsControllerTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
             .ThrowsAsync(new Exception("Service error"));
 
@@ -394,7 +394,7 @@ public class RegistrationsControllerTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetSamplingPlanByRegistrationMaterialId(id))
             .ReturnsAsync((RegistrationMaterialSamplingPlanDto?)null);
 
@@ -418,7 +418,7 @@ public class RegistrationsControllerTests
         var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<SiteAddressDetailsDto>();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetSiteAddressByRegistrationId(registrationId))
             .ReturnsAsync(expectedDto);
 
@@ -437,7 +437,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var registrationId = Guid.NewGuid();
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetSiteAddressByRegistrationId(registrationId))
             .ThrowsAsync(new Exception("Unexpected error"));
 
@@ -455,7 +455,7 @@ public class RegistrationsControllerTests
         var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetAuthorisedMaterialByRegistrationId(registrationId))
             .ReturnsAsync(expectedDto);
 
@@ -474,7 +474,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var registrationId = Guid.NewGuid();
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetAuthorisedMaterialByRegistrationId(registrationId))
             .ThrowsAsync(new Exception("Service error"));
 
@@ -492,7 +492,7 @@ public class RegistrationsControllerTests
         var registrationMaterialId = Guid.NewGuid();
         var expectedDto = _fixture.Create<PaymentFeeDetailsDto>();
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId))
             .ReturnsAsync(expectedDto);
 
@@ -511,7 +511,7 @@ public class RegistrationsControllerTests
     {
         // Arrange
         var registrationMaterialId = Guid.NewGuid();
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(service => service.GetPaymentFeeDetailsByRegistrationMaterialId(registrationMaterialId))
             .ThrowsAsync(new Exception("Service error"));
 
@@ -532,7 +532,7 @@ public class RegistrationsControllerTests
             .Setup(v => v.ValidateAsync(requestDto, default))
             .ReturnsAsync(new ValidationResult());
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(s => s.SaveOfflinePayment(It.IsAny<Guid>(), requestDto))
             .ReturnsAsync(true); 
 
@@ -551,7 +551,7 @@ public class RegistrationsControllerTests
         validator.RuleFor(x => x.Amount).Must(_ => false).WithMessage("Invalid");
 
         _controller = new RegistrationsController(
-            _mockRegistrationService.Object,
+            _mockReprocessorExporterService.Object,
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,
@@ -579,7 +579,7 @@ public class RegistrationsControllerTests
             .Setup(v => v.ValidateAsync(requestDto, default))
             .ReturnsAsync(new ValidationResult());
 
-        _mockRegistrationService
+        _mockReprocessorExporterService
             .Setup(s => s.MarkAsDulyMadeByRegistrationMaterialId(materialId, It.IsAny<Guid>(), requestDto))
             .ReturnsAsync(true);
 
@@ -598,7 +598,7 @@ public class RegistrationsControllerTests
         validator.RuleFor(x => x.DeterminationDate).Must(_ => false).WithMessage("Invalid");
 
         _controller = new RegistrationsController(
-            _mockRegistrationService.Object,
+            _mockReprocessorExporterService.Object,
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             _mockUpdateMaterialOutcomeValidator.Object,

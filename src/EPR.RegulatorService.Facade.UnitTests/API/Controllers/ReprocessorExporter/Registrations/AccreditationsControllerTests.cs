@@ -15,7 +15,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExpor
 [TestClass]
 public class AccreditationsControllerTests
 {
-    private Mock<IReprocessorExporterService> _mockRegistrationService = null!;
+    private Mock<IReprocessorExporterService> _mockReprocessorExporterService = null!;
     private Mock<ILogger<AccreditationsController>> _mockLogger = null!;
     private Fixture _fixture = null!;
     private AccreditationsController _controller = null!;
@@ -23,11 +23,11 @@ public class AccreditationsControllerTests
     [TestInitialize]
     public void TestInitialize()
     {
-        _mockRegistrationService = new Mock<IReprocessorExporterService>();
+        _mockReprocessorExporterService = new Mock<IReprocessorExporterService>();
         _mockLogger = new Mock<ILogger<AccreditationsController>>();
         _fixture = new Fixture();
 
-        _controller = new AccreditationsController(_mockRegistrationService.Object, _mockLogger.Object);
+        _controller = new AccreditationsController(_mockReprocessorExporterService.Object, _mockLogger.Object);
     }
 
     [TestMethod]
@@ -36,7 +36,7 @@ public class AccreditationsControllerTests
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
         var id = Guid.NewGuid();
-        _mockRegistrationService.Setup(service => service.GetRegistrationByIdWithAccreditationsAsync(id, 2025))
+        _mockReprocessorExporterService.Setup(service => service.GetRegistrationByIdWithAccreditationsAsync(id, 2025))
                                     .ReturnsAsync(expectedDto);
 
         // Act

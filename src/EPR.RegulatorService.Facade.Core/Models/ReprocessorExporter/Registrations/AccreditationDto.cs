@@ -18,5 +18,4 @@ public class AccreditationDto
     public string? ApplicationReference { get; set; }
     public DateTime? DeterminationDate { get; set; }
     public List<RegistrationTaskDto> Tasks { get; set; } = [];
-
 }
