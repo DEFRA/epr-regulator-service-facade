@@ -6,12 +6,13 @@ using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Accreditatio
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
 using System.Security.Claims;
-using FluentValidation.Results;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -47,6 +48,9 @@ public class AccreditationsControllerTests
                                                 _mockMarkAsDulyMadeRequestValidator.Object,
                                                 _mockRegulatorApplicationValidator.Object,
                                                 _mockLogger.Object);
+
+        _controller.ControllerContext = new ControllerContext();
+        _controller.ControllerContext.HttpContext = new DefaultHttpContext() { User = user };
     }
 
     [TestMethod]

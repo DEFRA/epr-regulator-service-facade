@@ -35,11 +35,8 @@ public class AccreditationServiceTests
         var id = 1;
         var accreditationFeeContextDto = _fixture.Create<AccreditationFeeContextDto>();
         var organisationName = "Green Ltd";
-
         var registeredMaterialId = Guid.NewGuid();
-
         var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
-
         var paymentFee = 3000.00m;
 
         _mockAccreditationServiceClient
@@ -83,13 +80,11 @@ public class AccreditationServiceTests
     [TestMethod]
     public async Task GetPaymentFeeDetailsByAccreditationMaterialId_ShouldThrowsException_WhenServiceFails()
     {
-
         var id = Guid.NewGuid();
 
         _mockAccreditationServiceClient
             .Setup(client => client.GetAccreditationFeeRequestByRegistrationMaterialId(id))
             .ThrowsAsync(new Exception("Service unavailable"));
-
 
         _service = new AccreditationService(_mockAccreditationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -132,10 +127,9 @@ public class AccreditationServiceTests
     public async Task UpdateRegulatorApplicationTaskStatus_ShouldReturnExpectedResult()
     {
         // Arrange
-
         var userId = Guid.NewGuid();
-
         var requestDto = _fixture.Create<UpdateAccreditationMaterialTaskStatusWithUserIdDto>();
+
         _mockAccreditationServiceClient.Setup(client => client.UpdateAccreditationMaterialTaskStatus(requestDto))
             .ReturnsAsync(true);
 
