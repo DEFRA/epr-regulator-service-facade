@@ -442,4 +442,34 @@ public class RegistrationServiceTests
         // Assert
         result.Should().BeTrue();
     }
+
+    [TestMethod]
+    public async Task SaveApplicationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockRegistrationServiceClient.Setup(client => client.SaveApplicationTaskQueryNotes(1, requestDto))
+                   .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveApplicationTaskQueryNotes(1, Guid.NewGuid(), requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task SaveRegistrationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockRegistrationServiceClient.Setup(client => client.SaveRegistrationTaskQueryNotes(1, requestDto))
+                   .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveRegistrationTaskQueryNotes(1, Guid.NewGuid(), requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
 }

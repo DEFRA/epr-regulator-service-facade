@@ -48,7 +48,9 @@ public class RegistrationServiceClientTests
                 SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan",
                 RegistrationFeeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/paymentFees",
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
-                RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference"
+                RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
+                SaveApplicationTaskQueryNotes = "api/v{0}/regulatorApplicationTaskStatus/{1}/queryNote",
+                SaveRegistrationTaskQueryNotes = "api/v{0}/regulatorRegistrationTaskStatus/{1}/queryNote"
             }
         });
 
@@ -403,5 +405,49 @@ public class RegistrationServiceClientTests
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task SaveApplicationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("regulatorApplicationTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
+
+        // Act
+        var result = await _client.SaveApplicationTaskQueryNotes(1, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task SaveRegistrationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("regulatorRegistrationTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
+
+        // Act
+        var result = await _client.SaveRegistrationTaskQueryNotes(1, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
     }
 }
