@@ -23,4 +23,5 @@ public static class LogMessages
     public const string SaveOfflinePayment = "Save offline payment";
     public const string AttemptingMarkAsDulyMade = "Attempting to mark a registration material as duly made.";
     public const string RegistrationAccreditationReference = "Retrieving registration or Accreditation reference number informations with ID {id}.";
+    public const string RegistrationAccreditationTasks = "Attempting to get registration accreditations and tasks";
 }

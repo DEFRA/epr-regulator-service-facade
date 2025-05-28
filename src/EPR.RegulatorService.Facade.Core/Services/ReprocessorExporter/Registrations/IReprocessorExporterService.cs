@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 
-public interface IRegistrationService
+public interface IReprocessorExporterService
 {
     Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request);
     Task<bool> UpdateRegulatorApplicationTaskStatus(UpdateRegulatorApplicationTaskDto request);
@@ -18,4 +18,5 @@ public interface IRegistrationService
     Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id);
     Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request);
+    Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year);
 }

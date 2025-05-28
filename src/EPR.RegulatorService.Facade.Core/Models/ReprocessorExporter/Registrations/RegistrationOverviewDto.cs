@@ -7,6 +7,7 @@ public class RegistrationOverviewDto
     public Guid Id { get; init; }
     public Guid OrganisationId { get; set; }
     public string OrganisationName { get; set; }
+    public string? SiteGridReference { get; init; }
     public string? SiteAddress { get; init; }
     public ApplicationOrganisationType OrganisationType { get; init; }
     public required string Regulator { get; init; }

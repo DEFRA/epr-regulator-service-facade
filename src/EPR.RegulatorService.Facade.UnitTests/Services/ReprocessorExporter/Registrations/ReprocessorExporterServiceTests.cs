@@ -12,21 +12,21 @@ using System.Threading.Tasks;
 namespace EPR.RegulatorService.Facade.UnitTests.Services.ReprocessorExporter.Registrations;
 
 [TestClass]
-public class RegistrationServiceTests
+public class ReprocessorExporterServiceTests
 {
-    private Mock<IRegistrationServiceClient> _mockRegistrationServiceClient = null!;
+    private Mock<IReprocessorExporterServiceClient> _mockRegistrationServiceClient = null!;
     private Mock<IAccountServiceClient> _mockAccountsServiceClient = null!;
     private Mock<IPaymentServiceClient> _mockPaymentServiceClient = null!;
-    private RegistrationService _service = null!;
+    private ReprocessorExporterService _service = null!;
     private Fixture _fixture = null!;
 
     [TestInitialize]
     public void TestInitialize()
     {
-        _mockRegistrationServiceClient = new Mock<IRegistrationServiceClient>();
+        _mockRegistrationServiceClient = new Mock<IReprocessorExporterServiceClient>();
         _mockAccountsServiceClient = new Mock<IAccountServiceClient>();
         _mockPaymentServiceClient = new Mock<IPaymentServiceClient>();
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
         _fixture = new Fixture();
     }
 
@@ -190,7 +190,7 @@ public class RegistrationServiceTests
             .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationDetails);
 
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         var result = await _service.GetSiteAddressByRegistrationId(registrationId);
@@ -219,7 +219,7 @@ public class RegistrationServiceTests
             .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationDetails);
 
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         await _service.GetSiteAddressByRegistrationId(registrationId);
@@ -309,7 +309,7 @@ public class RegistrationServiceTests
                 registrationFeeRequestInfo.ApplicationReferenceNumber))
             .ReturnsAsync(paymentFee);
 
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         var result = await _service.GetPaymentFeeDetailsByRegistrationMaterialId(id);
@@ -357,7 +357,7 @@ public class RegistrationServiceTests
                 registrationFeeRequestInfo.ApplicationReferenceNumber))
             .ReturnsAsync(paymentFee);
 
-        _service = new RegistrationService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         await _service.GetPaymentFeeDetailsByRegistrationMaterialId(id);
@@ -441,5 +441,21 @@ public class RegistrationServiceTests
 
         // Assert
         result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task GetAccreditationsByRegistrationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationOverviewDto>();
+        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationByIdWithAccreditationsAsync(id, 2025))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetRegistrationByIdWithAccreditationsAsync(id, 2025);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
     }
 }
