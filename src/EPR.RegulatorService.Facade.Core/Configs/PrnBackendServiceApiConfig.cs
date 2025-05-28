@@ -30,4 +30,7 @@ public class PrnServiceApiConfigEndpoints
     public string RegistrationFeeByRegistrationMaterialId { get; set; }
     public string MarkAsDulyMadeByRegistrationMaterialId { get; set; }
     public string RegistrationAccreditationReference { get; set; }
+    public string SaveApplicationTaskQueryNotes { get; set; }
+    public string SaveRegistrationTaskQueryNotes { get; set; }
+
 }

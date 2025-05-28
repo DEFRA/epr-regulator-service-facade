@@ -135,6 +135,21 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         return await registrationServiceClient.MarkAsDulyMadeByRegistrationMaterialId(id, markAsDulyMadeRequest);
     }
 
+    public async Task<bool> SaveApplicationTaskQueryNotes(int id, Guid userId, QueryNoteRequestDto request)
+    {
+        request.CreatedBy = userId;
+
+        return await registrationServiceClient.SaveApplicationTaskQueryNotes(id, request);
+    }
+
+    public async Task<bool> SaveRegistrationTaskQueryNotes(int id, Guid userId, QueryNoteRequestDto request)
+    {
+        request.CreatedBy = userId;
+
+        return await registrationServiceClient.SaveRegistrationTaskQueryNotes(id, request);
+    }
+
+
     private async Task<string> GenerateRegistrationAccreditationReference(int id)
     {
         var referenceInfos = await registrationServiceClient.GetRegistrationAccreditationReference(id);

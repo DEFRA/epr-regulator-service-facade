@@ -105,4 +105,18 @@ ILogger<RegistrationServiceClient> logger)
         var url = string.Format(_config.Endpoints.MarkAsDulyMadeByRegistrationMaterialId, _config.ApiVersion, id);
         return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
     }
+
+    public async Task<bool> SaveApplicationTaskQueryNotes(int id, QueryNoteRequestDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesBackendCall);
+        var url = string.Format(_config.Endpoints.SaveApplicationTaskQueryNotes, _config.ApiVersion, id);
+        return await PostAsync<QueryNoteRequestDto, bool>(url, request);
+    }
+
+    public async Task<bool> SaveRegistrationTaskQueryNotes(int id, QueryNoteRequestDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesBackendCall);
+        var url = string.Format(_config.Endpoints.SaveRegistrationTaskQueryNotes, _config.ApiVersion, id);
+        return await PostAsync<QueryNoteRequestDto, bool>(url, request);
+    }
 }

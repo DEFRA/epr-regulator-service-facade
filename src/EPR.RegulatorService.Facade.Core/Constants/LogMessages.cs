@@ -1,4 +1,6 @@
-﻿namespace EPR.RegulatorService.Facade.Core.Constants;
+﻿using System.Threading.Tasks;
+
+namespace EPR.RegulatorService.Facade.Core.Constants;
 
 public static class LogMessages
 {
@@ -23,4 +25,8 @@ public static class LogMessages
     public const string SaveOfflinePayment = "Save offline payment";
     public const string AttemptingMarkAsDulyMade = "Attempting to mark a registration material as duly made.";
     public const string RegistrationAccreditationReference = "Retrieving registration or Accreditation reference number informations with ID {id}.";
+    public const string AttemptingApplicationTaskQuerynotesSave = "Attempting to save application task query notes";
+    public const string AttemptingRegistrationTaskQuerynotesSave = "Attempting to save registration task query notes";
+    public const string AttemptingApplicationTaskQuerynotesBackendCall = "Attempting to call back end to save application task query notes";
+    public const string AttemptingRegistrationTaskQuerynotesBackendCall = "Attempting to call back end to save registration task query notes";
 }

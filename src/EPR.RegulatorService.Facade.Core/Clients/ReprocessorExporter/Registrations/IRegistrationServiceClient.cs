@@ -17,4 +17,6 @@ public interface IRegistrationServiceClient
     Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(int id);
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(int id);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, MarkAsDulyMadeWithUserIdDto request);
+    Task<bool> SaveApplicationTaskQueryNotes(int id, QueryNoteRequestDto request);
+    Task<bool> SaveRegistrationTaskQueryNotes(int id, QueryNoteRequestDto request);
 }

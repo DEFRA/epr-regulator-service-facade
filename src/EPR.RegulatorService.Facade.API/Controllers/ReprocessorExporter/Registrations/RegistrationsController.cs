@@ -22,6 +22,7 @@ public class RegistrationsController(IRegistrationService registrationService
     , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
     , IValidator<OfflinePaymentRequestDto> offlinePaymentRequestDtoValidator
     , IValidator<MarkAsDulyMadeRequestDto> markAsDulyMadeRequestDtoValidator
+    , IValidator<QueryNoteRequestDto> queryNoteRequestDtoValidator
     , ILogger<RegistrationsController> logger) : ControllerBase
 {
 
@@ -255,6 +256,48 @@ public class RegistrationsController(IRegistrationService registrationService
         await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.AttemptingMarkAsDulyMade);
         await registrationService.MarkAsDulyMadeByRegistrationMaterialId(id, User.UserId(), request);
+        return NoContent();
+    }
+
+    [HttpPost("regulatorApplicationTaskStatus/{id:int}/queryNote")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
+    [SwaggerOperation(
+           Summary = "Save query notes to application task",
+           Description = "Attempting to save query notes to application task. "
+       )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> SaveApplicationTaskQueryNotes(
+       [FromRoute] int id,
+       [FromBody] QueryNoteRequestDto request)
+    {
+        await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesSave);
+        await registrationService.SaveApplicationTaskQueryNotes(id, User.UserId(), request);
+        return NoContent();
+    }
+
+    [HttpPost("regulatorRegistrationTaskStatus/{id:int}/queryNote")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
+    [SwaggerOperation(
+          Summary = "Save query notes to registration task",
+          Description = "Attempting to save query notes to registration task. "
+      )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> SaveRegistrationTaskQueryNotes(
+      [FromRoute] int id,
+      [FromBody] QueryNoteRequestDto request)
+    {
+        await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesSave);
+        await registrationService.SaveRegistrationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
     }
 }

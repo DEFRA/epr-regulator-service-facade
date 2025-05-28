@@ -9,4 +9,5 @@ public static class ValidationMessages
     public const string AmountRequiredAndGreaterThanZero = "Amount is required and must be greater than zero.";
     public const string InvalidDulyMadeDate = "Duly Made date is mandatory and must be a valid date.";
     public const string InvalidDeterminationDate = "Determination date is mandatory and must be a valid date.";
+    public const string QueryNotesRequired = "The Query Notes field is required.";
 }

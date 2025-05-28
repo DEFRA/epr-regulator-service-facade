@@ -18,4 +18,6 @@ public interface IRegistrationService
     Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(int id);
     Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(int id, Guid userId, MarkAsDulyMadeRequestDto request);
+    Task<bool> SaveApplicationTaskQueryNotes(int id, Guid userId, QueryNoteRequestDto request);
+    Task<bool> SaveRegistrationTaskQueryNotes(int id, Guid userId, QueryNoteRequestDto request);
 }
