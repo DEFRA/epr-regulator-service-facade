@@ -130,6 +130,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 RegistrationSubmissionStatus.Refused => RegistrationSubmissionStatus.Rejected,
                 _ => item.ResubmissionStatus
             };
+            if ( resubmissionStatus == RegistrationSubmissionStatus.Cancelled)
+            {
+                item.SubmissionStatus = RegistrationSubmissionStatus.Cancelled;
+            }
         }
 
         private static void ProcessStandardDecision(
@@ -137,10 +141,16 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             AbstractCosmosSubmissionEvent cosmosItem)
         {
             item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+            item.RegulatorDecisionDate = cosmosItem.Created;
+            
             item.StatusPendingDate = cosmosItem.DecisionDate;
             if (!string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber))
             {
                 item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
+            }
+            if(cosmosItem.Decision == "Granted")
+            {
+                item.RegistrationDate = cosmosItem.Created;
             }
         }
 
@@ -178,6 +188,11 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
                     item.SubmissionDetails.Status = item.SubmissionStatus;
+
+                    if ( cosmosItem.Decision == "Granted")
+                    {
+                        item.RegistrationDate = item.SubmissionDetails.RegistrationDate = cosmosItem.Created;
+                    }
                 }
             }
             else
