@@ -18,7 +18,7 @@ public class UpdateRegulatorApplicationTaskDtoValidatorTests
         // Arrange
         var request = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 1,
+            RegistrationMaterialId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Review",
             Status = RegistrationTaskStatus.Completed,
             Comments = "All good",
@@ -38,7 +38,7 @@ public class UpdateRegulatorApplicationTaskDtoValidatorTests
         // Arrange
         var request = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 1,
+            RegistrationMaterialId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Task",
             Status = (RegistrationTaskStatus)999,
             Comments = "",
@@ -59,7 +59,7 @@ public class UpdateRegulatorApplicationTaskDtoValidatorTests
         // Arrange
         var request = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 2,
+            RegistrationMaterialId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Task",
             Status = RegistrationTaskStatus.Queried,
             Comments = "", // Required when status is Queried
@@ -80,7 +80,7 @@ public class UpdateRegulatorApplicationTaskDtoValidatorTests
         // Arrange
         var request = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 3,
+            RegistrationMaterialId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Task",
             Status = RegistrationTaskStatus.Completed,
             Comments = new string('x', 501),
@@ -101,7 +101,7 @@ public class UpdateRegulatorApplicationTaskDtoValidatorTests
         // Arrange
         var request = new UpdateRegulatorApplicationTaskDto
         {
-            RegistrationMaterialId = 1,
+            RegistrationMaterialId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Test",
             Status = RegistrationTaskStatus.Queried,
             Comments = "", // Should trigger the validation error

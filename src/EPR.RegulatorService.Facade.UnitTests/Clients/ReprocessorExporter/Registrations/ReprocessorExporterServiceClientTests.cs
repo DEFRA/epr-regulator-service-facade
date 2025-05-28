@@ -13,12 +13,12 @@ using System.Text.Json;
 namespace EPR.RegulatorService.Facade.UnitTests.Clients.ReprocessorExporter.Registrations;
 
 [TestClass]
-public class RegistrationServiceClientTests
+public class ReprocessorExporterServiceClientTests
 {
     private Mock<HttpMessageHandler> _mockHttpMessageHandler = null!;
     private Mock<IOptions<PrnBackendServiceApiConfig>> _mockOptions = null!;
-    private Mock<ILogger<RegistrationServiceClient>> _mockLogger = null!;
-    private RegistrationServiceClient _client = null!;
+    private Mock<ILogger<ReprocessorExporterServiceClient>> _mockLogger = null!;
+    private ReprocessorExporterServiceClient _client = null!;
     private Fixture _fixture = null!;
 
     [TestInitialize]
@@ -28,7 +28,7 @@ public class RegistrationServiceClientTests
         var httpClient = new HttpClient(_mockHttpMessageHandler.Object) { BaseAddress = new Uri("https://mock-api.com/") };
 
         _mockOptions = new Mock<IOptions<PrnBackendServiceApiConfig>>();
-        _mockLogger = new Mock<ILogger<RegistrationServiceClient>>();
+        _mockLogger = new Mock<ILogger<ReprocessorExporterServiceClient>>();
         _mockOptions.Setup(opt => opt.Value).Returns(new PrnBackendServiceApiConfig
         {
             BaseUrl = "https://mock-api.com",
@@ -48,11 +48,12 @@ public class RegistrationServiceClientTests
                 SamplingPlanByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/samplingPlan",
                 RegistrationFeeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/paymentFees",
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
-                RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference"
+                RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
+                RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations"
             }
         });
 
-        _client = new RegistrationServiceClient(httpClient, _mockOptions.Object, _mockLogger.Object);
+        _client = new ReprocessorExporterServiceClient(httpClient, _mockOptions.Object, _mockLogger.Object);
         _fixture = new Fixture();
     }
 
@@ -116,7 +117,7 @@ public class RegistrationServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
 
         // Act
-        var result = await _client.GetRegistrationByRegistrationId(1);
+        var result = await _client.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -138,7 +139,7 @@ public class RegistrationServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
 
         // Act
-        var result = await _client.GetRegistrationMaterialByRegistrationMaterialId(1);
+        var result = await _client.GetRegistrationMaterialByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -148,7 +149,7 @@ public class RegistrationServiceClientTests
     public async Task GetRegistrationAccreditationReference_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationAccreditationReferenceDto>();
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
         var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
@@ -195,7 +196,7 @@ public class RegistrationServiceClientTests
             });
 
         // Act
-        var result = await _client.UpdateMaterialOutcomeByRegistrationMaterialId(1, requestDto);
+        var result = await _client.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -205,7 +206,7 @@ public class RegistrationServiceClientTests
     public async Task GetWasteLicenceByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
         var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
@@ -231,7 +232,7 @@ public class RegistrationServiceClientTests
     public async Task GetReprocessingIOByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
         var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
@@ -257,7 +258,7 @@ public class RegistrationServiceClientTests
     public async Task GetSamplingPlanByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
-        var id = 1;
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
         var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
@@ -306,7 +307,7 @@ public class RegistrationServiceClientTests
             });
 
         // Act
-        var result = await _client.GetSiteAddressByRegistrationId(1);
+        var result = await _client.GetSiteAddressByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -337,7 +338,7 @@ public class RegistrationServiceClientTests
             });
 
         // Act
-        var result = await _client.GetAuthorisedMaterialByRegistrationId(1);
+        var result = await _client.GetAuthorisedMaterialByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -368,7 +369,7 @@ public class RegistrationServiceClientTests
             });
 
         // Act
-        var result = await _client.MarkAsDulyMadeByRegistrationMaterialId(1, requestDto);
+        var result = await _client.MarkAsDulyMadeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -399,7 +400,29 @@ public class RegistrationServiceClientTests
             });
 
         // Act
-        var result = await _client.GetRegistrationFeeRequestByRegistrationMaterialId(1);
+        var result = await _client.GetRegistrationFeeRequestByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetAccreditationsByRegistrationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var expectedDto = _fixture.Create<RegistrationOverviewDto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetRegistrationByIdWithAccreditationsAsync(Guid.NewGuid(), 2024);
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
