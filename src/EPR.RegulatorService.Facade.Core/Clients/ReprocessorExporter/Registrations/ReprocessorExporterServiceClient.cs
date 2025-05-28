@@ -109,7 +109,7 @@ ILogger<ReprocessorExporterServiceClient> logger)
     public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year)
     {
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
-        var url = string.Format($"{_config.Endpoints.AccreditationsByRegistrationId}", _config.ApiVersion, id);
+        var url = string.Format($"{_config.Endpoints.RegistrationByIdWithAccreditations}", _config.ApiVersion, id);
         if (year != null)
         {
             url = $"{url}?year={year}";
