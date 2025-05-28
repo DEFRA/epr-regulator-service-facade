@@ -17,7 +17,6 @@ public class RegistrationMaterialDto
     public string? RegistrationReferenceNumber { get; init; }
     public string? Comments { get; set; }
     public DateTime? DeterminationDate { get; set; }
-    public bool IsMaterialRegistered { get; set; } = false;
     public List<RegistrationTaskDto> Tasks { get; set; } = [];
     public List<AccreditationDto> Accreditations { get; set; } = [];
 }
