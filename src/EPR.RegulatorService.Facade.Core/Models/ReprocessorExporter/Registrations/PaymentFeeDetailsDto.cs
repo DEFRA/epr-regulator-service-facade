@@ -13,4 +13,6 @@ public class PaymentFeeDetailsDto
     public decimal FeeAmount { get; set; }
     public ApplicationOrganisationType ApplicationType { get; init; }
     public string Regulator { get; set; }
+    public DateTime? DulyMadeDate { get; set; }
+    public DateTime? DeterminationDate { get; set; }
 }
