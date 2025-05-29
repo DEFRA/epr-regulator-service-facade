@@ -627,7 +627,7 @@ public class RegistrationsControllerTests
     public async Task SaveApplicationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var regulatorApplicationTaskStatusId = Guid.NewGuid(); ;
+        var regulatorApplicationTaskStatusId = Guid.NewGuid();
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
 
         _mockQueryNoteRequestDtoValidator
