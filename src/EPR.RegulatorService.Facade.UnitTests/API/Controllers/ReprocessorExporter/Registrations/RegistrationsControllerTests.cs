@@ -646,7 +646,7 @@ public class RegistrationsControllerTests
     }
 
     [TestMethod]
-    public async Task SaveApplicationTaskQueryNotes_ShouldReturnNoContent_ShouldThrowValidationException_WhenValidationFails()
+    public async Task SaveApplicationTaskQueryNotes_ShouldThrowValidationException_WhenValidationFails()
     {
         // Arrange
         var validator = new InlineValidator<QueryNoteRequestDto>();
@@ -694,7 +694,7 @@ public class RegistrationsControllerTests
     }
 
     [TestMethod]
-    public async Task SaveRegistrationTaskQueryNotes_ShouldReturnNoContent_ShouldThrowValidationException_WhenValidationFails()
+    public async Task SaveRegistrationTaskQueryNotes_ShouldThrowValidationException_WhenValidationFails()
     {
         // Arrange
         var validator = new InlineValidator<QueryNoteRequestDto>();

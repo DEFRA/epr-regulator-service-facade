@@ -33,5 +33,4 @@ public class PrnServiceApiConfigEndpoints
     public string RegistrationByIdWithAccreditations { get; set; }
     public string SaveApplicationTaskQueryNotes { get; set; }
     public string SaveRegistrationTaskQueryNotes { get; set; }
-
 }

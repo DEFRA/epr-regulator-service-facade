@@ -275,7 +275,7 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
        [FromBody] QueryNoteRequestDto request)
     {
         await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesSave);
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
         await reprocessorExporterService.SaveApplicationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
     }
@@ -296,7 +296,7 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
       [FromBody] QueryNoteRequestDto request)
     {
         await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesSave);
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
         await reprocessorExporterService.SaveRegistrationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
     }
