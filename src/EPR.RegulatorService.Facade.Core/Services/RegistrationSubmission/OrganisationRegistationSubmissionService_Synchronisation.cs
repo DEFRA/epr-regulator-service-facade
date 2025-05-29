@@ -130,6 +130,10 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                 RegistrationSubmissionStatus.Refused => RegistrationSubmissionStatus.Rejected,
                 _ => item.ResubmissionStatus
             };
+            if ( resubmissionStatus == RegistrationSubmissionStatus.Cancelled)
+            {
+                item.SubmissionStatus = RegistrationSubmissionStatus.Cancelled;
+            }
         }
 
         private static void ProcessStandardDecision(
@@ -137,10 +141,16 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             AbstractCosmosSubmissionEvent cosmosItem)
         {
             item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+            item.RegulatorDecisionDate = cosmosItem.Created;
+            
             item.StatusPendingDate = cosmosItem.DecisionDate;
             if (!string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber))
             {
                 item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
+            }
+            if(cosmosItem.Decision == "Granted")
+            {
+                item.RegistrationDate = cosmosItem.Created;
             }
         }
 
@@ -157,20 +167,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                     //To avoid checking magic strings, assign the decision first & check on the enum
                     //and then re-assign as resubmission uses different status
                     var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
-                    {
-                        item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
-                    }
-                    else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
-                    {
-                        item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
-                    }
-                    else
-                    {
-                        item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
-                    }
-
-                    item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                    SetResubmissionStatus(item, resubmissionStatus);
                 }
                 else
                 {
@@ -178,12 +175,35 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
                     item.SubmissionDetails.Status = item.SubmissionStatus;
+
+                    if ( cosmosItem.Decision == "Granted")
+                    {
+                        item.RegistrationDate = item.SubmissionDetails.RegistrationDate = cosmosItem.Created;
+                    }
                 }
             }
             else
             {
                 item.RegulatorComments += $"<br/>{cosmosItem.Comments}";
             }
+        }
+
+        private static void SetResubmissionStatus(RegistrationSubmissionOrganisationDetailsFacadeResponse item, RegistrationSubmissionStatus resubmissionStatus)
+        {
+            if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
+            {
+                item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
+            }
+            else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
+            {
+                item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
+            }
+            else
+            {
+                item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
+            }
+
+            item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
         }
 
         public static void ApplyAppRefNumbersForRequiredStatuses(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, string statuses, GetOrganisationRegistrationSubmissionsFilter filter)

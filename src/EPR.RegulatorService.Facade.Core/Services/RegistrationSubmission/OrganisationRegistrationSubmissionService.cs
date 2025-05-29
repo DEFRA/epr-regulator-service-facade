@@ -53,6 +53,16 @@ public partial class OrganisationRegistrationSubmissionService(
                 MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedList);
             }
 
+            requestedList.items = [.. requestedList.items.OrderBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Cancelled)
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Refused)
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted && !x.IsResubmission )
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Queried)
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted && x.ResubmissionStatus == RegistrationSubmissionStatus.Rejected)
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted && x.ResubmissionStatus == RegistrationSubmissionStatus.Accepted)
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Granted && x.ResubmissionStatus == RegistrationSubmissionStatus.Pending)
+                .ThenBy(x => x.SubmissionStatus == RegistrationSubmissionStatus.Pending)
+                .ThenByDescending(x => x.SubmissionDate)];
+
             return requestedList;
         }
         catch (Exception ex)
