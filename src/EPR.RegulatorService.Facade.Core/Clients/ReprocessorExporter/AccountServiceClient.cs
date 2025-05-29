@@ -37,7 +37,7 @@ ILogger<AccountServiceClient> logger)
         //return await GetAsync<string>(url);
     }
 
-    public async Task<string> GetOrganisationNameById(int id)
+    public async Task<string> GetOrganisationNameById(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingOrganisationName);
 

@@ -16,7 +16,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
-public class RegistrationsController(IRegistrationService registrationService
+public class RegistrationsController(IReprocessorExporterService reprocessorExporterService
     , IValidator<UpdateRegulatorRegistrationTaskDto> updateRegulatorRegistrationTaskValidator
     , IValidator<UpdateRegulatorApplicationTaskDto> updateRegulatorApplicationTaskValidator
     , IValidator<UpdateMaterialOutcomeRequestDto> updateMaterialOutcomeValidator
@@ -43,7 +43,7 @@ public class RegistrationsController(IRegistrationService registrationService
 
         logger.LogInformation(LogMessages.UpdateRegulatorRegistrationTaskStatus);
 
-        _ = await registrationService.UpdateRegulatorRegistrationTaskStatus(request);
+        _ = await reprocessorExporterService.UpdateRegulatorRegistrationTaskStatus(request);
 
         return NoContent();
     }
@@ -65,12 +65,12 @@ public class RegistrationsController(IRegistrationService registrationService
 
         logger.LogInformation(LogMessages.UpdateRegulatorApplicationTaskStatus);
 
-        _ = await registrationService.UpdateRegulatorApplicationTaskStatus(request);
+        _ = await reprocessorExporterService.UpdateRegulatorApplicationTaskStatus(request);
 
         return NoContent();
     }
 
-    [HttpGet("registrations/{id:int}")]
+    [HttpGet("registrations/{id}")]
     [ProducesResponseType(typeof(RegistrationOverviewDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -79,14 +79,14 @@ public class RegistrationsController(IRegistrationService registrationService
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration with materials and tasks.", typeof(RegistrationOverviewDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetRegistrationByRegistrationId(int id)
+    public async Task<IActionResult> GetRegistrationByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
-        var result = await registrationService.GetRegistrationByRegistrationId(id);
+        var result = await reprocessorExporterService.GetRegistrationByRegistrationId(id);
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}")]
+    [HttpGet("registrationMaterials/{id}")]
     [ProducesResponseType(typeof(RegistrationMaterialDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -95,14 +95,14 @@ public class RegistrationsController(IRegistrationService registrationService
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
-        var result = await registrationService.GetRegistrationMaterialByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetRegistrationMaterialByRegistrationMaterialId(id);
         return Ok(result);
     }
 
-    [HttpPost("registrationMaterials/{id:int}/outcome")]
+    [HttpPost("registrationMaterials/{id}/outcome")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -114,16 +114,16 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
-        [FromRoute] int id,
+        [FromRoute] Guid id,
         [FromBody] UpdateMaterialOutcomeRequestDto request)
     {
         await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
-        await registrationService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
+        await reprocessorExporterService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
         return NoContent();
     }
 
-    [HttpGet("registrationMaterials/{id:int}/wasteLicences")]
+    [HttpGet("registrationMaterials/{id}/wasteLicences")]
     [ProducesResponseType(typeof(RegistrationMaterialWasteLicencesDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -132,14 +132,14 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicencesDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
-        var result = await registrationService.GetWasteLicenceByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetWasteLicenceByRegistrationMaterialId(id);
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}/reprocessingIO")]
+    [HttpGet("registrationMaterials/{id}/reprocessingIO")]
     [ProducesResponseType(typeof(RegistrationMaterialReprocessingIODto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -148,14 +148,14 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
-        var result = await registrationService.GetReprocessingIOByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetReprocessingIOByRegistrationMaterialId(id);
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}/samplingPlan")]
+    [HttpGet("registrationMaterials/{id}/samplingPlan")]
     [ProducesResponseType(typeof(RegistrationMaterialSamplingPlanDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -164,14 +164,14 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns sampling plan for a material.", typeof(RegistrationMaterialSamplingPlanDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
-        var result = await registrationService.GetSamplingPlanByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetSamplingPlanByRegistrationMaterialId(id);
         return Ok(result);
     }
 
-    [HttpGet("registrations/{id:int}/siteAddress")]
+    [HttpGet("registrations/{id}/siteAddress")]
     [ProducesResponseType(typeof(SiteAddressDetailsDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -180,14 +180,14 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns site address details.", typeof(SiteAddressDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetSiteAddressByRegistrationId(int id)
+    public async Task<IActionResult> GetSiteAddressByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
-        var result = await registrationService.GetSiteAddressByRegistrationId(id);
+        var result = await reprocessorExporterService.GetSiteAddressByRegistrationId(id);
         return Ok(result);
     }
 
-    [HttpGet("registrations/{id:int}/authorisedMaterials")]
+    [HttpGet("registrations/{id}/authorisedMaterials")]
     [ProducesResponseType(typeof(MaterialsAuthorisedOnSiteDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -196,14 +196,14 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns materials authorised details.", typeof(MaterialsAuthorisedOnSiteDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(int id)
+    public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
-        var result = await registrationService.GetAuthorisedMaterialByRegistrationId(id);
+        var result = await reprocessorExporterService.GetAuthorisedMaterialByRegistrationId(id);
         return Ok(result);
     }
 
-    [HttpGet("registrationMaterials/{id:int}/paymentFees")]
+    [HttpGet("registrationMaterials/{id}/paymentFees")]
     [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
@@ -212,10 +212,10 @@ public class RegistrationsController(IRegistrationService registrationService
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration fee details.", typeof(PaymentFeeDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(int id)
+    public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
-        var result = await registrationService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetPaymentFeeDetailsByRegistrationMaterialId(id);
         return Ok(result);
     }
 
@@ -234,11 +234,11 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.SaveOfflinePayment);
-        await registrationService.SaveOfflinePayment(User.UserId(), request);
+        await reprocessorExporterService.SaveOfflinePayment(User.UserId(), request);
         return NoContent();
     }
 
-    [HttpPost("registrationMaterials/{id:int}/markAsDulyMade")]
+    [HttpPost("registrationMaterials/{id}/markAsDulyMade")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
@@ -250,12 +250,12 @@ public class RegistrationsController(IRegistrationService registrationService
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> MarkAsDulyMadeByRegistrationMaterialId(
-        [FromRoute] int id, 
+        [FromRoute] Guid id, 
         [FromBody] MarkAsDulyMadeRequestDto request)
     {
         await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.AttemptingMarkAsDulyMade);
-        await registrationService.MarkAsDulyMadeByRegistrationMaterialId(id, User.UserId(), request);
+        await reprocessorExporterService.MarkAsDulyMadeByRegistrationMaterialId(id, User.UserId(), request);
         return NoContent();
     }
 
@@ -276,7 +276,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesSave);
-        await registrationService.SaveApplicationTaskQueryNotes(id, User.UserId(), request);
+        await reprocessorExporterService.SaveApplicationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
     }
 
@@ -297,7 +297,7 @@ public class RegistrationsController(IRegistrationService registrationService
     {
         await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.AttemptingApplicationTaskQuerynotesSave);
-        await registrationService.SaveRegistrationTaskQueryNotes(id, User.UserId(), request);
+        await reprocessorExporterService.SaveRegistrationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
     }
 }

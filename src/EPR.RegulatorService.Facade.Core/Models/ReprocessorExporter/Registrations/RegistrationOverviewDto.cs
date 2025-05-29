@@ -4,8 +4,10 @@ namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrati
 
 public class RegistrationOverviewDto
 {
-    public int Id { get; init; }
-    public required string OrganisationName { get; init; } = string.Empty;
+    public Guid Id { get; init; }
+    public Guid OrganisationId { get; set; }
+    public string OrganisationName { get; set; }
+    public string? SiteGridReference { get; init; }
     public string? SiteAddress { get; init; }
     public ApplicationOrganisationType OrganisationType { get; init; }
     public required string Regulator { get; init; }
