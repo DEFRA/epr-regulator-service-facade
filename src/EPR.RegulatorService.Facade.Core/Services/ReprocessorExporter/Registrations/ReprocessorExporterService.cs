@@ -85,7 +85,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             SiteAddress = registrationSiteAddress.SiteAddress,
             GridReference = registrationSiteAddress.GridReference,
             LegalCorrespondenceAddress = registrationSiteAddress.LegalCorrespondenceAddress,
-            TaskStatus = registrationSiteAddress.TaskStatus,
+            TaskStatusId = registrationSiteAddress.TaskStatusId,
             RegulatorApplicationTaskStatusId = registrationSiteAddress.RegulatorApplicationTaskStatusId,
             OrganisationName = organisationName,
         };
@@ -121,7 +121,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             FeeAmount = paymentFee,
             ApplicationType = registrationFeeRequestInfos.ApplicationType,
             Regulator = nationDetails.NationCode,
-            TaskStatus = registrationFeeRequestInfos.TaskStatus,
+            TaskStatusId = registrationFeeRequestInfos.TaskStatusId,
             RegulatorApplicationTaskStatusId = registrationFeeRequestInfos.RegulatorApplicationTaskStatusId
         };
     }
