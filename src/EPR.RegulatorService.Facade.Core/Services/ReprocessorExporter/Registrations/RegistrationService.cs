@@ -1,4 +1,5 @@
-﻿using EPR;
+﻿using Azure.Core;
+using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
@@ -88,11 +89,18 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
         var registrationFeeRequestInfos = await registrationServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
         var organisationName = await accountServiceClient.GetOrganisationNameById(registrationFeeRequestInfos.OrganisationId);
         var nationDetails = await accountServiceClient.GetNationDetailsById(registrationFeeRequestInfos.NationId);
-        var paymentFee = await paymentServiceClient.GetRegistrationPaymentFee(registrationFeeRequestInfos.MaterialName,
-                                                                              nationDetails.NationCode,
-                                                                              registrationFeeRequestInfos.CreatedDate,
-                                                                              registrationFeeRequestInfos.ApplicationType.ToString(),
-                                                                              registrationFeeRequestInfos.ApplicationReferenceNumber);
+
+        var paymentFeeRequest = new PaymentFeeRequestDto
+        {
+            RequestorType = "RequestorType",
+            Regulator = "Regulator",
+            DulyMadeDate = DateTime.Now,
+            MaterialType = "MaterialType",
+            ApplicationReferenceNumber = "ApplicationReferenceNumber"
+        };
+
+        var paymentFeeResponse = await paymentServiceClient.GetRegistrationPaymentFee(paymentFeeRequest);
+
         return new PaymentFeeDetailsDto
         {
             RegistrationId = registrationFeeRequestInfos.RegistrationId,
@@ -102,9 +110,13 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
             ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber,
             MaterialName = registrationFeeRequestInfos.MaterialName,
             SubmittedDate = registrationFeeRequestInfos.CreatedDate,
-            FeeAmount = paymentFee,
+            FeeAmount = paymentFeeResponse.RegistrationFee,
             ApplicationType = registrationFeeRequestInfos.ApplicationType,
-            Regulator = nationDetails.NationCode
+            Regulator = nationDetails.NationCode,
+            PaymentMethod = paymentFeeResponse.PreviousPaymentDetail.PaymentMethod,
+            PaymentDate = paymentFeeResponse.PreviousPaymentDetail.PaymentDate,
+            DulyMadeDate = DateTime.Now,
+            DeterminationDate = DateTime.Now
         };
     }
     
