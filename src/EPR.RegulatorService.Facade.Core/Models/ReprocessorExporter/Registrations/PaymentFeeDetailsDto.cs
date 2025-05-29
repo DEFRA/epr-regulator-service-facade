@@ -13,4 +13,6 @@ public class PaymentFeeDetailsDto
     public decimal FeeAmount { get; set; }
     public ApplicationOrganisationType ApplicationType { get; init; }
     public string Regulator { get; set; }
+    public string TaskStatus { get; set; }
+    public Guid RegulatorApplicationTaskStatusId { get; set; }
 }

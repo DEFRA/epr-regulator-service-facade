@@ -13,4 +13,6 @@ public class RegistrationFeeContextDto
     public ApplicationOrganisationType ApplicationType { get; init; }
     public string SiteAddress { get; set; } 
     public DateTime CreatedDate { get; set; }
+    public string TaskStatus { get; set; }
+    public Guid RegulatorApplicationTaskStatusId { get; set; }
 }
