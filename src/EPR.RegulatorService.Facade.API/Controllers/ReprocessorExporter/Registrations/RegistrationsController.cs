@@ -259,7 +259,7 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
         return NoContent();
     }
 
-    [HttpPost("regulatorApplicationTaskStatus/{id:int}/queryNote")]
+    [HttpPost("regulatorApplicationTaskStatus/{id}/queryNote")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
@@ -271,7 +271,7 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> SaveApplicationTaskQueryNotes(
-       [FromRoute] int id,
+       [FromRoute] Guid id,
        [FromBody] QueryNoteRequestDto request)
     {
         await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
@@ -280,7 +280,7 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
         return NoContent();
     }
 
-    [HttpPost("regulatorRegistrationTaskStatus/{id:int}/queryNote")]
+    [HttpPost("regulatorRegistrationTaskStatus/{id}/queryNote")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
@@ -292,7 +292,7 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> SaveRegistrationTaskQueryNotes(
-      [FromRoute] int id,
+      [FromRoute] Guid id,
       [FromBody] QueryNoteRequestDto request)
     {
         await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);

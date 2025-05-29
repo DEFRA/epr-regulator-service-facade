@@ -464,11 +464,11 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
-        _mockRegistrationServiceClient.Setup(client => client.SaveApplicationTaskQueryNotes(1, requestDto))
+        _mockRegistrationServiceClient.Setup(client => client.SaveApplicationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
                    .ReturnsAsync(true);
 
         // Act
-        var result = await _service.SaveApplicationTaskQueryNotes(1, Guid.NewGuid(), requestDto);
+        var result = await _service.SaveApplicationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), Guid.NewGuid(), requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -479,11 +479,11 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
-        _mockRegistrationServiceClient.Setup(client => client.SaveRegistrationTaskQueryNotes(1, requestDto))
+        _mockRegistrationServiceClient.Setup(client => client.SaveRegistrationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
                    .ReturnsAsync(true);
 
         // Act
-        var result = await _service.SaveRegistrationTaskQueryNotes(1, Guid.NewGuid(), requestDto);
+        var result = await _service.SaveRegistrationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), Guid.NewGuid(), requestDto);
 
         // Assert
         result.Should().BeTrue();

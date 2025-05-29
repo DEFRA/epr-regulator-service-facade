@@ -446,7 +446,7 @@ public class ReprocessorExporterServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
 
         // Act
-        var result = await _client.SaveApplicationTaskQueryNotes(1, requestDto);
+        var result = await _client.SaveApplicationTaskQueryNotes(Guid.NewGuid(), requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -468,7 +468,7 @@ public class ReprocessorExporterServiceClientTests
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
 
         // Act
-        var result = await _client.SaveRegistrationTaskQueryNotes(1, requestDto);
+        var result = await _client.SaveRegistrationTaskQueryNotes(Guid.NewGuid(), requestDto);
 
         // Assert
         result.Should().BeTrue();

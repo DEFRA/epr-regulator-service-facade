@@ -627,7 +627,7 @@ public class RegistrationsControllerTests
     public async Task SaveApplicationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var regulatorApplicationTaskStatusId = 1;
+        var regulatorApplicationTaskStatusId = Guid.NewGuid(); ;
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
 
         _mockQueryNoteRequestDtoValidator
@@ -667,7 +667,7 @@ public class RegistrationsControllerTests
 
         // Act & Assert
         await FluentActions.Invoking(() =>
-            _controller.SaveApplicationTaskQueryNotes(1, requestDto)
+            _controller.SaveApplicationTaskQueryNotes(Guid.NewGuid(), requestDto)
         ).Should().ThrowAsync<ValidationException>();
     }
 
@@ -675,7 +675,7 @@ public class RegistrationsControllerTests
     public async Task SaveRegistrationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var regulatorRegistrationTaskStatusId = 1;
+        var regulatorRegistrationTaskStatusId = Guid.NewGuid();
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
 
         _mockQueryNoteRequestDtoValidator
@@ -715,7 +715,7 @@ public class RegistrationsControllerTests
 
         // Act & Assert
         await FluentActions.Invoking(() =>
-            _controller.SaveRegistrationTaskQueryNotes(1, requestDto)
+            _controller.SaveRegistrationTaskQueryNotes(Guid.NewGuid(), requestDto)
         ).Should().ThrowAsync<ValidationException>();
     }
 

@@ -152,14 +152,14 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         return await reprocessorExporterServiceClient.GetRegistrationByIdWithAccreditationsAsync(id, year);
     }
 
-    public async Task<bool> SaveApplicationTaskQueryNotes(int id, Guid userId, QueryNoteRequestDto request)
+    public async Task<bool> SaveApplicationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request)
     {
         request.CreatedBy = userId;
 
         return await reprocessorExporterServiceClient.SaveApplicationTaskQueryNotes(id, request);
     }
 
-    public async Task<bool> SaveRegistrationTaskQueryNotes(int id, Guid userId, QueryNoteRequestDto request)
+    public async Task<bool> SaveRegistrationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request)
     {
         request.CreatedBy = userId;
 
