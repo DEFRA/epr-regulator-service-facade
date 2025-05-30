@@ -11,6 +11,6 @@
         public decimal MaximumReprocessingCapacityTonne { get; set; }
         public string MaximumReprocessingPeriod { get; set; }
         public string MaterialName { get; set; }
-        public int RegistrationMaterialId { get; set; }
+        public Guid RegistrationMaterialId { get; set; }
     }
 }

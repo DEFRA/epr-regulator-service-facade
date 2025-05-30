@@ -17,7 +17,7 @@ public class UpdateRegulatorRegistrationTaskDtoValidatorTests
     {
         var dto = new UpdateRegulatorRegistrationTaskDto
         {
-            RegistrationId = 10,
+            RegistrationId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Initial Review",
             Status = RegistrationTaskStatus.Completed,
             Comments = "Approved after verification.",
@@ -34,7 +34,7 @@ public class UpdateRegulatorRegistrationTaskDtoValidatorTests
     {
         var input = new UpdateRegulatorRegistrationTaskDto
         {
-            RegistrationId = 20,
+            RegistrationId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Validation Task",
             Status = (RegistrationTaskStatus)12345,
             Comments = "Status invalid test",
@@ -52,7 +52,7 @@ public class UpdateRegulatorRegistrationTaskDtoValidatorTests
     {
         var task = new UpdateRegulatorRegistrationTaskDto
         {
-            RegistrationId = 30,
+            RegistrationId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Review Request",
             Status = RegistrationTaskStatus.Queried,
             Comments = null, 
@@ -70,7 +70,7 @@ public class UpdateRegulatorRegistrationTaskDtoValidatorTests
     {
         var dto = new UpdateRegulatorRegistrationTaskDto
         {
-            RegistrationId = 40,
+            RegistrationId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Long Comment Check",
             Status = RegistrationTaskStatus.Completed,
             Comments = new string('A', 600),
@@ -88,7 +88,7 @@ public class UpdateRegulatorRegistrationTaskDtoValidatorTests
     {
         var task = new UpdateRegulatorRegistrationTaskDto
         {
-            RegistrationId = 50,
+            RegistrationId = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"),
             TaskName = "Escalation Review",
             Status = RegistrationTaskStatus.Queried,
             Comments = string.Empty, 
