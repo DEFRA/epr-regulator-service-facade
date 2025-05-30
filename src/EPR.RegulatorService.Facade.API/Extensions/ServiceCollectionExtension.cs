@@ -1,12 +1,10 @@
 ﻿using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
-using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
@@ -51,7 +49,5 @@ public static class ServiceCollectionExtension
         services.AddScoped<IReprocessorExporterService, ReprocessorExporterService>();
         services.AddScoped<IAccountServiceClient, AccountServiceClient>();
         services.AddScoped<IPaymentServiceClient, PaymentServiceClient>();
-        services.AddScoped<IAccreditationServiceClient, AccreditationServiceClient>();
-        services.AddScoped<IAccreditationService, AccreditationService>();
     }
 }

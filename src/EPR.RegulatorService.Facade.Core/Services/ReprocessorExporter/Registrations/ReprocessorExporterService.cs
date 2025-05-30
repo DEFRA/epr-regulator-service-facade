@@ -107,7 +107,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             Regulator = nationDetails.NationCode
         };
     }
-    
+
     public async Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request)
     {
         var offlinePaymentRequest = new SaveOfflinePaymentRequestDto
@@ -150,5 +150,64 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year)
     {
         return await reprocessorExporterServiceClient.GetRegistrationByIdWithAccreditationsAsync(id, year);
+    }
+    
+    public async Task<PaymentFeeDetailsDto> GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(Guid id)
+    {
+        var registrationFeeRequestInfos = await reprocessorExporterServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
+
+        var organisationNameTask = accountServiceClient.GetOrganisationNameById(registrationFeeRequestInfos.OrganisationId);
+        var nationDetailsTask = accountServiceClient.GetNationDetailsById(registrationFeeRequestInfos.NationId);
+
+        await Task.WhenAll(organisationNameTask, nationDetailsTask);
+
+        var organisationName = await organisationNameTask;
+        var nationDetails = await nationDetailsTask;
+
+        var paymentFee = await paymentServiceClient.GetAccreditationPaymentFee(registrationFeeRequestInfos.MaterialName,
+            nationDetails.NationCode,
+            registrationFeeRequestInfos.CreatedDate,
+            registrationFeeRequestInfos.ApplicationType.ToString(),
+            registrationFeeRequestInfos.ApplicationReferenceNumber);
+
+        return new PaymentFeeDetailsDto
+        {
+            RegistrationId = registrationFeeRequestInfos.RegistrationId,
+            RegistrationMaterialId = id,
+            OrganisationName = organisationName,
+            SiteAddress = registrationFeeRequestInfos.SiteAddress,
+            ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber,
+            MaterialName = registrationFeeRequestInfos.MaterialName,
+            SubmittedDate = registrationFeeRequestInfos.CreatedDate,
+            FeeAmount = paymentFee,
+            ApplicationType = registrationFeeRequestInfos.ApplicationType,
+            Regulator = nationDetails.NationCode
+        };
+    }
+    
+    public async Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request)
+    {
+        var markAsDulyMadeRequest = new MarkAsDulyMadeWithUserIdDto()
+        {
+            DulyMadeDate = request.DulyMadeDate,
+            DeterminationDate = request.DeterminationDate,
+            DulyMadeBy = userId
+        };
+
+        return await reprocessorExporterServiceClient.MarkAsDulyMadeByAccreditationId(id, markAsDulyMadeRequest);
+    }
+
+    public async Task<bool> UpdateRegulatorAccreditationTaskStatus(Guid userId, UpdateAccreditationTaskStatusDto request)
+    {
+        var updateAccreditationMaterialTaskStatusWithUserIdDto = new UpdateAccreditationTaskStatusWithUserIdDto()
+        {
+            AccreditationId = request.AccreditationId,
+            TaskName = request.TaskName,
+            Status = request.Status,
+            Comments = request.Comments,
+            UpdatedByUserId = userId
+        };
+
+        return await reprocessorExporterServiceClient.UpdateRegulatorAccreditationTaskStatus(updateAccreditationMaterialTaskStatusWithUserIdDto);
     }
 }

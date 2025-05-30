@@ -116,4 +116,18 @@ ILogger<ReprocessorExporterServiceClient> logger)
         }
         return await GetAsync<RegistrationOverviewDto>(url);
     }
+
+    public async Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, MarkAsDulyMadeWithUserIdDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingMarkAccreditationMaterialAsDulyMade);
+        var url = string.Format(_config.Endpoints.AccreditationMarkAsDulyMadeByRegistrationMaterialId, _config.ApiVersion, id);
+        return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
+    }
+
+    public async Task<bool> UpdateRegulatorAccreditationTaskStatus(UpdateAccreditationTaskStatusWithUserIdDto request)
+    {
+        logger.LogInformation(LogMessages.UpdateRegulatorAccreditationTaskStatus, request.Status.ToString());
+        var url = string.Format(_config.Endpoints.UpdateRegulatorAccreditationTaskStatusById, _config.ApiVersion);
+        return await PostAsync<UpdateAccreditationTaskStatusWithUserIdDto, bool>(url, request);
+    }
 }

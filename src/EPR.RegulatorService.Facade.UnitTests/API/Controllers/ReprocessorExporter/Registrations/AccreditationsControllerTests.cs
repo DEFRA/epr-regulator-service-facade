@@ -1,8 +1,6 @@
 ﻿using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
 using FluentValidation;
@@ -13,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System.Net;
 using System.Security.Claims;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -23,10 +22,8 @@ public class AccreditationsControllerTests
     private Mock<ILogger<AccreditationsController>> _mockLogger = null!;
     private Fixture _fixture = null!;
     private AccreditationsController _controller = null!;
-
-    private Mock<IAccreditationService> _mockAccreditationService = null!;
-    private Mock<IValidator<AccreditationMarkAsDulyMadeRequestDto>> _mockMarkAsDulyMadeRequestValidator = null!;
-    private Mock<IValidator<UpdateAccreditationMaterialTaskStatusDto>> _mockRegulatorApplicationValidator = null!;
+    private Mock<IValidator<MarkAsDulyMadeRequestDto>> _mockMarkAsDulyMadeRequestValidator = null!;
+    private Mock<IValidator<UpdateAccreditationTaskStatusDto>> _mockRegulatorApplicationValidator = null!;
 
     [TestInitialize]
     public void TestInitialize()
@@ -37,14 +34,12 @@ public class AccreditationsControllerTests
         }, "Test"));
 
         _mockReprocessorExporterService = new Mock<IReprocessorExporterService>();
-        _mockAccreditationService = new Mock<IAccreditationService>();
         _mockLogger = new Mock<ILogger<AccreditationsController>>();
-        _mockMarkAsDulyMadeRequestValidator = new Mock<IValidator<AccreditationMarkAsDulyMadeRequestDto>>();
-        _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateAccreditationMaterialTaskStatusDto>>();
+        _mockMarkAsDulyMadeRequestValidator = new Mock<IValidator<MarkAsDulyMadeRequestDto>>();
+        _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateAccreditationTaskStatusDto>>();
 
         _fixture = new Fixture();
         _controller = new AccreditationsController(_mockReprocessorExporterService.Object,
-                                                _mockAccreditationService.Object,
                                                 _mockMarkAsDulyMadeRequestValidator.Object,
                                                 _mockRegulatorApplicationValidator.Object,
                                                 _mockLogger.Object);
@@ -76,15 +71,14 @@ public class AccreditationsControllerTests
     public async Task GetPaymentFeeDetailsByAccreditationMaterialId_ShouldReturnOk_WithExpectedResult()
     {
         // Arrange
-        Guid accreditationMaterialId = Guid.NewGuid();
+        Guid id = Guid.NewGuid();
+        var expectedDto = _fixture.Create<PaymentFeeDetailsDto>();
 
-        var expectedDto = _fixture.Create<AccreditationPaymentFeeDetailsDto>();
-
-        _mockAccreditationService.Setup(service => service.GetPaymentFeeDetailsByAccreditationMaterialId(accreditationMaterialId))
-                                 .ReturnsAsync(expectedDto);
+        _mockReprocessorExporterService.Setup(service => service.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id))
+            .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _controller.GetPaymentFeeDetailsByAccreditationMaterialId(accreditationMaterialId);
+        var result = await _controller.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id);
 
         // Assert
         var okResult = result as OkObjectResult;
@@ -98,31 +92,34 @@ public class AccreditationsControllerTests
     {
         // Arrange
         var accreditationMaterialId = Guid.NewGuid();
-        _mockAccreditationService.Setup(service => service.GetPaymentFeeDetailsByAccreditationMaterialId(accreditationMaterialId))
-                                .ThrowsAsync(new Exception("Service error"));
+        _mockReprocessorExporterService.Setup(service => service.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(accreditationMaterialId))
+            .ThrowsAsync(new Exception("Service error"));
 
         // Act & Assert
-        await FluentActions.Invoking(() => _controller.GetPaymentFeeDetailsByAccreditationMaterialId(accreditationMaterialId))
-                            .Should().ThrowAsync<Exception>()
-                            .WithMessage("Service error");
+        await FluentActions.Invoking(() => _controller.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(accreditationMaterialId))
+            .Should().ThrowAsync<Exception>()
+            .WithMessage("Service error");
     }
 
     [TestMethod]
     public async Task MarkAccreditationMaterialStatusAsDulyMade_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var requestDto = _fixture.Create<AccreditationMarkAsDulyMadeWithUserIdDto>();
+        var accreditationId = Guid.NewGuid();
+
+        // Arrange
+        var requestDto = _fixture.Create<MarkAsDulyMadeRequestDto>();
 
         _mockMarkAsDulyMadeRequestValidator
             .Setup(v => v.ValidateAsync(requestDto, default))
             .ReturnsAsync(new ValidationResult());
 
-        _mockAccreditationService
-            .Setup(s => s.MarkAccreditationMaterialStatusAsDulyMade(It.IsAny<Guid>(), requestDto))
+        _mockReprocessorExporterService
+            .Setup(s => s.MarkAsDulyMadeByAccreditationId(It.IsAny<Guid>(), It.IsAny<Guid>(), requestDto))
             .ReturnsAsync(true);
 
         // Act
-        var result = await _controller.MarkAccreditationMaterialStatusAsDulyMade(requestDto);
+        var result = await _controller.MarkAsDulyMadeByAccreditationId(accreditationId, requestDto);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -132,22 +129,22 @@ public class AccreditationsControllerTests
     public async Task MarkAccreditationMaterialStatusAsDulyMade_ShouldThrowValidationException_WhenValidationFails()
     {
         // Arrange
-        var validator = new InlineValidator<AccreditationMarkAsDulyMadeRequestDto>();
+        var accreditationId = Guid.NewGuid();
+        var validator = new InlineValidator<MarkAsDulyMadeRequestDto>();
         validator.RuleFor(x => x.DeterminationDate).Must(_ => false).WithMessage("Invalid");
 
         _controller = new AccreditationsController(
             _mockReprocessorExporterService.Object,
-            _mockAccreditationService.Object,
             validator,
             _mockRegulatorApplicationValidator.Object,
             _mockLogger.Object
         );
 
-        var requestDto = new AccreditationMarkAsDulyMadeWithUserIdDto();
+        var requestDto = new MarkAsDulyMadeRequestDto();
 
         // Act & Assert
         await FluentActions.Invoking(() =>
-            _controller.MarkAccreditationMaterialStatusAsDulyMade(requestDto)
+            _controller.MarkAsDulyMadeByAccreditationId(accreditationId, requestDto)
         ).Should().ThrowAsync<ValidationException>();
     }
 
@@ -155,19 +152,19 @@ public class AccreditationsControllerTests
     public async Task UpdateAccreditationMaterialTaskStatus_ValidRequest_ReturnsNoContent()
     {
         // Arrange
-        var request = _fixture.Create<UpdateAccreditationMaterialTaskStatusDto>();
+        var request = _fixture.Create<UpdateAccreditationTaskStatusDto>();
         var validationResult = new ValidationResult();
 
         _mockRegulatorApplicationValidator
             .Setup(v => v.ValidateAsync(request, default))
             .ReturnsAsync(validationResult);
 
-        _mockAccreditationService
-            .Setup(s => s.UpdateAccreditationMaterialTaskStatus(It.IsAny<Guid>(), request))
+        _mockReprocessorExporterService
+            .Setup(s => s.UpdateRegulatorAccreditationTaskStatus(It.IsAny<Guid>(), request))
             .ReturnsAsync(true);
-
+        
         // Act
-        var result = await _controller.UpdateAccreditationMaterialTaskStatus(request);
+        var result = await _controller.UpdateRegulatorAccreditationTaskStatus(request);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -177,30 +174,27 @@ public class AccreditationsControllerTests
     public async Task UpdateAccreditationMaterialTaskStatus_InvalidRequest_ThrowsValidationException()
     {
         // Arrange
-        var validator = new InlineValidator<UpdateAccreditationMaterialTaskStatusDto>();
-        validator.RuleFor(x => x.RegistrationMaterialId).NotEmpty().WithMessage("RegistrationMaterialId is required");
-        validator.RuleFor(x => x.TaskId).NotEmpty().WithMessage("TaskName is required");
-        validator.RuleFor(x => x.TaskStatus).IsInEnum().WithMessage("Status is required");
-        
+        var validator = new InlineValidator<UpdateAccreditationTaskStatusDto>();
+        validator.RuleFor(x => x.TaskName).NotEmpty().WithMessage("TaskName is required");
+        validator.RuleFor(x => x.Status).IsInEnum().WithMessage("Status is required");
+
         _controller = new AccreditationsController(
             _mockReprocessorExporterService.Object,
-            _mockAccreditationService.Object,
             _mockMarkAsDulyMadeRequestValidator.Object,
             validator,
             _mockLogger.Object
         );
 
-        var invalidRequest = new UpdateAccreditationMaterialTaskStatusDto
+        var invalidRequest = new UpdateAccreditationTaskStatusDto
         {
-            RegistrationMaterialId = Guid.NewGuid(),
-            TaskStatus = 0,
+            Status = RegistrationTaskStatus.Queried,
             Comments = "Testing",
-            TaskId = 0
+            TaskName = ""
         };
 
         // Act & Assert
         await FluentActions.Invoking(() =>
-            _controller.UpdateAccreditationMaterialTaskStatus(invalidRequest)
+            _controller.UpdateRegulatorAccreditationTaskStatus(invalidRequest)
         ).Should().ThrowAsync<ValidationException>()
          .WithMessage("*is required*");
     }

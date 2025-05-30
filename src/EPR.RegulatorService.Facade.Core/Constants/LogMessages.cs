@@ -26,6 +26,6 @@ public static class LogMessages
     public const string RegistrationAccreditationTasks = "Attempting to get registration accreditations and tasks";
     public const string AttemptingAccreditationPaymentFee = "Attempting to get payment fee.";
     public const string AttemptingAccreditationFeeDetails = "Attempting to get accreditation material fee details.";
-    public const string UpdateAccreditationMaterialTaskStatus = "Attempting to update accreditation task status to : {Status}";
+    public const string UpdateRegulatorAccreditationTaskStatus = "Attempting to update regulator accreditation task status to : {Status}";
     public const string AttemptingMarkAccreditationMaterialAsDulyMade = "Attempting to mark a accreditation material as duly made.";
 }

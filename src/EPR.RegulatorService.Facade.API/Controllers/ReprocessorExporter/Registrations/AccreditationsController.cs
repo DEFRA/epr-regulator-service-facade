@@ -2,15 +2,13 @@
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Constants;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Accreditations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
-using FluentValidation;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -20,9 +18,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
 public class AccreditationsController(
     IReprocessorExporterService reprocessorExporterService,
-    IAccreditationService accreditationService,
-    IValidator<AccreditationMarkAsDulyMadeRequestDto> accreditationMarkAsDulyMadeRequestDtoValidator,
-    IValidator<UpdateAccreditationMaterialTaskStatusDto> updateAccreditationMaterialTaskValidator,
+    IValidator<MarkAsDulyMadeRequestDto> markAsDulyMadeRequestDtoValidator,
+    IValidator<UpdateAccreditationTaskStatusDto> updateAccreditationMaterialTaskValidator,
     ILogger<AccreditationsController> logger) : ControllerBase
 {
     [HttpGet("registrations/{id:Guid}/accreditations")]
@@ -42,22 +39,23 @@ public class AccreditationsController(
     }
 
     [HttpGet("accreditationMaterials/{id:guid}/paymentFees")]
-    [ProducesResponseType(typeof(AccreditationPaymentFeeDetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
-        Summary = "Get accreditation fee details.",
+        Summary = "Get accreditation fee details by registered material id.",
         Description = "Attempting to get accreditation fee details."
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns accreditation fee details.", typeof(AccreditationPaymentFeeDetailsDto))]
+    
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns accreditation fee details.", typeof(PaymentFeeDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetPaymentFeeDetailsByAccreditationMaterialId(Guid id)
+    public async Task<IActionResult> GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingAccreditationFeeDetails);
-        var result = await accreditationService.GetPaymentFeeDetailsByAccreditationMaterialId(id);
+        var result = await reprocessorExporterService.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id);
         return Ok(result);
     }
-
-    [HttpPost("accreditationMaterials/markAsDulyMade")]
+    
+    [HttpPost("accreditationMaterials/{id}/markAsDulyMade")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
@@ -68,18 +66,20 @@ public class AccreditationsController(
     [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> MarkAccreditationMaterialStatusAsDulyMade([FromBody] AccreditationMarkAsDulyMadeRequestDto request)
+    public async Task<IActionResult> MarkAsDulyMadeByAccreditationId(
+        [FromRoute] Guid id,
+        [FromBody] MarkAsDulyMadeRequestDto request)
     {
-        await accreditationMarkAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
+        await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.AttemptingMarkAccreditationMaterialAsDulyMade);
-        await accreditationService.MarkAccreditationMaterialStatusAsDulyMade(User.UserId(), request);
+        await reprocessorExporterService.MarkAsDulyMadeByAccreditationId(id, User.UserId(), request);
         return NoContent();
     }
 
-    [HttpPost("updateAccreditationMaterialTaskStatus")]
+    [HttpPost("regulatorAccreditationTaskStatus")]
     [SwaggerOperation(
-        Summary = "Updates a material-specific task status.",
-        Description = "Attempting to update regulator application task status."
+        Summary = "Updates a accreditation task status.",
+        Description = "Attempting to update regulator accreditation task status."
     )]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
@@ -87,11 +87,11 @@ public class AccreditationsController(
     [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> UpdateAccreditationMaterialTaskStatus([FromBody] UpdateAccreditationMaterialTaskStatusDto request)
+    public async Task<IActionResult> UpdateRegulatorAccreditationTaskStatus([FromBody] UpdateAccreditationTaskStatusDto request)
     {
         await updateAccreditationMaterialTaskValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.UpdateAccreditationMaterialTaskStatus, request.TaskStatus);
-        await accreditationService.UpdateAccreditationMaterialTaskStatus(User.UserId(), request);
+        logger.LogInformation(LogMessages.UpdateRegulatorAccreditationTaskStatus, request.Status);
+        await reprocessorExporterService.UpdateRegulatorAccreditationTaskStatus(User.UserId(), request);
         return NoContent();
     }
 }

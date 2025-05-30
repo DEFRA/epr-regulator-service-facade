@@ -49,7 +49,9 @@ public class ReprocessorExporterServiceClientTests
                 RegistrationFeeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/paymentFees",
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
-                RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations"
+                RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations",
+                AccreditationMarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/accreditationMaterials/markAsDulyMade",
+                UpdateRegulatorAccreditationTaskStatusById = "api/v{0}/accreditationMaterialTaskStatus"
             }
         });
 
@@ -426,5 +428,61 @@ public class ReprocessorExporterServiceClientTests
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
+    }
+
+  
+    [TestMethod]
+    public async Task MarkAccreditationStatusAsDulyMade_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var accreditationId = Guid.NewGuid();
+        var requestDto = _fixture.Create<MarkAsDulyMadeWithUserIdDto>();
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+        };
+        var responseContent = new StringContent(JsonSerializer.Serialize(true, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = responseContent
+            });
+
+        // Act
+        var result = await _client.MarkAsDulyMadeByAccreditationId(accreditationId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task UpdateAccreditationMaterialTaskStatus_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<UpdateAccreditationTaskStatusWithUserIdDto>();
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("accreditationMaterialTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
+
+        // Act
+        var result = await _client.UpdateRegulatorAccreditationTaskStatus(requestDto);
+        
+        // Assert
+        result.Should().BeTrue();
     }
 }

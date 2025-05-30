@@ -1,17 +1,17 @@
 ﻿using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
-using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Accreditations;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using FluentValidation;
 
-namespace EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Accreditations;
+namespace EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 
-public class UpdateAccreditationMaterialTaskStatusDtoValidator : AbstractValidator<UpdateAccreditationMaterialTaskStatusDto>
+public class UpdateAccreditationMaterialTaskStatusDtoValidator : AbstractValidator<UpdateAccreditationTaskStatusDto>
 {
     public UpdateAccreditationMaterialTaskStatusDtoValidator()
     {
-        var allowedStatuses = new[] { AccreditationTaskStatus.Queried, AccreditationTaskStatus.Completed };
+        var allowedStatuses = new[] { RegistrationTaskStatus.Queried, RegistrationTaskStatus.Completed };
 
-        RuleFor(x => x.TaskStatus)
+        RuleFor(x => x.Status)
                 .Must(status => allowedStatuses.Contains(status))
                 .WithMessage(ValidationMessages.InvalidAccreditationStatus);
 
@@ -19,7 +19,7 @@ public class UpdateAccreditationMaterialTaskStatusDtoValidator : AbstractValidat
                 .MaximumLength(500).WithMessage(ValidationMessages.AccreditationCommentsMaxLength);
 
         RuleFor(x => x.Comments)
-                .NotEmpty().When(x => x.TaskStatus == AccreditationTaskStatus.Queried)
+                .NotEmpty().When(x => x.Status == RegistrationTaskStatus.Queried)
                 .WithMessage(ValidationMessages.AccreditationCommentsRequired);
     }
 }
