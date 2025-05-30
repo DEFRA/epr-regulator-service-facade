@@ -19,12 +19,12 @@ ILogger<PaymentServiceClient> logger)
         logger.LogInformation(LogMessages.AttemptingRegistrationPaymentFee);
         var paymentFeeResponse = new PaymentFeeResponseDto
         {
-            MaterialType = "MaterialType",
+            MaterialType = request.MaterialType,
             RegistrationFee = 2921.00M,
             PreviousPaymentDetail = new PreviousPaymentDetailDto
             {
-                PaymentMode = "PaymentMode",
-                PaymentMethod = "MaterialType",
+                PaymentMode = "Offline",
+                PaymentMethod = "Bank transfer (Bacs)",
                 PaymentDate = DateTime.Now,
                 PaymentAmount = 2900.00M
             }

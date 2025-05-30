@@ -92,11 +92,11 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
 
         var paymentFeeRequest = new PaymentFeeRequestDto
         {
-            RequestorType = "RequestorType",
-            Regulator = "Regulator",
-            DulyMadeDate = DateTime.Now,
-            MaterialType = "MaterialType",
-            ApplicationReferenceNumber = "ApplicationReferenceNumber"
+            RequestorType = registrationFeeRequestInfos.ApplicationType.ToString(),
+            Regulator = nationDetails.NationCode,
+            SubmissionDate = registrationFeeRequestInfos.CreatedDate,
+            MaterialType = registrationFeeRequestInfos.MaterialName,
+            ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber
         };
 
         var paymentFeeResponse = await paymentServiceClient.GetRegistrationPaymentFee(paymentFeeRequest);
@@ -113,10 +113,10 @@ public class RegistrationService(IRegistrationServiceClient registrationServiceC
             FeeAmount = paymentFeeResponse.RegistrationFee,
             ApplicationType = registrationFeeRequestInfos.ApplicationType,
             Regulator = nationDetails.NationCode,
-            PaymentMethod = paymentFeeResponse.PreviousPaymentDetail.PaymentMethod,
-            PaymentDate = paymentFeeResponse.PreviousPaymentDetail.PaymentDate,
-            DulyMadeDate = DateTime.Now,
-            DeterminationDate = DateTime.Now
+            PaymentMethod = paymentFeeResponse.PreviousPaymentDetail?.PaymentMethod,
+            PaymentDate = paymentFeeResponse.PreviousPaymentDetail?.PaymentDate,
+            DulyMadeDate = registrationFeeRequestInfos.DulyMadeDate,
+            DeterminationDate = registrationFeeRequestInfos.DeterminationDate
         };
     }
     

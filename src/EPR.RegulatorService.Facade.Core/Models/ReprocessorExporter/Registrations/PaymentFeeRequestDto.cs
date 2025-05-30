@@ -3,7 +3,7 @@ public class PaymentFeeRequestDto
 {
     public string RequestorType { get; set; }
     public string Regulator { get; set; }
-    public DateTime DulyMadeDate { get; set; }
+    public DateTime SubmissionDate { get; set; }
     public string MaterialType { get; set; }
     public string ApplicationReferenceNumber { get; set; }
     

@@ -3,6 +3,6 @@ public class PaymentFeeResponseDto
 {
     public string MaterialType { get; set; }
     public decimal RegistrationFee { get; set; }
-    public PreviousPaymentDetailDto PreviousPaymentDetail { get; set; }
+    public PreviousPaymentDetailDto? PreviousPaymentDetail { get; set; }
     
 }
