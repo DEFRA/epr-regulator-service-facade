@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -40,7 +39,7 @@ public class AccreditationsController(
         return Ok(accreditations);
     }
 
-    [HttpGet("accreditationMaterials/{id:guid}/paymentFees")]
+    [HttpGet("accreditations/{id:guid}/paymentFees")]
     [ProducesResponseType(typeof(AccreditationPaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
