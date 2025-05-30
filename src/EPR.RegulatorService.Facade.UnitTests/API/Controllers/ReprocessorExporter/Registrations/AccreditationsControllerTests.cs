@@ -24,6 +24,8 @@ public class AccreditationsControllerTests
     private AccreditationsController _controller = null!;
     private Mock<IValidator<MarkAsDulyMadeRequestDto>> _mockMarkAsDulyMadeRequestValidator = null!;
     private Mock<IValidator<UpdateAccreditationTaskStatusDto>> _mockRegulatorApplicationValidator = null!;
+    private Mock<IValidator<OfflinePaymentRequestDto>> _mockOfflinePaymentRequestDtoValidator = null!;
+    private Mock<IValidator<OfflinePaymentRequestDto>> _mockOfflinePaymentRequestValidator = null!;
 
     [TestInitialize]
     public void TestInitialize()
@@ -37,11 +39,14 @@ public class AccreditationsControllerTests
         _mockLogger = new Mock<ILogger<AccreditationsController>>();
         _mockMarkAsDulyMadeRequestValidator = new Mock<IValidator<MarkAsDulyMadeRequestDto>>();
         _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateAccreditationTaskStatusDto>>();
+        _mockOfflinePaymentRequestDtoValidator = new Mock<IValidator<OfflinePaymentRequestDto>>();
+        _mockOfflinePaymentRequestValidator = new Mock<IValidator<OfflinePaymentRequestDto>>();
 
         _fixture = new Fixture();
         _controller = new AccreditationsController(_mockReprocessorExporterService.Object,
                                                 _mockMarkAsDulyMadeRequestValidator.Object,
                                                 _mockRegulatorApplicationValidator.Object,
+                                                _mockOfflinePaymentRequestDtoValidator.Object,
                                                 _mockLogger.Object);
 
         _controller.ControllerContext = new ControllerContext();
@@ -72,13 +77,13 @@ public class AccreditationsControllerTests
     {
         // Arrange
         Guid id = Guid.NewGuid();
-        var expectedDto = _fixture.Create<PaymentFeeDetailsDto>();
+        var expectedDto = _fixture.Create<AccreditationPaymentFeeDetailsDto>();
 
-        _mockReprocessorExporterService.Setup(service => service.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id))
+        _mockReprocessorExporterService.Setup(service => service.GetAccreditationPaymentFeeDetailsByAccreditationId(id))
             .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _controller.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id);
+        var result = await _controller.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
 
         // Assert
         var okResult = result as OkObjectResult;
@@ -92,11 +97,11 @@ public class AccreditationsControllerTests
     {
         // Arrange
         var accreditationMaterialId = Guid.NewGuid();
-        _mockReprocessorExporterService.Setup(service => service.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(accreditationMaterialId))
+        _mockReprocessorExporterService.Setup(service => service.GetAccreditationPaymentFeeDetailsByAccreditationId(accreditationMaterialId))
             .ThrowsAsync(new Exception("Service error"));
 
         // Act & Assert
-        await FluentActions.Invoking(() => _controller.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(accreditationMaterialId))
+        await FluentActions.Invoking(() => _controller.GetAccreditationPaymentFeeDetailsByAccreditationId(accreditationMaterialId))
             .Should().ThrowAsync<Exception>()
             .WithMessage("Service error");
     }
@@ -137,6 +142,7 @@ public class AccreditationsControllerTests
             _mockReprocessorExporterService.Object,
             validator,
             _mockRegulatorApplicationValidator.Object,
+            _mockOfflinePaymentRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -182,6 +188,7 @@ public class AccreditationsControllerTests
             _mockReprocessorExporterService.Object,
             _mockMarkAsDulyMadeRequestValidator.Object,
             validator,
+            _mockOfflinePaymentRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -197,5 +204,49 @@ public class AccreditationsControllerTests
             _controller.UpdateRegulatorAccreditationTaskStatus(invalidRequest)
         ).Should().ThrowAsync<ValidationException>()
          .WithMessage("*is required*");
+    }
+
+    [TestMethod]
+    public async Task SaveOfflinePayment_ShouldReturnNoContent_WhenValidRequest()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<OfflinePaymentRequestDto>();
+
+        _mockOfflinePaymentRequestValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(new ValidationResult());
+
+        _mockReprocessorExporterService
+            .Setup(s => s.SaveOfflinePayment(It.IsAny<Guid>(), requestDto))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.SaveAccreditationOfflinePayment(requestDto);
+
+        // Assert
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [TestMethod]
+    public async Task SaveOfflinePayment_ShouldThrowValidationException_WhenValidationFails()
+    {
+        // Arrange
+        var validator = new InlineValidator<OfflinePaymentRequestDto>();
+        validator.RuleFor(x => x.Amount).Must(_ => false).WithMessage("Invalid");
+
+        _controller = new AccreditationsController(
+            _mockReprocessorExporterService.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
+            validator,
+            _mockLogger.Object
+        );
+
+        var requestDto = new OfflinePaymentRequestDto();
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.SaveAccreditationOfflinePayment(requestDto)
+        ).Should().ThrowAsync<ValidationException>();
     }
 }

@@ -18,6 +18,7 @@ public interface IReprocessorExporterServiceClient
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(Guid id);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, MarkAsDulyMadeWithUserIdDto request);
     Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year);
+    Task<AccreditationFeeContextDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id);
     Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, MarkAsDulyMadeWithUserIdDto request);
     Task<bool> UpdateRegulatorAccreditationTaskStatus(UpdateAccreditationTaskStatusWithUserIdDto request);
 }

@@ -116,6 +116,13 @@ ILogger<ReprocessorExporterServiceClient> logger)
         }
         return await GetAsync<RegistrationOverviewDto>(url);
     }
+    
+    public async Task<AccreditationFeeContextDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.AttemptingAccreditationFeeDetails);
+        var url = string.Format($"{_config.Endpoints.AccreditationFeeByAccreditationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<AccreditationFeeContextDto>(url);
+    }
 
     public async Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, MarkAsDulyMadeWithUserIdDto request)
     {

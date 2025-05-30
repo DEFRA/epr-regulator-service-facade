@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -20,6 +21,7 @@ public class AccreditationsController(
     IReprocessorExporterService reprocessorExporterService,
     IValidator<MarkAsDulyMadeRequestDto> markAsDulyMadeRequestDtoValidator,
     IValidator<UpdateAccreditationTaskStatusDto> updateAccreditationMaterialTaskValidator,
+    IValidator<OfflinePaymentRequestDto> offlinePaymentRequestDtoValidator,
     ILogger<AccreditationsController> logger) : ControllerBase
 {
     [HttpGet("registrations/{id:Guid}/accreditations")]
@@ -48,14 +50,14 @@ public class AccreditationsController(
     
     [SwaggerResponse(StatusCodes.Status200OK, "Returns accreditation fee details.", typeof(PaymentFeeDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
-    public async Task<IActionResult> GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(Guid id)
+    public async Task<IActionResult> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingAccreditationFeeDetails);
-        var result = await reprocessorExporterService.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id);
+        var result = await reprocessorExporterService.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
         return Ok(result);
     }
     
-    [HttpPost("accreditationMaterials/{id}/markAsDulyMade")]
+    [HttpPost("accreditations/{id}/markAsDulyMade")]
     [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
@@ -92,6 +94,26 @@ public class AccreditationsController(
         await updateAccreditationMaterialTaskValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.UpdateRegulatorAccreditationTaskStatus, request.Status);
         await reprocessorExporterService.UpdateRegulatorAccreditationTaskStatus(User.UserId(), request);
+        return NoContent();
+    }
+
+
+    [HttpPost("accreditations/offlinePayment")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
+    [SwaggerOperation(
+        Summary = "Saves a new offline payment",
+        Description = "Save a new offline payment with mandatory payment request data.  "
+    )]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> SaveAccreditationOfflinePayment([FromBody] OfflinePaymentRequestDto request)
+    {
+        await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
+        logger.LogInformation(LogMessages.SaveAccreditationOfflinePayment);
+        await reprocessorExporterService.SaveAccreditationOfflinePayment(User.UserId(), request);
         return NoContent();
     }
 }

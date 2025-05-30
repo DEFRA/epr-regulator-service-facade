@@ -40,4 +40,13 @@ ILogger<PaymentServiceClient> logger)
         //var url = string.Format(_config.Endpoints.SaveOfflinePayment, _config.ApiVersion);
         //return await PostAsync<OfflinePaymentRequestDto, bool>(url, request);
     }
+
+    public async Task<bool> SaveAccreditationOfflinePayment(SaveOfflinePaymentRequestDto request)
+    {
+        logger.LogInformation(LogMessages.SaveAccreditationOfflinePayment);
+        return true;
+
+        //var url = string.Format(_config.Endpoints.SaveAccreditationOfflinePayment, _config.ApiVersion);
+        //return await PostAsync<SaveOfflinePaymentRequestDto, bool>(url, request);
+    }
 }

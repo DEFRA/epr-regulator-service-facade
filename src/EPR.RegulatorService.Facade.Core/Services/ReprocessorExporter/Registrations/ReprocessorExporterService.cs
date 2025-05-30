@@ -152,35 +152,34 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         return await reprocessorExporterServiceClient.GetRegistrationByIdWithAccreditationsAsync(id, year);
     }
     
-    public async Task<PaymentFeeDetailsDto> GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(Guid id)
+    public async Task<AccreditationPaymentFeeDetailsDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
     {
-        var registrationFeeRequestInfos = await reprocessorExporterServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
+        var accreditationFeeRequestInfos = await reprocessorExporterServiceClient.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
 
-        var organisationNameTask = accountServiceClient.GetOrganisationNameById(registrationFeeRequestInfos.OrganisationId);
-        var nationDetailsTask = accountServiceClient.GetNationDetailsById(registrationFeeRequestInfos.NationId);
+        var organisationNameTask = accountServiceClient.GetOrganisationNameById(accreditationFeeRequestInfos.OrganisationId);
+        var nationDetailsTask = accountServiceClient.GetNationDetailsById(accreditationFeeRequestInfos.NationId);
 
         await Task.WhenAll(organisationNameTask, nationDetailsTask);
 
         var organisationName = await organisationNameTask;
         var nationDetails = await nationDetailsTask;
 
-        var paymentFee = await paymentServiceClient.GetAccreditationPaymentFee(registrationFeeRequestInfos.MaterialName,
+        var paymentFee = await paymentServiceClient.GetAccreditationPaymentFee(accreditationFeeRequestInfos.MaterialName,
             nationDetails.NationCode,
-            registrationFeeRequestInfos.CreatedDate,
-            registrationFeeRequestInfos.ApplicationType.ToString(),
-            registrationFeeRequestInfos.ApplicationReferenceNumber);
+            accreditationFeeRequestInfos.CreatedDate,
+            accreditationFeeRequestInfos.ApplicationType.ToString(),
+            accreditationFeeRequestInfos.ApplicationReferenceNumber);
 
-        return new PaymentFeeDetailsDto
+        return new AccreditationPaymentFeeDetailsDto
         {
-            RegistrationId = registrationFeeRequestInfos.RegistrationId,
-            RegistrationMaterialId = id,
+            AccreditationId = id,
             OrganisationName = organisationName,
-            SiteAddress = registrationFeeRequestInfos.SiteAddress,
-            ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber,
-            MaterialName = registrationFeeRequestInfos.MaterialName,
-            SubmittedDate = registrationFeeRequestInfos.CreatedDate,
+            SiteAddress = accreditationFeeRequestInfos.SiteAddress,
+            ApplicationReferenceNumber = accreditationFeeRequestInfos.ApplicationReferenceNumber,
+            MaterialName = accreditationFeeRequestInfos.MaterialName,
+            SubmittedDate = accreditationFeeRequestInfos.CreatedDate,
             FeeAmount = paymentFee,
-            ApplicationType = registrationFeeRequestInfos.ApplicationType,
+            ApplicationType = accreditationFeeRequestInfos.ApplicationType,
             Regulator = nationDetails.NationCode
         };
     }
@@ -209,5 +208,22 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         };
 
         return await reprocessorExporterServiceClient.UpdateRegulatorAccreditationTaskStatus(updateAccreditationMaterialTaskStatusWithUserIdDto);
+    }
+
+    public async Task<bool> SaveAccreditationOfflinePayment(Guid userId, OfflinePaymentRequestDto request)
+    {
+        var offlinePaymentRequest = new SaveOfflinePaymentRequestDto
+        {
+            Amount = request.Amount,
+            PaymentReference = request.PaymentReference,
+            PaymentDate = request.PaymentDate,
+            PaymentMethod = request.PaymentMethod,
+            Regulator = request.Regulator,
+            UserId = userId,
+            Description = ReprocessorExporterConstants.OfflinePaymentAccreditationDescription,
+            Comments = ReprocessorExporterConstants.OfflinePaymentAccreditationComment
+        };
+
+        return await paymentServiceClient.SaveAccreditationOfflinePayment(offlinePaymentRequest);
     }
 }

@@ -418,17 +418,17 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var id = 1;
-        var accreditationFeeContextDto = _fixture.Create<RegistrationFeeContextDto>();
+        var accreditationFeeContextDto = _fixture.Create<AccreditationFeeContextDto>();
         var organisationName = "Green Ltd";
 
-        var registeredMaterialId = Guid.NewGuid();
+        var accreditationId = Guid.NewGuid();
 
         var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
 
         var paymentFee = 3000.00m;
 
         _mockReprocessorExporterServiceClient
-            .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(It.IsAny<Guid>()))
+            .Setup(client => client.GetAccreditationPaymentFeeDetailsByAccreditationId(It.IsAny<Guid>()))
             .ReturnsAsync(accreditationFeeContextDto);
 
         _mockAccountsServiceClient
@@ -451,11 +451,11 @@ public class ReprocessorExporterServiceTests
         _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
-        var result = await _service.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(registeredMaterialId);
+        var result = await _service.GetAccreditationPaymentFeeDetailsByAccreditationId(accreditationId);
 
         // Assert
         result.Should().NotBeNull();
-        result.RegistrationMaterialId.Should().Be(registeredMaterialId);
+        result.AccreditationId.Should().Be(accreditationId);
         result.OrganisationName.Should().Be(organisationName);
         result.SiteAddress.Should().BeEquivalentTo(accreditationFeeContextDto.SiteAddress);
         result.ApplicationReferenceNumber.Should().Be(accreditationFeeContextDto.ApplicationReferenceNumber);
@@ -471,12 +471,12 @@ public class ReprocessorExporterServiceTests
         var id = Guid.NewGuid();
 
         _mockReprocessorExporterServiceClient
-            .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
+            .Setup(client => client.GetAccreditationPaymentFeeDetailsByAccreditationId(id))
             .ThrowsAsync(new Exception("Service unavailable"));
         
         _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
-        await FluentActions.Invoking(() => _service.GetAccreditationPaymentFeeDetailsByRegistrationMaterialId(id))
+        await FluentActions.Invoking(() => _service.GetAccreditationPaymentFeeDetailsByAccreditationId(id))
                             .Should().ThrowAsync<Exception>()
                             .WithMessage("Service unavailable");
     }
@@ -581,5 +581,45 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().BeTrue();
     }
+
+    [TestMethod]
+    public async Task SaveAccreditationOfflinePayment_ShouldReturnTrue_WhenClientCallSucceeds()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var requestDto = _fixture.Create<OfflinePaymentRequestDto>();
+
+        var expectedDto = new SaveOfflinePaymentRequestDto
+        {
+            Amount = requestDto.Amount,
+            PaymentReference = requestDto.PaymentReference,
+            PaymentDate = requestDto.PaymentDate,
+            PaymentMethod = requestDto.PaymentMethod,
+            Regulator = requestDto.Regulator,
+            UserId = userId,
+            Description = ReprocessorExporterConstants.OfflinePaymentAccreditationDescription,
+            Comments = ReprocessorExporterConstants.OfflinePaymentAccreditationComment
+        };
+
+        _mockPaymentServiceClient
+            .Setup(client => client.SaveAccreditationOfflinePayment(It.Is<SaveOfflinePaymentRequestDto>(dto =>
+                dto.Amount == expectedDto.Amount &&
+                dto.PaymentReference == expectedDto.PaymentReference &&
+                dto.PaymentDate == expectedDto.PaymentDate &&
+                dto.PaymentMethod == expectedDto.PaymentMethod &&
+                dto.Regulator == expectedDto.Regulator &&
+                dto.UserId == expectedDto.UserId &&
+                dto.Description == expectedDto.Description &&
+                dto.Comments == expectedDto.Comments
+            )))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveAccreditationOfflinePayment(userId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
 
 }
