@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EPR.RegulatorService.Facade.API.Handlers;
+﻿using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
@@ -11,6 +10,7 @@ using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
 using Notify.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
