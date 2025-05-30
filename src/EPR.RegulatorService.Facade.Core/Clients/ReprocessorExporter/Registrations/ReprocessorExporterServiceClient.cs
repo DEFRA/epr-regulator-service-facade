@@ -116,4 +116,11 @@ ILogger<ReprocessorExporterServiceClient> logger)
         }
         return await GetAsync<RegistrationOverviewDto>(url);
     }
+
+    public async Task<AccreditationSamplingPlanDto> GetSamplingPlanByAccreditationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.SamplingPlanAccreditation);
+        var url = string.Format($"{_config.Endpoints.SamplingPlansByAccreditationId}", _config.ApiVersion, id);
+        return await GetAsync<AccreditationSamplingPlanDto>(url);
+    }
 }
