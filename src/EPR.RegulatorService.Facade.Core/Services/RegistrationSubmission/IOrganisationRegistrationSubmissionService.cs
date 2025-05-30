@@ -9,7 +9,11 @@ public interface IOrganisationRegistrationSubmissionService
 {
     Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter, Guid userId);
 
-    Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId);
+    Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+        Guid submissionId,
+        Guid userId,
+        int lateFeeCutOffDay,
+        int lateFeeCutOffMonth);
 
     Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(RegulatorDecisionCreateRequest request, Guid userId);
 
