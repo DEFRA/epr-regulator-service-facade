@@ -29,6 +29,7 @@ parameters:
     - development
     - tst
     - preprod
+    - preprod2
     - prod
 - name: imageTag
   displayName: Enter Tag for the Image (Docker tag) or Release name (Git repo tag)
@@ -52,6 +53,10 @@ variables:
     - name: env
       value: PRD1
     - template: vars/${{ parameters.envToDeploy }}.yaml
+  - ${{ elseif eq(parameters.envToDeploy, 'preprod2') }}:
+    - name: env
+      value: PRE2
+    - template: vars/${{ parameters.envToDeploy }}.yaml
 # Release tags reference
   - template: pipelines/image-tags/${{ parameters.envToDeploy }}.yaml@ReleaseTags
   - ${{ if eq(parameters.envToDeploy, 'development') }}:
@@ -69,7 +74,8 @@ resources:
     - repository: ReleaseTags
       name: RWD-CPR-EPR4P-ADO/epr-app-config-settings
       type: git
-      ref: ${{ replace(replace(contains(parameters.imageTag, 'RELEASE'),'True',replace('refs/tags/RELEASETAG','RELEASETAG', parameters.imageTag)),'False','main') }}
+      # ref: ${{ replace(replace(contains(parameters.imageTag, 'RELEASE'),'True',replace('refs/tags/RELEASETAG','RELEASETAG', parameters.imageTag)),'False','main') }}
+      ref: feature/rc8.2topre2
 
     - repository: AutomationTesting #this repo contain the automation testing script
       name: RWD-CPR-EPR4P-ADO/epr-playwright-bdd
