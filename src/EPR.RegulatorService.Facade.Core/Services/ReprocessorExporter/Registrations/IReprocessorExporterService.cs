@@ -19,4 +19,6 @@ public interface IReprocessorExporterService
     Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request);
     Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year);
+    Task<bool> SaveApplicationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request);
+    Task<bool> SaveRegistrationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request);
 }

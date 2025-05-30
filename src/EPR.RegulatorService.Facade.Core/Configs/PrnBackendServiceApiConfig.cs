@@ -31,4 +31,6 @@ public class PrnServiceApiConfigEndpoints
     public string MarkAsDulyMadeByRegistrationMaterialId { get; set; }
     public string RegistrationAccreditationReference { get; set; }
     public string RegistrationByIdWithAccreditations { get; set; }
+    public string SaveApplicationTaskQueryNotes { get; set; }
+    public string SaveRegistrationTaskQueryNotes { get; set; }
 }
