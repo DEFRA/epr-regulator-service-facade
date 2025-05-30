@@ -41,14 +41,14 @@ public class AccreditationsController(
     }
 
     [HttpGet("accreditationMaterials/{id:guid}/paymentFees")]
-    [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AccreditationPaymentFeeDetailsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "Get accreditation fee details by registered material id.",
         Description = "Attempting to get accreditation fee details."
     )]
     
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns accreditation fee details.", typeof(PaymentFeeDetailsDto))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns accreditation fee details.", typeof(AccreditationPaymentFeeDetailsDto))]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
     {
