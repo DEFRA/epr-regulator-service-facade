@@ -43,9 +43,9 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem(ModelState);
             }
 
-                var serviceResult =
-                    await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
-                        GetUserId(request.UserId));
+            var serviceResult =
+                await organisationRegistrationSubmissionService.HandleCreateRegulatorDecisionSubmissionEvent(request,
+                    GetUserId(request.UserId));
 
             if (serviceResult.IsSuccessStatusCode)
             {

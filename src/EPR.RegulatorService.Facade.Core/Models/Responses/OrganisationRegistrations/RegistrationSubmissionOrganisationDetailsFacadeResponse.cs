@@ -48,6 +48,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public string Postcode { get; set; }
 
     public RegistrationSubmissionOrganisationSubmissionSummaryDetails SubmissionDetails { get; set; }
+    public DateTime? RegulatorResubmissionDecisionDate { get; set; }
     public DateTime? RegulatorDecisionDate { get; internal set; }
     public DateTime? ProducerCommentDate { get; internal set; }
     public Guid? RegulatorUserId { get; internal set; }
@@ -73,6 +74,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
             SubmissionStatus = details.SubmissionStatus,
             StatusPendingDate = details.StatusPendingDate,
             RegistrationDate = details.RegistrationDate,
+            RegulatorResubmissionDecisionDate = details.RegulatorResubmissionDecisionDate,
             RegulatorDecisionDate = details.RegulatorDecisionDate,
             ResubmissionDate = details.ResubmissionDate,
             ResubmissionStatus = details.ResubmissionStatus,
