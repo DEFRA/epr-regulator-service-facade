@@ -189,8 +189,8 @@ public class OrganisationRegistrationDetailsDto
             SubmittedByUserId = dto.SubmittedUserId,
             SubmissionPeriod = dto.SubmissionPeriod,
             ResubmissionStatus = dto.ResubmissionStatus,
-            RegistrationDate = dto.RegistrationDate,
-            ResubmissionDate = dto.ResubmissionDate,
+            RegistrationDate = convertDateTime(dto.RegistrationDate),
+            ResubmissionDate = convertDateTime(dto.ResubmissionDate),
             ResubmissionFileId = dto.ResubmissionFileId,
             IsResubmission = dto.IsResubmission
         };

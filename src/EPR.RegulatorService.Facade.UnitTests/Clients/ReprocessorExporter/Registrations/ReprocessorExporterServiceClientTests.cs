@@ -50,6 +50,7 @@ public class ReprocessorExporterServiceClientTests
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
                 RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations",
+                SamplingPlanByAccreditationId = "api/v{0}/accreditations/{1}/samplingPlan",
                 SaveApplicationTaskQueryNotes = "api/v{0}/regulatorApplicationTaskStatus/{1}/queryNote",
                 SaveRegistrationTaskQueryNotes = "api/v{0}/regulatorRegistrationTaskStatus/{1}/queryNote"
             }
@@ -425,6 +426,32 @@ public class ReprocessorExporterServiceClientTests
 
         // Act
         var result = await _client.GetRegistrationByIdWithAccreditationsAsync(Guid.NewGuid(), 2024);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
+        var expectedDto = _fixture.Create<AccreditationSamplingPlanDto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"accreditations/{id}/samplingPlan")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetSamplingPlanByAccreditationId(id);
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);

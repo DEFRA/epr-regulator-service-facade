@@ -1,7 +1,7 @@
-﻿using System.Net;
-using Asp.Versioning;
+﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement.Mvc;
@@ -31,5 +31,24 @@ public class AccreditationsController(
         logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
         var accreditations = await reprocessorExporterService.GetRegistrationByIdWithAccreditationsAsync(id, year);
         return Ok(accreditations);
+    }
+
+    [HttpGet("accreditations/{id:Guid}/samplingPlan")]
+    [ProducesResponseType(typeof(AccreditationSamplingPlanDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+            Summary = "get sampling data for a given accreditation",
+            Description = "Returns all sampling data of an accreditation"
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "If the request is successful.", typeof(SamplingPlanFileDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetSamplingPlansAsync(Guid id)
+    {
+        logger.LogInformation(LogMessages.SamplingPlanAccreditation);
+        var samplingPlans = await reprocessorExporterService.GetSamplingPlanByAccreditationId(id);
+
+        return Ok(samplingPlans);
     }
 }

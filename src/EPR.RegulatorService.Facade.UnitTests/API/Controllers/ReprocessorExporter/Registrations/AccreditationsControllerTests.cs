@@ -31,7 +31,7 @@ public class AccreditationsControllerTests
     }
 
     [TestMethod]
-    public async Task GetRegistrationByRegistrationId_ShouldReturnExpectedResult()
+    public async Task GetRegistrationByIdWithAccreditations_ShouldReturnExpectedResult()
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
@@ -41,6 +41,25 @@ public class AccreditationsControllerTests
 
         // Act
         var result = await _controller.GetRegistrationByIdWithAccreditationsAsync(id ,2025);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var expectedDto = _fixture.Create<AccreditationSamplingPlanDto>();
+        var id = Guid.NewGuid();
+        _mockReprocessorExporterService.Setup(service => service.GetSamplingPlanByAccreditationId(id))
+                                    .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetSamplingPlansAsync(id);
 
         // Assert
         var okResult = result as OkObjectResult;
