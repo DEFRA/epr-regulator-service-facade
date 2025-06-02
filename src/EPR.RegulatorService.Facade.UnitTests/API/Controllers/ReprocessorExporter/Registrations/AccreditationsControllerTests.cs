@@ -59,7 +59,7 @@ public class AccreditationsControllerTests
                                     .ReturnsAsync(expectedDto);
 
         // Act
-        var result = await _controller.GetSamplingPlansByAccreditationId(id);
+        var result = await _controller.GetSamplingPlansAsync(id);
 
         // Assert
         var okResult = result as OkObjectResult;
