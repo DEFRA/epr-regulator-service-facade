@@ -1,4 +1,5 @@
 ﻿namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+
 public class PaymentFeeRequestDto
 {
     public string RequestorType { get; set; }
