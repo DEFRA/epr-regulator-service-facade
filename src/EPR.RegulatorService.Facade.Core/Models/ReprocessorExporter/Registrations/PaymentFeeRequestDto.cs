@@ -5,6 +5,5 @@ public class PaymentFeeRequestDto
     public string Regulator { get; set; }
     public DateTime SubmissionDate { get; set; }
     public string MaterialType { get; set; }
-    public string ApplicationReferenceNumber { get; set; }
-    
+    public string ApplicationReferenceNumber { get; set; } 
 }
