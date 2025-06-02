@@ -2,7 +2,7 @@
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 
-public interface IRegistrationServiceClient
+public interface IReprocessorExporterServiceClient
 {
     Task<bool> UpdateRegulatorRegistrationTaskStatus(UpdateRegulatorRegistrationTaskDto request);
     Task<bool> UpdateRegulatorApplicationTaskStatus(UpdateRegulatorApplicationTaskDto request);
@@ -17,4 +17,5 @@ public interface IRegistrationServiceClient
     Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id);
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(Guid id);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, MarkAsDulyMadeWithUserIdDto request);
+    Task<RegistrationOverviewDto> GetRegistrationByIdWithAccreditationsAsync(Guid id, int? year);
 }
