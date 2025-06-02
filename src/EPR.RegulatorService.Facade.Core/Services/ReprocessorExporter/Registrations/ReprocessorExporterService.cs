@@ -176,6 +176,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             OrganisationName = organisationName,
             SiteAddress = accreditationFeeRequestInfos.SiteAddress,
             ApplicationReferenceNumber = accreditationFeeRequestInfos.ApplicationReferenceNumber,
+            PrnTonnage= accreditationFeeRequestInfos.PrnTonnage,
             MaterialName = accreditationFeeRequestInfos.MaterialName,
             SubmittedDate = accreditationFeeRequestInfos.CreatedDate,
             FeeAmount = paymentFee,

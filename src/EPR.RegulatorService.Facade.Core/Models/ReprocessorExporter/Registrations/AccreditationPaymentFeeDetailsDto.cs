@@ -7,6 +7,7 @@ public class AccreditationPaymentFeeDetailsDto
     public string OrganisationName { get; set; }
     public string? SiteAddress { get; set; }
     public string ApplicationReferenceNumber { get; set; }
+    public int PrnTonnage { get; set; }
     public string MaterialName { get; set; }
     public DateTime SubmittedDate { get; set; }
     public decimal FeeAmount { get; set; }
