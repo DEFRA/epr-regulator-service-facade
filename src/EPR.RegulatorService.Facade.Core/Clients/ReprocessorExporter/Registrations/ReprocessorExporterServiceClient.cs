@@ -120,7 +120,7 @@ ILogger<ReprocessorExporterServiceClient> logger)
     public async Task<AccreditationSamplingPlanDto> GetSamplingPlanByAccreditationId(Guid id)
     {
         logger.LogInformation(LogMessages.SamplingPlanAccreditation);
-        var url = string.Format($"{_config.Endpoints.SamplingPlansByAccreditationId}", _config.ApiVersion, id);
+        var url = string.Format($"{_config.Endpoints.SamplingPlanByAccreditationId}", _config.ApiVersion, id);
         return await GetAsync<AccreditationSamplingPlanDto>(url);
     }
 }

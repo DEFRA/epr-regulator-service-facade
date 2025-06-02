@@ -50,7 +50,7 @@ public class ReprocessorExporterServiceClientTests
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
                 RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations",
-                SamplingPlansByAccreditationId = "api/v{0}/accreditations/{1}/samplingPlan"
+                SamplingPlanByAccreditationId = "api/v{0}/accreditations/{1}/samplingPlan"
             }
         });
 

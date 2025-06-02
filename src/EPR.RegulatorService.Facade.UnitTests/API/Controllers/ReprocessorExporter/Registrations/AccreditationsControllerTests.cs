@@ -50,7 +50,7 @@ public class AccreditationsControllerTests
     }
 
     [TestMethod]
-    public async Task GetSamplingPlansByAccreditationId_ShouldReturnExpectedResult()
+    public async Task GetSamplingPlanByAccreditationId_ShouldReturnExpectedResult()
     {
         // Arrange
         var expectedDto = _fixture.Create<AccreditationSamplingPlanDto>();
