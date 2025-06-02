@@ -51,7 +51,7 @@ public class ReprocessorExporterServiceClientTests
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
                 RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations",
                 AccreditationFeeByAccreditationMaterialId = "api/v{0}/accreditationMaterials/{1}/paymentFees",
-                AccreditationMarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/accreditationMaterials/markAsDulyMade",
+                MarkAsDulyMadeByAccreditationId = "api/v{0}/accreditationMaterials/markAsDulyMade",
                 UpdateRegulatorAccreditationTaskStatusById = "api/v{0}/accreditationMaterialTaskStatus"
             }
         });

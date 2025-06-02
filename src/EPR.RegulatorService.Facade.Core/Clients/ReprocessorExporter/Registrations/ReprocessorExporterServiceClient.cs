@@ -127,7 +127,7 @@ ILogger<ReprocessorExporterServiceClient> logger)
     public async Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, MarkAsDulyMadeWithUserIdDto request)
     {
         logger.LogInformation(LogMessages.AttemptingMarkAccreditationMaterialAsDulyMade);
-        var url = string.Format(_config.Endpoints.AccreditationMarkAsDulyMadeByRegistrationMaterialId, _config.ApiVersion, id);
+        var url = string.Format(_config.Endpoints.MarkAsDulyMadeByAccreditationId, _config.ApiVersion, id);
         return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
     }
 
