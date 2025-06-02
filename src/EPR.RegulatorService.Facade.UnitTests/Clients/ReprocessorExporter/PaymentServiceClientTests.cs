@@ -68,4 +68,36 @@ public class PaymentServiceClientTests
         // Assert
         result.Should().BeTrue(); 
     }
+
+
+    [TestMethod]
+    public async Task GetAccreditationPaymentFee_ShouldReturnHardcodedValue()
+    {
+        // Arrange
+        var materialName = "Plastic";
+        var nationName = "England";
+        var submittedDate = DateTime.UtcNow;
+        var requestorType = "Producer";
+        var reference = "ABC123";
+
+        // Act
+        var result = await _client.GetAccreditationPaymentFee(materialName, nationName, submittedDate, requestorType, reference);
+
+        // Assert
+        result.Should().Be(3000.00m);
+    }
+
+    [TestMethod]
+    public async Task SaveAccreditationOfflinePayment_ShouldReturnTrue_WhenCalled()
+    {
+        // Arrange
+        var requestDto = new SaveOfflinePaymentRequestDto();
+
+        // Act
+        var result = await _client.SaveAccreditationOfflinePayment(requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
 }
