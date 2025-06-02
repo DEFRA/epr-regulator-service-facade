@@ -1,9 +1,11 @@
 ﻿using EPR.RegulatorService.Facade.Core.Enums;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 
 [ExcludeFromCodeCoverage]
+[DebuggerDisplay("{OrganisationName},{SubmissionId}")]
 public class OrganisationRegistrationSubmissionSummaryResponse
 {
     public Guid SubmissionId { get; set; }
@@ -39,4 +41,5 @@ public class OrganisationRegistrationSubmissionSummaryResponse
     public DateTime? RegistrationDate { get; set; }
 
     public DateTime? RegulatorDecisionDate { get; set; }
+    public DateTime? RegulatorResubmissionDecisionDate { get; set; }
 }
