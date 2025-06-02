@@ -430,8 +430,38 @@ public class ReprocessorExporterServiceClientTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
+    
+    [TestMethod]
+    public async Task GetAccreditationPaymentFeeDetailsByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var expectedDto = _fixture.Create<AccreditationFeeContextDto>();
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+        };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
 
-  
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = responseContent
+            });
+
+        // Act
+        var result = await _client.GetAccreditationPaymentFeeDetailsByAccreditationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
     [TestMethod]
     public async Task MarkAccreditationStatusAsDulyMade_ShouldReturnExpectedResult()
     {
