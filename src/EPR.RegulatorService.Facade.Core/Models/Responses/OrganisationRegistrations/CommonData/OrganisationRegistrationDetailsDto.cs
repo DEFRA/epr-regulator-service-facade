@@ -38,6 +38,7 @@ public class OrganisationRegistrationDetailsDto
     public string? RegulatorComment { get; set; }
     public string? ProducerComment { get; set; }
     public string? RegulatorDecisionDate { get; set; }
+    public string? RegulatorResubmissionDecisionDate { get; set; }
     public string? ProducerCommentDate { get; set; }
     public Guid? RegulatorUserId { get; set; }
 
@@ -150,6 +151,7 @@ public class OrganisationRegistrationDetailsDto
         response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
         response.ProducerComments = dto.ProducerComment ?? string.Empty;
         response.RegulatorDecisionDate = convertDateTime(dto.RegulatorDecisionDate);
+        response.RegulatorResubmissionDecisionDate = convertDateTime(dto.RegulatorResubmissionDecisionDate);
         response.ProducerCommentDate = convertDateTime(dto.ProducerCommentDate);
         response.RegulatorUserId = dto.RegulatorUserId;
 
@@ -177,6 +179,7 @@ public class OrganisationRegistrationDetailsDto
             AccountRole = dto.ServiceRole,
             SubmittedOnTime = !dto.IsLateSubmission,
             DecisionDate = convertDateTime(dto.RegulatorDecisionDate),
+            ResubmissionDecisionDate = convertDateTime(dto.RegulatorResubmissionDecisionDate),
             StatusPendingDate = convertDateTime(dto.StatusPendingDate),
             Email = dto.Email,
             TimeAndDateOfSubmission = convertDateTime(dto.SubmittedDateTime) ?? DateTime.UtcNow,
