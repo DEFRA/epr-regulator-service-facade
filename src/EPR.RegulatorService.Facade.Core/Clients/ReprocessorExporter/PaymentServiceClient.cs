@@ -25,7 +25,7 @@ ILogger<PaymentServiceClient> logger)
             {
                 PaymentMode = "Offline",
                 PaymentMethod = "Bank transfer (Bacs)",
-                PaymentDate = DateTime.Now,
+                PaymentDate = DateTime.UtcNow.Date,
                 PaymentAmount = 2900.00M
             }
         };
