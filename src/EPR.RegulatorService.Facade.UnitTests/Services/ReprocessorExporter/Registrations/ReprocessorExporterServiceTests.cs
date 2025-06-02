@@ -458,4 +458,20 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
+
+    [TestMethod]
+    public async Task GetSamplingPlanByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var expectedDto = _fixture.Create<AccreditationSamplingPlanDto>();
+        _mockRegistrationServiceClient.Setup(client => client.GetSamplingPlanByAccreditationId(id))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetSamplingPlanByAccreditationId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
 }
