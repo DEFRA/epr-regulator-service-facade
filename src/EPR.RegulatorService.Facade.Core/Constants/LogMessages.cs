@@ -1,4 +1,6 @@
-﻿namespace EPR.RegulatorService.Facade.Core.Constants;
+﻿using System.Threading.Tasks;
+
+namespace EPR.RegulatorService.Facade.Core.Constants;
 
 public static class LogMessages
 {
@@ -25,4 +27,6 @@ public static class LogMessages
     public const string RegistrationAccreditationReference = "Retrieving registration or Accreditation reference number informations with ID {id}.";
     public const string RegistrationAccreditationTasks = "Attempting to get registration accreditations and tasks";
     public const string SamplingPlanAccreditation = "Fetching sampling plan details for accreditation.";
+    public const string AttemptingApplicationTaskQueryNotesSave = "Attempting to save application task query notes";
+    public const string AttemptingRegistrationTaskQueryNotesSave = "Attempting to save registration task query notes";
 }

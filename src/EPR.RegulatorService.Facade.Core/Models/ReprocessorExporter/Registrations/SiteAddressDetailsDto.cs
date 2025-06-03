@@ -6,4 +6,8 @@ public class SiteAddressDetailsDto
     public string SiteAddress { get; set; } = string.Empty;
     public string GridReference { get; set; } = string.Empty;
     public string LegalCorrespondenceAddress { get; set; } = string.Empty;
+    public string TaskStatus { get; set; }
+    public Guid RegulatorRegistrationTaskStatusId { get; set; }
+    public string OrganisationName { get; set; } = string.Empty;
+    public List<QueryNoteResponseDto> QueryNotes { get; set; }
 }

@@ -50,7 +50,9 @@ public class ReprocessorExporterServiceClientTests
                 MarkAsDulyMadeByRegistrationMaterialId = "api/v{0}/registrationMaterials/{1}/markAsDulyMade",
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
                 RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations",
-                SamplingPlanByAccreditationId = "api/v{0}/accreditations/{1}/samplingPlan"
+                SamplingPlanByAccreditationId = "api/v{0}/accreditations/{1}/samplingPlan",
+                SaveApplicationTaskQueryNotes = "api/v{0}/regulatorApplicationTaskStatus/{1}/queryNote",
+                SaveRegistrationTaskQueryNotes = "api/v{0}/regulatorRegistrationTaskStatus/{1}/queryNote"
             }
         });
 
@@ -453,5 +455,49 @@ public class ReprocessorExporterServiceClientTests
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task SaveApplicationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("regulatorApplicationTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
+
+        // Act
+        var result = await _client.SaveApplicationTaskQueryNotes(Guid.NewGuid(), requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task SaveRegistrationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Post &&
+                    msg.RequestUri!.ToString().Contains("regulatorRegistrationTaskStatus")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = new StringContent("true") });
+
+        // Act
+        var result = await _client.SaveRegistrationTaskQueryNotes(Guid.NewGuid(), requestDto);
+
+        // Assert
+        result.Should().BeTrue();
     }
 }
