@@ -466,4 +466,34 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
     }
+
+    [TestMethod]
+    public async Task SaveApplicationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockRegistrationServiceClient.Setup(client => client.SaveApplicationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
+                   .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveApplicationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), Guid.NewGuid(), requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task SaveRegistrationTaskQueryNotes_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockRegistrationServiceClient.Setup(client => client.SaveRegistrationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
+                   .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveRegistrationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), Guid.NewGuid(), requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
 }

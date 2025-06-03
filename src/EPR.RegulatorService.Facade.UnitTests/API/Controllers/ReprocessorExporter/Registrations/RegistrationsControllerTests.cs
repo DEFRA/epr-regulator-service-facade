@@ -28,6 +28,7 @@ public class RegistrationsControllerTests
     private Mock<IValidator<UpdateMaterialOutcomeRequestDto>> _mockUpdateMaterialOutcomeValidator = null!;
     private Mock<IValidator<OfflinePaymentRequestDto>> _mockOfflinePaymentRequestValidator = null!;
     private Mock<IValidator<MarkAsDulyMadeRequestDto>> _mockMarkAsDulyMadeRequestValidator = null!;
+    private Mock<IValidator<QueryNoteRequestDto>> _mockQueryNoteRequestDtoValidator = null!;
     private Mock<ILogger<RegistrationsController>> _mockLogger = null!;
     private Fixture _fixture = null!;
     private RegistrationsController _controller;
@@ -46,6 +47,7 @@ public class RegistrationsControllerTests
         _mockUpdateMaterialOutcomeValidator = new Mock<IValidator<UpdateMaterialOutcomeRequestDto>>();
         _mockOfflinePaymentRequestValidator = new Mock<IValidator<OfflinePaymentRequestDto>>();
         _mockMarkAsDulyMadeRequestValidator = new Mock<IValidator<MarkAsDulyMadeRequestDto>>();
+        _mockQueryNoteRequestDtoValidator = new Mock<IValidator<QueryNoteRequestDto>>();
         _mockLogger = new Mock<ILogger<RegistrationsController>>();
         _fixture = new Fixture();
 
@@ -56,6 +58,7 @@ public class RegistrationsControllerTests
             _mockUpdateMaterialOutcomeValidator.Object,
             _mockOfflinePaymentRequestValidator.Object,
             _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockQueryNoteRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -106,6 +109,7 @@ public class RegistrationsControllerTests
             _mockUpdateMaterialOutcomeValidator.Object,
             _mockOfflinePaymentRequestValidator.Object,
             _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockQueryNoteRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -164,6 +168,7 @@ public class RegistrationsControllerTests
             _mockUpdateMaterialOutcomeValidator.Object,
             _mockOfflinePaymentRequestValidator.Object,
             _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockQueryNoteRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -258,6 +263,7 @@ public class RegistrationsControllerTests
             validator,
             _mockOfflinePaymentRequestValidator.Object,
             _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockQueryNoteRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -557,6 +563,7 @@ public class RegistrationsControllerTests
             _mockUpdateMaterialOutcomeValidator.Object,
             validator,
             _mockMarkAsDulyMadeRequestValidator.Object,
+            _mockQueryNoteRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -604,6 +611,7 @@ public class RegistrationsControllerTests
             _mockUpdateMaterialOutcomeValidator.Object,
             _mockOfflinePaymentRequestValidator.Object,
             validator,
+            _mockQueryNoteRequestDtoValidator.Object,
             _mockLogger.Object
         );
 
@@ -614,5 +622,102 @@ public class RegistrationsControllerTests
             _controller.MarkAsDulyMadeByRegistrationMaterialId(Guid.NewGuid(), requestDto)
         ).Should().ThrowAsync<ValidationException>();
     }
+
+    [TestMethod]
+    public async Task SaveApplicationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
+    {
+        // Arrange
+        var regulatorApplicationTaskStatusId = Guid.NewGuid();
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+
+        _mockQueryNoteRequestDtoValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(new ValidationResult());
+
+        _mockReprocessorExporterService
+            .Setup(s => s.SaveApplicationTaskQueryNotes(regulatorApplicationTaskStatusId, It.IsAny<Guid>(), requestDto))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.SaveApplicationTaskQueryNotes(regulatorApplicationTaskStatusId, requestDto);
+
+        // Assert
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [TestMethod]
+    public async Task SaveApplicationTaskQueryNotes_ShouldThrowValidationException_WhenValidationFails()
+    {
+        // Arrange
+        var validator = new InlineValidator<QueryNoteRequestDto>();
+        validator.RuleFor(x => x.Note).NotEmpty().WithMessage("The Query Note field is required.");
+
+        _controller = new RegistrationsController(
+            _mockReprocessorExporterService.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
+            _mockUpdateMaterialOutcomeValidator.Object,
+            _mockOfflinePaymentRequestValidator.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
+            validator,
+            _mockLogger.Object
+        );
+
+        var requestDto = new QueryNoteRequestDto();
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.SaveApplicationTaskQueryNotes(Guid.NewGuid(), requestDto)
+        ).Should().ThrowAsync<ValidationException>();
+    }
+
+    [TestMethod]
+    public async Task SaveRegistrationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
+    {
+        // Arrange
+        var regulatorRegistrationTaskStatusId = Guid.NewGuid();
+        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+
+        _mockQueryNoteRequestDtoValidator
+            .Setup(v => v.ValidateAsync(requestDto, default))
+            .ReturnsAsync(new ValidationResult());
+
+        _mockReprocessorExporterService
+            .Setup(s => s.SaveRegistrationTaskQueryNotes(regulatorRegistrationTaskStatusId, It.IsAny<Guid>(), requestDto))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.SaveRegistrationTaskQueryNotes(regulatorRegistrationTaskStatusId, requestDto);
+
+        // Assert
+        result.Should().BeOfType<NoContentResult>();
+    }
+
+    [TestMethod]
+    public async Task SaveRegistrationTaskQueryNotes_ShouldThrowValidationException_WhenValidationFails()
+    {
+        // Arrange
+        var validator = new InlineValidator<QueryNoteRequestDto>();
+        validator.RuleFor(x => x.Note).NotEmpty().WithMessage("The Query Note field is required.");
+
+        _controller = new RegistrationsController(
+            _mockReprocessorExporterService.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
+            _mockUpdateMaterialOutcomeValidator.Object,
+            _mockOfflinePaymentRequestValidator.Object,
+            _mockMarkAsDulyMadeRequestValidator.Object,
+            validator,
+            _mockLogger.Object
+        );
+
+        var requestDto = new QueryNoteRequestDto();
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.SaveRegistrationTaskQueryNotes(Guid.NewGuid(), requestDto)
+        ).Should().ThrowAsync<ValidationException>();
+    }
+
 
 }

@@ -32,4 +32,6 @@ public class PrnServiceApiConfigEndpoints
     public string RegistrationAccreditationReference { get; set; }
     public string RegistrationByIdWithAccreditations { get; set; }
     public string SamplingPlanByAccreditationId { get; set; } 
+    public string SaveApplicationTaskQueryNotes { get; set; }
+    public string SaveRegistrationTaskQueryNotes { get; set; }
 }
