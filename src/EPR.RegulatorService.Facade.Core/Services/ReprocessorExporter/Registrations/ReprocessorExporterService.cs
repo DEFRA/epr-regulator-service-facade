@@ -1,4 +1,5 @@
-﻿using EPR;
+﻿using Azure.Core;
+using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
@@ -105,11 +106,18 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         var registrationFeeRequestInfos = await reprocessorExporterServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
         var organisationName = await accountServiceClient.GetOrganisationNameById(registrationFeeRequestInfos.OrganisationId);
         var nationDetails = await accountServiceClient.GetNationDetailsById(registrationFeeRequestInfos.NationId);
-        var paymentFee = await paymentServiceClient.GetRegistrationPaymentFee(registrationFeeRequestInfos.MaterialName,
-                                                                              nationDetails.NationCode,
-                                                                              registrationFeeRequestInfos.CreatedDate,
-                                                                              registrationFeeRequestInfos.ApplicationType.ToString(),
-                                                                              registrationFeeRequestInfos.ApplicationReferenceNumber);
+
+        var paymentFeeRequest = new PaymentFeeRequestDto
+        {
+            RequestorType = registrationFeeRequestInfos.ApplicationType.ToString(),
+            Regulator = nationDetails.NationCode,
+            SubmissionDate = registrationFeeRequestInfos.CreatedDate,
+            MaterialType = registrationFeeRequestInfos.MaterialName,
+            ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber
+        };
+
+        var paymentFeeResponse = await paymentServiceClient.GetRegistrationPaymentFee(paymentFeeRequest);
+
         return new PaymentFeeDetailsDto
         {
             RegistrationId = registrationFeeRequestInfos.RegistrationId,
@@ -119,12 +127,16 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber,
             MaterialName = registrationFeeRequestInfos.MaterialName,
             SubmittedDate = registrationFeeRequestInfos.CreatedDate,
-            FeeAmount = paymentFee,
+            FeeAmount = paymentFeeResponse.RegistrationFee,
             ApplicationType = registrationFeeRequestInfos.ApplicationType,
             Regulator = nationDetails.NationCode,
             TaskStatus = registrationFeeRequestInfos.TaskStatus,
             RegulatorApplicationTaskStatusId = registrationFeeRequestInfos.RegulatorApplicationTaskStatusId,
-            QueryNotes = registrationFeeRequestInfos.QueryNotes
+            QueryNotes = registrationFeeRequestInfos.QueryNotes,
+            PaymentMethod = paymentFeeResponse.PreviousPaymentDetail?.PaymentMethod,
+            PaymentDate = paymentFeeResponse.PreviousPaymentDetail?.PaymentDate,
+            DulyMadeDate = registrationFeeRequestInfos.DulyMadeDate,
+            DeterminationDate = registrationFeeRequestInfos.DeterminationDate
         };
     }
     

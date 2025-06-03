@@ -16,4 +16,6 @@ public class RegistrationFeeContextDto
     public string TaskStatus { get; set; }
     public Guid RegulatorApplicationTaskStatusId { get; set; }
     public List<QueryNoteResponseDto> QueryNotes { get; set; }
+    public DateTime? DulyMadeDate { get; set; }
+    public DateTime? DeterminationDate { get; set; }
 }

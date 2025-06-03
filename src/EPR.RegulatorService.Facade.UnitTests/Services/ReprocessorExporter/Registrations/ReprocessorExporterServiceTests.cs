@@ -286,7 +286,6 @@ public class ReprocessorExporterServiceTests
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
         var organisationName = "Test Org";
         var nationDetails = new NationDetailsResponseDto { Name = "Scotland", NationCode = "GB-SCT" };
-        var paymentFee = 150.75m;
 
         _mockRegistrationServiceClient
             .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
@@ -300,14 +299,11 @@ public class ReprocessorExporterServiceTests
             .Setup(client => client.GetNationDetailsById(registrationFeeRequestInfo.NationId))
             .ReturnsAsync(nationDetails);
 
+        var paymentFeeResponse = _fixture.Create<PaymentFeeResponseDto>();
+
         _mockPaymentServiceClient
-            .Setup(client => client.GetRegistrationPaymentFee(
-                registrationFeeRequestInfo.MaterialName,
-                nationDetails.NationCode,
-                registrationFeeRequestInfo.CreatedDate,
-                registrationFeeRequestInfo.ApplicationType.ToString(),
-                registrationFeeRequestInfo.ApplicationReferenceNumber))
-            .ReturnsAsync(paymentFee);
+             .Setup(client => client.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()))
+             .ReturnsAsync(paymentFeeResponse);
 
         _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -323,7 +319,12 @@ public class ReprocessorExporterServiceTests
         result.MaterialName.Should().Be(registrationFeeRequestInfo.MaterialName);
         result.ApplicationType.Should().Be(registrationFeeRequestInfo.ApplicationType);
         result.SubmittedDate.Should().Be(registrationFeeRequestInfo.CreatedDate);
-        result.FeeAmount.Should().Be(paymentFee);
+        result.FeeAmount.Should().Be(paymentFeeResponse.RegistrationFee);
+        result.Regulator.Should().Be(nationDetails.NationCode);
+        result.PaymentMethod.Should().Be(paymentFeeResponse.PreviousPaymentDetail?.PaymentMethod);
+        result.PaymentDate.Should().Be(paymentFeeResponse.PreviousPaymentDetail?.PaymentDate);
+        result.DulyMadeDate.Should().Be(registrationFeeRequestInfo.DulyMadeDate);
+        result.DeterminationDate.Should().Be(registrationFeeRequestInfo.DeterminationDate);
     }
 
     [TestMethod]
@@ -334,7 +335,6 @@ public class ReprocessorExporterServiceTests
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
         var organisationName = "Org Name";
         var nationDetails = new NationDetailsResponseDto { Name = "Northern Ireland", NationCode = "GB-NIR" };
-        var paymentFee = 200.00m;
 
         _mockRegistrationServiceClient
             .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
@@ -348,14 +348,11 @@ public class ReprocessorExporterServiceTests
             .Setup(client => client.GetNationDetailsById(registrationFeeRequestInfo.NationId))
             .ReturnsAsync(nationDetails);
 
+        var paymentFeeResponse = _fixture.Create<PaymentFeeResponseDto>();
+
         _mockPaymentServiceClient
-            .Setup(client => client.GetRegistrationPaymentFee(
-                registrationFeeRequestInfo.MaterialName,
-                nationDetails.NationCode,
-                registrationFeeRequestInfo.CreatedDate,
-                registrationFeeRequestInfo.ApplicationType.ToString(),
-                registrationFeeRequestInfo.ApplicationReferenceNumber))
-            .ReturnsAsync(paymentFee);
+            .Setup(client => client.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()))
+            .ReturnsAsync(paymentFeeResponse);
 
         _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -366,12 +363,7 @@ public class ReprocessorExporterServiceTests
         _mockRegistrationServiceClient.Verify(c => c.GetRegistrationFeeRequestByRegistrationMaterialId(id), Times.Once);
         _mockAccountsServiceClient.Verify(c => c.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId), Times.Once);
         _mockAccountsServiceClient.Verify(c => c.GetNationDetailsById(registrationFeeRequestInfo.NationId), Times.Once);
-        _mockPaymentServiceClient.Verify(c => c.GetRegistrationPaymentFee(
-            registrationFeeRequestInfo.MaterialName,
-            nationDetails.NationCode,
-            registrationFeeRequestInfo.CreatedDate,
-            registrationFeeRequestInfo.ApplicationType.ToString(),
-            registrationFeeRequestInfo.ApplicationReferenceNumber), Times.Once);
+        _mockPaymentServiceClient.Verify(c => c.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()), Times.Once);
     }
 
     [TestMethod]
