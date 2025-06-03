@@ -151,6 +151,11 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     {
         return await reprocessorExporterServiceClient.GetRegistrationByIdWithAccreditationsAsync(id, year);
     }
+
+    public async Task<AccreditationSamplingPlanDto> GetSamplingPlanByAccreditationId(Guid id)
+    {
+        return await reprocessorExporterServiceClient.GetSamplingPlanByAccreditationId(id);
+    }
     
     public async Task<AccreditationPaymentFeeDetailsDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
     {
