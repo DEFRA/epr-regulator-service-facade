@@ -8,7 +8,7 @@ public class QueryNoteRequestDtoValidator : AbstractValidator<QueryNoteRequestDt
 {
     public QueryNoteRequestDtoValidator()
     {
-        RuleFor(x => x.Notes)
+        RuleFor(x => x.Note)
             .NotEmpty()
             .WithMessage(ValidationMessages.QueryNotesRequired);
     }
