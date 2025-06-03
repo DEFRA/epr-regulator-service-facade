@@ -86,7 +86,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             GridReference = registrationSiteAddress.GridReference,
             LegalCorrespondenceAddress = registrationSiteAddress.LegalCorrespondenceAddress,
             TaskStatus = registrationSiteAddress.TaskStatus,
-            RegulatorApplicationTaskStatusId = registrationSiteAddress.RegulatorApplicationTaskStatusId,
+            RegulatorRegistrationTaskStatusId = registrationSiteAddress.RegulatorRegistrationTaskStatusId,
             OrganisationName = organisationName,
             QueryNotes = registrationSiteAddress.QueryNotes
         };
