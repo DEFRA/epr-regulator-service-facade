@@ -132,8 +132,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             Regulator = nationDetails.NationCode,
             TaskStatus = registrationFeeRequestInfos.TaskStatus,
             RegulatorApplicationTaskStatusId = registrationFeeRequestInfos.RegulatorApplicationTaskStatusId,
-            QueryNotes = registrationFeeRequestInfos.QueryNotes
-            
+            QueryNotes = registrationFeeRequestInfos.QueryNotes,
             PaymentMethod = paymentFeeResponse.PreviousPaymentDetail?.PaymentMethod,
             PaymentDate = paymentFeeResponse.PreviousPaymentDetail?.PaymentDate,
             DulyMadeDate = registrationFeeRequestInfos.DulyMadeDate,
