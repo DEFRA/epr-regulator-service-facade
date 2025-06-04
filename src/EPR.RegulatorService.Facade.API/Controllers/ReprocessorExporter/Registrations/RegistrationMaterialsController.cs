@@ -29,6 +29,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
             Description = "attempting to get summary info for a material.  "
         )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
@@ -42,6 +43,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
             Summary = "update the outcome of a material registration",
             Description = "attempting to update the outcome of a material registration.  "
         )]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
     public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
         [FromRoute] Guid id,
         [FromBody] UpdateMaterialOutcomeRequestDto request)
@@ -59,6 +61,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
         Description = "Retrieve waste permit and exemption details for a specific material."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicencesDto))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
     public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
@@ -73,6 +76,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
         Description = "Retrieve reprocessing inputs, outputs, and process description for a specific material."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODto))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
     public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
@@ -87,6 +91,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
         Description = "Retrieve sampling plan associated with a material."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns sampling plan for a material.", typeof(RegistrationMaterialSamplingPlanDto))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
     public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
@@ -101,6 +106,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
     Description = "Attempting to get registration fee details."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration fee details.", typeof(PaymentFeeDetailsDto))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
     public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
@@ -114,6 +120,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
             Summary = "Saves a new offline payment",
             Description = "Save a new offline payment with mandatory payment request data.  "
         )]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
     public async Task<IActionResult> SaveOfflinePayment([FromBody] OfflinePaymentRequestDto request)
     {
         await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
@@ -127,6 +134,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
             Summary = "Mark a registration material as duly made”",
             Description = "Attempting to mark a registration material as duly made. "
         )]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
     public async Task<IActionResult> MarkAsDulyMadeByRegistrationMaterialId(
         [FromRoute] Guid id, 
         [FromBody] MarkAsDulyMadeRequestDto request)
