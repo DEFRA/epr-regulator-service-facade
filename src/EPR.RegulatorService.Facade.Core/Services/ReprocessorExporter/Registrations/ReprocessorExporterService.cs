@@ -171,7 +171,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
 
         var paymentFee = await paymentServiceClient.GetAccreditationPaymentFee(accreditationFeeRequestInfos.MaterialName,
             nationDetails.NationCode,
-            accreditationFeeRequestInfos.CreatedDate,
+            accreditationFeeRequestInfos.SubmittedDate,
             accreditationFeeRequestInfos.ApplicationType.ToString(),
             accreditationFeeRequestInfos.ApplicationReferenceNumber);
 
@@ -183,7 +183,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             ApplicationReferenceNumber = accreditationFeeRequestInfos.ApplicationReferenceNumber,
             PrnTonnage= accreditationFeeRequestInfos.PrnTonnage,
             MaterialName = accreditationFeeRequestInfos.MaterialName,
-            SubmittedDate = accreditationFeeRequestInfos.CreatedDate,
+            SubmittedDate = accreditationFeeRequestInfos.SubmittedDate,
             FeeAmount = paymentFee,
             ApplicationType = accreditationFeeRequestInfos.ApplicationType,
             Regulator = nationDetails.NationCode

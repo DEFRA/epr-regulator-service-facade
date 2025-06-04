@@ -13,5 +13,5 @@ public class AccreditationFeeContextDto
     public PrnTonnageType PrnTonnage { get; set; }
     public ApplicationOrganisationType ApplicationType { get; init; }
     public string SiteAddress { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTime SubmittedDate { get; set; }
 }

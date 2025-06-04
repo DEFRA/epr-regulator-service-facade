@@ -443,7 +443,7 @@ public class ReprocessorExporterServiceTests
             .Setup(client => client.GetAccreditationPaymentFee(
                 accreditationFeeContextDto.MaterialName,
                 nationDetails.NationCode,
-                accreditationFeeContextDto.CreatedDate,
+                accreditationFeeContextDto.SubmittedDate,
                 accreditationFeeContextDto.ApplicationType.ToString(),
                 accreditationFeeContextDto.ApplicationReferenceNumber))
             .ReturnsAsync(paymentFee);
@@ -461,7 +461,7 @@ public class ReprocessorExporterServiceTests
         result.ApplicationReferenceNumber.Should().Be(accreditationFeeContextDto.ApplicationReferenceNumber);
         result.MaterialName.Should().Be(accreditationFeeContextDto.MaterialName);
         result.ApplicationType.Should().Be(accreditationFeeContextDto.ApplicationType);
-        result.SubmittedDate.Should().Be(accreditationFeeContextDto.CreatedDate);
+        result.SubmittedDate.Should().Be(accreditationFeeContextDto.SubmittedDate);
         result.FeeAmount.Should().Be(paymentFee);
     }
     
