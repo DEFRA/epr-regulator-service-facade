@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations
 {
+    [ExcludeFromCodeCoverage]
     public static class CommonApiConvention
     {
         [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
