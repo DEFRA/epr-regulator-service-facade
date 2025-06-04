@@ -24,12 +24,13 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
 {   
     [HttpGet("registrationMaterials/{id}")]
     [ProducesResponseType(typeof(RegistrationMaterialDetailsDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
     [SwaggerOperation(
             Summary = "get summary info for a material",
             Description = "attempting to get summary info for a material.  "
         )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns summary info for a material.", typeof(RegistrationMaterialDetailsDto))]
-    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
     public async Task<IActionResult> GetRegistrationMaterialByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SummaryInfoMaterial);
@@ -38,12 +39,16 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
     }
 
     [HttpPost("registrationMaterials/{id}/outcome")]
+    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
+    [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [SwaggerOperation(
             Summary = "update the outcome of a material registration",
             Description = "attempting to update the outcome of a material registration.  "
         )]
-    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
+    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateMaterialOutcomeByRegistrationMaterialId(
         [FromRoute] Guid id,
         [FromBody] UpdateMaterialOutcomeRequestDto request)
@@ -56,12 +61,13 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
 
     [HttpGet("registrationMaterials/{id}/wasteLicences")]
     [ProducesResponseType(typeof(RegistrationMaterialWasteLicencesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "Show waste permit and exemption details for a material",
         Description = "Retrieve waste permit and exemption details for a specific material."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns waste permit and exemption details.", typeof(RegistrationMaterialWasteLicencesDto))]
-    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.WasteLicencesRegistrationMaterial, id);
@@ -71,12 +77,13 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
 
     [HttpGet("registrationMaterials/{id}/reprocessingIO")]
     [ProducesResponseType(typeof(RegistrationMaterialReprocessingIODto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "Show reprocessing inputs, outputs, and process description",
         Description = "Retrieve reprocessing inputs, outputs, and process description for a specific material."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns reprocessing inputs, outputs, and process details.", typeof(RegistrationMaterialReprocessingIODto))]
-    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.ReprocessingIORegistrationMaterial, id);
@@ -86,12 +93,13 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
 
     [HttpGet("registrationMaterials/{id}/samplingPlan")]
     [ProducesResponseType(typeof(RegistrationMaterialSamplingPlanDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
         Summary = "Get sampling plan for a material",
         Description = "Retrieve sampling plan associated with a material."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns sampling plan for a material.", typeof(RegistrationMaterialSamplingPlanDto))]
-    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.SamplingPlanRegistrationMaterial, id);
@@ -101,12 +109,13 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
 
     [HttpGet("registrationMaterials/{id}/paymentFees")]
     [ProducesResponseType(typeof(PaymentFeeDetailsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [SwaggerOperation(
     Summary = "Get registration fee details.",
     Description = "Attempting to get registration fee details."
     )]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns registration fee details.", typeof(PaymentFeeDetailsDto))]
-    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Get))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         logger.LogInformation(LogMessages.AttemptingRegistrationFeeDetails);
@@ -115,7 +124,6 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
     }
 
     [HttpPost("registrationMaterials/offlinePayment")]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
     [SwaggerOperation(
             Summary = "Saves a new offline payment",
             Description = "Save a new offline payment with mandatory payment request data.  "
