@@ -45,8 +45,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IAntivirusService, AntivirusService>();
         services.AddScoped<IAntivirusClient, AntivirusClient>();
         services.AddScoped<AntivirusApiAuthorizationHandler>();
-        services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
-        services.AddScoped<IRegistrationService, RegistrationService>();
+        services.AddScoped<IReprocessorExporterServiceClient, ReprocessorExporterServiceClient>();
+        services.AddScoped<IReprocessorExporterService, ReprocessorExporterService>();
         services.AddScoped<IAccountServiceClient, AccountServiceClient>();
         services.AddScoped<IPaymentServiceClient, PaymentServiceClient>();
     }
