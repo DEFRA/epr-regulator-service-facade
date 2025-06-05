@@ -76,16 +76,11 @@ public class AccreditationsController(
     }
     
     [HttpPost("accreditations/{id}/markAsDulyMade")]
-    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
     [SwaggerOperation(
         Summary = "Mark a accreditation material as duly made”",
         Description = "Attempting to mark a accreditation material as duly made. "
     )]
-    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
-    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
     public async Task<IActionResult> MarkAsDulyMadeByAccreditationId(
         [FromRoute] Guid id,
         [FromBody] MarkAsDulyMadeRequestDto request)
@@ -117,16 +112,11 @@ public class AccreditationsController(
 
 
     [HttpPost("accreditations/offlinePayment")]
-    [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(NoContentResult))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ContentResult))]
     [SwaggerOperation(
         Summary = "Saves a new offline payment",
         Description = "Save a new offline payment with mandatory payment request data.  "
     )]
-    [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
-    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
     public async Task<IActionResult> SaveAccreditationOfflinePayment([FromBody] OfflinePaymentRequestDto request)
     {
         await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
