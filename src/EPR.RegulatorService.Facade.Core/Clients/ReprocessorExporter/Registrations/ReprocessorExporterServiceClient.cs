@@ -123,6 +123,27 @@ ILogger<ReprocessorExporterServiceClient> logger)
         var url = string.Format($"{_config.Endpoints.SamplingPlanByAccreditationId}", _config.ApiVersion, id);
         return await GetAsync<AccreditationSamplingPlanDto>(url);
     }
+    
+    public async Task<AccreditationFeeContextDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.AttemptingAccreditationFeeDetails);
+        var url = string.Format($"{_config.Endpoints.AccreditationFeeByAccreditationMaterialId}", _config.ApiVersion, id);
+        return await GetAsync<AccreditationFeeContextDto>(url);
+    }
+
+    public async Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, MarkAsDulyMadeWithUserIdDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingMarkAccreditationMaterialAsDulyMade);
+        var url = string.Format(_config.Endpoints.MarkAsDulyMadeByAccreditationId, _config.ApiVersion, id);
+        return await PostAsync<MarkAsDulyMadeWithUserIdDto, bool>(url, request);
+    }
+
+    public async Task<bool> UpdateRegulatorAccreditationTaskStatus(UpdateAccreditationTaskStatusWithUserIdDto request)
+    {
+        logger.LogInformation(LogMessages.UpdateRegulatorAccreditationTaskStatus, request.Status.ToString());
+        var url = string.Format(_config.Endpoints.UpdateRegulatorAccreditationTaskStatusById, _config.ApiVersion);
+        return await PostAsync<UpdateAccreditationTaskStatusWithUserIdDto, bool>(url, request);
+    }
 
     public async Task<bool> SaveApplicationTaskQueryNotes(Guid id, QueryNoteRequestDto request)
     {

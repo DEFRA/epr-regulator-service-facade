@@ -14,7 +14,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Services.ReprocessorExporter.Reg
 [TestClass]
 public class ReprocessorExporterServiceTests
 {
-    private Mock<IReprocessorExporterServiceClient> _mockRegistrationServiceClient = null!;
+    private Mock<IReprocessorExporterServiceClient> _mockReprocessorExporterServiceClient = null!;
     private Mock<IAccountServiceClient> _mockAccountsServiceClient = null!;
     private Mock<IPaymentServiceClient> _mockPaymentServiceClient = null!;
     private ReprocessorExporterService _service = null!;
@@ -23,10 +23,10 @@ public class ReprocessorExporterServiceTests
     [TestInitialize]
     public void TestInitialize()
     {
-        _mockRegistrationServiceClient = new Mock<IReprocessorExporterServiceClient>();
+        _mockReprocessorExporterServiceClient = new Mock<IReprocessorExporterServiceClient>();
         _mockAccountsServiceClient = new Mock<IAccountServiceClient>();
         _mockPaymentServiceClient = new Mock<IPaymentServiceClient>();
-        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
         _fixture = new Fixture();
     }
 
@@ -35,7 +35,7 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var requestDto = _fixture.Create<UpdateRegulatorApplicationTaskDto>();
-        _mockRegistrationServiceClient.Setup(client => client.UpdateRegulatorApplicationTaskStatus(requestDto))
+        _mockReprocessorExporterServiceClient.Setup(client => client.UpdateRegulatorApplicationTaskStatus(requestDto))
                    .ReturnsAsync(true);
 
         // Act
@@ -50,7 +50,7 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var requestDto = _fixture.Create<UpdateRegulatorRegistrationTaskDto>();
-        _mockRegistrationServiceClient.Setup(client => client.UpdateRegulatorRegistrationTaskStatus(requestDto))
+        _mockReprocessorExporterServiceClient.Setup(client => client.UpdateRegulatorRegistrationTaskStatus(requestDto))
                    .ReturnsAsync(true);
 
         // Act
@@ -65,7 +65,7 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -80,7 +80,7 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationMaterialDetailsDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationMaterialByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetRegistrationMaterialByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -122,13 +122,13 @@ public class ReprocessorExporterServiceTests
             RegistrationReferenceNumber = expectedReference
         };
 
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationAccreditationReference(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetRegistrationAccreditationReference(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
             .ReturnsAsync(referenceDto);
 
         _mockAccountsServiceClient.Setup(client => client.GetNationDetailsById(referenceDto.NationId))
             .ReturnsAsync(nationDetails);
 
-        _mockRegistrationServiceClient.Setup(client =>
+        _mockReprocessorExporterServiceClient.Setup(client =>
             client.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), It.Is<UpdateMaterialOutcomeWithReferenceDto>(
                 x => x.Comments == expectedDto.Comments &&
                      x.Status == expectedDto.Status &&
@@ -148,7 +148,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetWasteLicenceByRegistrationMaterialId(id))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteLicenceByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -164,7 +164,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetReprocessingIOByRegistrationMaterialId(id))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetReprocessingIOByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -182,7 +182,7 @@ public class ReprocessorExporterServiceTests
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
         var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
 
-        _mockRegistrationServiceClient
+        _mockReprocessorExporterServiceClient
             .Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
             .ReturnsAsync(registrationSiteAddress);
 
@@ -190,7 +190,7 @@ public class ReprocessorExporterServiceTests
             .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationDetails);
 
-        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         var result = await _service.GetSiteAddressByRegistrationId(registrationId);
@@ -211,7 +211,7 @@ public class ReprocessorExporterServiceTests
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
         var nationDetails = new NationDetailsResponseDto { Name = "Wales", NationCode = "GB-WLS" };
 
-        _mockRegistrationServiceClient
+        _mockReprocessorExporterServiceClient
             .Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
             .ReturnsAsync(registrationSiteAddress);
 
@@ -219,13 +219,13 @@ public class ReprocessorExporterServiceTests
             .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationDetails);
 
-        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         await _service.GetSiteAddressByRegistrationId(registrationId);
 
         // Assert
-        _mockRegistrationServiceClient.Verify(c => c.GetSiteAddressByRegistrationId(registrationId), Times.Once);
+        _mockReprocessorExporterServiceClient.Verify(c => c.GetSiteAddressByRegistrationId(registrationId), Times.Once);
         _mockAccountsServiceClient.Verify(c => c.GetNationDetailsById(registrationSiteAddress.NationId), Times.Once);
     }
 
@@ -236,7 +236,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -252,14 +252,14 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var registrationId = Guid.NewGuid();
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
                    .ReturnsAsync(expectedDto);
 
         // Act
         await _service.GetAuthorisedMaterialByRegistrationId(registrationId);
 
         // Assert
-        _mockRegistrationServiceClient.Verify(client => client.GetAuthorisedMaterialByRegistrationId(registrationId), Times.Once);
+        _mockReprocessorExporterServiceClient.Verify(client => client.GetAuthorisedMaterialByRegistrationId(registrationId), Times.Once);
     }
 
     [TestMethod]
@@ -268,7 +268,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetSamplingPlanByRegistrationMaterialId(id))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetSamplingPlanByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -287,7 +287,7 @@ public class ReprocessorExporterServiceTests
         var organisationName = "Test Org";
         var nationDetails = new NationDetailsResponseDto { Name = "Scotland", NationCode = "GB-SCT" };
 
-        _mockRegistrationServiceClient
+        _mockReprocessorExporterServiceClient
             .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
             .ReturnsAsync(registrationFeeRequestInfo);
 
@@ -305,7 +305,7 @@ public class ReprocessorExporterServiceTests
              .Setup(client => client.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()))
              .ReturnsAsync(paymentFeeResponse);
 
-        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         var result = await _service.GetPaymentFeeDetailsByRegistrationMaterialId(id);
@@ -336,7 +336,7 @@ public class ReprocessorExporterServiceTests
         var organisationName = "Org Name";
         var nationDetails = new NationDetailsResponseDto { Name = "Northern Ireland", NationCode = "GB-NIR" };
 
-        _mockRegistrationServiceClient
+        _mockReprocessorExporterServiceClient
             .Setup(client => client.GetRegistrationFeeRequestByRegistrationMaterialId(id))
             .ReturnsAsync(registrationFeeRequestInfo);
 
@@ -354,13 +354,13 @@ public class ReprocessorExporterServiceTests
             .Setup(client => client.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()))
             .ReturnsAsync(paymentFeeResponse);
 
-        _service = new ReprocessorExporterService(_mockRegistrationServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
         // Act
         await _service.GetPaymentFeeDetailsByRegistrationMaterialId(id);
 
         // Assert
-        _mockRegistrationServiceClient.Verify(c => c.GetRegistrationFeeRequestByRegistrationMaterialId(id), Times.Once);
+        _mockReprocessorExporterServiceClient.Verify(c => c.GetRegistrationFeeRequestByRegistrationMaterialId(id), Times.Once);
         _mockAccountsServiceClient.Verify(c => c.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId), Times.Once);
         _mockAccountsServiceClient.Verify(c => c.GetNationDetailsById(registrationFeeRequestInfo.NationId), Times.Once);
         _mockPaymentServiceClient.Verify(c => c.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()), Times.Once);
@@ -404,6 +404,74 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().BeTrue();
     }
+    
+    [TestMethod]
+    public async Task GetPaymentFeeDetailsByAccreditationMaterialId_ShouldReturnMappedPaymentFeeDetailsDto_FromAccountAndPaymentServices()
+    {
+        // Arrange
+        var id = 1;
+        var accreditationFeeContextDto = _fixture.Create<AccreditationFeeContextDto>();
+        var organisationName = "Green Ltd";
+
+        var accreditationId = Guid.NewGuid();
+
+        var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
+
+        var paymentFee = 3000.00m;
+
+        _mockReprocessorExporterServiceClient
+            .Setup(client => client.GetAccreditationPaymentFeeDetailsByAccreditationId(It.IsAny<Guid>()))
+            .ReturnsAsync(accreditationFeeContextDto);
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationNameById(accreditationFeeContextDto.OrganisationId))
+            .ReturnsAsync(organisationName);
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetNationDetailsById(accreditationFeeContextDto.NationId))
+            .ReturnsAsync(nationDetails);
+
+        _mockPaymentServiceClient
+            .Setup(client => client.GetAccreditationPaymentFee(
+                accreditationFeeContextDto.MaterialName,
+                nationDetails.NationCode,
+                accreditationFeeContextDto.SubmittedDate,
+                accreditationFeeContextDto.ApplicationType.ToString(),
+                accreditationFeeContextDto.ApplicationReferenceNumber))
+            .ReturnsAsync(paymentFee);
+
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+
+        // Act
+        var result = await _service.GetAccreditationPaymentFeeDetailsByAccreditationId(accreditationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.AccreditationId.Should().Be(accreditationId);
+        result.OrganisationName.Should().Be(organisationName);
+        result.SiteAddress.Should().BeEquivalentTo(accreditationFeeContextDto.SiteAddress);
+        result.ApplicationReferenceNumber.Should().Be(accreditationFeeContextDto.ApplicationReferenceNumber);
+        result.MaterialName.Should().Be(accreditationFeeContextDto.MaterialName);
+        result.ApplicationType.Should().Be(accreditationFeeContextDto.ApplicationType);
+        result.SubmittedDate.Should().Be(accreditationFeeContextDto.SubmittedDate);
+        result.FeeAmount.Should().Be(paymentFee);
+    }
+    
+    [TestMethod]
+    public async Task GetPaymentFeeDetailsByAccreditationMaterialId_ShouldThrowsException_WhenServiceFails()
+    {
+        var id = Guid.NewGuid();
+
+        _mockReprocessorExporterServiceClient
+            .Setup(client => client.GetAccreditationPaymentFeeDetailsByAccreditationId(id))
+            .ThrowsAsync(new Exception("Service unavailable"));
+        
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+
+        await FluentActions.Invoking(() => _service.GetAccreditationPaymentFeeDetailsByAccreditationId(id))
+                            .Should().ThrowAsync<Exception>()
+                            .WithMessage("Service unavailable");
+    }
 
     [TestMethod]
     public async Task MarkAsDulyMadeByRegistrationMaterialId_ShouldReturnTrue_WhenClientCallSucceeds()
@@ -420,7 +488,7 @@ public class ReprocessorExporterServiceTests
             DulyMadeBy = userId
         };
 
-        _mockRegistrationServiceClient
+        _mockReprocessorExporterServiceClient
             .Setup(client => client.MarkAsDulyMadeByRegistrationMaterialId(id, It.Is<MarkAsDulyMadeWithUserIdDto>(dto =>
                 dto.DulyMadeDate == expectedDto.DulyMadeDate &&
                 dto.DeterminationDate == expectedDto.DeterminationDate &&
@@ -441,7 +509,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetRegistrationByIdWithAccreditationsAsync(id, 2025))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetRegistrationByIdWithAccreditationsAsync(id, 2025))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -457,7 +525,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var expectedDto = _fixture.Create<AccreditationSamplingPlanDto>();
-        _mockRegistrationServiceClient.Setup(client => client.GetSamplingPlanByAccreditationId(id))
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetSamplingPlanByAccreditationId(id))
                    .ReturnsAsync(expectedDto);
 
         // Act
@@ -468,11 +536,107 @@ public class ReprocessorExporterServiceTests
     }
 
     [TestMethod]
+    public async Task MarkAccreditationStatusAsDulyMade_ShouldReturnTrue_WhenClientCallSucceeds()
+    {
+        // Arrange
+        var accreditationId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var requestDto = _fixture.Create<MarkAsDulyMadeRequestDto>();
+
+        var expectedDto = new MarkAsDulyMadeRequestDto()
+        {
+            DulyMadeDate = requestDto.DulyMadeDate,
+            DeterminationDate = requestDto.DeterminationDate
+
+        };
+
+        _mockReprocessorExporterServiceClient
+            .Setup(client => client.MarkAsDulyMadeByAccreditationId(accreditationId, It.Is<MarkAsDulyMadeWithUserIdDto>(dto =>
+                dto.DulyMadeDate == expectedDto.DulyMadeDate &&
+                dto.DeterminationDate == expectedDto.DeterminationDate &&
+                dto.DulyMadeBy == userId
+            )))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.MarkAsDulyMadeByAccreditationId(accreditationId, userId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task UpdateAccreditationMaterialTaskStatus_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var requestDto = _fixture.Create<UpdateAccreditationTaskStatusWithUserIdDto>();
+
+        _mockReprocessorExporterServiceClient.Setup(client => client.UpdateRegulatorAccreditationTaskStatus(requestDto))
+            .ReturnsAsync(true);
+
+        _mockReprocessorExporterServiceClient.Setup(client => client.UpdateRegulatorAccreditationTaskStatus(It.Is<UpdateAccreditationTaskStatusWithUserIdDto>(dto =>
+                        dto.AccreditationId == requestDto.AccreditationId &&
+                        dto.TaskName == requestDto.TaskName &&
+                        dto.Status == requestDto.Status &&
+                        dto.Comments == requestDto.Comments &&
+                        dto.UpdatedByUserId == userId)))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.UpdateRegulatorAccreditationTaskStatus(userId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task SaveAccreditationOfflinePayment_ShouldReturnTrue_WhenClientCallSucceeds()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var requestDto = _fixture.Create<OfflinePaymentRequestDto>();
+
+        var expectedDto = new SaveOfflinePaymentRequestDto
+        {
+            Amount = requestDto.Amount,
+            PaymentReference = requestDto.PaymentReference,
+            PaymentDate = requestDto.PaymentDate,
+            PaymentMethod = requestDto.PaymentMethod,
+            Regulator = requestDto.Regulator,
+            UserId = userId,
+            Description = ReprocessorExporterConstants.OfflinePaymentAccreditationDescription,
+            Comments = ReprocessorExporterConstants.OfflinePaymentAccreditationComment
+        };
+
+        _mockPaymentServiceClient
+            .Setup(client => client.SaveAccreditationOfflinePayment(It.Is<SaveOfflinePaymentRequestDto>(dto =>
+                dto.Amount == expectedDto.Amount &&
+                dto.PaymentReference == expectedDto.PaymentReference &&
+                dto.PaymentDate == expectedDto.PaymentDate &&
+                dto.PaymentMethod == expectedDto.PaymentMethod &&
+                dto.Regulator == expectedDto.Regulator &&
+                dto.UserId == expectedDto.UserId &&
+                dto.Description == expectedDto.Description &&
+                dto.Comments == expectedDto.Comments
+            )))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _service.SaveAccreditationOfflinePayment(userId, requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+
+
+    [TestMethod]
     public async Task SaveApplicationTaskQueryNotes_ShouldReturnExpectedResult()
     {
         // Arrange
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
-        _mockRegistrationServiceClient.Setup(client => client.SaveApplicationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
+        _mockReprocessorExporterServiceClient.Setup(client => client.SaveApplicationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
                    .ReturnsAsync(true);
 
         // Act
@@ -487,7 +651,7 @@ public class ReprocessorExporterServiceTests
     {
         // Arrange
         var requestDto = _fixture.Create<QueryNoteRequestDto>();
-        _mockRegistrationServiceClient.Setup(client => client.SaveRegistrationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
+        _mockReprocessorExporterServiceClient.Setup(client => client.SaveRegistrationTaskQueryNotes(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto))
                    .ReturnsAsync(true);
 
         // Act

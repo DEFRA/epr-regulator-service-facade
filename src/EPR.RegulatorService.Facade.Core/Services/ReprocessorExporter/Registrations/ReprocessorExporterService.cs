@@ -139,7 +139,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             DeterminationDate = registrationFeeRequestInfos.DeterminationDate
         };
     }
-    
+
     public async Task<bool> SaveOfflinePayment(Guid userId, OfflinePaymentRequestDto request)
     {
         var offlinePaymentRequest = new SaveOfflinePaymentRequestDto
@@ -187,6 +187,82 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<AccreditationSamplingPlanDto> GetSamplingPlanByAccreditationId(Guid id)
     {
         return await reprocessorExporterServiceClient.GetSamplingPlanByAccreditationId(id);
+    }
+    
+    public async Task<AccreditationPaymentFeeDetailsDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
+    {
+        var accreditationFeeRequestInfos = await reprocessorExporterServiceClient.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
+
+        var organisationNameTask = accountServiceClient.GetOrganisationNameById(accreditationFeeRequestInfos.OrganisationId);
+        var nationDetailsTask = accountServiceClient.GetNationDetailsById(accreditationFeeRequestInfos.NationId);
+
+        await Task.WhenAll(organisationNameTask, nationDetailsTask);
+
+        var organisationName = await organisationNameTask;
+        var nationDetails = await nationDetailsTask;
+
+        var paymentFee = await paymentServiceClient.GetAccreditationPaymentFee(accreditationFeeRequestInfos.MaterialName,
+            nationDetails.NationCode,
+            accreditationFeeRequestInfos.SubmittedDate,
+            accreditationFeeRequestInfos.ApplicationType.ToString(),
+            accreditationFeeRequestInfos.ApplicationReferenceNumber);
+
+        return new AccreditationPaymentFeeDetailsDto
+        {
+            AccreditationId = id,
+            OrganisationName = organisationName,
+            SiteAddress = accreditationFeeRequestInfos.SiteAddress,
+            ApplicationReferenceNumber = accreditationFeeRequestInfos.ApplicationReferenceNumber,
+            PrnTonnage= accreditationFeeRequestInfos.PrnTonnage,
+            MaterialName = accreditationFeeRequestInfos.MaterialName,
+            SubmittedDate = accreditationFeeRequestInfos.SubmittedDate,
+            FeeAmount = paymentFee,
+            ApplicationType = accreditationFeeRequestInfos.ApplicationType,
+            Regulator = nationDetails.NationCode
+        };
+    }
+    
+    public async Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request)
+    {
+        var markAsDulyMadeRequest = new MarkAsDulyMadeWithUserIdDto()
+        {
+            DulyMadeDate = request.DulyMadeDate,
+            DeterminationDate = request.DeterminationDate,
+            DulyMadeBy = userId
+        };
+
+        return await reprocessorExporterServiceClient.MarkAsDulyMadeByAccreditationId(id, markAsDulyMadeRequest);
+    }
+
+    public async Task<bool> UpdateRegulatorAccreditationTaskStatus(Guid userId, UpdateAccreditationTaskStatusDto request)
+    {
+        var updateAccreditationMaterialTaskStatusWithUserIdDto = new UpdateAccreditationTaskStatusWithUserIdDto()
+        {
+            AccreditationId = request.AccreditationId,
+            TaskName = request.TaskName,
+            Status = request.Status,
+            Comments = request.Comments,
+            UpdatedByUserId = userId
+        };
+
+        return await reprocessorExporterServiceClient.UpdateRegulatorAccreditationTaskStatus(updateAccreditationMaterialTaskStatusWithUserIdDto);
+    }
+
+    public async Task<bool> SaveAccreditationOfflinePayment(Guid userId, OfflinePaymentRequestDto request)
+    {
+        var offlinePaymentRequest = new SaveOfflinePaymentRequestDto
+        {
+            Amount = request.Amount,
+            PaymentReference = request.PaymentReference,
+            PaymentDate = request.PaymentDate,
+            PaymentMethod = request.PaymentMethod,
+            Regulator = request.Regulator,
+            UserId = userId,
+            Description = ReprocessorExporterConstants.OfflinePaymentAccreditationDescription,
+            Comments = ReprocessorExporterConstants.OfflinePaymentAccreditationComment
+        };
+
+        return await paymentServiceClient.SaveAccreditationOfflinePayment(offlinePaymentRequest);
     }
 
     public async Task<bool> SaveApplicationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request)
