@@ -22,4 +22,6 @@ public interface IReprocessorExporterServiceClient
     Task<AccreditationFeeContextDto> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id);
     Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, MarkAsDulyMadeWithUserIdDto request);
     Task<bool> UpdateRegulatorAccreditationTaskStatus(UpdateAccreditationTaskStatusWithUserIdDto request);
+    Task<bool> SaveApplicationTaskQueryNotes(Guid id, QueryNoteRequestDto request);
+    Task<bool> SaveRegistrationTaskQueryNotes(Guid id, QueryNoteRequestDto request);
 }

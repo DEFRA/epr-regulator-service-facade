@@ -144,4 +144,18 @@ ILogger<ReprocessorExporterServiceClient> logger)
         var url = string.Format(_config.Endpoints.UpdateRegulatorAccreditationTaskStatusById, _config.ApiVersion);
         return await PostAsync<UpdateAccreditationTaskStatusWithUserIdDto, bool>(url, request);
     }
+
+    public async Task<bool> SaveApplicationTaskQueryNotes(Guid id, QueryNoteRequestDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
+        var url = string.Format(_config.Endpoints.SaveApplicationTaskQueryNotes, _config.ApiVersion, id);
+        return await PostAsync<QueryNoteRequestDto, bool>(url, request);
+    }
+
+    public async Task<bool> SaveRegistrationTaskQueryNotes(Guid id, QueryNoteRequestDto request)
+    {
+        logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
+        var url = string.Format(_config.Endpoints.SaveRegistrationTaskQueryNotes, _config.ApiVersion, id);
+        return await PostAsync<QueryNoteRequestDto, bool>(url, request);
+    }
 }

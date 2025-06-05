@@ -13,11 +13,23 @@ IOptions<PaymentBackendServiceApiConfig> options,
 ILogger<PaymentServiceClient> logger)
 : BaseHttpClient(httpClient), IPaymentServiceClient
 {
-    private readonly PaymentBackendServiceApiConfig _config = options.Value;
-    public async Task<decimal> GetRegistrationPaymentFee(string materialName, string regulator, DateTime submittedDate, string requestorType, string reference)
+    //private readonly PaymentBackendServiceApiConfig _config = options.Value;
+    public async Task<PaymentFeeResponseDto> GetRegistrationPaymentFee(PaymentFeeRequestDto request)
     {
-         logger.LogInformation(LogMessages.AttemptingRegistrationPaymentFee);
-         return 2921.00M;
+        logger.LogInformation(LogMessages.AttemptingRegistrationPaymentFee);
+        var paymentFeeResponse = new PaymentFeeResponseDto
+        {
+            MaterialType = request.MaterialType,
+            RegistrationFee = 2921.00M,
+            PreviousPaymentDetail = new PreviousPaymentDetailDto
+            {
+                PaymentMode = "Offline",
+                PaymentMethod = "Bank transfer (Bacs)",
+                PaymentDate = DateTime.UtcNow.Date,
+                PaymentAmount = 2900.00M
+            }
+        };
+        return paymentFeeResponse; 
 
         //var url = string.Format($"{_config.Endpoints.GetRegistrationPaymentFee}", _config.ApiVersion, materialName, regulator, submittedDate, requestorType, reference);
         //return await GetAsync<decimal>(url);

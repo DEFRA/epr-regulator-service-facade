@@ -35,4 +35,6 @@ public class PrnServiceApiConfigEndpoints
     public string AccreditationFeeByAccreditationMaterialId { get; set; }
     public string MarkAsDulyMadeByAccreditationId { get; set; }
     public string UpdateRegulatorAccreditationTaskStatusById { get; set; }
+    public string SaveApplicationTaskQueryNotes { get; set; }
+    public string SaveRegistrationTaskQueryNotes { get; set; }
 }

@@ -23,4 +23,6 @@ public interface IReprocessorExporterService
     Task<bool> MarkAsDulyMadeByAccreditationId(Guid id, Guid userId, MarkAsDulyMadeRequestDto request);
     Task<bool> UpdateRegulatorAccreditationTaskStatus(Guid userId, UpdateAccreditationTaskStatusDto request);
     Task<bool> SaveAccreditationOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
+    Task<bool> SaveApplicationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request);
+    Task<bool> SaveRegistrationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request);
 }

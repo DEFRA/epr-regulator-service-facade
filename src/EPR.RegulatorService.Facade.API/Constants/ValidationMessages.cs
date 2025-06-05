@@ -9,6 +9,7 @@ public static class ValidationMessages
     public const string AmountRequiredAndGreaterThanZero = "Amount is required and must be greater than zero.";
     public const string InvalidDulyMadeDate = "Duly Made date is mandatory and must be a valid date.";
     public const string InvalidDeterminationDate = "Determination date is mandatory and must be a valid date.";
+    public const string QueryNotesRequired = "The Query Note field is required.";
     public const string InvalidAccreditationStatus = "Invalid accreditation material status.";
     public const string AccreditationCommentsMaxLength = "Accreditation Comment cannot exceed 500 characters.";
     public const string AccreditationCommentsRequired = "Comments are required.";
