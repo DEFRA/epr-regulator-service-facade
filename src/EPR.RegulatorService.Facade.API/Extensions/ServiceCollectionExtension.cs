@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using EPR.RegulatorService.Facade.API.Handlers;
+﻿using EPR.RegulatorService.Facade.API.Handlers;
 using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
@@ -11,6 +10,7 @@ using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Notify.Client;
 using Notify.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.API.Extensions;
 
@@ -45,8 +45,8 @@ public static class ServiceCollectionExtension
         services.AddScoped<IAntivirusService, AntivirusService>();
         services.AddScoped<IAntivirusClient, AntivirusClient>();
         services.AddScoped<AntivirusApiAuthorizationHandler>();
-        services.AddScoped<IRegistrationServiceClient, RegistrationServiceClient>();
-        services.AddScoped<IRegistrationService, RegistrationService>();
+        services.AddScoped<IReprocessorExporterServiceClient, ReprocessorExporterServiceClient>();
+        services.AddScoped<IReprocessorExporterService, ReprocessorExporterService>();
         services.AddScoped<IAccountServiceClient, AccountServiceClient>();
         services.AddScoped<IPaymentServiceClient, PaymentServiceClient>();
     }

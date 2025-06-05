@@ -2,8 +2,8 @@
 
 namespace EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 
-public class UpdateRegulatorRegistrationTaskDto: UpdateRegulatorTaskBaseDto
+public class UpdateAccreditationTaskStatusDto : UpdateRegulatorTaskBaseDto
 {
     [Required]
-    public required Guid RegistrationId { get; set; }
+    public Guid AccreditationId { get; set; }
 }
