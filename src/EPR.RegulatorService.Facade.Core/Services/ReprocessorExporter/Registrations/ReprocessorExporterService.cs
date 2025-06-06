@@ -1,15 +1,7 @@
-﻿using Azure.Core;
-using EPR;
-using EPR.RegulatorService;
-using EPR.RegulatorService.Facade;
-using EPR.RegulatorService.Facade.Core;
-using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
+﻿using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.Services;
-using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 
@@ -91,6 +83,16 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             OrganisationName = organisationName,
             QueryNotes = registrationSiteAddress.QueryNotes
         };
+    }
+
+    public async Task<RegistrationWasteCarrierDto> GetWasteCarrierDetailsByRegistrationId(Guid id)
+    {
+        var wasteCarrier = await reprocessorExporterServiceClient.GetWasteCarrierDetailsByRegistrationId(id);
+        var organisationName = await accountServiceClient.GetOrganisationNameById(wasteCarrier.OrganisationId);
+
+        wasteCarrier.OrganisationName = organisationName;
+
+        return wasteCarrier;
     }
 
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id)

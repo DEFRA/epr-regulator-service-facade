@@ -13,7 +13,8 @@ public interface IReprocessorExporterServiceClient
     Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(Guid id);
     Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(Guid id);
     Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(Guid id);
-    Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(Guid id); 
+    Task<RegistrationSiteAddressDto> GetSiteAddressByRegistrationId(Guid id);
+    Task<RegistrationWasteCarrierDto> GetWasteCarrierDetailsByRegistrationId(Guid id);
     Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id);
     Task<RegistrationFeeContextDto> GetRegistrationFeeRequestByRegistrationMaterialId(Guid id);
     Task<bool> MarkAsDulyMadeByRegistrationMaterialId(Guid id, MarkAsDulyMadeWithUserIdDto request);

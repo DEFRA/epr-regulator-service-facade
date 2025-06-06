@@ -99,6 +99,22 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
         return Ok(result);
     }
 
+    [HttpGet("registrations/{id}/wasteCarrier")]
+    [ProducesResponseType(typeof(RegistrationWasteCarrierDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "get waste carrier details",
+        Description = "attempting to get waste carrier details.  "
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns waste carrier details.", typeof(RegistrationWasteCarrierDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetWasteCarrierDetailsByRegistrationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.AttemptingWasteCarrierDetails);
+        var result = await reprocessorExporterService.GetWasteCarrierDetailsByRegistrationId(id);
+        return Ok(result);
+    }
+
     [HttpGet("registrations/{id}/authorisedMaterials")]
     [ProducesResponseType(typeof(MaterialsAuthorisedOnSiteDto), 200)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

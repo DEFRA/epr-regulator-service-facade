@@ -263,6 +263,38 @@ public class ReprocessorExporterServiceTests
     }
 
     [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldReturnExpectedDto()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldCallClientExactlyOnce()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        await _service.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        _mockReprocessorExporterServiceClient.Verify(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId), Times.Once);
+    }
+
+    [TestMethod]
     public async Task GetSamplingPlanByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange
