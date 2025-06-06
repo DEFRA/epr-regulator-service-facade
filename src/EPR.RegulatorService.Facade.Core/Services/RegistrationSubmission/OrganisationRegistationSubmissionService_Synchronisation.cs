@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.OrganisationRegistrationSubmissionService;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 {
@@ -105,31 +106,29 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             {
                 if (item.RegulatorDecisionDate is null || cosmosItem.Created > item.RegulatorDecisionDate)
                 {
-                    if (item.IsResubmission)
+                    if (item.IsResubmission && "Granted Refused".Contains(cosmosItem.Decision))
                     {
-                        ProcessResubmissionDecision(item, cosmosItem.Decision);
+                        ProcessResubmissionDecision(item, cosmosItem);
                     }
                     else
                     {
                         ProcessStandardDecision(item, cosmosItem);
                     }
-
-                    item.RegulatorDecisionDate = cosmosItem.Created;
                 }
             }
         }
-
         private static void ProcessResubmissionDecision(
-            OrganisationRegistrationSubmissionSummaryResponse item,
-            string decision)
+            OrganisationRegistrationSubmissionSummaryResponse item,AbstractCosmosSubmissionEvent cosmosItem)
         {
-            var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(decision);
+            var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
             item.ResubmissionStatus = resubmissionStatus switch
             {
                 RegistrationSubmissionStatus.Granted => RegistrationSubmissionStatus.Accepted,
                 RegistrationSubmissionStatus.Refused => RegistrationSubmissionStatus.Rejected,
                 _ => item.ResubmissionStatus
             };
+
+            item.RegulatorResubmissionDecisionDate = cosmosItem.Created;
         }
 
         private static void ProcessStandardDecision(
@@ -137,10 +136,15 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             AbstractCosmosSubmissionEvent cosmosItem)
         {
             item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+            item.RegulatorDecisionDate = cosmosItem.Created;
             item.StatusPendingDate = cosmosItem.DecisionDate;
             if (!string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber))
             {
                 item.RegistrationReferenceNumber = cosmosItem.RegistrationReferenceNumber;
+            }
+            if (cosmosItem.Decision == "Granted")
+            {
+                item.RegistrationDate = cosmosItem.Created;
             }
         }
 
@@ -149,40 +153,52 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
             {
                 item.RegulatorComments = cosmosItem.Comments;
-                item.RegulatorDecisionDate = cosmosItem.Created;
-                item.SubmissionDetails.DecisionDate = cosmosItem.DecisionDate ?? cosmosItem.Created;
 
-                if (item.IsResubmission)
+                if (item.IsResubmission && "Granted Refused".Contains(cosmosItem.Decision))
                 {
                     //To avoid checking magic strings, assign the decision first & check on the enum
                     //and then re-assign as resubmission uses different status
+                    item.RegulatorResubmissionDecisionDate = cosmosItem.Created;
+                    item.SubmissionDetails.ResubmissionDecisionDate = cosmosItem.Created;
                     var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
-                    if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
-                    {
-                        item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
-                    }
-                    else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
-                    {
-                        item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
-                    }
-                    else
-                    {
-                        item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
-                    }
-
-                    item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                    SetResubmissionStatus(item, resubmissionStatus);
                 }
                 else
                 {
+                    item.SubmissionDetails.DecisionDate = cosmosItem.DecisionDate ?? cosmosItem.Created;
                     item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
                     item.StatusPendingDate = cosmosItem.DecisionDate;
                     item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
                     item.SubmissionDetails.Status = item.SubmissionStatus;
+                    item.RegulatorDecisionDate = cosmosItem.Created;
+
+                    if (cosmosItem.Decision == "Granted")
+                    {
+                        item.RegistrationDate = item.SubmissionDetails.RegistrationDate = cosmosItem.Created;
+                    }
                 }
             }
             else
             {
                 item.RegulatorComments += $"<br/>{cosmosItem.Comments}";
+            }
+        }
+
+        private static void SetResubmissionStatus(RegistrationSubmissionOrganisationDetailsFacadeResponse item, RegistrationSubmissionStatus resubmissionStatus)
+        {
+            if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
+            {
+                item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
+                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+            }
+            else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
+            {
+                item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
+                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+            }
+            else
+            {
+                item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
             }
         }
 
