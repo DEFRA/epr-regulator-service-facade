@@ -7,5 +7,5 @@ public class PersonDetailsResponseDto
     public string JobTitle { get; set; }
     public string Email { get; set; }
     public string TelephoneNumber { get; set; }
-    public string ServiceRole { get; set; } //Type to be confimed
+    public string ServiceRole { get; set; }
 }
