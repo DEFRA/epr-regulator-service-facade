@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using System.Net;
 using System.Security.Claims;
+using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
 
