@@ -81,14 +81,14 @@ public static class HttpClientServiceCollectionExtension
         })
             .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
 
-        services.AddHttpClient<IRegistrationServiceClient, RegistrationServiceClient>((sp, client) =>
+        services.AddHttpClient<IReprocessorExporterServiceClient, ReprocessorExporterServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(PrnServiceApiSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);
         })
         .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
         .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
-
+        
         services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(paymentServiceApiSettings.BaseUrl);

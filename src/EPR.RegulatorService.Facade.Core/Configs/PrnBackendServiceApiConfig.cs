@@ -10,7 +10,7 @@ public class PrnBackendServiceApiConfig
     public string BaseUrl { get; set; } = null!;
     public int Timeout { get; set; }
     public string ClientId { get; set; } = string.Empty;
-    public int ApiVersion { get; set; }
+    public double ApiVersion { get; set; }
     public int ServiceRetryCount { get; set; }
     public PrnServiceApiConfigEndpoints Endpoints { get; set; } = null!;
 }
@@ -30,4 +30,11 @@ public class PrnServiceApiConfigEndpoints
     public string RegistrationFeeByRegistrationMaterialId { get; set; }
     public string MarkAsDulyMadeByRegistrationMaterialId { get; set; }
     public string RegistrationAccreditationReference { get; set; }
+    public string RegistrationByIdWithAccreditations { get; set; }
+    public string SamplingPlanByAccreditationId { get; set; } 
+    public string AccreditationFeeByAccreditationMaterialId { get; set; }
+    public string MarkAsDulyMadeByAccreditationId { get; set; }
+    public string UpdateRegulatorAccreditationTaskStatusById { get; set; }
+    public string SaveApplicationTaskQueryNotes { get; set; }
+    public string SaveRegistrationTaskQueryNotes { get; set; }
 }
