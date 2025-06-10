@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
@@ -198,17 +199,10 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
         var antiVirusResponse = await _antivirusService.SendFile(antiVirusDetails, stream);
         var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 
-        // if clean, return file
-        if (antiVirusResult == ContentScan.Clean)
-        {
-            var file = new FileContentResult(stream.ToArray(), "text/csv")
-            {
-                FileDownloadName = request.FileName
-            };
+        var file = AntiVirus.CheckAntiVirusScan(antiVirusResult, stream, request.FileName);
 
-            return file;
-        }
-
-        return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
+        return file != null
+           ? file
+           : new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
     }
 }

@@ -5,13 +5,12 @@ using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Extensions;
-using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
+using EPR.RegulatorService.Facade.API.Helpers;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -169,17 +168,10 @@ public class AccreditationsController(
         var antiVirusResponse = await _antivirusService.SendFile(antiVirusDetails, stream);
         var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 
-        // if clean, return file
-        if (antiVirusResult == ContentScan.Clean)
-        {
-            var file = new FileContentResult(stream.ToArray(), "text/csv")
-            {
-                FileDownloadName = request.FileName
-            };
+        var file = AntiVirus.CheckAntiVirusScan(antiVirusResult, stream, request.FileName);
 
-            return file;
-        }
-
-        return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
+        return file != null 
+           ? file
+           : new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };                
     }
 }

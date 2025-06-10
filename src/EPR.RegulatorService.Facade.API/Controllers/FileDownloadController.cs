@@ -75,18 +75,11 @@ public class FileDownloadController : ControllerBase
             return new BadRequestObjectResult("There was an error communicating with the submissions API.");
         }
 
-        // if clean, return file
-        if (antiVirusResult == ContentScan.Clean)
-        {
-            var file = new FileContentResult(stream.ToArray(), "text/csv")
-            {
-                FileDownloadName = request.FileName
-            };
+        var file = AntiVirus.CheckAntiVirusScan(antiVirusResult, stream, request.FileName);
 
-            return file;
-        }
-
-        return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") {  StatusCode = StatusCodes.Status403Forbidden };
+        return file != null
+           ? file
+           : new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
     }
     private string SetContainerName(SubmissionType submissionType) =>
             submissionType == SubmissionType.Producer
