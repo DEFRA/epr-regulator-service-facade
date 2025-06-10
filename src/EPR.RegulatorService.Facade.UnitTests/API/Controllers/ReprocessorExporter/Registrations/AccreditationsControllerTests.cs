@@ -29,7 +29,6 @@ public class AccreditationsControllerTests
     private readonly Mock<IBlobStorageService> _mockBlobStorageService = new();
     private readonly Mock<IAntivirusService> _mockAntiVirusService = new();
     private readonly Mock<IOptions<BlobStorageConfig>> _mockBlobStorageConfig = new();
-    private readonly Mock<IOptions<AntivirusApiConfig>> _mockAntivirusApiConfig = new();
     private FileDownloadRequestDto _fileDownloadRequest = new();
     private HttpResponseMessage _cleanAntiVirusResponse = new();
     private HttpResponseMessage _maliciousAntiVirusResponse = new();
@@ -41,14 +40,8 @@ public class AccreditationsControllerTests
         RegistrationContainerName = RegistrationContainerName,
         ReprocessorExporterAccreditationContainerName = RegistrationContainerName,
     };
-    private readonly AntivirusApiConfig _antivirusApiConfig = new()
-    {
-        CollectionSuffix = "test-suffix",
-        PersistFile = true
-    };
 
     IOptions<BlobStorageConfig> blobStorageConfigSettings;
-    IOptions<AntivirusApiConfig> antivirusApiConfigSettings;
 
     private Mock<IReprocessorExporterService> _mockReprocessorExporterService = null!;
     private Mock<ILogger<AccreditationsController>> _mockLogger = null!;
@@ -68,9 +61,7 @@ public class AccreditationsControllerTests
         }, "Test"));
 
         _mockBlobStorageConfig.Setup(x => x.Value).Returns(_blobStorageConfig);
-        _mockAntivirusApiConfig.Setup(x => x.Value).Returns(_antivirusApiConfig);
         blobStorageConfigSettings = Options.Create(_blobStorageConfig);
-        antivirusApiConfigSettings = Options.Create(_antivirusApiConfig);
 
         _fileDownloadRequest = new FileDownloadRequestDto()
         {
@@ -103,7 +94,6 @@ public class AccreditationsControllerTests
                                                 _mockBlobStorageService.Object,
                                                 _mockAntiVirusService.Object,
                                                 blobStorageConfigSettings,
-                                                antivirusApiConfigSettings,
                                                 _mockLogger.Object);
 
         _controller.ControllerContext = new ControllerContext();
@@ -222,7 +212,6 @@ public class AccreditationsControllerTests
             _mockBlobStorageService.Object,
             _mockAntiVirusService.Object,
             blobStorageConfigSettings,
-            antivirusApiConfigSettings,
             _mockLogger.Object
         );
 
@@ -272,7 +261,6 @@ public class AccreditationsControllerTests
             _mockBlobStorageService.Object,
             _mockAntiVirusService.Object,
             blobStorageConfigSettings,
-            antivirusApiConfigSettings,
             _mockLogger.Object
         );
 
@@ -326,7 +314,6 @@ public class AccreditationsControllerTests
             _mockBlobStorageService.Object,
             _mockAntiVirusService.Object,
             blobStorageConfigSettings,
-            antivirusApiConfigSettings,
             _mockLogger.Object
         );
 
@@ -363,8 +350,7 @@ public class AccreditationsControllerTests
             .ReturnsAsync(new MemoryStream());
 
         _mockAntiVirusService.Setup(x => x.SendFile(
-            It.IsAny<FileDetails>(),
-            It.IsAny<string>(),
+            It.IsAny<AntiVirusDetails>(),
             It.IsAny<MemoryStream>()))
             .Throws<HttpRequestException>();
 
@@ -384,8 +370,7 @@ public class AccreditationsControllerTests
             .ReturnsAsync(new MemoryStream());
 
         _mockAntiVirusService.Setup(x => x.SendFile(
-            It.IsAny<FileDetails>(),
-            It.IsAny<string>(),
+            It.IsAny<AntiVirusDetails>(),            
             It.IsAny<MemoryStream>()))
             .ReturnsAsync(_maliciousAntiVirusResponse);
 
@@ -407,8 +392,7 @@ public class AccreditationsControllerTests
             .ReturnsAsync(new MemoryStream());
 
         _mockAntiVirusService.Setup(x => x.SendFile(
-                It.IsAny<FileDetails>(),
-                It.IsAny<string>(),
+                It.IsAny<AntiVirusDetails>(),                
                 It.IsAny<MemoryStream>()))
             .ReturnsAsync(_cleanAntiVirusResponse);
 
