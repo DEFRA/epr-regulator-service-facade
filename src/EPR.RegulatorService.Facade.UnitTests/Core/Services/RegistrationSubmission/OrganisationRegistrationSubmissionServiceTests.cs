@@ -363,6 +363,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         {
             result.ResubmissionStatus.Should().Be(expectedStatus);
             result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
+            result.SubmissionDetails.RegistrationDate.Should().NotBeNull();
+            result.SubmissionDetails.ResubmissionDate.Should().NotBeNull();
         }
         
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
