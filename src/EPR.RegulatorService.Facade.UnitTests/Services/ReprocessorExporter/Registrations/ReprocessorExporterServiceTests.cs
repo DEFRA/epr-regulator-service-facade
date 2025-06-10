@@ -181,6 +181,7 @@ public class ReprocessorExporterServiceTests
         var registrationId = Guid.NewGuid();
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
         var nationDetails = new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" };
+        var organisationDetails = new OrganisationDetailsResponseDto { OrganisationName = "Org Name" };
 
         _mockReprocessorExporterServiceClient
             .Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
@@ -189,6 +190,10 @@ public class ReprocessorExporterServiceTests
         _mockAccountsServiceClient
             .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationDetails);
+
+        _mockAccountsServiceClient
+          .Setup(client => client.GetOrganisationDetailsById(registrationSiteAddress.OrganisationId))
+          .ReturnsAsync(organisationDetails);
 
         _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -201,6 +206,7 @@ public class ReprocessorExporterServiceTests
         result.GridReference.Should().Be(registrationSiteAddress.GridReference);
         result.LegalCorrespondenceAddress.Should().BeEquivalentTo(registrationSiteAddress.LegalCorrespondenceAddress);
         result.NationName.Should().Be(nationDetails.Name);
+        result.OrganisationName.Should().Be(organisationDetails.OrganisationName);
     }
 
     [TestMethod]
@@ -210,6 +216,7 @@ public class ReprocessorExporterServiceTests
         var registrationId = Guid.NewGuid();
         var registrationSiteAddress = _fixture.Create<RegistrationSiteAddressDto>();
         var nationDetails = new NationDetailsResponseDto { Name = "Wales", NationCode = "GB-WLS" };
+        var organisationDetails = new OrganisationDetailsResponseDto { OrganisationName = "Org Name" };
 
         _mockReprocessorExporterServiceClient
             .Setup(client => client.GetSiteAddressByRegistrationId(registrationId))
@@ -218,6 +225,10 @@ public class ReprocessorExporterServiceTests
         _mockAccountsServiceClient
             .Setup(client => client.GetNationDetailsById(registrationSiteAddress.NationId))
             .ReturnsAsync(nationDetails);
+
+        _mockAccountsServiceClient
+           .Setup(client => client.GetOrganisationDetailsById(registrationSiteAddress.OrganisationId))
+           .ReturnsAsync(organisationDetails);
 
         _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
 
@@ -284,7 +295,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
-        var organisationName = "Test Org";
+        var organisationDetails = new OrganisationDetailsResponseDto { OrganisationName = "Test Org" };
         var nationDetails = new NationDetailsResponseDto { Name = "Scotland", NationCode = "GB-SCT" };
 
         _mockReprocessorExporterServiceClient
@@ -292,8 +303,8 @@ public class ReprocessorExporterServiceTests
             .ReturnsAsync(registrationFeeRequestInfo);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId))
-            .ReturnsAsync(organisationName);
+            .Setup(client => client.GetOrganisationDetailsById(registrationFeeRequestInfo.OrganisationId))
+            .ReturnsAsync(organisationDetails);
 
         _mockAccountsServiceClient
             .Setup(client => client.GetNationDetailsById(registrationFeeRequestInfo.NationId))
@@ -313,7 +324,7 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().NotBeNull();
         result.RegistrationMaterialId.Should().Be(id);
-        result.OrganisationName.Should().Be(organisationName);
+        result.OrganisationName.Should().Be(organisationDetails.OrganisationName);
         result.SiteAddress.Should().BeEquivalentTo(registrationFeeRequestInfo.SiteAddress);
         result.ApplicationReferenceNumber.Should().Be(registrationFeeRequestInfo.ApplicationReferenceNumber);
         result.MaterialName.Should().Be(registrationFeeRequestInfo.MaterialName);
@@ -333,7 +344,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var registrationFeeRequestInfo = _fixture.Create<RegistrationFeeContextDto>();
-        var organisationName = "Org Name";
+        var organisationDetails = new OrganisationDetailsResponseDto { OrganisationName = "Org Name" };
         var nationDetails = new NationDetailsResponseDto { Name = "Northern Ireland", NationCode = "GB-NIR" };
 
         _mockReprocessorExporterServiceClient
@@ -341,8 +352,8 @@ public class ReprocessorExporterServiceTests
             .ReturnsAsync(registrationFeeRequestInfo);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId))
-            .ReturnsAsync(organisationName);
+            .Setup(client => client.GetOrganisationDetailsById(registrationFeeRequestInfo.OrganisationId))
+            .ReturnsAsync(organisationDetails);
 
         _mockAccountsServiceClient
             .Setup(client => client.GetNationDetailsById(registrationFeeRequestInfo.NationId))
@@ -361,7 +372,7 @@ public class ReprocessorExporterServiceTests
 
         // Assert
         _mockReprocessorExporterServiceClient.Verify(c => c.GetRegistrationFeeRequestByRegistrationMaterialId(id), Times.Once);
-        _mockAccountsServiceClient.Verify(c => c.GetOrganisationNameById(registrationFeeRequestInfo.OrganisationId), Times.Once);
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationDetailsById(registrationFeeRequestInfo.OrganisationId), Times.Once);
         _mockAccountsServiceClient.Verify(c => c.GetNationDetailsById(registrationFeeRequestInfo.NationId), Times.Once);
         _mockPaymentServiceClient.Verify(c => c.GetRegistrationPaymentFee(It.IsAny<PaymentFeeRequestDto>()), Times.Once);
     }
@@ -411,7 +422,7 @@ public class ReprocessorExporterServiceTests
         // Arrange
         var id = 1;
         var accreditationFeeContextDto = _fixture.Create<AccreditationFeeContextDto>();
-        var organisationName = "Green Ltd";
+        var organisationDetails = new OrganisationDetailsResponseDto { OrganisationName = "Green Ltd" };
 
         var accreditationId = Guid.NewGuid();
 
@@ -424,8 +435,8 @@ public class ReprocessorExporterServiceTests
             .ReturnsAsync(accreditationFeeContextDto);
 
         _mockAccountsServiceClient
-            .Setup(client => client.GetOrganisationNameById(accreditationFeeContextDto.OrganisationId))
-            .ReturnsAsync(organisationName);
+            .Setup(client => client.GetOrganisationDetailsById(accreditationFeeContextDto.OrganisationId))
+            .ReturnsAsync(organisationDetails);
 
         _mockAccountsServiceClient
             .Setup(client => client.GetNationDetailsById(accreditationFeeContextDto.NationId))
@@ -448,7 +459,7 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().NotBeNull();
         result.AccreditationId.Should().Be(accreditationId);
-        result.OrganisationName.Should().Be(organisationName);
+        result.OrganisationName.Should().Be(organisationDetails.OrganisationName);
         result.SiteAddress.Should().BeEquivalentTo(accreditationFeeContextDto.SiteAddress);
         result.ApplicationReferenceNumber.Should().Be(accreditationFeeContextDto.ApplicationReferenceNumber);
         result.MaterialName.Should().Be(accreditationFeeContextDto.MaterialName);

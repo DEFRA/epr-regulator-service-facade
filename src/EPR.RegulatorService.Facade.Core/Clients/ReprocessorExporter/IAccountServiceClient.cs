@@ -10,5 +10,5 @@ namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 public interface IAccountServiceClient
 {
     Task<NationDetailsResponseDto> GetNationDetailsById(int id);
-    Task<string> GetOrganisationNameById(Guid id);
+    Task<OrganisationDetailsResponseDto> GetOrganisationDetailsById(Guid id);
 }

@@ -6,6 +6,7 @@ using EPR.RegulatorService.Facade.Core;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
@@ -28,7 +29,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(Guid id)
     {
         var result = await reprocessorExporterServiceClient.GetRegistrationByRegistrationId(id);
-        result.OrganisationName = await accountServiceClient.GetOrganisationNameById(result.OrganisationId);
+        result.OrganisationName = (await accountServiceClient.GetOrganisationDetailsById(result.OrganisationId))?.OrganisationName;
         return result;
     }
 
@@ -52,7 +53,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(Guid id)
     {
         var wasteLicence = await reprocessorExporterServiceClient.GetWasteLicenceByRegistrationMaterialId(id);
-        wasteLicence.OrganisationName = await accountServiceClient.GetOrganisationNameById(wasteLicence.OrganisationId);
+        wasteLicence.OrganisationName = (await accountServiceClient.GetOrganisationDetailsById(wasteLicence.OrganisationId))?.OrganisationName;
 
         return wasteLicence;
     }
@@ -60,7 +61,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(Guid id)
     {
         var reprocessingIO = await reprocessorExporterServiceClient.GetReprocessingIOByRegistrationMaterialId(id);
-        reprocessingIO.OrganisationName = await accountServiceClient.GetOrganisationNameById(reprocessingIO.OrganisationId);
+        reprocessingIO.OrganisationName = (await accountServiceClient.GetOrganisationDetailsById(reprocessingIO.OrganisationId))?.OrganisationName;
 
         return reprocessingIO;
     }
@@ -68,7 +69,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(Guid id)
     {
         var samplingPlan = await reprocessorExporterServiceClient.GetSamplingPlanByRegistrationMaterialId(id);
-        samplingPlan.OrganisationName = await accountServiceClient.GetOrganisationNameById(samplingPlan.OrganisationId);
+        samplingPlan.OrganisationName = (await accountServiceClient.GetOrganisationDetailsById(samplingPlan.OrganisationId))?.OrganisationName;
 
         return samplingPlan;
     }
@@ -77,7 +78,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     {
         var registrationSiteAddress = await reprocessorExporterServiceClient.GetSiteAddressByRegistrationId(id);
         var nationDetails = await accountServiceClient.GetNationDetailsById(registrationSiteAddress.NationId);
-        var organisationName = await accountServiceClient.GetOrganisationNameById(registrationSiteAddress.OrganisationId);
+        var organisationDetails = await accountServiceClient.GetOrganisationDetailsById(registrationSiteAddress.OrganisationId);
 
         return new SiteAddressDetailsDto
         {
@@ -88,7 +89,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             LegalCorrespondenceAddress = registrationSiteAddress.LegalCorrespondenceAddress,
             TaskStatus = registrationSiteAddress.TaskStatus,
             RegulatorRegistrationTaskStatusId = registrationSiteAddress.RegulatorRegistrationTaskStatusId,
-            OrganisationName = organisationName,
+            OrganisationName = organisationDetails?.OrganisationName,
             QueryNotes = registrationSiteAddress.QueryNotes
         };
     }
@@ -96,7 +97,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
         var authorisedMaterial = await reprocessorExporterServiceClient.GetAuthorisedMaterialByRegistrationId(id);
-        authorisedMaterial.OrganisationName = await accountServiceClient.GetOrganisationNameById(authorisedMaterial.OrganisationId);
+        authorisedMaterial.OrganisationName = (await accountServiceClient.GetOrganisationDetailsById(authorisedMaterial.OrganisationId))?.OrganisationName;
 
         return authorisedMaterial;
     }
@@ -104,7 +105,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<PaymentFeeDetailsDto> GetPaymentFeeDetailsByRegistrationMaterialId(Guid id)
     {
         var registrationFeeRequestInfos = await reprocessorExporterServiceClient.GetRegistrationFeeRequestByRegistrationMaterialId(id);
-        var organisationName = await accountServiceClient.GetOrganisationNameById(registrationFeeRequestInfos.OrganisationId);
+        var organisationDetails = await accountServiceClient.GetOrganisationDetailsById(registrationFeeRequestInfos.OrganisationId);
         var nationDetails = await accountServiceClient.GetNationDetailsById(registrationFeeRequestInfos.NationId);
 
         var paymentFeeRequest = new PaymentFeeRequestDto
@@ -122,7 +123,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         {
             RegistrationId = registrationFeeRequestInfos.RegistrationId,
             RegistrationMaterialId = id,
-            OrganisationName = organisationName,
+            OrganisationName = organisationDetails?.OrganisationName,
             SiteAddress = registrationFeeRequestInfos.SiteAddress,
             ApplicationReferenceNumber = registrationFeeRequestInfos.ApplicationReferenceNumber,
             MaterialName = registrationFeeRequestInfos.MaterialName,
@@ -193,12 +194,12 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     {
         var accreditationFeeRequestInfos = await reprocessorExporterServiceClient.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
 
-        var organisationNameTask = accountServiceClient.GetOrganisationNameById(accreditationFeeRequestInfos.OrganisationId);
+        var organisationDetailsTask = accountServiceClient.GetOrganisationDetailsById(accreditationFeeRequestInfos.OrganisationId);
         var nationDetailsTask = accountServiceClient.GetNationDetailsById(accreditationFeeRequestInfos.NationId);
 
-        await Task.WhenAll(organisationNameTask, nationDetailsTask);
+        await Task.WhenAll(organisationDetailsTask, nationDetailsTask);
 
-        var organisationName = await organisationNameTask;
+        var organisationDetails = await organisationDetailsTask;
         var nationDetails = await nationDetailsTask;
 
         var paymentFee = await paymentServiceClient.GetAccreditationPaymentFee(accreditationFeeRequestInfos.MaterialName,
@@ -210,7 +211,7 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         return new AccreditationPaymentFeeDetailsDto
         {
             AccreditationId = id,
-            OrganisationName = organisationName,
+            OrganisationName = organisationDetails?.OrganisationName,
             SiteAddress = accreditationFeeRequestInfos.SiteAddress,
             ApplicationReferenceNumber = accreditationFeeRequestInfos.ApplicationReferenceNumber,
             PrnTonnage= accreditationFeeRequestInfos.PrnTonnage,
