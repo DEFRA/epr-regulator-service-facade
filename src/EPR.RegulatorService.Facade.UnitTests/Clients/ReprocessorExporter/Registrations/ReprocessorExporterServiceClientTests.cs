@@ -602,15 +602,4 @@ public class ReprocessorExporterServiceClientTests
         // Assert
         result.Should().BeTrue();
     }
-
-    private static StringContent SerialiseContent<T>(T expectedDto)
-    {
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
-        return responseContent;
-    }
 }
