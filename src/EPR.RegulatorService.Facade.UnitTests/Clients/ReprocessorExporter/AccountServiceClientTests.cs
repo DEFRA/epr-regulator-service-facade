@@ -70,6 +70,24 @@ public class AccountServiceClientTests
         result.Should().BeEquivalentTo(expectedDto);
     }
 
+
+    [TestMethod]
+    public async Task GetNationDetailsById_WithMalformedFormatString_ThrowsFormatException()
+    {
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints
+            {
+                GetNationDetailsById = "nations/nation-id/" // Missing {0}
+            }
+        });
+
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+    }
+
+
     [TestMethod]
     public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
     {
