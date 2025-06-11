@@ -39,7 +39,7 @@ public class AccountServiceClientTests
             Endpoints = new AccountsServiceEndpoints
             {
                 GetNationDetailsById = "regulators/GetNationNameById/{0}",
-                GetOrganisationDetailsById = "regulators/GetOrganisationDetailsById/{0}"
+                GetOrganisationDetailsById = "regulators/getOrganisationDetailsById/{0}"
             }
         });
 
@@ -63,7 +63,7 @@ public class AccountServiceClientTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
+    public async Task GetOrganisationDetailsById_WhenServiceNotReady_ReturnsHardcodedValue()
     {
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
@@ -76,7 +76,7 @@ public class AccountServiceClientTests
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(msg =>
                     msg.Method == HttpMethod.Get &&
-                    msg.RequestUri!.ToString().Contains($"GetOrganisationDetailsById")),
+                    msg.RequestUri!.ToString().Contains($"getOrganisationDetailsById")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
