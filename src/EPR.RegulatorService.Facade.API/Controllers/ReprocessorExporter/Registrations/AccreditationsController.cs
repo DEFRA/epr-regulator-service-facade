@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
@@ -10,7 +9,6 @@ using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
-using EPR.RegulatorService.Facade.API.Helpers;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -171,8 +169,8 @@ public class AccreditationsController : FileDownloadBaseController
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetBusinessPlanAsync(Guid id)
     {
-        logger.LogInformation(LogMessages.BusinessPlanAccreditation);
-        var businessPlan = await reprocessorExporterService.GetBusinessPlanByAccreditationId(id);
+        _logger.LogInformation(LogMessages.BusinessPlanAccreditation);
+        var businessPlan = await _reprocessorExporterService.GetBusinessPlanByAccreditationId(id);
 
         return Ok(businessPlan);
     }
