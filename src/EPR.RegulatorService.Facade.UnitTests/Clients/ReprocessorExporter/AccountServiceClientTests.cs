@@ -39,7 +39,7 @@ public class AccountServiceClientTests
             Endpoints = new AccountsServiceEndpoints
             {
                 GetNationDetailsById = "regulators/GetNationNameById/{0}",
-                GetOrganisationDetailsById = "regulators/getOrganisationDetailsById/{0}"
+                GetOrganisationDetailsById = "organisations/organisation-with-persons/{0}"
             }
         });
 
@@ -76,7 +76,7 @@ public class AccountServiceClientTests
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(msg =>
                     msg.Method == HttpMethod.Get &&
-                    msg.RequestUri!.ToString().Contains($"getOrganisationDetailsById")),
+                    msg.RequestUri!.ToString().Contains($"organisations/organisation-with-persons")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
@@ -86,5 +86,21 @@ public class AccountServiceClientTests
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetNationDetailsById_WithMalformedFormatString_ThrowsFormatException()
+    {
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints
+            {
+                GetOrganisationDetailsById = "organisations/organisation-with-persons/"
+            }
+        });
+
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetOrganisationDetailsById(Guid.NewGuid()));
     }
 }

@@ -68,6 +68,17 @@ public class ReprocessorExporterServiceTests
         _mockReprocessorExporterServiceClient.Setup(client => client.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175")))
                    .ReturnsAsync(expectedDto);
 
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
+
         // Act
         var result = await _service.GetRegistrationByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
@@ -151,6 +162,17 @@ public class ReprocessorExporterServiceTests
         _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteLicenceByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
 
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
+
         // Act
         var result = await _service.GetWasteLicenceByRegistrationMaterialId(id);
 
@@ -166,6 +188,17 @@ public class ReprocessorExporterServiceTests
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
         _mockReprocessorExporterServiceClient.Setup(client => client.GetReprocessingIOByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
+
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
 
         // Act
         var result = await _service.GetReprocessingIOByRegistrationMaterialId(id);
@@ -250,6 +283,17 @@ public class ReprocessorExporterServiceTests
         _mockReprocessorExporterServiceClient.Setup(client => client.GetAuthorisedMaterialByRegistrationId(registrationId))
                    .ReturnsAsync(expectedDto);
 
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
+
         // Act
         var result = await _service.GetAuthorisedMaterialByRegistrationId(registrationId);
 
@@ -281,6 +325,17 @@ public class ReprocessorExporterServiceTests
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
         _mockReprocessorExporterServiceClient.Setup(client => client.GetSamplingPlanByRegistrationMaterialId(id))
                    .ReturnsAsync(expectedDto);
+
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
 
         // Act
         var result = await _service.GetSamplingPlanByRegistrationMaterialId(id);
