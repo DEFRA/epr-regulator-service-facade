@@ -63,7 +63,7 @@ public class AccountServiceClientTests
     }
 
     [TestMethod]
-    public async Task GetOrganisationDetailsById_WhenServiceNotReady_ReturnsHardcodedValue()
+    public async Task GetOrganisationDetailsById_WhenOrganisationExists_ReturnsExpectedDetails()
     {
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
