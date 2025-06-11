@@ -7,5 +7,5 @@ public class PersonDetailsResponseDto
     public string JobTitle { get; set; }
     public string Email { get; set; }
     public string TelephoneNumber { get; set; }
-    public List<string> ServiceRole { get; set; }
+    public List<string> ServiceRoles { get; set; }
 }
