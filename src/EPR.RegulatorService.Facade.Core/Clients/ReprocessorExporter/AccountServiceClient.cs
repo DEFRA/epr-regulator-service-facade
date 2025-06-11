@@ -41,7 +41,6 @@ ILogger<AccountServiceClient> logger)
     {
         logger.LogInformation(LogMessages.AttemptingOrganisationDetails);
 
-
         var url = string.Format($"{_config.Endpoints.GetOrganisationDetailsById}", id);
         return await GetAsync<OrganisationDetailsResponseDto>(url);
     }
