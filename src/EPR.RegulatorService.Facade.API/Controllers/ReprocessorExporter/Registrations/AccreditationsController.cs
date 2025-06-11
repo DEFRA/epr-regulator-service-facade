@@ -24,20 +24,37 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
-public class AccreditationsController(
-    IReprocessorExporterService reprocessorExporterService,
+public class AccreditationsController : FileDownloadBaseController
+{
+
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly IAntivirusService _antivirusService;
+    private readonly BlobStorageConfig _blobStorageConfig;
+    private readonly IReprocessorExporterService _reprocessorExporterService;
+    private readonly IValidator<MarkAsDulyMadeRequestDto> _markAsDulyMadeRequestDtoValidator;
+    private readonly IValidator<UpdateAccreditationTaskStatusDto> _updateAccreditationMaterialTaskValidator;
+    private readonly IValidator<OfflinePaymentRequestDto> _offlinePaymentRequestDtoValidator;
+    private readonly ILogger<AccreditationsController> _logger;
+
+    public AccreditationsController(
+        IReprocessorExporterService reprocessorExporterService,
     IValidator<MarkAsDulyMadeRequestDto> markAsDulyMadeRequestDtoValidator,
     IValidator<UpdateAccreditationTaskStatusDto> updateAccreditationMaterialTaskValidator,
     IValidator<OfflinePaymentRequestDto> offlinePaymentRequestDtoValidator,
     IBlobStorageService blobStorageService,
     IAntivirusService antivirusService,
-    IOptions<BlobStorageConfig> blobStorageConfig,    
-    ILogger<AccreditationsController> logger) : ControllerBase
-{
-
-    private readonly IBlobStorageService _blobStorageService = blobStorageService;
-    private readonly IAntivirusService _antivirusService = antivirusService;
-    private readonly BlobStorageConfig _blobStorageConfig = blobStorageConfig.Value;
+    IOptions<BlobStorageConfig> blobStorageConfig,
+    ILogger<AccreditationsController> logger) : base(antivirusService)
+    {
+        _reprocessorExporterService = reprocessorExporterService;
+        _markAsDulyMadeRequestDtoValidator = markAsDulyMadeRequestDtoValidator;
+        _updateAccreditationMaterialTaskValidator = updateAccreditationMaterialTaskValidator;
+        _offlinePaymentRequestDtoValidator = offlinePaymentRequestDtoValidator;
+        _blobStorageService =  blobStorageService;
+        _antivirusService = antivirusService;
+        _blobStorageConfig = blobStorageConfig.Value;
+        _logger = logger;
+    }
 
     [HttpGet("registrations/{id:Guid}/accreditations")]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -50,8 +67,8 @@ public class AccreditationsController(
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationByIdWithAccreditationsAsync(Guid id, [FromQuery] int? year)
     {
-        logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
-        var accreditations = await reprocessorExporterService.GetRegistrationByIdWithAccreditationsAsync(id, year);
+        _logger.LogInformation(LogMessages.RegistrationAccreditationTasks);
+        var accreditations = await _reprocessorExporterService.GetRegistrationByIdWithAccreditationsAsync(id, year);
         return Ok(accreditations);
     }
 
@@ -68,8 +85,8 @@ public class AccreditationsController(
     [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetSamplingPlansAsync(Guid id)
     {
-        logger.LogInformation(LogMessages.SamplingPlanAccreditation);
-        var samplingPlans = await reprocessorExporterService.GetSamplingPlanByAccreditationId(id);
+        _logger.LogInformation(LogMessages.SamplingPlanAccreditation);
+        var samplingPlans = await _reprocessorExporterService.GetSamplingPlanByAccreditationId(id);
 
         return Ok(samplingPlans);
     }
@@ -86,8 +103,8 @@ public class AccreditationsController(
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetAccreditationPaymentFeeDetailsByAccreditationId(Guid id)
     {
-        logger.LogInformation(LogMessages.AttemptingAccreditationFeeDetails);
-        var result = await reprocessorExporterService.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
+        _logger.LogInformation(LogMessages.AttemptingAccreditationFeeDetails);
+        var result = await _reprocessorExporterService.GetAccreditationPaymentFeeDetailsByAccreditationId(id);
         return Ok(result);
     }
     
@@ -101,9 +118,9 @@ public class AccreditationsController(
         [FromRoute] Guid id,
         [FromBody] MarkAsDulyMadeRequestDto request)
     {
-        await markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.AttemptingMarkAccreditationMaterialAsDulyMade);
-        await reprocessorExporterService.MarkAsDulyMadeByAccreditationId(id, User.UserId(), request);
+        await _markAsDulyMadeRequestDtoValidator.ValidateAndThrowAsync(request);
+        _logger.LogInformation(LogMessages.AttemptingMarkAccreditationMaterialAsDulyMade);
+        await _reprocessorExporterService.MarkAsDulyMadeByAccreditationId(id, User.UserId(), request);
         return NoContent();
     }
 
@@ -120,9 +137,9 @@ public class AccreditationsController(
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateRegulatorAccreditationTaskStatus([FromBody] UpdateAccreditationTaskStatusDto request)
     {
-        await updateAccreditationMaterialTaskValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.UpdateRegulatorAccreditationTaskStatus, request.Status);
-        await reprocessorExporterService.UpdateRegulatorAccreditationTaskStatus(User.UserId(), request);
+        await _updateAccreditationMaterialTaskValidator.ValidateAndThrowAsync(request);
+        _logger.LogInformation(LogMessages.UpdateRegulatorAccreditationTaskStatus, request.Status);
+        await _reprocessorExporterService.UpdateRegulatorAccreditationTaskStatus(User.UserId(), request);
         return NoContent();
     }
 
@@ -135,9 +152,9 @@ public class AccreditationsController(
     [ApiConventionMethod(typeof(CommonApiConvention), nameof(CommonApiConvention.Post))]
     public async Task<IActionResult> SaveAccreditationOfflinePayment([FromBody] OfflinePaymentRequestDto request)
     {
-        await offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.SaveAccreditationOfflinePayment);
-        await reprocessorExporterService.SaveAccreditationOfflinePayment(User.UserId(), request);
+        await _offlinePaymentRequestDtoValidator.ValidateAndThrowAsync(request);
+        _logger.LogInformation(LogMessages.SaveAccreditationOfflinePayment);
+        await _reprocessorExporterService.SaveAccreditationOfflinePayment(User.UserId(), request);
         return NoContent();
     }
 
@@ -151,7 +168,7 @@ public class AccreditationsController(
         )]
     public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequestDto request)
     {
-        logger.LogInformation(LogMessages.RegulatorAccreditationDownloadFile);
+        _logger.LogInformation(LogMessages.RegulatorAccreditationDownloadFile);
 
         var stream = await _blobStorageService.DownloadFileStreamAsync(_blobStorageConfig.ReprocessorExporterAccreditationContainerName,
                                                                         request.FileId.ToString());
@@ -164,11 +181,7 @@ public class AccreditationsController(
             UserId = User.UserId(),
             UserEmail = User.Email()
         };
-
-        var antiVirusResponse = await _antivirusService.SendFile(antiVirusDetails, stream);
-        var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
-
-        var file = AntiVirus.CheckAntiVirusScan(antiVirusResult, stream, request.FileName);
+        var file = await AntiVirusScanFile(antiVirusDetails, stream);
 
         return file != null 
            ? file

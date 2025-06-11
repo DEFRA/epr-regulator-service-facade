@@ -19,7 +19,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [ApiController]
 [Route("api/downloads")]
-public class FileDownloadController : ControllerBase
+public class FileDownloadController : FileDownloadBaseController
 {
     private readonly IBlobStorageService _blobStorageService;
     private readonly ISubmissionService _submissionService;
@@ -30,7 +30,7 @@ public class FileDownloadController : ControllerBase
         IBlobStorageService blobStorageService,
         ISubmissionService submissionService,
         IAntivirusService antivirusService,
-        IOptions<BlobStorageConfig> options)
+        IOptions<BlobStorageConfig> options) : base(antivirusService)
     {
         _blobStorageService = blobStorageService;
         _submissionService = submissionService;
@@ -75,7 +75,7 @@ public class FileDownloadController : ControllerBase
             return new BadRequestObjectResult("There was an error communicating with the submissions API.");
         }
 
-        var file = AntiVirus.CheckAntiVirusScan(antiVirusResult, stream, request.FileName);
+        var file = await AntiVirusScanFile(antiVirusDetails, stream);
 
         return file != null
            ? file
