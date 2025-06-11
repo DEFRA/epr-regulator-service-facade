@@ -43,17 +43,25 @@ public class PaymentServiceClientTests
     public async Task GetRegistrationPaymentFee_ShouldReturnHardcodedValue()
     {
         // Arrange
-        var materialName = "Plastic";
-        var nationName = "England";
-        var submittedDate = DateTime.UtcNow;
-        var requestorType = "Producer";
-        var reference = "ABC123";
+        var paymentFeeRequest = new PaymentFeeRequestDto
+        {
+            RequestorType = "Producer",
+            Regulator = "NationCode",
+            SubmissionDate = DateTime.UtcNow,
+            MaterialType = "Plastic",
+            ApplicationReferenceNumber = "ABC123"
+        };
 
         // Act
-        var result = await _client.GetRegistrationPaymentFee(materialName, nationName, submittedDate, requestorType, reference);
+        var result = await _client.GetRegistrationPaymentFee(paymentFeeRequest);
 
         // Assert
-        result.Should().Be(2921.00m);
+        result.MaterialType.Should().Be("Plastic");
+        result.RegistrationFee.Should().Be(2921.00M);
+        result.PreviousPaymentDetail.PaymentMode.Should().Be("Offline");
+        result.PreviousPaymentDetail.PaymentMethod.Should().Be("Bank transfer (Bacs)");
+        result.PreviousPaymentDetail.PaymentDate.Should().Be(DateTime.UtcNow.Date);
+        result.PreviousPaymentDetail.PaymentAmount.Should().Be(2900.00M);
     }
 
     [TestMethod]
@@ -68,4 +76,36 @@ public class PaymentServiceClientTests
         // Assert
         result.Should().BeTrue(); 
     }
+
+
+    [TestMethod]
+    public async Task GetAccreditationPaymentFee_ShouldReturnHardcodedValue()
+    {
+        // Arrange
+        var materialName = "Plastic";
+        var nationName = "England";
+        var submittedDate = DateTime.UtcNow;
+        var requestorType = "Producer";
+        var reference = "ABC123";
+
+        // Act
+        var result = await _client.GetAccreditationPaymentFee(materialName, nationName, submittedDate, requestorType, reference);
+
+        // Assert
+        result.Should().Be(3000.00m);
+    }
+
+    [TestMethod]
+    public async Task SaveAccreditationOfflinePayment_ShouldReturnTrue_WhenCalled()
+    {
+        // Arrange
+        var requestDto = new SaveOfflinePaymentRequestDto();
+
+        // Act
+        var result = await _client.SaveAccreditationOfflinePayment(requestDto);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
 }

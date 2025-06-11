@@ -13,13 +13,34 @@ IOptions<PaymentBackendServiceApiConfig> options,
 ILogger<PaymentServiceClient> logger)
 : BaseHttpClient(httpClient), IPaymentServiceClient
 {
-    private readonly PaymentBackendServiceApiConfig _config = options.Value;
-    public async Task<decimal> GetRegistrationPaymentFee(string materialName, string regulator, DateTime submittedDate, string requestorType, string reference)
+    //private readonly PaymentBackendServiceApiConfig _config = options.Value;
+    public async Task<PaymentFeeResponseDto> GetRegistrationPaymentFee(PaymentFeeRequestDto request)
     {
-         logger.LogInformation(LogMessages.AttemptingRegistrationPaymentFee);
-         return 2921.00M;
+        logger.LogInformation(LogMessages.AttemptingRegistrationPaymentFee);
+        var paymentFeeResponse = new PaymentFeeResponseDto
+        {
+            MaterialType = request.MaterialType,
+            RegistrationFee = 2921.00M,
+            PreviousPaymentDetail = new PreviousPaymentDetailDto
+            {
+                PaymentMode = "Offline",
+                PaymentMethod = "Bank transfer (Bacs)",
+                PaymentDate = DateTime.UtcNow.Date,
+                PaymentAmount = 2900.00M
+            }
+        };
+        return paymentFeeResponse; 
 
         //var url = string.Format($"{_config.Endpoints.GetRegistrationPaymentFee}", _config.ApiVersion, materialName, regulator, submittedDate, requestorType, reference);
+        //return await GetAsync<decimal>(url);
+    }
+
+    public async Task<decimal> GetAccreditationPaymentFee(string materialName, string regulator, DateTime submittedDate, string requestorType, string reference)
+    {
+        logger.LogInformation(LogMessages.AttemptingAccreditationPaymentFee);
+        return 3000.00M;
+
+        //var url = string.Format($"{_config.Endpoints.GetAccreditationPaymentFee}", _config.ApiVersion, materialName, regulator, submittedDate, requestorType, reference);
         //return await GetAsync<decimal>(url);
     }
 
@@ -30,5 +51,14 @@ ILogger<PaymentServiceClient> logger)
 
         //var url = string.Format(_config.Endpoints.SaveOfflinePayment, _config.ApiVersion);
         //return await PostAsync<OfflinePaymentRequestDto, bool>(url, request);
+    }
+
+    public async Task<bool> SaveAccreditationOfflinePayment(SaveOfflinePaymentRequestDto request)
+    {
+        logger.LogInformation(LogMessages.SaveAccreditationOfflinePayment);
+        return true;
+
+        //var url = string.Format(_config.Endpoints.SaveAccreditationOfflinePayment, _config.ApiVersion);
+        //return await PostAsync<SaveOfflinePaymentRequestDto, bool>(url, request);
     }
 }
