@@ -124,4 +124,23 @@ public class AccreditationsController(
         await reprocessorExporterService.SaveAccreditationOfflinePayment(User.UserId(), request);
         return NoContent();
     }
+
+    [HttpGet("accreditations/{id:Guid}/businessPlan")]
+    [ProducesResponseType(typeof(AccreditationBusinessPlanDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+            Summary = "get business plan for a given accreditation",
+            Description = "Returns business plan data for an accreditation"
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "If the request is successful.", typeof(AccreditationBusinessPlanDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetBusinessPlanAsync(Guid id)
+    {
+        logger.LogInformation(LogMessages.BusinessPlanAccreditation);
+        var businessPlan = await reprocessorExporterService.GetBusinessPlanByAccreditationId(id);
+
+        return Ok(businessPlan);
+    }
 }

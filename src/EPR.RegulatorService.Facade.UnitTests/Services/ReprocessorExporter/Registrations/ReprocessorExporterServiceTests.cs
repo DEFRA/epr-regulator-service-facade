@@ -660,4 +660,36 @@ public class ReprocessorExporterServiceTests
         // Assert
         result.Should().BeTrue();
     }
+
+    [TestMethod]
+    public async Task GetBusinessPlanByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var expectedDto = _fixture.Create<AccreditationBusinessPlanDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetBusinessPlanByAccreditationId(id))
+                   .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _service.GetBusinessPlanByAccreditationId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task BusinessPlanByAccreditationId_ShouldThrowsException_WhenServiceFails()
+    {
+        var id = Guid.NewGuid();
+
+        _mockReprocessorExporterServiceClient
+            .Setup(client => client.GetBusinessPlanByAccreditationId(id))
+            .ThrowsAsync(new Exception("Service unavailable"));
+
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+
+        await FluentActions.Invoking(() => _service.GetBusinessPlanByAccreditationId(id))
+                            .Should().ThrowAsync<Exception>()
+                            .WithMessage("Service unavailable");
+    }
 }

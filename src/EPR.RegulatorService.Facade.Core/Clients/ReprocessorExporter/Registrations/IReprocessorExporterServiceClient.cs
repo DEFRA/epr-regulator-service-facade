@@ -24,4 +24,5 @@ public interface IReprocessorExporterServiceClient
     Task<bool> UpdateRegulatorAccreditationTaskStatus(UpdateAccreditationTaskStatusWithUserIdDto request);
     Task<bool> SaveApplicationTaskQueryNotes(Guid id, QueryNoteRequestDto request);
     Task<bool> SaveRegistrationTaskQueryNotes(Guid id, QueryNoteRequestDto request);
+    Task<AccreditationBusinessPlanDto> GetBusinessPlanByAccreditationId(Guid id);
 }
