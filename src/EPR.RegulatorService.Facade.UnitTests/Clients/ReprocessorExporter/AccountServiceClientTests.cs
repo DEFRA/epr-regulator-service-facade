@@ -87,6 +87,20 @@ public class AccountServiceClientTests
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
     }
 
+    [TestMethod]
+    public async Task GetNationDetailsById_WithoutConfig_ThrowsFormatException()
+    {
+        // Arrange
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints()
+        });
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+
+        // Act and Assert
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+    }
+
 
     [TestMethod]
     public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
