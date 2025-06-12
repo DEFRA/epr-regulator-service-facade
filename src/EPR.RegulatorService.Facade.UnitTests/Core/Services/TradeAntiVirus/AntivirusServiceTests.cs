@@ -1,7 +1,10 @@
 ﻿using EPR.RegulatorService.Facade.Core.Clients;
+using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
@@ -10,13 +13,25 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
     public class AntivirusServiceTests
     {
         private Mock<IAntivirusClient> _mockAntivirusClient = null!;
+        private readonly Mock<IOptions<AntivirusApiConfig>> _mockAntivirusApiConfig = new();
         private AntivirusService _antivirusService = null!;
+
+        private readonly AntivirusApiConfig _antivirusApiConfig = new()
+        {
+            CollectionSuffix = "_Test",
+            PersistFile = true
+        };
+
+        IOptions<AntivirusApiConfig> antivirusApiConfigSettings;
 
         [TestInitialize]
         public void Setup()
         {
             _mockAntivirusClient = new Mock<IAntivirusClient>();
-            _antivirusService = new AntivirusService(_mockAntivirusClient.Object);
+            _mockAntivirusApiConfig.Setup(x => x.Value).Returns(_antivirusApiConfig);
+            antivirusApiConfigSettings = Options.Create(_antivirusApiConfig);
+
+            _antivirusService = new AntivirusService(_mockAntivirusClient.Object ,antivirusApiConfigSettings);
         }
 
         [TestMethod]
@@ -42,6 +57,15 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
                 Content = null!
             };
 
+            var antiVirusFileDetails = new AntiVirusDetails
+            {
+                FileId = fileId,
+                FileName = fileName,
+                SubmissionType = SubmissionType.Producer,
+                UserId = userId,
+                UserEmail = email
+            };  
+
             var response = new HttpResponseMessage(System.Net.HttpStatusCode.OK);
             _mockAntivirusClient.Setup(c => c.VirusScanFile(It.Is<FileDetails>(f =>
                 f.Key == expectedFileDetails.Key &&
@@ -55,7 +79,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
             ), fileName, fileStream)).ReturnsAsync(response);
 
             // Act
-            var result = await _antivirusService.SendFile(expectedFileDetails, fileName, fileStream);
+            var result = await _antivirusService.SendFile(antiVirusFileDetails, fileStream);
 
             // Assert
             result.Should().Be(response);
@@ -66,30 +90,26 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.TradeAntiVirus
         public async Task SendFile_ShouldThrowException_WhenVirusScanFileFails()
         {
             // Arrange
-            var storageContainerName = "Producer"; // Replace with a valid enum value
             var fileId = Guid.NewGuid();
             var fileName = "testfile.txt";
             var fileStream = new MemoryStream();
             var userId = Guid.NewGuid();
             var email = "user@example.com";
 
-            var fileDetails = new FileDetails
+            var antiVirusFileDetails = new AntiVirusDetails
             {
-                Key = fileId,
-                Extension = ".txt",
-                FileName = "testfile",
-                Collection = storageContainerName,
+                FileId = fileId,
+                FileName = fileName,
+                SubmissionType = SubmissionType.Producer,
                 UserId = userId,
-                UserEmail = email,
-                PersistFile = true,
-                Content = null!
+                UserEmail = email
             };
 
             _mockAntivirusClient.Setup(c => c.VirusScanFile(It.IsAny<FileDetails>(), fileName, fileStream))
                 .ThrowsAsync(new HttpRequestException("Virus scan failed"));
 
             // Act
-            Func<Task> act = async () => await _antivirusService.SendFile(fileDetails, fileName, fileStream);
+            Func<Task> act = async () => await _antivirusService.SendFile(antiVirusFileDetails, fileStream);
 
             // Assert
             await act.Should().ThrowAsync<HttpRequestException>().WithMessage("Virus scan failed");
