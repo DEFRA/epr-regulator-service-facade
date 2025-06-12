@@ -74,6 +74,7 @@ public class AccountServiceClientTests
     [TestMethod]
     public async Task GetNationDetailsById_WithMalformedFormatString_ThrowsFormatException()
     {
+        // Arrange
         _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
         {
             Endpoints = new AccountsServiceEndpoints
@@ -81,9 +82,40 @@ public class AccountServiceClientTests
                 GetNationDetailsById = "nations/nation-id/" // Missing {0}
             }
         });
-
         var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+        
+        // Act and Assert
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+    }
 
+    [TestMethod]
+    public async Task GetNationDetailsById_WithNullString_ThrowsFormatException()
+    {
+        // Arrange
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints()
+            {
+                GetNationDetailsById = null
+            }
+        });
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+        
+        // Act and Assert
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+    }
+
+    [TestMethod]
+    public async Task GetNationDetailsById_WithoutConfig_ThrowsFormatException()
+    {
+        // Arrange
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints()
+        });
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+        
+        // Act and Assert
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
     }
 
