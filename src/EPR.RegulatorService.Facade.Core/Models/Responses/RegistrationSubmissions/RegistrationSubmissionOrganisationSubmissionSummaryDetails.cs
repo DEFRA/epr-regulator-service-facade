@@ -17,7 +17,8 @@ public class RegistrationSubmissionOrganisationSubmissionSummaryDetails
 
     public RegistrationSubmissionStatus Status { get; set; }
     public DateTime? DecisionDate { get; set; }
-
+    public DateTime? ResubmissionDecisionDate { get; set; }
+    public DateTime? StatusPendingDate { get; set; }
     public DateTime TimeAndDateOfSubmission { get; set; }
     public bool SubmittedOnTime { get; set; }
     public Guid? SubmittedByUserId { get; set; }
