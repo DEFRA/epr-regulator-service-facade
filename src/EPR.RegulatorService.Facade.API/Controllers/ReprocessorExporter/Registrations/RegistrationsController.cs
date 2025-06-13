@@ -1,17 +1,13 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.API.Helpers;
-using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
-using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -130,6 +126,22 @@ public class RegistrationsController : FileDownloadBaseController
     {
         _logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var result = await _reprocessorExporterService.GetSiteAddressByRegistrationId(id);
+        return Ok(result);
+    }
+
+    [HttpGet("registrations/{id}/wasteCarrier")]
+    [ProducesResponseType(typeof(RegistrationWasteCarrierDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "get waste carrier details",
+        Description = "attempting to get waste carrier details.  "
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns waste carrier details.", typeof(RegistrationWasteCarrierDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetWasteCarrierDetailsByRegistrationId(Guid id)
+    {
+        _logger.LogInformation(LogMessages.AttemptingWasteCarrierDetails);
+        var result = await _reprocessorExporterService.GetWasteCarrierDetailsByRegistrationId(id);
         return Ok(result);
     }
 

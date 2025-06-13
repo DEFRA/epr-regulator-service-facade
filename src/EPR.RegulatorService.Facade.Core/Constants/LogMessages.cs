@@ -19,6 +19,7 @@ public static class LogMessages
     public const string RegulatorRegistrationDownloadFile = "Attempting to download a file for registrations.";
     public const string RegulatorAccreditationDownloadFile = "Attempting to download a file for accreditations.";
     public const string AttemptingSiteAddressDetails = "Attempting to get site address details.";
+    public const string AttemptingWasteCarrierDetails = "Attempting to get waste carrier details.";
     public const string AttemptingAuthorisedMaterial = "Attempting to get authorised materials details.";
     public const string AttemptingRegistrationPaymentFee = "Attempting to get payment fee.";
     public const string AttemptingRegistrationFeeDetails = "Attempting to get registration fee details.";
