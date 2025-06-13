@@ -38,7 +38,8 @@ public class AccountServiceClientTests
         {
             Endpoints = new AccountsServiceEndpoints
             {
-                GetNationDetailsById = "nations/nation-id/{0}"
+                GetNationDetailsById = "nations/nation-id/{0}",
+                GetPersonDetailsByIds = "organisations/person-details-by-ids"
             }
         });
 
@@ -101,6 +102,64 @@ public class AccountServiceClientTests
 
         // Act and Assert
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+    }
+
+    [TestMethod]
+    public async Task GetPersonDetailsByIds_ReturnsValidValue()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<PersonDetailsRequestDto>();
+        var expectedResponseDto = _fixture.Create<List<PersonDetailsResponseDto>>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedResponseDto, jsonOptions));
+        _mockHttpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>(
+        "SendAsync",
+            ItExpr.Is<HttpRequestMessage>(msg =>
+                msg.Method == HttpMethod.Post &&
+                msg.RequestUri!.ToString().Contains($"organisations/person-details-by-ids")),
+            ItExpr.IsAny<CancellationToken>()
+        )
+        .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetPersonDetailsByIds(requestDto);
+
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedResponseDto);
+    }
+
+    [TestMethod]
+    public async Task GetPersonDetailsByIds_WithMalformedEndpointConfig_ThrowsFormatException()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<PersonDetailsRequestDto>();
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints
+            {
+                GetPersonDetailsByIds = "organisations/person-details-by-ids/1"
+            }
+        });
+                var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+        
+        // Act and Assert
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetPersonDetailsByIds(requestDto));
+    }
+
+    [TestMethod]
+    public async Task GetPersonDetailsByIds_WithoutEndpointConfig_ThrowsFormatException()
+    {
+        // Arrange
+        var requestDto = _fixture.Create<PersonDetailsRequestDto>();
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints()
+        });
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+
+        // Act and Assert
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetPersonDetailsByIds(requestDto));
     }
 
 

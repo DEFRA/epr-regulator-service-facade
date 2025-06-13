@@ -1,4 +1,5 @@
-﻿using EPR;
+﻿using Azure.Core;
+using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
@@ -26,6 +27,14 @@ ILogger<AccountServiceClient> logger)
 
         var url = string.Format($"{_config.Endpoints.GetNationDetailsById}", nationId);
         return await GetAsync<NationDetailsResponseDto>(url);
+    }
+
+    public async Task<List<PersonDetailsResponseDto>> GetPersonDetailsByIds(PersonDetailsRequestDto requestDto)
+    {
+        logger.LogInformation(LogMessages.AttemptingPersonDetails);
+
+        var url = string.Format($"{_config.Endpoints.GetPersonDetailsByIds}");
+        return await PostAsync<PersonDetailsRequestDto, List<PersonDetailsResponseDto>>(url, requestDto);
     }
 
     public async Task<string> GetOrganisationNameById(Guid id)
