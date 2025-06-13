@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.API.Helpers;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
@@ -10,7 +9,6 @@ using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
-using EPR.RegulatorService.Facade.API.Helpers;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -156,6 +154,25 @@ public class AccreditationsController : FileDownloadBaseController
         _logger.LogInformation(LogMessages.SaveAccreditationOfflinePayment);
         await _reprocessorExporterService.SaveAccreditationOfflinePayment(User.UserId(), request);
         return NoContent();
+    }
+
+    [HttpGet("accreditations/{id:Guid}/businessPlan")]
+    [ProducesResponseType(typeof(AccreditationBusinessPlanDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+            Summary = "get business plan for a given accreditation",
+            Description = "Returns business plan data for an accreditation"
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "If the request is successful.", typeof(AccreditationBusinessPlanDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetBusinessPlanAsync(Guid id)
+    {
+        _logger.LogInformation(LogMessages.BusinessPlanAccreditation);
+        var businessPlan = await _reprocessorExporterService.GetBusinessPlanByAccreditationId(id);
+
+        return Ok(businessPlan);
     }
 
     [HttpPost("accreditations/file-download")]
