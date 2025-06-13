@@ -72,8 +72,9 @@ public class AccountServiceClientTests
 
 
     [TestMethod]
-    public async Task GetNationDetailsById_WithMalformedFormatString_ThrowsFormatException()
+    public async Task GetNationDetailsById_WithMalformedEndpointConfig_ThrowsFormatException()
     {
+        // Arrange
         _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
         {
             Endpoints = new AccountsServiceEndpoints
@@ -83,12 +84,13 @@ public class AccountServiceClientTests
         });
 
         var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
-
+        
+        // Act and Assert
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
     }
 
     [TestMethod]
-    public async Task GetNationDetailsById_WithoutConfig_ThrowsFormatException()
+    public async Task GetNationDetailsById_WithoutEndpointConfig_ThrowsFormatException()
     {
         // Arrange
         _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
