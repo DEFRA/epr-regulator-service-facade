@@ -8,5 +8,4 @@ public class PersonDetailsResponseDto
     public string Email { get; set; }
     public string TelephoneNumber { get; set; }
     public string ServiceRole { get; set; }
-
 }

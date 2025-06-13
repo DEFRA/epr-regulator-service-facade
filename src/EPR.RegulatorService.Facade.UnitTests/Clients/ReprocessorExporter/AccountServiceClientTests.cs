@@ -39,7 +39,8 @@ public class AccountServiceClientTests
             Endpoints = new AccountsServiceEndpoints
             {
                 GetNationDetailsById = "nations/nation-id/{0}",
-                GetPersonDetailsByIds = "organisations/person-details-by-ids"
+                GetPersonDetailsByIds = "organisations/person-details-by-ids",
+                GetOrganisationDetailsById = "organisations/organisation-with-persons/{0}"
             }
         });
 
@@ -164,16 +165,44 @@ public class AccountServiceClientTests
 
 
     [TestMethod]
-    public async Task GetOrganisationNameById_WhenServiceNotReady_ReturnsHardcodedValue()
+    public async Task GetOrganisationDetailsById_WhenOrganisationExists_ReturnsExpectedDetails()
     {
         // Arrange
-        var id = Guid.NewGuid();
-        var expectedName = "Green Ltd";
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
+        var expectedDto = _fixture.Create<OrganisationDetailsResponseDto>();
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"organisations/organisation-with-persons")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
 
         // Act
-        var result = await _client.GetOrganisationNameById(id);
+        var result = await _client.GetOrganisationDetailsById(id);
 
         // Assert
-        result.Should().Be(expectedName);
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetNationDetailsById_WithMalformedFormatString_ThrowsFormatException()
+    {
+        _mockOptions.Setup(opt => opt.Value).Returns(new AccountsServiceApiConfig
+        {
+            Endpoints = new AccountsServiceEndpoints
+            {
+                GetOrganisationDetailsById = "organisations/organisation-with-persons/"
+            }
+        });
+
+        var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
+
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetOrganisationDetailsById(Guid.NewGuid()));
     }
 }

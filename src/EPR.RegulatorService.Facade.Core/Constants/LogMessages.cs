@@ -23,7 +23,7 @@ public static class LogMessages
     public const string AttemptingAuthorisedMaterial = "Attempting to get authorised materials details.";
     public const string AttemptingRegistrationPaymentFee = "Attempting to get payment fee.";
     public const string AttemptingRegistrationFeeDetails = "Attempting to get registration fee details.";
-    public const string AttemptingOrganisationName = "Attempting to get organisation name.";
+    public const string AttemptingOrganisationDetails = "Attempting to get organisation details.";
     public const string SaveOfflinePayment = "Save offline payment";
     public const string AttemptingMarkAsDulyMade = "Attempting to mark a registration material as duly made.";
     public const string RegistrationAccreditationReference = "Retrieving registration or Accreditation reference number informations with ID {id}.";
