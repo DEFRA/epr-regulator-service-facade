@@ -19,7 +19,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Net;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
 
@@ -315,6 +314,43 @@ public class RegistrationsControllerTests
             _controller.GetAuthorisedMaterialByRegistrationId(registrationId)
         ).Should().ThrowAsync<Exception>()
          .WithMessage("Service error");
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldReturnOk_WithExpectedResult()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+
+        _mockReprocessorExporterService
+            .Setup(service => service.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldThrowException_WhenServiceFails()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        _mockReprocessorExporterService
+            .Setup(service => service.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+                _controller.GetWasteCarrierDetailsByRegistrationId(registrationId)
+            ).Should().ThrowAsync<Exception>()
+            .WithMessage("Service error");
     }
 
     [TestMethod]

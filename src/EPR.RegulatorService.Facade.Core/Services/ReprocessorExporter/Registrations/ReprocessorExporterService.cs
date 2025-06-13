@@ -94,6 +94,14 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         };
     }
 
+    public async Task<RegistrationWasteCarrierDto> GetWasteCarrierDetailsByRegistrationId(Guid id)
+    {
+        var wasteCarrier = await reprocessorExporterServiceClient.GetWasteCarrierDetailsByRegistrationId(id);
+        wasteCarrier.OrganisationName = (await accountServiceClient.GetOrganisationDetailsById(wasteCarrier.OrganisationId))?.OrganisationName;
+
+        return wasteCarrier;
+    }
+
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
         var authorisedMaterial = await reprocessorExporterServiceClient.GetAuthorisedMaterialByRegistrationId(id);

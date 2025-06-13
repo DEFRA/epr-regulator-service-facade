@@ -449,6 +449,73 @@ public class ReprocessorExporterServiceTests
     }
 
     [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldReturnExpectedDto()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
+
+        // Act
+        var result = await _service.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationDetailsById(It.IsAny<Guid>()), Times.Once);
+        result.Should().BeEquivalentTo(expectedDto);
+        result.OrganisationName.Should().BeEquivalentTo(expectedDto.OrganisationName);
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldReturnExpectedDto_WhenOrganisationDetailsNotPresent()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        _mockAccountsServiceClient
+       .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+       .ReturnsAsync((OrganisationDetailsResponseDto?)null);
+
+        // Act
+        var result = await _service.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationDetailsById(It.IsAny<Guid>()), Times.Once);
+        result.Should().BeEquivalentTo(expectedDto);
+        result.OrganisationName.Should().BeEquivalentTo(null);
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldCallClientExactlyOnce()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        await _service.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        _mockReprocessorExporterServiceClient.Verify(client => client.GetWasteCarrierDetailsByRegistrationId(registrationId), Times.Once);
+    }
+
+    [TestMethod]
     public async Task GetSamplingPlanByRegistrationMaterialId_ShouldReturnExpectedResult()
     {
         // Arrange

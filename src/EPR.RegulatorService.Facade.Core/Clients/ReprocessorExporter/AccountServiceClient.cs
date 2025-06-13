@@ -1,4 +1,5 @@
-﻿using EPR;
+﻿using Azure.Core;
+using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
@@ -20,21 +21,20 @@ ILogger<AccountServiceClient> logger)
 : BaseHttpClient(httpClient), IAccountServiceClient
 {
     private readonly AccountsServiceApiConfig _config = options.Value;
-    public async Task<NationDetailsResponseDto> GetNationDetailsById(int id)
+    public async Task<NationDetailsResponseDto> GetNationDetailsById(int nationId)
     {
-        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
+        logger.LogInformation(LogMessages.AttemptingNationDetails);
 
-        return id switch
-        {
-            1 => new NationDetailsResponseDto { Name = "England", NationCode = "GB-ENG" },
-            2 => new NationDetailsResponseDto { Name = "Northern Ireland", NationCode = "GB-NIR" },
-            3 => new NationDetailsResponseDto { Name = "Scotland", NationCode = "GB-SCT" },
-            4 => new NationDetailsResponseDto { Name = "Wales", NationCode = "GB-WLS" },
-            _ => new NationDetailsResponseDto { Name = "Unknown Nation", NationCode = "" }
-        };
+        var url = string.Format($"{_config.Endpoints.GetNationDetailsById}", nationId);
+        return await GetAsync<NationDetailsResponseDto>(url);
+    }
 
-        //var url = string.Format($"{_config.Endpoints.GetNationDetailsById}", id);
-        //return await GetAsync<string>(url);
+    public async Task<List<PersonDetailsResponseDto>> GetPersonDetailsByIds(PersonDetailsRequestDto requestDto)
+    {
+        logger.LogInformation(LogMessages.AttemptingPersonDetails);
+
+        var url = string.Format($"{_config.Endpoints.GetPersonDetailsByIds}");
+        return await PostAsync<PersonDetailsRequestDto, List<PersonDetailsResponseDto>>(url, requestDto);
     }
 
     public async Task<OrganisationDetailsResponseDto> GetOrganisationDetailsById(Guid id)
