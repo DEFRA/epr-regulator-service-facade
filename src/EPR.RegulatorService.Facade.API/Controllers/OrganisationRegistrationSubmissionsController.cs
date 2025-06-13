@@ -158,6 +158,7 @@ public class OrganisationRegistrationSubmissionsController(
         }
     }
 
+    //TODO:: Update the signature or expose a new endpoint??
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -167,7 +168,8 @@ public class OrganisationRegistrationSubmissionsController(
     public async Task<IActionResult> GetRegistrationSubmissionDetails(
         [Required] Guid submissionId,
         [Required][FromQuery] int lateFeeCutOffDay,
-        [Required][FromQuery] int lateFeeCutOffMonth)
+        [Required][FromQuery] int lateFeeCutOffMonth,
+        [Required][FromQuery] IDictionary<string, string> queryParams = null)
     {
         try
         {
@@ -176,12 +178,17 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
+            //var result =
+            //    await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
+            //        submissionId,
+            //        User.UserId(),
+            //        queryParams);
+
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
-                    submissionId,
-                    User.UserId(),
-                    lateFeeCutOffDay,
-                    lateFeeCutOffMonth);
+                 await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
+                     submissionId,
+                     User.UserId(),
+                     queryParams);
 
             if (result is null)
             {

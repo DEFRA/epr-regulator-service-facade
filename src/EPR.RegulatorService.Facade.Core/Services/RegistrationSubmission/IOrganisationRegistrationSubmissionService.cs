@@ -28,4 +28,9 @@ public interface IOrganisationRegistrationSubmissionService
         MaterialType materialType = MaterialType.None);
 
     Task<HttpResponseMessage> HandleCreatePackagingDataResubmissionFeePaymentEvent(PackagingDataResubmissionFeePaymentCreateRequest request, Guid userId);
+
+    Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+        Guid submissionId,
+        Guid userId,
+        IDictionary<string, string> queryParams);
 }

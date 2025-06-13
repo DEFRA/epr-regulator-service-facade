@@ -1,7 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
@@ -11,8 +7,14 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData;
 
@@ -140,6 +142,61 @@ public class CommonDataService(
         }
 
         return default;
+    }
+
+    public async Task<PaycalParametersResponse> GetPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    {
+        var url = string.Format($"{_config.Endpoints.GetPaycalParameters}", submissionId);
+        string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
+        var response = await httpClient.GetAsync(urlWithParams);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<PaycalParametersResponse>(content, _deserialisationOptions);
+    }
+
+    public async Task<SubmissionDetailsResponse> GetOrganisationRegistrationSubmissionDetailsPartAsync(
+        Guid submissionId)
+    {
+        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetailsPart}", submissionId);
+        var response = await httpClient.GetAsync(url);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<SubmissionDetailsResponse>(content, _deserialisationOptions);
+        ////return ConvertCommonDataDetailToFEData(jsonObject);
+    }
+
+    public async Task<SubmissionStatusResponse> GetOrganisationRegistrationSubmissionStatusPartAsync(
+        Guid submissionId)
+    {
+        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionStatusPart}", submissionId);
+        var response = await httpClient.GetAsync(url);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<SubmissionStatusResponse>(content, _deserialisationOptions);
     }
 
     [ExcludeFromCodeCoverage]

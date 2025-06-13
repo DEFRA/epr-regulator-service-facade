@@ -169,6 +169,44 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
+    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+    Guid submissionId,
+    Guid userId,
+    IDictionary<string, string> queryParams)
+    {
+        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
+
+        var lastSyncTime = await GetLastSyncTime();
+
+        if (lastSyncTime.HasValue)
+        {
+            deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
+        }
+
+        var requestedItem1 = commonDataService.GetPaycalParametersAsync(submissionId, queryParams);
+        var requestedItem2 = commonDataService.GetOrganisationRegistrationSubmissionDetailsPartAsync(submissionId);
+        var requestedItem3 = commonDataService.GetOrganisationRegistrationSubmissionStatusPartAsync(submissionId);
+
+        await Task.WhenAll(requestedItem1, requestedItem2, requestedItem3);
+        var paycalParameters = await requestedItem1;
+        var submissionDetails = await requestedItem2;
+        var submissionStatus = await requestedItem3;
+
+        ////TODO:: Map all the above 3 responses appropriately
+        var model = new RegistrationSubmissionOrganisationDetailsFacadeResponse { 
+            SubmissionId = submissionDetails.SubmissionId,
+            RegistrationReferenceNumber = submissionStatus.RegistrationReferenceNumber,
+            OrganisationSize = paycalParameters.OrganisationSize.ToString()
+        };
+
+        if (deltaRegistrationDecisionsResponse.Count > 0)
+        {
+            MergeCosmosUpdates(deltaRegistrationDecisionsResponse, model);
+        }
+
+        return model;
+    }
+
     private async Task<DateTime?> GetLastSyncTime()
     {
         var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
