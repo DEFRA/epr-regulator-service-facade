@@ -36,4 +36,5 @@ public static class LogMessages
     public const string AttemptingApplicationTaskQueryNotesSave = "Attempting to save application task query notes";
     public const string AttemptingRegistrationTaskQueryNotesSave = "Attempting to save registration task query notes";
     public const string AttemptingNationDetails = "Attempting to get nation details";
+    public const string AttemptingPersonDetails = "Attempting to get person details";
 }
