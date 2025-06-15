@@ -37,13 +37,11 @@ ILogger<AccountServiceClient> logger)
         return await PostAsync<PersonDetailsRequestDto, List<PersonDetailsResponseDto>>(url, requestDto);
     }
 
-    public async Task<string> GetOrganisationNameById(Guid id)
+    public async Task<OrganisationDetailsResponseDto> GetOrganisationDetailsById(Guid id)
     {
-        logger.LogInformation(LogMessages.AttemptingOrganisationName);
+        logger.LogInformation(LogMessages.AttemptingOrganisationDetails);
 
-        return "Green Ltd";
-
-        //var url = string.Format($"{_config.Endpoints.GetOrganisationNameById}", id);
-        //return await GetAsync<string>(url);
+        var url = string.Format($"{_config.Endpoints.GetOrganisationDetailsById}", id);
+        return await GetAsync<OrganisationDetailsResponseDto>(url);
     }
 }
