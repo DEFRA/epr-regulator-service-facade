@@ -1,5 +1,4 @@
-﻿using EPR.RegulatorService.Facade.Core.Clients;
-using EPR.RegulatorService.Facade.Core.Configs;
+﻿using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using Microsoft.Extensions.Logging;
@@ -83,6 +82,13 @@ ILogger<ReprocessorExporterServiceClient> logger)
         logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
         var url = string.Format($"{_config.Endpoints.SiteAddressByRegistrationId}", _config.ApiVersion, id);
         return await GetAsync<RegistrationSiteAddressDto>(url);
+    }
+
+    public async Task<RegistrationWasteCarrierDto> GetWasteCarrierDetailsByRegistrationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.AttemptingWasteCarrierDetails);
+        var url = string.Format($"{_config.Endpoints.WasteCarrierDetailsByRegistrationId}", _config.ApiVersion, id);
+        return await GetAsync<RegistrationWasteCarrierDto>(url);
     }
 
     public async Task<MaterialsAuthorisedOnSiteDto> GetAuthorisedMaterialByRegistrationId(Guid id)

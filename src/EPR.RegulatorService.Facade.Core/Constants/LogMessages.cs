@@ -17,10 +17,11 @@ public static class LogMessages
     public const string RegulatorRegistrationDownloadFile = "Attempting to download a file for registrations.";
     public const string RegulatorAccreditationDownloadFile = "Attempting to download a file for accreditations.";
     public const string AttemptingSiteAddressDetails = "Attempting to get site address details.";
+    public const string AttemptingWasteCarrierDetails = "Attempting to get waste carrier details.";
     public const string AttemptingAuthorisedMaterial = "Attempting to get authorised materials details.";
     public const string AttemptingRegistrationPaymentFee = "Attempting to get payment fee.";
     public const string AttemptingRegistrationFeeDetails = "Attempting to get registration fee details.";
-    public const string AttemptingOrganisationName = "Attempting to get organisation name.";
+    public const string AttemptingOrganisationDetails = "Attempting to get organisation details.";
     public const string SaveOfflinePayment = "Save offline payment";
     public const string AttemptingMarkAsDulyMade = "Attempting to mark a registration material as duly made.";
     public const string RegistrationAccreditationReference = "Retrieving registration or Accreditation reference number informations with ID {id}.";
@@ -34,4 +35,6 @@ public static class LogMessages
     public const string SaveAccreditationOfflinePayment = "Save accreditation offline payment";
     public const string AttemptingApplicationTaskQueryNotesSave = "Attempting to save application task query notes";
     public const string AttemptingRegistrationTaskQueryNotesSave = "Attempting to save registration task query notes";
+    public const string AttemptingNationDetails = "Attempting to get nation details";
+    public const string AttemptingPersonDetails = "Attempting to get person details";
 }
