@@ -290,13 +290,13 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<AccreditationBusinessPlanDto> GetBusinessPlanByAccreditationId(Guid id)
     {
         var businessplanInfo =  await reprocessorExporterServiceClient.GetBusinessPlanByAccreditationId(id);
-        var organisationName = await accountServiceClient.GetOrganisationNameById(businessplanInfo.OrganisationId);
+        var organisationDetails = await accountServiceClient.GetOrganisationDetailsById(businessplanInfo.OrganisationId);
 
         return new AccreditationBusinessPlanDto
         {
             AccreditationId = businessplanInfo.AccreditationId,
             OrganisationId = businessplanInfo.OrganisationId,
-            OrganisationName = organisationName,
+            OrganisationName = organisationDetails.OrganisationName,
             SiteAddress = businessplanInfo.SiteAddress,
             MaterialName = businessplanInfo.MaterialName,
             InfrastructurePercentage = businessplanInfo.InfrastructurePercentage,
