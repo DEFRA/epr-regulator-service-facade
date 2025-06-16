@@ -281,11 +281,13 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
     public async Task<AccreditationBusinessPlanDto> GetBusinessPlanByAccreditationId(Guid id)
     {
         var businessplanInfo =  await reprocessorExporterServiceClient.GetBusinessPlanByAccreditationId(id);
+        var organisationName = await accountServiceClient.GetOrganisationNameById(businessplanInfo.OrganisationId);
 
         return new AccreditationBusinessPlanDto
         {
             AccreditationId = businessplanInfo.AccreditationId,
-            OrganisationName = businessplanInfo.OrganisationName,
+            OrganisationId = businessplanInfo.OrganisationId,
+            OrganisationName = organisationName,
             SiteAddress = businessplanInfo.SiteAddress,
             MaterialName = businessplanInfo.MaterialName,
             InfrastructurePercentage = businessplanInfo.InfrastructurePercentage,
@@ -302,7 +304,8 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
             NewUsersRecycledPackagingWasteNotes = businessplanInfo.NewUsersRecycledPackagingWasteNotes,
             NotCoveredOtherCategoriesPercentage = businessplanInfo.NotCoveredOtherCategoriesPercentage,
             NotCoveredOtherCategoriesNotes = businessplanInfo.NotCoveredOtherCategoriesNotes,
-            TaskStatus = businessplanInfo.TaskStatus
+            TaskStatus = businessplanInfo.TaskStatus,
+            QueryNotes = businessplanInfo.QueryNotes
         };
     }
 }

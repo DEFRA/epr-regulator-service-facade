@@ -2,7 +2,8 @@
 public class AccreditationBusinessPlanDto
 {
     public Guid AccreditationId { get; set; }
-    public string OrganisationName { get; set; }
+    public Guid OrganisationId { get; set; }
+    public string OrganisationName { get; set; } = string.Empty;
     public string SiteAddress { get; set; }
     public string MaterialName { get; set; }
     public decimal InfrastructurePercentage { get; set; }
@@ -20,4 +21,5 @@ public class AccreditationBusinessPlanDto
     public decimal NotCoveredOtherCategoriesPercentage { get; set; }
     public string NotCoveredOtherCategoriesNotes { get; set; }
     public string TaskStatus { get; set; }
+    public List<QueryNoteResponseDto> QueryNotes { get; set; }
 }
