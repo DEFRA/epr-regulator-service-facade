@@ -2,6 +2,7 @@
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
@@ -1052,11 +1053,24 @@ public class ReprocessorExporterServiceTests
         _mockReprocessorExporterServiceClient.Setup(client => client.GetBusinessPlanByAccreditationId(id))
                    .ReturnsAsync(expectedDto);
 
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
+
         // Act
         var result = await _service.GetBusinessPlanByAccreditationId(id);
 
         // Assert
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationDetailsById(It.IsAny<Guid>()), Times.Once);
         result.Should().BeEquivalentTo(expectedDto);
+        result.OrganisationName.Should().BeEquivalentTo(organisationDetailsDto.OrganisationName);
     }
 
     [TestMethod]
