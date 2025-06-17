@@ -62,8 +62,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
             _sut = new FileDownloadController(_mockBlobStorageService.Object,
                 _mockSubmissionService.Object,
                 _mockAntiVirusService.Object,
-                _mockBlobStorageConfig.Object,
-                _mockAntivirusApiConfig.Object);
+                _mockBlobStorageConfig.Object);
             _sut.ControllerContext = new ControllerContext();
             _sut.ControllerContext.HttpContext = new DefaultHttpContext() { User = user };
             
@@ -123,8 +122,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
-                It.IsAny<FileDetails>(),
-                It.IsAny<string>(),
+                It.IsAny<AntiVirusDetails>(),
                 It.IsAny<MemoryStream>()))
                 .Throws<HttpRequestException>();
 
@@ -144,8 +142,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(                    
-                    It.IsAny<FileDetails>(),
-                    It.IsAny<string>(),
+                    It.IsAny<AntiVirusDetails>(),
                     It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_cleanAntiVirusResponse);
 
@@ -170,8 +167,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
-                    It.IsAny<FileDetails>(),
-                    It.IsAny<string>(),
+                    It.IsAny<AntiVirusDetails>(),
                     It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_maliciousAntiVirusResponse);
 
@@ -197,8 +193,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.FileDownload
                 .ReturnsAsync(new MemoryStream());
 
             _mockAntiVirusService.Setup(x => x.SendFile(
-                    It.IsAny<FileDetails>(),
-                    It.IsAny<string>(),
+                    It.IsAny<AntiVirusDetails>(),
                     It.IsAny<MemoryStream>()))
                 .ReturnsAsync(_cleanAntiVirusResponse);
 

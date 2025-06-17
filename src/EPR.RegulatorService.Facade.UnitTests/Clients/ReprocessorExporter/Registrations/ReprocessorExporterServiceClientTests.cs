@@ -112,8 +112,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -134,8 +133,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationMaterialDetailsDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -157,8 +155,7 @@ public class ReprocessorExporterServiceClientTests
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationAccreditationReferenceDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -214,8 +211,7 @@ public class ReprocessorExporterServiceClientTests
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationMaterialWasteLicencesDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -240,8 +236,7 @@ public class ReprocessorExporterServiceClientTests
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationMaterialReprocessingIODto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -266,8 +261,7 @@ public class ReprocessorExporterServiceClientTests
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<RegistrationMaterialSamplingPlanDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -293,12 +287,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationSiteAddressDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -314,6 +303,32 @@ public class ReprocessorExporterServiceClientTests
 
         // Act
         var result = await _client.GetSiteAddressByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+        var responseContent = SerialiseContent(expectedDto);
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = responseContent
+            });
+
+        // Act
+        var result = await _client.GetWasteCarrierDetailsByRegistrationId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"));
 
         // Assert
         result.Should().BeEquivalentTo(expectedDto);
@@ -417,8 +432,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationOverviewDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -440,8 +454,7 @@ public class ReprocessorExporterServiceClientTests
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<AccreditationSamplingPlanDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = SerialiseContent(expectedDto);
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -588,5 +601,13 @@ public class ReprocessorExporterServiceClientTests
 
         // Assert
         result.Should().BeTrue();
+    }
+
+    private HttpContent SerialiseContent<T>(T expectedDto)
+    {
+        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+
+        return responseContent;
     }
 }

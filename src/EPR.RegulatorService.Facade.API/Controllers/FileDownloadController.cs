@@ -19,26 +19,23 @@ namespace EPR.RegulatorService.Facade.API.Controllers;
 
 [ApiController]
 [Route("api/downloads")]
-public class FileDownloadController : ControllerBase
+public class FileDownloadController : FileDownloadBaseController
 {
     private readonly IBlobStorageService _blobStorageService;
     private readonly ISubmissionService _submissionService;
     private readonly IAntivirusService _antivirusService;
     private readonly BlobStorageConfig _options;
-    private readonly AntivirusApiConfig _antivirusApiConfig;
 
     public FileDownloadController(
         IBlobStorageService blobStorageService,
         ISubmissionService submissionService,
         IAntivirusService antivirusService,
-        IOptions<BlobStorageConfig> options,
-        IOptions<AntivirusApiConfig> antivirusApiConfig)
+        IOptions<BlobStorageConfig> options) : base(antivirusService)
     {
         _blobStorageService = blobStorageService;
         _submissionService = submissionService;
         _antivirusService = antivirusService;
         _options = options.Value;
-        _antivirusApiConfig = antivirusApiConfig.Value;
     }
 
     [HttpPost]
@@ -49,33 +46,22 @@ public class FileDownloadController : ControllerBase
         // Get file from blob storage
         var stream = await _blobStorageService.DownloadFileStreamAsync(containerName, request.BlobName);
 
-        // send FileDownloadRequest to Trade antivirus API for checking
-        var userId = User.UserId();
-        var email = User.Email();
-
-        var truncatedFileName = FileHelpers.GetTruncatedFileName(request.FileName, FileConstants.FileNameTruncationLength);
-        var suffix = _antivirusApiConfig.CollectionSuffix;
-
-        var antiVirusContainer = AntiVirus.GetContainerName(request.SubmissionType.GetDisplayName<SubmissionType>(), suffix);
-
-        var fileDetails = new FileDetails
+        var antiVirusDetails = new AntiVirusDetails
         {
-            Key = request.FileId,
-            Extension = Path.GetExtension(request.FileName),
-            FileName = Path.GetFileNameWithoutExtension(request.FileName),
-            Collection = antiVirusContainer,
-            UserId = userId,
-            UserEmail = email,
-            PersistFile = _antivirusApiConfig.PersistFile
+            FileId = request.FileId,
+            FileName = request.FileName,
+            SubmissionType = request.SubmissionType,
+            UserId = User.UserId(),
+            UserEmail = User.Email()
         };
 
-        var antiVirusResponse = await _antivirusService.SendFile(fileDetails, truncatedFileName, stream);        
+        var antiVirusResponse = await _antivirusService.SendFile(antiVirusDetails, stream);        
         var antiVirusResult = await antiVirusResponse.Content.ReadAsStringAsync();
 
         // Create a new submissions event for the download attempt
         var fileDownloadCheckEvent = new FileDownloadCheckEvent()
         {
-            UserEmail = email,
+            UserEmail = User.Email(),
             ContentScan = antiVirusResult,
             FileId = request.FileId,
             FileName = request.FileName,
@@ -89,18 +75,11 @@ public class FileDownloadController : ControllerBase
             return new BadRequestObjectResult("There was an error communicating with the submissions API.");
         }
 
-        // if clean, return file
-        if (antiVirusResult == ContentScan.Clean)
-        {
-            var file = new FileContentResult(stream.ToArray(), "text/csv")
-            {
-                FileDownloadName = request.FileName
-            };
+        var file = await AntiVirusScanFile(antiVirusDetails, stream);
 
-            return file;
-        }
-
-        return new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") {  StatusCode = StatusCodes.Status403Forbidden };
+        return file != null
+           ? file
+           : new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
     }
     private string SetContainerName(SubmissionType submissionType) =>
             submissionType == SubmissionType.Producer

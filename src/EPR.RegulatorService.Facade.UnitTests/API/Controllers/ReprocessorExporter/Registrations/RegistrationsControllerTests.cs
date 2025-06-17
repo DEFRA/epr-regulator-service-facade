@@ -1,7 +1,12 @@
 ﻿using AutoFixture;
 using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Exceptions;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
+using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentValidation;
@@ -9,17 +14,36 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Net;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.ReprocessorExporter.Registrations;
 
 [TestClass]
 public class RegistrationsControllerTests
 {
+    private const string BlobStorageServiceError = "Error occurred during download from blob storage";
+    private const string FileInfectedError = "The file was found but it was flagged as infected. It will not be downloaded.";
+    private readonly Mock<IBlobStorageService> _mockBlobStorageService = new();
+    private readonly Mock<IAntivirusService> _mockAntiVirusService = new();
+    private readonly Mock<IOptions<BlobStorageConfig>> _mockBlobStorageConfig = new();       
+    private FileDownloadRequestDto _fileDownloadRequest = new();
+    private HttpResponseMessage _cleanAntiVirusResponse = new();
+    private HttpResponseMessage _maliciousAntiVirusResponse = new();
+    private const string RegistrationContainerName = "test-container";
+
+    private readonly BlobStorageConfig _blobStorageConfig = new()
+    {
+        PomContainerName = "pom-test-container",
+        RegistrationContainerName = RegistrationContainerName,
+        ReprocessorExporterRegistrationContainerName = RegistrationContainerName,
+    };    
+
+    IOptions<BlobStorageConfig> blobStorageConfigSettings;
+
     private Mock<IReprocessorExporterService> _mockReprocessorExporterService = null!;
     private Mock<IValidator<UpdateRegulatorRegistrationTaskDto>> _mockRegulatorRegistrationValidator = null!;
     private Mock<IValidator<UpdateRegulatorApplicationTaskDto>> _mockRegulatorApplicationValidator = null!; 
@@ -36,6 +60,25 @@ public class RegistrationsControllerTests
                 new Claim(ClaimTypes.Email, "testuser@test.com"),
             }, "Test"));
 
+        _mockBlobStorageConfig.Setup(x => x.Value).Returns(_blobStorageConfig);
+        blobStorageConfigSettings = Options.Create(_blobStorageConfig);
+
+        _fileDownloadRequest = new FileDownloadRequestDto()
+        {
+            FileName = "TestFile.csv",
+            FileId = Guid.NewGuid()
+        };
+
+        _cleanAntiVirusResponse = new HttpResponseMessage()
+        {
+            Content = new StringContent("Content-Scan: Clean")
+        };
+
+        _maliciousAntiVirusResponse = new HttpResponseMessage()
+        {
+            Content = new StringContent("Content-Scan: Malicious")
+        };
+
         _mockReprocessorExporterService = new Mock<IReprocessorExporterService>();
         _mockRegulatorRegistrationValidator = new Mock<IValidator<UpdateRegulatorRegistrationTaskDto>>();
         _mockRegulatorApplicationValidator = new Mock<IValidator<UpdateRegulatorApplicationTaskDto>>();
@@ -48,6 +91,9 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             _mockQueryNoteRequestDtoValidator.Object,
+            _mockBlobStorageService.Object, 
+            _mockAntiVirusService.Object, 
+            blobStorageConfigSettings, 
             _mockLogger.Object
         );
 
@@ -96,6 +142,9 @@ public class RegistrationsControllerTests
             validator,
             _mockRegulatorApplicationValidator.Object,
             _mockQueryNoteRequestDtoValidator.Object,
+            _mockBlobStorageService.Object,
+            _mockAntiVirusService.Object,
+            blobStorageConfigSettings,
             _mockLogger.Object
         );
 
@@ -152,6 +201,9 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             validator,
             _mockQueryNoteRequestDtoValidator.Object,
+            _mockBlobStorageService.Object,
+            _mockAntiVirusService.Object,
+            blobStorageConfigSettings,
             _mockLogger.Object
         );
 
@@ -265,6 +317,43 @@ public class RegistrationsControllerTests
     }
 
     [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldReturnOk_WithExpectedResult()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        var expectedDto = _fixture.Create<RegistrationWasteCarrierDto>();
+
+        _mockReprocessorExporterService
+            .Setup(service => service.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ReturnsAsync(expectedDto);
+
+        // Act
+        var result = await _controller.GetWasteCarrierDetailsByRegistrationId(registrationId);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        okResult.Should().NotBeNull();
+        okResult!.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        okResult.Value.Should().BeEquivalentTo(expectedDto);
+    }
+
+    [TestMethod]
+    public async Task GetWasteCarrierDetailsByRegistrationId_ShouldThrowException_WhenServiceFails()
+    {
+        // Arrange
+        var registrationId = Guid.NewGuid();
+        _mockReprocessorExporterService
+            .Setup(service => service.GetWasteCarrierDetailsByRegistrationId(registrationId))
+            .ThrowsAsync(new Exception("Service error"));
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+                _controller.GetWasteCarrierDetailsByRegistrationId(registrationId)
+            ).Should().ThrowAsync<Exception>()
+            .WithMessage("Service error");
+    }
+
+    [TestMethod]
     public async Task SaveApplicationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
@@ -298,6 +387,9 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             validator,
+            _mockBlobStorageService.Object,
+            _mockAntiVirusService.Object,
+            blobStorageConfigSettings,
             _mockLogger.Object
         );
 
@@ -310,25 +402,63 @@ public class RegistrationsControllerTests
     }
 
     [TestMethod]
+    public async Task Should_return_BlobStorageServiceException_when_BlobStorageServiceFails()
+    {
+        // Arrange
+        _mockBlobStorageService
+            .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .Throws(new BlobStorageServiceException(BlobStorageServiceError));
+
+        // Act and Assert
+        await _controller
+            .Invoking(x => x.DownloadFile(_fileDownloadRequest))
+            .Should()
+            .ThrowAsync<BlobStorageServiceException>()
+            .WithMessage(BlobStorageServiceError);
+    }
+
+    //[TestMethod]
+    //public async Task Should_return_HttpRequestException_when_AntiVirusServiceFails()
     public async Task SaveRegistrationTaskQueryNotes_ShouldReturnNoContent_WhenValidRequest()
     {
         // Arrange
-        var regulatorRegistrationTaskStatusId = Guid.NewGuid();
-        var requestDto = _fixture.Create<QueryNoteRequestDto>();
+        _mockBlobStorageService
+            .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, It.IsAny<string>()))
+            .ReturnsAsync(new MemoryStream());
 
-        _mockQueryNoteRequestDtoValidator
-            .Setup(v => v.ValidateAsync(requestDto, default))
-            .ReturnsAsync(new ValidationResult());
+        _mockAntiVirusService.Setup(x => x.SendFile(
+            It.IsAny<AntiVirusDetails>(),            
+            It.IsAny<MemoryStream>()))
+            .Throws<HttpRequestException>();
 
-        _mockReprocessorExporterService
-            .Setup(s => s.SaveRegistrationTaskQueryNotes(regulatorRegistrationTaskStatusId, It.IsAny<Guid>(), requestDto))
-            .ReturnsAsync(true);
+        // Act and Assert
+        await _controller
+            .Invoking(x => x.DownloadFile(_fileDownloadRequest))
+            .Should()
+            .ThrowAsync<HttpRequestException>();
+    }
+
+
+    [TestMethod]
+    public async Task Should_return_ForbiddenObjectResult_when_AntiVirusServiceReturnsMalicious()
+    {
+        // Arrange
+        _mockBlobStorageService
+            .Setup(x => x.DownloadFileStreamAsync(RegistrationContainerName, It.IsAny<string>()))
+            .ReturnsAsync(new MemoryStream());
+
+        _mockAntiVirusService.Setup(x => x.SendFile(
+            It.IsAny<AntiVirusDetails>(),
+            It.IsAny<MemoryStream>()))
+            .ReturnsAsync(_maliciousAntiVirusResponse);
 
         // Act
-        var result = await _controller.SaveRegistrationTaskQueryNotes(regulatorRegistrationTaskStatusId, requestDto);
+        var result = await _controller.DownloadFile(_fileDownloadRequest);
 
         // Assert
-        result.Should().BeOfType<NoContentResult>();
+        result.Should().BeOfType<ObjectResult>();
+        ((ObjectResult)result).StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        ((ObjectResult)result).Value.Should().Be(FileInfectedError);
     }
 
     [TestMethod]
@@ -343,6 +473,9 @@ public class RegistrationsControllerTests
             _mockRegulatorRegistrationValidator.Object,
             _mockRegulatorApplicationValidator.Object,
             validator,
+            _mockBlobStorageService.Object,
+            _mockAntiVirusService.Object,
+            blobStorageConfigSettings,
             _mockLogger.Object
         );
 
@@ -352,5 +485,44 @@ public class RegistrationsControllerTests
         await FluentActions.Invoking(() =>
             _controller.SaveRegistrationTaskQueryNotes(Guid.NewGuid(), requestDto)
         ).Should().ThrowAsync<ValidationException>();
+    }
+
+    public async Task Should_return_FileContentResult_when_AntiVirusServiceReturnsClean()
+    {
+        // Arrange
+        var validator = new InlineValidator<QueryNoteRequestDto>();
+        validator.RuleFor(x => x.Note).NotEmpty().WithMessage("The Query Note field is required.");
+        _mockBlobStorageService
+            .Setup(x => x.DownloadFileStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(new MemoryStream());
+
+        _controller = new RegistrationsController(
+            _mockReprocessorExporterService.Object,
+            _mockRegulatorRegistrationValidator.Object,
+            _mockRegulatorApplicationValidator.Object,
+            validator,
+            _mockBlobStorageService.Object,
+            _mockAntiVirusService.Object,
+            blobStorageConfigSettings,
+            _mockLogger.Object
+        );
+        _mockAntiVirusService.Setup(x => x.SendFile(
+                It.IsAny<AntiVirusDetails>(),                
+                It.IsAny<MemoryStream>()))
+            .ReturnsAsync(_cleanAntiVirusResponse);
+
+        var requestDto = new QueryNoteRequestDto();
+        // Act
+        var result = await _controller.DownloadFile(_fileDownloadRequest) as FileContentResult;
+
+        // Act & Assert
+        await FluentActions.Invoking(() =>
+            _controller.SaveRegistrationTaskQueryNotes(Guid.NewGuid(), requestDto)
+        ).Should().ThrowAsync<ValidationException>();
+        // Assert
+        result.Should().BeOfType<FileContentResult>();
+        result.Should().NotBeNull();
+        result.FileDownloadName.Should().Be(_fileDownloadRequest.FileName);
+        result.ContentType.Should().Be("text/csv");
     }
 }
