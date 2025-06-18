@@ -26,4 +26,5 @@ public interface IReprocessorExporterService
     Task<bool> SaveAccreditationOfflinePayment(Guid userId, OfflinePaymentRequestDto request);
     Task<bool> SaveApplicationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request);
     Task<bool> SaveRegistrationTaskQueryNotes(Guid id, Guid userId, QueryNoteRequestDto request);
+    Task<AccreditationBusinessPlanDto> GetBusinessPlanByAccreditationId(Guid id);
 }

@@ -164,4 +164,12 @@ ILogger<ReprocessorExporterServiceClient> logger)
         var url = string.Format(_config.Endpoints.SaveRegistrationTaskQueryNotes, _config.ApiVersion, id);
         return await PostAsync<QueryNoteRequestDto, bool>(url, request);
     }
+
+    public async Task<AccreditationBusinessPlanDto> GetBusinessPlanByAccreditationId(Guid id)
+    {
+        logger.LogInformation(LogMessages.BusinessPlanAccreditation);
+        var url = string.Format($"{_config.Endpoints.BusinessPlanByAccreditationId}", _config.ApiVersion, id);
+        return await GetAsync<AccreditationBusinessPlanDto>(url);
+    }
 }
+

@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using EPR;
+﻿using EPR;
 using EPR.RegulatorService;
 using EPR.RegulatorService.Facade;
 using EPR.RegulatorService.Facade.Core;
@@ -288,5 +287,36 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         request.CreatedBy = userId;
 
         return await reprocessorExporterServiceClient.SaveRegistrationTaskQueryNotes(id, request);
+    }
+
+    public async Task<AccreditationBusinessPlanDto> GetBusinessPlanByAccreditationId(Guid id)
+    {
+        var businessplanInfo =  await reprocessorExporterServiceClient.GetBusinessPlanByAccreditationId(id);
+        var organisationDetails = await accountServiceClient.GetOrganisationDetailsById(businessplanInfo.OrganisationId);
+
+        return new AccreditationBusinessPlanDto
+        {
+            AccreditationId = businessplanInfo.AccreditationId,
+            OrganisationId = businessplanInfo.OrganisationId,
+            OrganisationName = organisationDetails.OrganisationName,
+            SiteAddress = businessplanInfo.SiteAddress,
+            MaterialName = businessplanInfo.MaterialName,
+            InfrastructurePercentage = businessplanInfo.InfrastructurePercentage,
+            InfrastructureNotes = businessplanInfo.InfrastructureNotes,
+            RecycledWastePercentage = businessplanInfo.RecycledWastePercentage,
+            RecycledWasteNotes = businessplanInfo.RecycledWasteNotes,
+            BusinessCollectionsPercentage = businessplanInfo.BusinessCollectionsPercentage,
+            BusinessCollectionsNotes = businessplanInfo.BusinessCollectionsNotes,
+            CommunicationsPercentage = businessplanInfo.CommunicationsPercentage,
+            CommunicationsNotes = businessplanInfo.CommunicationsNotes,
+            NewMarketsPercentage = businessplanInfo.NewMarketsPercentage,
+            NewMarketsNotes = businessplanInfo.NewMarketsNotes,
+            NewUsersRecycledPackagingWastePercentage = businessplanInfo.NewUsersRecycledPackagingWastePercentage,
+            NewUsersRecycledPackagingWasteNotes = businessplanInfo.NewUsersRecycledPackagingWasteNotes,
+            NotCoveredOtherCategoriesPercentage = businessplanInfo.NotCoveredOtherCategoriesPercentage,
+            NotCoveredOtherCategoriesNotes = businessplanInfo.NotCoveredOtherCategoriesNotes,
+            TaskStatus = businessplanInfo.TaskStatus,
+            QueryNotes = businessplanInfo.QueryNotes
+        };
     }
 }
