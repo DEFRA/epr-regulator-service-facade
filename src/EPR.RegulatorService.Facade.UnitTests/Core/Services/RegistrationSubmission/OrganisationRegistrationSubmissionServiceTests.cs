@@ -363,6 +363,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         {
             result.ResubmissionStatus.Should().Be(expectedStatus);
             result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
+            result.SubmissionDetails.RegistrationDate.Should().NotBeNull();
+            result.SubmissionDetails.ResubmissionDate.Should().NotBeNull();
         }
         
         result.SubmissionDetails.RegistrationDate.Should().NotBeNull();
