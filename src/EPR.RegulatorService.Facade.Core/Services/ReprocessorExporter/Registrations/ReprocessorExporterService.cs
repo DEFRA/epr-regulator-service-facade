@@ -37,14 +37,16 @@ public class ReprocessorExporterService(IReprocessorExporterServiceClient reproc
         return await reprocessorExporterServiceClient.GetRegistrationMaterialByRegistrationMaterialId(id);
     }
 
-    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(Guid id, UpdateMaterialOutcomeRequestDto request)
+    public async Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(Guid id, Guid userId, UpdateMaterialOutcomeRequestDto request)
     {
         var referenceNumber = await GenerateRegistrationAccreditationReference(id);
         var outcomeRequest = new UpdateMaterialOutcomeWithReferenceDto 
         { 
             Comments = request.Comments,
             Status = request.Status,
-            RegistrationReferenceNumber = referenceNumber 
+            RegistrationReferenceNumber = referenceNumber,
+            User = userId
+            
         };
         return await reprocessorExporterServiceClient.UpdateMaterialOutcomeByRegistrationMaterialId(id, outcomeRequest);
     }

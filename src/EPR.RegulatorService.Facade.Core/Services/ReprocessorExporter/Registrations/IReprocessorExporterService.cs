@@ -8,7 +8,7 @@ public interface IReprocessorExporterService
     Task<bool> UpdateRegulatorApplicationTaskStatus(UpdateRegulatorApplicationTaskDto request);
     Task<RegistrationOverviewDto> GetRegistrationByRegistrationId(Guid id);
     Task<RegistrationMaterialDetailsDto> GetRegistrationMaterialByRegistrationMaterialId(Guid id);
-    Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(Guid id, UpdateMaterialOutcomeRequestDto request);
+    Task<bool> UpdateMaterialOutcomeByRegistrationMaterialId(Guid id, Guid userId, UpdateMaterialOutcomeRequestDto request);
     Task<RegistrationMaterialWasteLicencesDto> GetWasteLicenceByRegistrationMaterialId(Guid id);
     Task<RegistrationMaterialReprocessingIODto> GetReprocessingIOByRegistrationMaterialId(Guid id);
     Task<RegistrationMaterialSamplingPlanDto> GetSamplingPlanByRegistrationMaterialId(Guid id);

@@ -171,7 +171,7 @@ public class ReprocessorExporterServiceTests
             .ReturnsAsync(true);
 
         // Act
-        var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto);
+        var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), It.IsAny<Guid>(), requestDto);
 
         // Assert
         result.Should().BeTrue();
