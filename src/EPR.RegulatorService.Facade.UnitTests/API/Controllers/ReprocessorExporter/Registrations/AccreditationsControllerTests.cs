@@ -406,4 +406,44 @@ public class AccreditationsControllerTests
         result.FileDownloadName.Should().Be(_fileDownloadRequest.FileName);
         result.ContentType.Should().Be("text/csv");
     }
+
+    [TestMethod]
+    public async Task GetBusinessPlanAsync_ReturnsOkResult_WithBusinessPlan()
+    {
+        // Arrange
+        var accreditationId = Guid.NewGuid();
+        var expectedBusinessPlan = new AccreditationBusinessPlanDto();
+
+        _mockReprocessorExporterService
+            .Setup(s => s.GetBusinessPlanByAccreditationId(accreditationId))
+            .ReturnsAsync(expectedBusinessPlan);
+
+        // Act
+        var result = await _controller.GetBusinessPlanAsync(accreditationId);
+
+        // Assert
+        var okResult = result as OkObjectResult;
+        Assert.IsNotNull(okResult);
+        Assert.AreEqual(expectedBusinessPlan, okResult.Value);
+    }
+
+    [TestMethod]
+    public async Task GetBusinessPlanAsync_ThrowsException_WhenServiceFails()
+    {
+        // Arrange
+        var accreditationId = Guid.NewGuid();
+        var expectedMessage = "Service failure";
+
+        _mockReprocessorExporterService
+            .Setup(s => s.GetBusinessPlanByAccreditationId(accreditationId))
+            .ThrowsAsync(new Exception(expectedMessage));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsExceptionAsync<Exception>(async () =>
+        {
+            await _controller.GetBusinessPlanAsync(accreditationId);
+        });
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
 }
