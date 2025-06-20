@@ -184,6 +184,16 @@ public class OrganisationRegistrationSubmissionsController(
 
             return Ok(result);
         }
+        catch (HttpProtocolException ex)
+        {
+            logger.LogError(ex, $"HttpProtocolException: Submission with ID {submissionId} causes Http Exceptions.");
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, $"HttpRequest Exception: Submission with ID {submissionId} causes Http Exceptions.");
+            throw;
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionDetails)}");
