@@ -364,7 +364,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             result.ResubmissionStatus.Should().Be(expectedStatus);
             result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
         }
-        
+
         _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
         _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
     }

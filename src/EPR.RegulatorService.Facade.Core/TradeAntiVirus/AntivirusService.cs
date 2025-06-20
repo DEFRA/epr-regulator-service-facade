@@ -1,7 +1,10 @@
-﻿using EPR.RegulatorService.Facade.Core.Clients;
+﻿using Azure.Core;
+using EPR.RegulatorService.Facade.Core.Clients;
 using EPR.RegulatorService.Facade.Core.Configs;
+using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Extensions;
+using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using Microsoft.Extensions.Options;
 
@@ -11,33 +14,42 @@ namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
     {
         private readonly IAntivirusClient _antivirusClient;
         private readonly AntivirusApiConfig _antivirusApiConfig;
-
         public AntivirusService(IAntivirusClient antivirusClient, IOptions<AntivirusApiConfig> antivirusApiConfig)
         {
             _antivirusClient = antivirusClient;
             _antivirusApiConfig = antivirusApiConfig.Value;
         }
 
-        public async Task<HttpResponseMessage> SendFile(SubmissionType submissionType, Guid fileId, string fileName, MemoryStream fileStream, Guid userId, string email)
+        public async Task<HttpResponseMessage> SendFile(FileDetails fileDetails, string fileName, MemoryStream fileStream)
         {
+            return await _antivirusClient.VirusScanFile(fileDetails, fileName, fileStream);
+        }
+
+        public async Task<HttpResponseMessage> SendFile(AntiVirusDetails antiVirusDetails, MemoryStream fileStream)
+        {
+            var userId = antiVirusDetails.UserId;
+            var email = antiVirusDetails.UserEmail;
+
+            var truncatedFileName = FileHelpers.GetTruncatedFileName(antiVirusDetails.FileName, FileConstants.FileNameTruncationLength);
+            var suffix = _antivirusApiConfig.CollectionSuffix;
+
+            var antiVirusContainer = GetContainerName(antiVirusDetails.SubmissionType.GetDisplayName<SubmissionType>(), suffix);
+
             var fileDetails = new FileDetails
             {
-                Key = fileId,
-                Extension = Path.GetExtension(fileName),
-                FileName = Path.GetFileNameWithoutExtension(fileName),
-                Collection = GetCollectionName(submissionType.GetDisplayName<SubmissionType>()),
+                Key = antiVirusDetails.FileId,
+                Extension = Path.GetExtension(antiVirusDetails.FileName),
+                FileName = Path.GetFileNameWithoutExtension(antiVirusDetails.FileName),
+                Collection = antiVirusContainer,
                 UserId = userId,
                 UserEmail = email,
                 PersistFile = _antivirusApiConfig.PersistFile
             };
 
-            return await _antivirusClient.VirusScanFile(fileDetails, fileName, fileStream);
+            return await _antivirusClient.VirusScanFile(fileDetails, truncatedFileName, fileStream);
         }
 
-        private string GetCollectionName(string submissionType)
-        {
-            var suffix = _antivirusApiConfig?.CollectionSuffix;
-            return suffix is null ? submissionType : submissionType + suffix;
-        }
+        private string GetContainerName(string submissionType, string suffix) =>
+            suffix is null ? submissionType : submissionType + suffix;
     }
 }
