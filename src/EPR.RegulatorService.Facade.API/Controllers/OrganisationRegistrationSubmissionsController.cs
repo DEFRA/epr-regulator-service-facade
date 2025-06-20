@@ -174,15 +174,9 @@ public class OrganisationRegistrationSubmissionsController(
                 return ValidationProblem();
             }
 
-            var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
+            Thread.Sleep(new TimeSpan(0, 30, 0));
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            return NotFound();
         }
         catch (HttpProtocolException ex)
         {
