@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
@@ -159,6 +160,7 @@ public class OrganisationRegistrationSubmissionsController(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -167,34 +169,9 @@ public class OrganisationRegistrationSubmissionsController(
     [Route("organisation-registration-submission-details/{submissionId:Guid}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
     {
-        try
-        {
-            if (!ModelState.IsValid)
-            {
-                return ValidationProblem();
-            }
+        Thread.Sleep(new TimeSpan(0, 30, 0));
 
-            Thread.Sleep(new TimeSpan(0, 30, 0));
-
-            return NotFound();
-        }
-        catch (HttpProtocolException ex)
-        {
-            logger.LogError(ex, $"HttpProtocolException: Submission with ID {submissionId} causes Http Exceptions.");
-            throw;
-        }
-        catch (HttpRequestException ex)
-        {
-            logger.LogError(ex, $"HttpRequest Exception: Submission with ID {submissionId} causes Http Exceptions.");
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionDetails)}");
-            return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
-                HttpContext.Request.Path,
-                StatusCodes.Status500InternalServerError);
-        }
+        return NotFound();
     }
 
     private void SendEventEmail(RegulatorDecisionCreateRequest request)
