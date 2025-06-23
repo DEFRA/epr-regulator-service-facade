@@ -51,6 +51,7 @@ public class ReprocessorExporterServiceClientTests
                 RegistrationAccreditationReference = "api/v{0}/registrationMaterials/{1}/RegistrationAccreditationReference",
                 RegistrationByIdWithAccreditations = "api/v{0}/registrations/{1}/accreditations",
                 SamplingPlanByAccreditationId = "api/v{0}/accreditations/{1}/samplingPlan",
+                BusinessPlanByAccreditationId = "api/v{0}/accreditations/{1}/businessPlan",
                 AccreditationFeeByAccreditationMaterialId = "api/v{0}/accreditationMaterials/{1}/paymentFees",
                 MarkAsDulyMadeByAccreditationId = "api/v{0}/accreditationMaterials/markAsDulyMade",
                 UpdateRegulatorAccreditationTaskStatusById = "api/v{0}/accreditationMaterialTaskStatus",
@@ -601,6 +602,31 @@ public class ReprocessorExporterServiceClientTests
 
         // Assert
         result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task GetBusinessPlanByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
+        var expectedDto = _fixture.Create<AccreditationBusinessPlanDto>();
+        var responseContent = SerialiseContent(expectedDto);
+
+        _mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(msg =>
+                    msg.Method == HttpMethod.Get &&
+                    msg.RequestUri!.ToString().Contains($"accreditations/{id}/businessPlan")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = responseContent });
+
+        // Act
+        var result = await _client.GetBusinessPlanByAccreditationId(id);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
     }
 
     private HttpContent SerialiseContent<T>(T expectedDto)
