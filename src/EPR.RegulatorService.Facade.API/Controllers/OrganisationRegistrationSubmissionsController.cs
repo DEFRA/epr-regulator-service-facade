@@ -169,9 +169,40 @@ public class OrganisationRegistrationSubmissionsController(
     [Route("organisation-registration-submission-details/{submissionId:Guid}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
     {
-        Thread.Sleep(new TimeSpan(0, 30, 0));
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem();
+            }
 
-        return NotFound();
+            var result =
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.Parse("d6cd0177-47b4-4412-b1e5-d142c93411ee"));
+
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+        catch (HttpProtocolException ex)
+        {
+            logger.LogError(ex, $"HttpProtocolException: Submission with ID {submissionId} causes Http Exceptions.");
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, $"HttpRequest Exception: Submission with ID {submissionId} causes Http Exceptions.");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionDetails)}");
+            return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
+                HttpContext.Request.Path,
+                StatusCodes.Status500InternalServerError);
+        }
     }
 
     private void SendEventEmail(RegulatorDecisionCreateRequest request)
