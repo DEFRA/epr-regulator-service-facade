@@ -40,6 +40,9 @@ public class FileDownloadController : FileDownloadBaseController
 
     [HttpPost]
     [Route("file-download")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequest request)
     {        
         var containerName = SetContainerName(request.SubmissionType);

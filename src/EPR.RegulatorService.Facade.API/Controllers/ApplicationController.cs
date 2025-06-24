@@ -24,6 +24,7 @@ public class ApplicationController : ControllerBase
     
     [HttpPost]
     [Route("api/regulators/accounts/govNotification")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GovNotification([FromBody] GovNotificationRequestModel request)
     {
         var model = CreateBaseEmailModel(request);
