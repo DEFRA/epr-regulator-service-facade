@@ -177,7 +177,7 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.Parse("d6cd0177-47b4-4412-b1e5-d142c93411ee"));
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
 
             if (result is null)
             {
@@ -196,14 +196,13 @@ public class OrganisationRegistrationSubmissionsController(
             logger.LogError(ex, $"HttpRequest Exception: Submission with ID {submissionId} causes Http Exceptions.");
             throw;
         }
-        catch (Exception ex)
+            catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionDetails)}");
             return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
                 HttpContext.Request.Path,
                 StatusCodes.Status500InternalServerError);
-        }
-    }
+        }}
 
     private void SendEventEmail(RegulatorDecisionCreateRequest request)
     {
