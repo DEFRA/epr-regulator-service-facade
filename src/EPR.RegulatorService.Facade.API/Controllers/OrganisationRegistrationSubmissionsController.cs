@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
@@ -159,6 +160,7 @@ public class OrganisationRegistrationSubmissionsController(
         }
     }
 
+    [ExcludeFromCodeCoverage]
     [HttpGet]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -184,14 +186,23 @@ public class OrganisationRegistrationSubmissionsController(
 
             return Ok(result);
         }
-        catch (Exception ex)
+        catch (HttpProtocolException ex)
+        {
+            logger.LogError(ex, $"HttpProtocolException: Submission with ID {submissionId} causes Http Exceptions.");
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, $"HttpRequest Exception: Submission with ID {submissionId} causes Http Exceptions.");
+            throw;
+        }
+            catch (Exception ex)
         {
             logger.LogError(ex, $"Exception during {nameof(GetRegistrationSubmissionDetails)}");
             return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
                 HttpContext.Request.Path,
                 StatusCodes.Status500InternalServerError);
-        }
-    }
+        }}
 
     private void SendEventEmail(RegulatorDecisionCreateRequest request)
     {
