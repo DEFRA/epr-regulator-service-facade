@@ -32,7 +32,8 @@ public class PrnServiceApiConfigEndpoints
     public string MarkAsDulyMadeByRegistrationMaterialId { get; set; }
     public string RegistrationAccreditationReference { get; set; }
     public string RegistrationByIdWithAccreditations { get; set; }
-    public string SamplingPlanByAccreditationId { get; set; } 
+    public string SamplingPlanByAccreditationId { get; set; }
+    public string BusinessPlanByAccreditationId { get; set; }
     public string AccreditationFeeByAccreditationMaterialId { get; set; }
     public string MarkAsDulyMadeByAccreditationId { get; set; }
     public string UpdateRegulatorAccreditationTaskStatusById { get; set; }

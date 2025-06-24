@@ -2,6 +2,7 @@
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
 using FluentAssertions;
@@ -170,7 +171,7 @@ public class ReprocessorExporterServiceTests
             .ReturnsAsync(true);
 
         // Act
-        var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), requestDto);
+        var result = await _service.UpdateMaterialOutcomeByRegistrationMaterialId(Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175"), It.IsAny<Guid>(), requestDto);
 
         // Assert
         result.Should().BeTrue();
@@ -1041,5 +1042,50 @@ public class ReprocessorExporterServiceTests
 
         // Assert
         result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task GetBusinessPlanByAccreditationId_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var expectedDto = _fixture.Create<AccreditationBusinessPlanDto>();
+        _mockReprocessorExporterServiceClient.Setup(client => client.GetBusinessPlanByAccreditationId(id))
+                   .ReturnsAsync(expectedDto);
+
+        var organisationDetailsDto = new OrganisationDetailsResponseDto
+        {
+            OrganisationName = "Test Org"
+        };
+
+        _mockAccountsServiceClient
+            .Setup(client => client.GetOrganisationDetailsById(expectedDto.OrganisationId))
+            .ReturnsAsync(organisationDetailsDto);
+
+        expectedDto.OrganisationName = organisationDetailsDto.OrganisationName;
+
+        // Act
+        var result = await _service.GetBusinessPlanByAccreditationId(id);
+
+        // Assert
+        _mockAccountsServiceClient.Verify(c => c.GetOrganisationDetailsById(It.IsAny<Guid>()), Times.Once);
+        result.Should().BeEquivalentTo(expectedDto);
+        result.OrganisationName.Should().BeEquivalentTo(organisationDetailsDto.OrganisationName);
+    }
+
+    [TestMethod]
+    public async Task BusinessPlanByAccreditationId_ShouldThrowsException_WhenServiceFails()
+    {
+        var id = Guid.NewGuid();
+
+        _mockReprocessorExporterServiceClient
+            .Setup(client => client.GetBusinessPlanByAccreditationId(id))
+            .ThrowsAsync(new Exception("Service unavailable"));
+
+        _service = new ReprocessorExporterService(_mockReprocessorExporterServiceClient.Object, _mockAccountsServiceClient.Object, _mockPaymentServiceClient.Object);
+
+        await FluentActions.Invoking(() => _service.GetBusinessPlanByAccreditationId(id))
+                            .Should().ThrowAsync<Exception>()
+                            .WithMessage("Service unavailable");
     }
 }

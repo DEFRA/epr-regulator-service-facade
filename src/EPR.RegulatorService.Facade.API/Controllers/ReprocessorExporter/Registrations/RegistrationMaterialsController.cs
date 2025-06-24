@@ -55,7 +55,7 @@ public class RegistrationMaterialsController(IReprocessorExporterService reproce
     {
         await updateMaterialOutcomeValidator.ValidateAndThrowAsync(request);
         logger.LogInformation(LogMessages.OutcomeMaterialRegistration);
-        await reprocessorExporterService.UpdateMaterialOutcomeByRegistrationMaterialId(id, request);
+        await reprocessorExporterService.UpdateMaterialOutcomeByRegistrationMaterialId(id, User.UserId(), request);
         return NoContent();
     }
 
