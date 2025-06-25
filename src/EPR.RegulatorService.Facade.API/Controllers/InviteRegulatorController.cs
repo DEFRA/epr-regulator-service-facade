@@ -1,6 +1,7 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Extensions;
+using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using EPR.RegulatorService.Facade.Core.Services.ServiceRoles;
@@ -28,8 +29,9 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
         [HttpPost]
         [Route("invite-regulator-user")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateInviteEnrollment([FromBody] RegulatorInviteEnrollmentRequest request)
         {
             try
@@ -99,6 +101,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         [Route("enrol-invited-user")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EnrolInvitedUser([FromBody] EnrolInvitedUserRequest request)
         {
             try
@@ -137,8 +140,9 @@ namespace EPR.RegulatorService.Facade.API.Controllers
 
         [HttpGet]
         [Route("invited-regulator-user")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetInvitedEnrollment([FromQuery] string email)
         {
             try

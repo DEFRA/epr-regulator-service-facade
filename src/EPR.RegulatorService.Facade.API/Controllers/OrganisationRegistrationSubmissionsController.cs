@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using EPR.RegulatorService.Facade.API.Extensions;
+﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
+using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
@@ -132,7 +134,7 @@ public class OrganisationRegistrationSubmissionsController(
 
     [HttpPost]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Route("organisation-registration-submissions")]
@@ -161,8 +163,9 @@ public class OrganisationRegistrationSubmissionsController(
 
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RegistrationSubmissionOrganisationDetailsFacadeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Route("organisation-registration-submission-details/{submissionId:Guid}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
