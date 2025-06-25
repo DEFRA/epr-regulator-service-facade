@@ -31,7 +31,7 @@ public class CommonDataServiceTests
     private readonly ILogger<CommonDataService> _logger = new Mock<ILogger<CommonDataService>>().Object;
     private const string BaseAddress = "http://localhost";
     private const string GetPoMSubmissions = "GetPoMSubmissions";
-    private const string GetOrganisationRegistrationDetails = "GetOrganisationRegistrationDetails";
+    private const string GetOrganisationRegistrationSubmissionDetails = "submissions/organisation-registration-submission/{0}?lateFeeCutOffDay={1}&lateFeeCutOffMonth={2}";
     private const string GetOrganisationRegistrationSubmissionsSummaries = "GetOrganisationRegistrationSubmissionsSummaries";
     private const string GetPomResubmissionPayCalParameters = "submissions/pom-resubmission-paycal-parameters";
     private HttpClient _httpClient;
@@ -49,7 +49,7 @@ public class CommonDataServiceTests
             Endpoints = new()
             {
                 GetPoMSubmissions = GetPoMSubmissions,
-                GetOrganisationRegistrationSubmissionDetails = GetOrganisationRegistrationDetails,
+                GetOrganisationRegistrationSubmissionDetails = GetOrganisationRegistrationSubmissionDetails,
                 GetOrganisationRegistrationSubmissionsSummaries = GetOrganisationRegistrationSubmissionsSummaries,
                 GetPomResubmissionPaycalParameters = GetPomResubmissionPayCalParameters
             }
@@ -244,11 +244,18 @@ public class CommonDataServiceTests
     {
         //Arrange
         var submissionId = Guid.NewGuid();
-        _expectedUrl = $"{BaseAddress}/{ _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails,
+            submissionId,
+            lateFeeCutOffDay,
+            lateFeeCutOffMonth);
 
         var expectedResult = _fixture
             .Build<OrganisationRegistrationDetailsDto>()
-            .With(x => x.SubmissionId,submissionId)     // Generate a valid Guid
+            .With(x => x.SubmissionId, submissionId)     // Generate a valid Guid
             .With(x => x.OrganisationId, Guid.NewGuid())   // Another valid Guid
             .With(x => x.SubmittedUserId, Guid.NewGuid())  // Nullable Guid, still valid
             .With(x => x.RegulatorUserId, Guid.NewGuid())  // Another nullable Guid
@@ -257,11 +264,11 @@ public class CommonDataServiceTests
             .With(x => x.StatusPendingDate, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"))
             .With(x => x.SubmissionStatus, RandomStatus().ToString())
             .Create();
-        
+
         SetupApiSuccessCall(JsonSerializer.Serialize(expectedResult));
 
         // Act
-        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
         results.Should().BeOfType<RegistrationSubmissionOrganisationDetailsFacadeResponse>();
         Assert.IsNotNull(results);
@@ -272,12 +279,19 @@ public class CommonDataServiceTests
     public async Task Should_Return_Null_When_HTTP_Results_AreEmpty()
     {
         var submissionId = Guid.NewGuid();
-        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails,
+            submissionId,
+            lateFeeCutOffDay,
+            lateFeeCutOffMonth);
 
         SetupNullApiSuccessCall();
 
         // Act
-        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
         results.Should().BeNull();
     }
@@ -333,7 +347,7 @@ public class CommonDataServiceTests
 
         results.Should().BeOfType<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>>();
         results.Should().NotBeNull();
-        results.totalItems.Should().Be(0);  
+        results.totalItems.Should().Be(0);
         results.currentPage.Should().Be(1);
     }
 
@@ -342,7 +356,7 @@ public class CommonDataServiceTests
     {
         // Arrange
         var submissionId = Guid.NewGuid();
-        
+
         SetupNullApiSuccessCall();
 
         // Act
@@ -360,7 +374,7 @@ public class CommonDataServiceTests
         _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}";
 
         SetupApiSuccessCall("{}");
-        
+
         // Act
         await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
 
@@ -459,11 +473,20 @@ public class CommonDataServiceTests
     public async Task Should_Throw_HttpRequestException_when_fetching_registration_submission_details_And_Api_Fails()
     {
         //Arrange
-        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}";
+        var submissionId = Guid.NewGuid();
+        var lateFeeCutOffDay = 1;
+        var lateFeeCutOffMonth = 4;
+
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}" +
+            $"?lateFeeCutOffDay={lateFeeCutOffDay}&lateFeeCutOffMonth={lateFeeCutOffMonth}";
         SetupApiBadRequestCall();
 
         // Act
-        Assert.ThrowsExceptionAsync<HttpRequestException>(() => _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid()));
+        Assert.ThrowsExceptionAsync<HttpRequestException>(() =>
+            _sut.GetOrganisationRegistrationSubmissionDetails(
+                submissionId,
+                lateFeeCutOffDay,
+                lateFeeCutOffMonth));
     }
 
     private static RegistrationSubmissionOrganisationType RandomOrganisationType()
