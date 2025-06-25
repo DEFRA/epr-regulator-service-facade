@@ -50,6 +50,8 @@ public class SubmissionsController : ControllerBase
 
     [HttpPost]
     [Route("pom/regulator-decision")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegulatorPoMDecisionEvent([FromBody] RegulatorPoMDecisionCreateRequest request)
     {
         if (!ModelState.IsValid)
@@ -93,6 +95,8 @@ public class SubmissionsController : ControllerBase
 
     [HttpGet]
     [Route("pom/get-submissions")]
+    [ProducesResponseType(typeof(PaginatedResponse<PomSubmissionSummaryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPoMSubmissions([FromQuery] PoMSubmissionsFilters request)
     {
         if (!ModelState.IsValid)
@@ -144,6 +148,9 @@ public class SubmissionsController : ControllerBase
 
     [HttpGet]
     [Route("pom/get-resubmission-paycal-parameters/{submissionId}")]
+    [ProducesResponseType(typeof(PomResubmissionPaycalParametersDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetResubmissionPaycalDetails([FromRoute] Guid submissionId, [FromQuery] Guid? complianceSchemeId)
     {
         if (!ModelState.IsValid)
@@ -162,6 +169,8 @@ public class SubmissionsController : ControllerBase
 
     [HttpPost]
     [Route("registration/regulator-decision")]
+    [ProducesResponseType(typeof(List<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateRegulatorRegistrationDecisionEvent([FromBody] RegulatorRegistrationDecisionCreateRequest request)
     {
         if (!ModelState.IsValid)
@@ -201,6 +210,8 @@ public class SubmissionsController : ControllerBase
 
     [HttpGet]
     [Route("registrations/get-submissions")]
+    [ProducesResponseType(typeof(PaginatedResponse<RegistrationSubmissionSummaryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetRegistrationSubmissions([FromQuery] RegistrationSubmissionsFilters request)
     {
         if (!ModelState.IsValid)

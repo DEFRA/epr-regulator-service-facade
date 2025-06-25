@@ -23,6 +23,8 @@ public class RegulatorController :  ControllerBase
 
     [HttpGet]
     [Route("api/organisations/pending-applications")]
+    [ProducesResponseType(typeof(PaginatedResponse<OrganisationEnrolments>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PendingApplications(int currentPage, int pageSize, string organisationName, string applicationType)
     {
         try
@@ -56,6 +58,8 @@ public class RegulatorController :  ControllerBase
 
     [HttpGet]
     [Route("api/organisations/{organisationId}/pending-applications")]
+    [ProducesResponseType(typeof(ApplicationEnrolmentDetailsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetOrganisationApplications(Guid organisationId)
     {
         try
@@ -90,6 +94,8 @@ public class RegulatorController :  ControllerBase
 
     [HttpPost]
     [Route("api/organisations/update-enrolment")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateEnrolment([FromBody]UpdateEnrolmentRequest updateEnrolmentRequest)
     {
         try
@@ -128,6 +134,8 @@ public class RegulatorController :  ControllerBase
 
     [HttpPost]
     [Route("api/accounts/transfer-nation")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult>TransferOrganisationNation([FromBody]OrganisationTransferNationRequest request)
     {
         try
@@ -159,6 +167,8 @@ public class RegulatorController :  ControllerBase
     
     [HttpGet]
     [Route("api/user-accounts")]
+    [ProducesResponseType(typeof(UserOrganisationsListModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserDetails()
     {
         try
