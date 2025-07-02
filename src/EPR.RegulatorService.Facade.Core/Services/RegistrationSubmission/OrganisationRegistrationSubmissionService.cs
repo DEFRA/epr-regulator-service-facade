@@ -164,72 +164,56 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
-    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId,
-                                                                                                                             int organisationType,
-                                                                                                                             Guid userId,
-                                                                                                                             IDictionary<string, string> queryParams)
+    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+    Guid submissionId,
+    int organisationType,
+    Guid userId,
+    IDictionary<string, string> queryParams)
     {
-        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
+        var tasks = new List<Task>();
 
+        // Delta Registration Decisions
         var lastSyncTime = await GetLastSyncTime();
+        var deltaEvents = lastSyncTime.HasValue
+            ? await GetDeltaSubmissionEvents(lastSyncTime.Value, userId, submissionId)
+            : [];
 
-        if (lastSyncTime.HasValue)
-        {
-            deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
-        }
+        // Submission Details
+        var submissionDetailsTask = commonDataService.GetOrganisationRegistrationSubmissionDetailsPartAsync(submissionId);
+        tasks.Add(submissionDetailsTask);
 
-        Task<SubmissionDetailsDto> submissionDetailsTask = commonDataService.GetOrganisationRegistrationSubmissionDetailsPartAsync(submissionId);
-
-        Task<ProducerPaycalParametersDto> producerPaycalParametersTask = null;
-
-        Task<List<CsoPaycalParametersDto>> csoPaycalParametersTask = null;
-
-        ProducerPaycalParametersDto producerPaycalParametersResult = null;
-
-        List<CsoPaycalParametersDto> csoPaycalParametersresult = null;
+        // Paycal Parameters
+        Task<ProducerPaycalParametersDto> producerTask = null;
+        Task<List<CsoPaycalParametersDto>> csoTask = null;
 
         if (organisationType == 1)
-            producerPaycalParametersTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
+            producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
         else
-            csoPaycalParametersTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
+            csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
 
-
-        var tasks = new List<Task> { submissionDetailsTask };
-
-        if(producerPaycalParametersTask != null) tasks.Add(producerPaycalParametersTask);
-
-        if(csoPaycalParametersTask != null) tasks.Add(csoPaycalParametersTask);
+        if (producerTask != null) tasks.Add(producerTask);
+        if (csoTask != null) tasks.Add(csoTask);
 
         await Task.WhenAll(tasks);
 
-        var submissionDetailsResult = await submissionDetailsTask;
+        var submissionDetails = await submissionDetailsTask;
+        var model = SubmissionDetailsMapper.MapFromSubmissionDetailsResponse(submissionDetails);
 
-        if (producerPaycalParametersTask != null)
+        if (producerTask is not null)
         {
-            producerPaycalParametersResult = await producerPaycalParametersTask;
+            var producerData = await producerTask;
+            SubmissionDetailsMapper.MapFromProducerPaycalParametersResponse(model, producerData);
         }
 
-        if (csoPaycalParametersTask != null)
+        if (csoTask is not null)
         {
-            csoPaycalParametersresult  = await csoPaycalParametersTask;
+            var csoData = await csoTask;
+            SubmissionDetailsMapper.MapFromCsoPaycalParametersResponse(model, csoData);
         }
 
-        var model =  SubmissionDetailsMapper.MapFromSubmissionDetailsResponse(submissionDetailsResult);
-
-        if (producerPaycalParametersResult != null)
+        if (deltaEvents.Count > 0)
         {
-            SubmissionDetailsMapper.MapFromProducerPaycalParametersResponse(model, producerPaycalParametersResult);
-        }
-
-        if (csoPaycalParametersresult != null)
-        {
-            SubmissionDetailsMapper.MapFromCsoPaycalParametersResponse(model, csoPaycalParametersresult);
-        }
-
-
-        if (deltaRegistrationDecisionsResponse.Count > 0)
-        {
-            MergeCosmosUpdates(deltaRegistrationDecisionsResponse, model);
+            MergeCosmosUpdates(deltaEvents, model);
         }
 
         return model;
