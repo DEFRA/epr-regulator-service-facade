@@ -164,11 +164,7 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
-    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
-    Guid submissionId,
-    int organisationType,
-    Guid userId,
-    IDictionary<string, string> queryParams)
+    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId,int organisationType,Guid userId, IDictionary<string, string> queryParams)
     {
         var tasks = new List<Task>();
 
@@ -186,13 +182,14 @@ public partial class OrganisationRegistrationSubmissionService(
         Task<PaycalParametersDto> producerTask = null;
         Task<List<PaycalParametersDto>> csoTask = null;
 
-        if (organisationType == 1)
-            producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
-        else
+        if (organisationType == 2)
             csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
+        else
+            producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
+        
 
-        if (producerTask != null) tasks.Add(producerTask);
-        if (csoTask != null) tasks.Add(csoTask);
+        if (producerTask is not null) tasks.Add(producerTask);
+        if (csoTask is not null) tasks.Add(csoTask);
 
         await Task.WhenAll(tasks);
 
