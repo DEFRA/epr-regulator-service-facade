@@ -111,7 +111,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
         }
 
         public static void MapFromProducerPaycalParametersResponse(OrganisationRegistrationSubmissionDetailsResponse response,
-                                                                    ProducerPaycalParametersDto producerPaycalParametersDto)
+                                                                    PaycalParametersDto producerPaycalParametersDto)
         {
             if(response == null || producerPaycalParametersDto == null) return;
 
@@ -127,7 +127,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
         }
 
         public static void MapFromCsoPaycalParametersResponse(OrganisationRegistrationSubmissionDetailsResponse response,
-                                                               List<CsoPaycalParametersDto> csoPaycalParametersDtos)
+                                                               List<PaycalParametersDto> csoPaycalParametersDtos)
         {
             response.CsoMembershipDetails = csoPaycalParametersDtos.Select(x => new CsoMembershipDetailsDto
             {

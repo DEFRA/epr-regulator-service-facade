@@ -27,11 +27,11 @@ public interface ICommonDataService
 
     Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId);
 
-    Task<ProducerPaycalParametersDto> GetProducerPaycalParametersAsync(
+    Task<PaycalParametersDto> GetProducerPaycalParametersAsync(
         Guid submissionId,
         IDictionary<string, string> queryParams);
 
-    Task<List<CsoPaycalParametersDto>> GetCsoPaycalParametersAsync(
+    Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(
         Guid submissionId,
         IDictionary<string, string> queryParams);
 

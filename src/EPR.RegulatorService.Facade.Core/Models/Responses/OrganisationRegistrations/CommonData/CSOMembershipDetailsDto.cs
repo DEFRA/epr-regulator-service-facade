@@ -7,7 +7,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 public class CsoMembershipDetailsDto
 {
     public string MemberId { get; set; }
-    public string MemberType { get; set; } //OrganisationSize
+    public string MemberType { get; set; }
     public bool IsOnlineMarketPlace { get; set; }
     public bool IsLateFeeApplicable { get; set; }
     public int NumberOfSubsidiaries { get; set; }

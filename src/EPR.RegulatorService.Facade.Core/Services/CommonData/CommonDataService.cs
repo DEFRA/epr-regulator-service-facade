@@ -144,7 +144,7 @@ public class CommonDataService(
         return default;
     }
 
-    public async Task<ProducerPaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    public async Task<PaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
     {
         var url = string.Format($"{_config.Endpoints.GetProducerPaycalParameters}", submissionId);
         string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
@@ -159,10 +159,10 @@ public class CommonDataService(
             return null;
         }
 
-        return JsonSerializer.Deserialize<ProducerPaycalParametersDto>(content, _deserialisationOptions);
+        return JsonSerializer.Deserialize<PaycalParametersDto>(content, _deserialisationOptions);
     }
 
-    public async Task<List<CsoPaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    public async Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
     {
         var url = string.Format($"{_config.Endpoints.GetCsoPaycalParameters}", submissionId);
         string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
@@ -177,7 +177,7 @@ public class CommonDataService(
             return null;
         }
 
-        return JsonSerializer.Deserialize<List<CsoPaycalParametersDto>>(content, _deserialisationOptions);
+        return JsonSerializer.Deserialize<List<PaycalParametersDto>>(content, _deserialisationOptions);
     }
 
     public async Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsPartAsync(
