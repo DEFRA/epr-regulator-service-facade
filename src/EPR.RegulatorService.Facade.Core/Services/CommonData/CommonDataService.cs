@@ -6,12 +6,12 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -144,9 +144,9 @@ public class CommonDataService(
         return default;
     }
 
-    public async Task<PaycalParametersResponse> GetPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    public async Task<ProducerPaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
     {
-        var url = string.Format($"{_config.Endpoints.GetPaycalParameters}", submissionId);
+        var url = string.Format($"{_config.Endpoints.GetProducerPaycalParameters}", submissionId);
         string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
         var response = await httpClient.GetAsync(urlWithParams);
 
@@ -159,13 +159,31 @@ public class CommonDataService(
             return null;
         }
 
-        return JsonSerializer.Deserialize<PaycalParametersResponse>(content, _deserialisationOptions);
+        return JsonSerializer.Deserialize<ProducerPaycalParametersDto>(content, _deserialisationOptions);
     }
 
-    public async Task<SubmissionDetailsResponse> GetOrganisationRegistrationSubmissionDetailsPartAsync(
+    public async Task<List<CsoPaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    {
+        var url = string.Format($"{_config.Endpoints.GetCsoPaycalParameters}", submissionId);
+        string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
+        var response = await httpClient.GetAsync(urlWithParams);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<List<CsoPaycalParametersDto>>(content, _deserialisationOptions);
+    }
+
+    public async Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsPartAsync(
         Guid submissionId)
     {
-        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetailsPart}", submissionId);
+        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId);
         var response = await httpClient.GetAsync(url);
 
         response.EnsureSuccessStatusCode();
@@ -177,26 +195,7 @@ public class CommonDataService(
             return null;
         }
 
-        return JsonSerializer.Deserialize<SubmissionDetailsResponse>(content, _deserialisationOptions);
-        ////return ConvertCommonDataDetailToFEData(jsonObject);
-    }
-
-    public async Task<SubmissionStatusResponse> GetOrganisationRegistrationSubmissionStatusPartAsync(
-        Guid submissionId)
-    {
-        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionStatusPart}", submissionId);
-        var response = await httpClient.GetAsync(url);
-
-        response.EnsureSuccessStatusCode();
-
-        string content = await response.Content.ReadAsStringAsync();
-
-        if (string.IsNullOrWhiteSpace(content))
-        {
-            return null;
-        }
-
-        return JsonSerializer.Deserialize<SubmissionStatusResponse>(content, _deserialisationOptions);
+        return JsonSerializer.Deserialize<SubmissionDetailsDto>(content, _deserialisationOptions);
     }
 
     [ExcludeFromCodeCoverage]

@@ -6,6 +6,7 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
@@ -18,12 +19,6 @@ public partial class OrganisationRegistrationSubmissionService(
     ISubmissionService submissionService,
     ILogger<OrganisationRegistrationSubmissionService> logger) : IOrganisationRegistrationSubmissionService
 {
-
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
 
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
         GetOrganisationRegistrationSubmissionsFilter filter, Guid userId)
@@ -78,30 +73,30 @@ public partial class OrganisationRegistrationSubmissionService(
         }
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
-        Guid submissionId,
-        Guid userId,
-        int lateFeeCutOffDay,
-        int lateFeeCutOffMonth)
-    {
-        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
+    //public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+    //    Guid submissionId,
+    //    Guid userId,
+    //    int lateFeeCutOffDay,
+    //    int lateFeeCutOffMonth)
+    //{
+    //    List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
 
-        var lastSyncTime = await GetLastSyncTime();
+    //    var lastSyncTime = await GetLastSyncTime();
 
-        if (lastSyncTime.HasValue)
-        {
-            deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
-        }
+    //    if (lastSyncTime.HasValue)
+    //    {
+    //        deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
+    //    }
 
-        var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
+    //    var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
-        if (deltaRegistrationDecisionsResponse.Count > 0 && requestedItem is not null)
-        {
-            MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
-        }
+    //    if (deltaRegistrationDecisionsResponse.Count > 0 && requestedItem is not null)
+    //    {
+    //        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
+    //    }
 
-        return requestedItem;
-    }
+    //    return requestedItem;
+    //}
 
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
         RegulatorDecisionCreateRequest request, Guid userId)
@@ -169,10 +164,10 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
-    Guid submissionId,
-    Guid userId,
-    IDictionary<string, string> queryParams)
+    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId,
+                                                                                                                             int organisationType,
+                                                                                                                             Guid userId,
+                                                                                                                             IDictionary<string, string> queryParams)
     {
         List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
 
@@ -183,21 +178,54 @@ public partial class OrganisationRegistrationSubmissionService(
             deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
         }
 
-        var requestedItem1 = commonDataService.GetPaycalParametersAsync(submissionId, queryParams);
-        var requestedItem2 = commonDataService.GetOrganisationRegistrationSubmissionDetailsPartAsync(submissionId);
-        var requestedItem3 = commonDataService.GetOrganisationRegistrationSubmissionStatusPartAsync(submissionId);
+        Task<SubmissionDetailsDto> submissionDetailsTask = commonDataService.GetOrganisationRegistrationSubmissionDetailsPartAsync(submissionId);
 
-        await Task.WhenAll(requestedItem1, requestedItem2, requestedItem3);
-        var paycalParameters = await requestedItem1;
-        var submissionDetails = await requestedItem2;
-        var submissionStatus = await requestedItem3;
+        Task<ProducerPaycalParametersDto> producerPaycalParametersTask = null;
 
-        ////TODO:: Map all the above 3 responses appropriately
-        var model = new RegistrationSubmissionOrganisationDetailsFacadeResponse { 
-            SubmissionId = submissionDetails.SubmissionId,
-            RegistrationReferenceNumber = submissionStatus.RegistrationReferenceNumber,
-            OrganisationSize = paycalParameters.OrganisationSize.ToString()
-        };
+        Task<List<CsoPaycalParametersDto>> csoPaycalParametersTask = null;
+
+        ProducerPaycalParametersDto producerPaycalParametersResult = null;
+
+        List<CsoPaycalParametersDto> csoPaycalParametersresult = null;
+
+        if (organisationType == 1)
+            producerPaycalParametersTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
+        else
+            csoPaycalParametersTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
+
+
+        var tasks = new List<Task> { submissionDetailsTask };
+
+        if(producerPaycalParametersTask != null) tasks.Add(producerPaycalParametersTask);
+
+        if(csoPaycalParametersTask != null) tasks.Add(csoPaycalParametersTask);
+
+        await Task.WhenAll(tasks);
+
+        var submissionDetailsResult = await submissionDetailsTask;
+
+        if (producerPaycalParametersTask != null)
+        {
+            producerPaycalParametersResult = await producerPaycalParametersTask;
+        }
+
+        if (csoPaycalParametersTask != null)
+        {
+            csoPaycalParametersresult  = await csoPaycalParametersTask;
+        }
+
+        var model =  SubmissionDetailsMapper.MapFromSubmissionDetailsResponse(submissionDetailsResult);
+
+        if (producerPaycalParametersResult != null)
+        {
+            SubmissionDetailsMapper.MapFromProducerPaycalParametersResponse(model, producerPaycalParametersResult);
+        }
+
+        if (csoPaycalParametersresult != null)
+        {
+            SubmissionDetailsMapper.MapFromCsoPaycalParametersResponse(model, csoPaycalParametersresult);
+        }
+
 
         if (deltaRegistrationDecisionsResponse.Count > 0)
         {
@@ -206,6 +234,7 @@ public partial class OrganisationRegistrationSubmissionService(
 
         return model;
     }
+
 
     private async Task<DateTime?> GetLastSyncTime()
     {
@@ -218,4 +247,9 @@ public partial class OrganisationRegistrationSubmissionService(
         var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
         return submissionEventsLastSync.LastSyncTime;
     }
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 }

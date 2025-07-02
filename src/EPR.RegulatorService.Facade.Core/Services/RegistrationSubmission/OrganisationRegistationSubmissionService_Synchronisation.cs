@@ -3,6 +3,7 @@ using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -85,11 +86,23 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
 
-        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsFacadeResponse item)
+        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, OrganisationRegistrationSubmissionDetailsResponse item)
         {
             var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
                                                                 .OrderBy(x => x.Created);
             var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderByDescending(x => x.Created );
+
+            foreach (var decision in regulatorDecisions)
+            {
+                AssignRegulatorDetails(item, decision);
+            }
+        }
+
+        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsFacadeResponse item)
+        {
+            var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
+                                                                .OrderBy(x => x.Created);
+            var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderByDescending(x => x.Created);
 
             foreach (var decision in regulatorDecisions)
             {
@@ -176,6 +189,40 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
                     item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
                     item.SubmissionDetails.Status = item.SubmissionStatus;
 
+                    if (cosmosItem.Decision == "Granted")
+                    {
+                        item.RegistrationDate = item.SubmissionDetails.RegistrationDate = cosmosItem.Created;
+                    }
+                }
+            }
+            else
+            {
+                item.RegulatorComments += $"<br/>{cosmosItem.Comments}";
+            }
+        }
+
+        private static void AssignRegulatorDetails(OrganisationRegistrationSubmissionDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
+        {
+            if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
+            {
+                item.RegulatorComments = cosmosItem.Comments;
+                item.RegulatorDecisionDate = cosmosItem.Created;
+                item.SubmissionDetails.DecisionDate = cosmosItem.DecisionDate ?? cosmosItem.Created;
+
+                if (item.IsResubmission)
+                {
+                    //To avoid checking magic strings, assign the decision first & check on the enum
+                    //and then re-assign as resubmission uses different status
+                    var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    SetResubmissionStatus(item, resubmissionStatus);
+                }
+                else
+                {
+                    item.SubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
+                    item.StatusPendingDate = cosmosItem.DecisionDate;
+                    item.RegistrationReferenceNumber = string.IsNullOrWhiteSpace(cosmosItem.RegistrationReferenceNumber) ? item.RegistrationReferenceNumber : cosmosItem.RegistrationReferenceNumber;
+                    item.SubmissionDetails.Status = item.SubmissionStatus;
+
                     if ( cosmosItem.Decision == "Granted")
                     {
                         item.RegistrationDate = item.SubmissionDetails.RegistrationDate = cosmosItem.Created;
@@ -189,6 +236,24 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
         }
 
         private static void SetResubmissionStatus(RegistrationSubmissionOrganisationDetailsFacadeResponse item, RegistrationSubmissionStatus resubmissionStatus)
+        {
+            if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
+            {
+                item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
+            }
+            else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
+            {
+                item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
+            }
+            else
+            {
+                item.SubmissionDetails.Status = item.SubmissionStatus = resubmissionStatus;
+            }
+
+            item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+        }
+
+        private static void SetResubmissionStatus(OrganisationRegistrationSubmissionDetailsResponse item, RegistrationSubmissionStatus resubmissionStatus)
         {
             if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
             {

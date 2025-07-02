@@ -2,6 +2,7 @@
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 
 namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 
@@ -9,11 +10,11 @@ public interface IOrganisationRegistrationSubmissionService
 {
     Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter, Guid userId);
 
-    Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
-        Guid submissionId,
-        Guid userId,
-        int lateFeeCutOffDay,
-        int lateFeeCutOffMonth);
+    //Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+    //    Guid submissionId,
+    //    Guid userId,
+    //    int lateFeeCutOffDay,
+    //    int lateFeeCutOffMonth);
 
     Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(RegulatorDecisionCreateRequest request, Guid userId);
 
@@ -29,8 +30,9 @@ public interface IOrganisationRegistrationSubmissionService
 
     Task<HttpResponseMessage> HandleCreatePackagingDataResubmissionFeePaymentEvent(PackagingDataResubmissionFeePaymentCreateRequest request, Guid userId);
 
-    Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
+    Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
         Guid submissionId,
+        int organisationType,
         Guid userId,
         IDictionary<string, string> queryParams);
 }

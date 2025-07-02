@@ -24,9 +24,7 @@ public class CommonDataServiceEndpoints
 
     public string GetPomResubmissionPaycalParameters { get; set; } = null!;
 
-    public string GetPaycalParameters { get; set; } = null!;
+    public string GetProducerPaycalParameters { get; set; } = null!;
 
-    public string GetOrganisationRegistrationSubmissionDetailsPart{ get; set; } = null!;
-
-    public string GetOrganisationRegistrationSubmissionStatusPart { get; set; } = null!;
+    public string GetCsoPaycalParameters { get; set; } = null!;
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
-using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData;
 
@@ -17,6 +17,7 @@ public interface ICommonDataService
 
     Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest);
 
+    // TO DO: Refactor
     Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
         Guid submissionId,
         int lateFeeCutOffDay,
@@ -26,13 +27,15 @@ public interface ICommonDataService
 
     Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId);
 
-    Task<PaycalParametersResponse> GetPaycalParametersAsync(
+    Task<ProducerPaycalParametersDto> GetProducerPaycalParametersAsync(
         Guid submissionId,
         IDictionary<string, string> queryParams);
 
-    Task<SubmissionDetailsResponse> GetOrganisationRegistrationSubmissionDetailsPartAsync(
+    Task<List<CsoPaycalParametersDto>> GetCsoPaycalParametersAsync(
+        Guid submissionId,
+        IDictionary<string, string> queryParams);
+
+    Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsPartAsync(
         Guid submissionId);
 
-    Task<SubmissionStatusResponse> GetOrganisationRegistrationSubmissionStatusPartAsync(
-        Guid submissionId);
 }
