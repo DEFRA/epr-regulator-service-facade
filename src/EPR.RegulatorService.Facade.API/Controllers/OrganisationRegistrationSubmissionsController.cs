@@ -163,7 +163,7 @@ public class OrganisationRegistrationSubmissionsController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Route("organisation-registration-submission-details/{submissionId:Guid}")]
+    [Route("organisation-registration-submission-details/{submissionId:Guid}/{organisationType:int}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails(
         [Required] Guid submissionId,
         [Required] int organisationType,

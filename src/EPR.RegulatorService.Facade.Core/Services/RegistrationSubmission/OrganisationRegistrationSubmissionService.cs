@@ -182,6 +182,8 @@ public partial class OrganisationRegistrationSubmissionService(
         Task<PaycalParametersDto> producerTask = null;
         Task<List<PaycalParametersDto>> csoTask = null;
 
+        queryParams.Add("beforeProducerSubmits","false");
+
         if (organisationType == 2)
             csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
         else
