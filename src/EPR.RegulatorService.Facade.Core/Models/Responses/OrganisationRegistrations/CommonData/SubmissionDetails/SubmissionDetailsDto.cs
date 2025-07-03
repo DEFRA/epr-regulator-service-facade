@@ -10,15 +10,15 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public Guid OrganisationId { get; set; }
 
-        public string OrganisationName { get; set; } = string.Empty;
+        public string OrganisationName { get; set; }
 
-        public string OrganisationReference { get; set; } = string.Empty;
+        public string OrganisationReference { get; set; }
 
-        public string ApplicationReferenceNumber { get; set; } = string.Empty;
+        public string ApplicationReferenceNumber { get; set; }
 
-        public string? RegistrationReferenceNumber { get; set; } = string.Empty;
+        public string? RegistrationReferenceNumber { get; set; }
 
-        public string SubmissionStatus { get; set; } = string.Empty;
+        public string SubmissionStatus { get; set; }
 
         public DateTime? StatusPendingDate { get; set; }
 
@@ -26,39 +26,39 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public bool IsResubmission { get; set; }
 
-        public string ResubmissionStatus { get; set; } = string.Empty;
+        public string ResubmissionStatus { get; set; } 
 
         public DateTime? RegistrationDate { get; set; }
 
         public DateTime? ResubmissionDate { get; set; }
 
-        public string? ResubmissionFileId { get; internal set; }
+        public string? ResubmissionFileId { get; set; }
 
-        public string SubmissionPeriod { get; internal set; } = string.Empty;
+        public string SubmissionPeriod { get; set; } 
 
         public int RelevantYear { get; set; }
 
         public bool IsComplianceScheme { get; set; }
 
-        public string OrganisationSize { get; set; } = string.Empty;
+        public string OrganisationSize { get; set; } 
 
-        public string? OrganisationType { get; set; } = string.Empty;
+        public string? OrganisationType { get; set; }
 
         public int NationId { get; set; }
 
-        public string NationCode { get; set; } = string.Empty;
+        public string NationCode { get; set; } 
 
-        public string? RegulatorComment { get; set; } = string.Empty;
+        public string? RegulatorComment { get; set; }
 
-        public string? ProducerComment { get; set; } = string.Empty;
+        public string? ProducerComment { get; set; } 
 
-        public DateTime? RegulatorDecisionDate { get; internal set; }
+        public DateTime? RegulatorDecisionDate { get; set; }
 
         public DateTime? RegulatorResubmissionDecisionDate { get; set; }
 
-        public Guid? RegulatorUserId { get; internal set; }
+        public Guid? RegulatorUserId { get; set; }
 
-        public string CompaniesHouseNumber { get; set; } = string.Empty;
+        public string? CompaniesHouseNumber { get; set; }
 
         public string? BuildingName { get; set; }
 
@@ -66,52 +66,52 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public string? BuildingNumber { get; set; }
 
-        public string Street { get; set; } = string.Empty;
+        public string Street { get; set; }
 
-        public string Locality { get; set; } = string.Empty;
+        public string Locality { get; set; } 
 
         public string? DependentLocality { get; set; }
 
-        public string Town { get; set; } = string.Empty;
+        public string? Town { get; set; }
 
-        public string County { get; set; } = string.Empty;
+        public string? County { get; set; }
 
-        public string Country { get; set; } = string.Empty;
+        public string? Country { get; set; }
 
-        public string Postcode { get; set; } = string.Empty;
+        public string? Postcode { get; set; }
 
         public Guid? SubmittedUserId { get; set; }
 
-        public string FirstName { get; set; } = string.Empty;
+        public string? FirstName { get; set; }
 
-        public string LastName { get; set; } = string.Empty;
+        public string? LastName { get; set; }
 
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; } 
 
-        public string Telephone { get; set; } = string.Empty;
+        public string? Telephone { get; set; }
 
-        public string ServiceRole { get; set; } = string.Empty;
+        public string? ServiceRole { get; set; }
 
         public int? ServiceRoleId { get; set; }
 
         public Guid? CompanyDetailsFileId { get; set; }
 
-        public string CompanyDetailsFileName { get; set; } = string.Empty;
+        public string? CompanyDetailsFileName { get; set; }
 
-        public string CompanyDetailsBlobName { get; set; } = string.Empty;
+        public string? CompanyDetailsBlobName { get; set; }
 
         public Guid? PartnershipFileId { get; set; }
 
-        public string PartnershipFileName { get; set; } = string.Empty;
+        public string? PartnershipFileName { get; set; }
 
-        public string PartnershipBlobName { get; set; } = string.Empty;
+        public string? PartnershipBlobName { get; set; }
 
         public Guid? BrandsFileId { get; set; }
 
-        public string BrandsFileName { get; set; } = string.Empty;
+        public string? BrandsFileName { get; set; }
 
-        public string BrandsBlobName { get; set; } = string.Empty;
+        public string? BrandsBlobName { get; set; }
 
-        public string ComplianceSchemeId { get; set; } = string.Empty;
+        public string? ComplianceSchemeId { get; set; }
     }
 }
