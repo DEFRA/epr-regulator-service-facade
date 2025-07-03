@@ -96,7 +96,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 DeclaredBy = response.OrganisationType == RegistrationSubmissionOrganisationType.compliance
                                                           ? "Not required (compliance scheme)"
                                                           : $"{dto.FirstName} {dto.LastName}",
-                Status = parsedSubmissionStatus,
+                Status = parsedSubmissionStatus == RegistrationSubmissionStatus.None ? RegistrationSubmissionStatus.Pending : parsedSubmissionStatus,
                 Files = GetSubmissionFileDetails(dto),
                 SubmittedByUserId = dto.SubmittedUserId,
                 SubmissionPeriod = dto.SubmissionPeriod,
