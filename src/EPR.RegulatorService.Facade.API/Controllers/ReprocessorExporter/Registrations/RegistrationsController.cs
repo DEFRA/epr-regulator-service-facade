@@ -1,11 +1,17 @@
 ﻿using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Constants;
 using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
+using EPR.RegulatorService.Facade.Core.Services.BlobStorage;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
+using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -16,12 +22,36 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}")]
 [FeatureGate(FeatureFlags.ReprocessorExporter)]
-public class RegistrationsController(IReprocessorExporterService reprocessorExporterService
-    , IValidator<UpdateRegulatorRegistrationTaskDto> updateRegulatorRegistrationTaskValidator
-    , IValidator<UpdateRegulatorApplicationTaskDto> updateRegulatorApplicationTaskValidator
-    , IValidator<QueryNoteRequestDto> queryNoteRequestDtoValidator
-    , ILogger<RegistrationsController> logger) : ControllerBase
+public class RegistrationsController : FileDownloadBaseController
 {
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly IAntivirusService _antivirusService;
+    private readonly BlobStorageConfig _blobStorageConfig;
+    private readonly IReprocessorExporterService _reprocessorExporterService;
+    private readonly IValidator<UpdateRegulatorRegistrationTaskDto> _updateRegulatorRegistrationTaskValidator;
+    private readonly IValidator<UpdateRegulatorApplicationTaskDto> _updateRegulatorApplicationTaskValidator;
+    private readonly IValidator<QueryNoteRequestDto> _queryNoteRequestDtoValidator;
+    private readonly ILogger<RegistrationsController> _logger;
+
+    public RegistrationsController(
+        IReprocessorExporterService reprocessorExporterService,
+        IValidator<UpdateRegulatorRegistrationTaskDto> updateRegulatorRegistrationTaskValidator,
+        IValidator<UpdateRegulatorApplicationTaskDto> updateRegulatorApplicationTaskValidator,
+        IValidator<QueryNoteRequestDto> queryNoteRequestDtoValidator,
+        IBlobStorageService blobStorageService,
+        IAntivirusService antivirusService,
+        IOptions<BlobStorageConfig> blobStorageConfig,
+        ILogger<RegistrationsController> logger) : base(antivirusService)
+    {
+        _reprocessorExporterService = reprocessorExporterService;
+        _updateRegulatorRegistrationTaskValidator = updateRegulatorRegistrationTaskValidator;
+        _updateRegulatorApplicationTaskValidator = updateRegulatorApplicationTaskValidator;
+        _queryNoteRequestDtoValidator = queryNoteRequestDtoValidator;
+        _blobStorageService = blobStorageService;
+        _antivirusService = antivirusService;
+        _blobStorageConfig = blobStorageConfig.Value;
+        _logger = logger;
+    }
 
     [HttpPost("regulatorRegistrationTaskStatus")]
     [SwaggerOperation(
@@ -36,11 +66,11 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateRegulatorRegistrationTaskStatus([FromBody] UpdateRegulatorRegistrationTaskDto request)
     {
-        await updateRegulatorRegistrationTaskValidator.ValidateAndThrowAsync(request);
+        await _updateRegulatorRegistrationTaskValidator.ValidateAndThrowAsync(request);
 
-        logger.LogInformation(LogMessages.UpdateRegulatorRegistrationTaskStatus);
+        _logger.LogInformation(LogMessages.UpdateRegulatorRegistrationTaskStatus);
 
-        _ = await reprocessorExporterService.UpdateRegulatorRegistrationTaskStatus(request);
+        _ = await _reprocessorExporterService.UpdateRegulatorRegistrationTaskStatus(request);
 
         return NoContent();
     }
@@ -58,11 +88,11 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> UpdateRegulatorApplicationTaskStatus([FromBody] UpdateRegulatorApplicationTaskDto request)
     {
-        await updateRegulatorApplicationTaskValidator.ValidateAndThrowAsync(request);
+        await _updateRegulatorApplicationTaskValidator.ValidateAndThrowAsync(request);
 
-        logger.LogInformation(LogMessages.UpdateRegulatorApplicationTaskStatus);
+        _logger.LogInformation(LogMessages.UpdateRegulatorApplicationTaskStatus);
 
-        _ = await reprocessorExporterService.UpdateRegulatorApplicationTaskStatus(request);
+        _ = await _reprocessorExporterService.UpdateRegulatorApplicationTaskStatus(request);
 
         return NoContent();
     }
@@ -78,8 +108,8 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetRegistrationByRegistrationId(Guid id)
     {
-        logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
-        var result = await reprocessorExporterService.GetRegistrationByRegistrationId(id);
+        _logger.LogInformation(LogMessages.RegistrationMaterialsTasks);
+        var result = await _reprocessorExporterService.GetRegistrationByRegistrationId(id);
         return Ok(result);
     }
 
@@ -94,8 +124,24 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetSiteAddressByRegistrationId(Guid id)
     {
-        logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
-        var result = await reprocessorExporterService.GetSiteAddressByRegistrationId(id);
+        _logger.LogInformation(LogMessages.AttemptingSiteAddressDetails);
+        var result = await _reprocessorExporterService.GetSiteAddressByRegistrationId(id);
+        return Ok(result);
+    }
+
+    [HttpGet("registrations/{id}/wasteCarrier")]
+    [ProducesResponseType(typeof(RegistrationWasteCarrierDto), 200)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [SwaggerOperation(
+        Summary = "get waste carrier details",
+        Description = "attempting to get waste carrier details.  "
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns waste carrier details.", typeof(RegistrationWasteCarrierDto))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    public async Task<IActionResult> GetWasteCarrierDetailsByRegistrationId(Guid id)
+    {
+        _logger.LogInformation(LogMessages.AttemptingWasteCarrierDetails);
+        var result = await _reprocessorExporterService.GetWasteCarrierDetailsByRegistrationId(id);
         return Ok(result);
     }
 
@@ -110,8 +156,8 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
     public async Task<IActionResult> GetAuthorisedMaterialByRegistrationId(Guid id)
     {
-        logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
-        var result = await reprocessorExporterService.GetAuthorisedMaterialByRegistrationId(id);
+        _logger.LogInformation(LogMessages.AttemptingAuthorisedMaterial);
+        var result = await _reprocessorExporterService.GetAuthorisedMaterialByRegistrationId(id);
         return Ok(result);
     }
 
@@ -130,9 +176,9 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
        [FromRoute] Guid id,
        [FromBody] QueryNoteRequestDto request)
     {
-        await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
-        await reprocessorExporterService.SaveApplicationTaskQueryNotes(id, User.UserId(), request);
+        await _queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
+        _logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
+        await _reprocessorExporterService.SaveApplicationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
     }
 
@@ -151,9 +197,40 @@ public class RegistrationsController(IReprocessorExporterService reprocessorExpo
       [FromRoute] Guid id,
       [FromBody] QueryNoteRequestDto request)
     {
-        await queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
-        logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
-        await reprocessorExporterService.SaveRegistrationTaskQueryNotes(id, User.UserId(), request);
+        await _queryNoteRequestDtoValidator.ValidateAndThrowAsync(request);
+        _logger.LogInformation(LogMessages.AttemptingApplicationTaskQueryNotesSave);
+        await _reprocessorExporterService.SaveRegistrationTaskQueryNotes(id, User.UserId(), request);
         return NoContent();
+    }
+
+    [HttpPost("registrations/file-download")]
+    [ProducesResponseType(typeof(FileContentResult), 200)]
+    [SwaggerResponse(StatusCodes.Status403Forbidden, "If the file being downloaded is infected with a virus.", typeof(ObjectResult))]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+    [SwaggerOperation(
+            Summary = "Downloads a file from Azure blob storage.",
+            Description = "Attempting to download a file from Azure blob storage."
+        )]
+    public async Task<IActionResult> DownloadFile([FromBody] FileDownloadRequestDto request)
+    {
+        _logger.LogInformation(LogMessages.RegulatorRegistrationDownloadFile);
+
+        var stream = await _blobStorageService.DownloadFileStreamAsync(_blobStorageConfig.ReprocessorExporterRegistrationContainerName,
+                                                                        request.FileId.ToString());
+
+        var antiVirusDetails = new AntiVirusDetails
+        {
+            FileId = request.FileId,
+            FileName = request.FileName,
+            SubmissionType = SubmissionType.Registration,
+            UserId = User.UserId(),
+            UserEmail = User.Email()
+        };                 
+
+        var file = await AntiVirusScanFile(antiVirusDetails, stream);
+
+        return file != null
+           ? file
+           : new ObjectResult("The file was found but it was flagged as infected. It will not be downloaded.") { StatusCode = StatusCodes.Status403Forbidden };
     }
 }

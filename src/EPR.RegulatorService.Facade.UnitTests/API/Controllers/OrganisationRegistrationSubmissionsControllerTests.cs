@@ -263,6 +263,41 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
+    public async Task Should_Allow_Null_FileId_When_Status_Is_Cancellation_And_Submission_Is_Resubmission()
+    {
+        // Arrange
+        var request = new RegulatorDecisionCreateRequest
+        {
+            OrganisationId = Guid.NewGuid(),
+            Status = RegistrationSubmissionStatus.Cancelled,
+            SubmissionId = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            Comments = "comments",
+            FileId = null,
+            ExistingRegRefNumber = "EXISTING",
+            IsResubmission = true
+        };
+
+        var handlerResponse =
+        _fixture
+            .Build<HttpResponseMessage>()
+            .With(x => x.StatusCode, HttpStatusCode.Created)
+            .With(x => x.Content, new StringContent(_fixture.Create<string>()))
+            .Create();
+        
+        _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
+
+        // Act
+        var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as ObjectResult;
+
+        // Assert
+        result.Should().NotBeNull();
+        _submissionsServiceMock.Verify(r => r.CreateSubmissionEvent(
+            It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>()), Times.AtMostOnce);
+    }
+
+    [TestMethod]
     [DataRow(HttpStatusCode.InternalServerError)]
     [DataRow(HttpStatusCode.BadGateway)]
     [DataRow(HttpStatusCode.ServiceUnavailable)]

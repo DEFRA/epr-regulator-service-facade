@@ -45,6 +45,8 @@ public class OrganisationsSearchController : ControllerBase
 
     [HttpGet]
     [Route("api/organisations/search-organisations")]
+    [ProducesResponseType(typeof(PaginatedResponse<OrganisationSearchResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetOrganisationsBySearchTerm(int currentPage, int pageSize, string searchTerm)
     {
         try
@@ -79,6 +81,8 @@ public class OrganisationsSearchController : ControllerBase
     
     [HttpGet]
     [Route("api/organisations/organisation-details")]
+    [ProducesResponseType(typeof(OrganisationDetailResults), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> OrganisationDetails(Guid externalId)
     {
         try
@@ -114,6 +118,8 @@ public class OrganisationsSearchController : ControllerBase
     
     [HttpGet]
     [Route("api/organisations/users-by-organisation-external-id")]
+    [ProducesResponseType(typeof(List<OrganisationUserOverviewResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUsersByOrganisationExternalId(Guid externalId)
     {
         try
@@ -147,9 +153,10 @@ public class OrganisationsSearchController : ControllerBase
     }
     
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [Route("api/organisations/remove-approved-users")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RemoveApprovedPerson(RemoveApprovedUsersRequest request)
     {
         try
@@ -195,6 +202,7 @@ public class OrganisationsSearchController : ControllerBase
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AddRemoveApprovedUser(FacadeAddRemoveApprovedPersonRequest request)
     {
         if (!ModelState.IsValid)

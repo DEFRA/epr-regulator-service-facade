@@ -41,6 +41,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public RegistrationSubmissionOrganisationSubmissionSummaryDetails SubmissionDetails { get; set; }
         public DateTime? RegulatorDecisionDate { get; internal set; }
+        public DateTime? RegulatorResubmissionDecisionDate { get; set; }
         public DateTime? ProducerCommentDate { get; internal set; }
         public Guid? RegulatorUserId { get; internal set; }
         public bool IsOnlineMarketPlace { get; internal set; }

@@ -88,7 +88,7 @@ public class RegistrationMaterialsControllerTests
             .ReturnsAsync(validationResult);
 
         _mockReprocessorExporterService
-            .Setup(service => service.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, requestDto))
+            .Setup(service => service.UpdateMaterialOutcomeByRegistrationMaterialId(registrationMaterialId, It.IsAny<Guid>(), requestDto))
             .ReturnsAsync(true);
 
         // Act

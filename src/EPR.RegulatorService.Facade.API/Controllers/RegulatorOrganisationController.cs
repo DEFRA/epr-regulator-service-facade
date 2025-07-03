@@ -1,9 +1,10 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Shared;
+using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
+using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
 using Microsoft.AspNetCore.Mvc;
-using EPR.RegulatorService.Facade.Core.Extensions;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
@@ -21,8 +22,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         }
 
         [HttpGet(Name = "GetRegulatorAccountByNation")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(CheckRegulatorOrganisationExistResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetRegulatorAccountByNation([FromQuery] string nation)
         {
             var userId = User.UserId();
@@ -42,6 +43,7 @@ namespace EPR.RegulatorService.Facade.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateRegulatorOrganisation([FromBody] CreateRegulatorAccountRequest request)
         {
             if (!ModelState.IsValid)

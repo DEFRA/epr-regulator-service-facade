@@ -66,7 +66,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
             response.ProducerComments = dto.ProducerComment ?? string.Empty;
             response.RegulatorDecisionDate = dto.RegulatorDecisionDate;
-            //response.ProducerCommentDate = dto.ProducerCommentDate; // TO DO : Missing Property
+            response.RegulatorResubmissionDecisionDate = dto.RegulatorResubmissionDecisionDate;
             response.RegulatorUserId = dto.RegulatorUserId;
 
             response.CompaniesHouseNumber = dto.CompaniesHouseNumber ?? string.Empty;
@@ -86,7 +86,9 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             {
                 AccountRoleId = dto.ServiceRoleId,
                 AccountRole = dto.ServiceRole,
-                DecisionDate = dto.StatusPendingDate ?? dto.RegulatorDecisionDate,
+                DecisionDate = dto.RegulatorDecisionDate,
+                ResubmissionDecisionDate = dto.RegulatorResubmissionDecisionDate,
+                StatusPendingDate = dto.StatusPendingDate,
                 Email = dto.Email,
                 TimeAndDateOfSubmission = dto.SubmittedDateTime ?? DateTime.UtcNow,
                 Telephone = dto.Telephone,
