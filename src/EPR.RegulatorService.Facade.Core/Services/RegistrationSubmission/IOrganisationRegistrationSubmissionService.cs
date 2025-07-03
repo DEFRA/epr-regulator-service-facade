@@ -26,7 +26,7 @@ public interface IOrganisationRegistrationSubmissionService
 
     Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
         Guid submissionId,
-        int organisationType,
+        OrganisationType organisationType,
         Guid userId,
         IDictionary<string, string> queryParams);
 }

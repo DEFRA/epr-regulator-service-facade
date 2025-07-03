@@ -139,7 +139,7 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
-    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId,int organisationType,Guid userId, IDictionary<string, string> queryParams)
+    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, OrganisationType organisationType,Guid userId, IDictionary<string, string> queryParams)
     {
         var tasks = new List<Task>();
 
@@ -159,7 +159,7 @@ public partial class OrganisationRegistrationSubmissionService(
 
         queryParams.Add("beforeProducerSubmits","false");
 
-        if (organisationType == 2)
+        if (organisationType == OrganisationType.ComplianceScheme)
             csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
         else
             producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);

@@ -21,18 +21,18 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 RegistrationReferenceNumber = dto.RegistrationReferenceNumber ?? string.Empty
             };
 
-            if (Enum.TryParse<RegistrationSubmissionStatus>(dto.SubmissionStatus, true, out var submissionStatus))
+            if (Enum.TryParse<RegistrationSubmissionStatus>(dto.SubmissionStatus, true, out var parsedSubmissionStatus))
             {
-                response.SubmissionStatus = submissionStatus;
+                response.SubmissionStatus = parsedSubmissionStatus;
             }
             else
             {
                 response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
             }
 
-            if (Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out submissionStatus))
+            if (Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var resubmissionStatus))
             {
-                response.ResubmissionStatus = submissionStatus;
+                response.ResubmissionStatus = resubmissionStatus;
             }
             else
             {
@@ -96,7 +96,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 DeclaredBy = response.OrganisationType == RegistrationSubmissionOrganisationType.compliance
                                                           ? "Not required (compliance scheme)"
                                                           : $"{dto.FirstName} {dto.LastName}",
-                Status = Enum.Parse<RegistrationSubmissionStatus>(dto.SubmissionStatus),
+                Status = parsedSubmissionStatus,
                 Files = GetSubmissionFileDetails(dto),
                 SubmittedByUserId = dto.SubmittedUserId,
                 SubmissionPeriod = dto.SubmissionPeriod,

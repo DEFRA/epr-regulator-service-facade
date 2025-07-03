@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
@@ -168,10 +169,10 @@ public class OrganisationRegistrationSubmissionsController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Route("organisation-registration-submission-details/{submissionId:Guid}/{organisationType:int}")]
+    [Route("organisation-registration-submission-details/{submissionId:Guid}/{organisationType}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails(
         [Required] Guid submissionId,
-        [Required] int organisationType,
+        [Required] OrganisationType organisationType,
         [Required][FromQuery] IDictionary<string, string> queryParams = null)
     {
         try

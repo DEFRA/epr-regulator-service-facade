@@ -18,7 +18,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public string? RegistrationReferenceNumber { get; set; }
 
-        public string SubmissionStatus { get; set; } = "None";
+        public string SubmissionStatus { get; set; } 
 
         public DateTime? StatusPendingDate { get; set; }
 
@@ -26,7 +26,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
 
         public bool IsResubmission { get; set; }
 
-        public string ResubmissionStatus { get; set; } = "None";
+        public string ResubmissionStatus { get; set; }
 
         public DateTime? RegistrationDate { get; set; }
 

@@ -302,7 +302,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Act
         var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
             submissionId,
-            1,
+            OrganisationType.ComplianceScheme,
             userId,queryParams);
 
         //Assert
@@ -372,7 +372,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Act
         var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(
-            submissionId,1,
+            submissionId, OrganisationType.DirectProducer,
             userId,queryParams);
 
         //Assert
@@ -544,7 +544,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Act
         var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
-            submissionId,1,
+            submissionId, OrganisationType.DirectProducer,
             userId,queryParams);
 
         //Assert
@@ -632,7 +632,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Act
         var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
-            submissionId,1,
+            submissionId, OrganisationType.DirectProducer,
             userId, queryParams);
 
         //Assert
@@ -1159,9 +1159,9 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         // Helper: Create a default item with minimal setup
-        private RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
+        private OrganisationRegistrationSubmissionDetailsResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
         {
-            return new RegistrationSubmissionOrganisationDetailsFacadeResponse
+            return new OrganisationRegistrationSubmissionDetailsResponse
             {
                 ApplicationReferenceNumber = appRef,
                 SubmissionStatus = initialStatus,

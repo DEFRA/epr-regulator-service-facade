@@ -351,7 +351,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _sut.ModelState.AddModelError(keyName, errorMessage);
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams) as ObjectResult;
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams) as ObjectResult;
 
         // Assert
         Assert.IsNotNull(result);
@@ -373,7 +373,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ThrowsAsync(exception).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.ComplianceScheme, queryParams);
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
@@ -396,7 +396,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .ReturnsAsync(null as SubmissionDetailsDto).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -421,7 +421,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .ReturnsAsync(new SubmissionDetailsDto()).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams);
 
         // Assert
         var statusCodeResult = result as OkObjectResult;

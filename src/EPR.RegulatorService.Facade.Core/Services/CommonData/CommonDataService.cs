@@ -183,26 +183,4 @@ public class CommonDataService(
         pageSize = commonDataPaginatedCollection.pageSize
     };
 
-    [ExcludeFromCodeCoverage]
-    private RegistrationSubmissionOrganisationDetailsFacadeResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
-    {
-        if (jsonObject == null) return null;
-
-        var objRet = (RegistrationSubmissionOrganisationDetailsFacadeResponse)jsonObject;
-
-        if (!string.IsNullOrWhiteSpace(jsonObject.CSOJson))
-        {
-            try
-            {
-                List<CsoMembershipDetailsDto> csoDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(jsonObject.CSOJson);
-                objRet.CsoMembershipDetails = csoDetails;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Cannot parse the CSO Membership details JSON object");
-            }
-        }
-
-        return objRet;
-    }
 }
