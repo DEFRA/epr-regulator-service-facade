@@ -46,30 +46,6 @@ public class CommonDataService(
         return await httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 
-    //public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
-    //    Guid submissionId,
-    //    int lateFeeCutOffDay,
-    //    int lateFeeCutOffMonth)
-    //{
-    //    var url = string.Format(
-    //        $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
-
-    //    var response = await httpClient.GetAsync(url);
-
-    //    response.EnsureSuccessStatusCode();
-
-    //    string content = await response.Content.ReadAsStringAsync();
-
-    //    if (string.IsNullOrWhiteSpace(content))
-    //    {
-    //        return null;
-    //    }
-
-    //    var jsonObject = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(content, _deserialisationOptions);
-
-    //    return ConvertCommonDataDetailToFEData(jsonObject);
-    //}
-
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{filter.GenerateQueryString()}";

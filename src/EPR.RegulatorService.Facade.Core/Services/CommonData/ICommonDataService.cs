@@ -17,12 +17,6 @@ public interface ICommonDataService
 
     Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest);
 
-    // TO DO: Refactor
-    //Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
-    //    Guid submissionId,
-    //    int lateFeeCutOffDay,
-    //    int lateFeeCutOffMonth);
-
     Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter);
 
     Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId);

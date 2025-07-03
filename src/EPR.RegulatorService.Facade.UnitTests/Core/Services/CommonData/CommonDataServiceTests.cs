@@ -467,11 +467,9 @@ public class CommonDataServiceTests
     {
         //Arrange
         var submissionId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
-        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}" +
-            $"?lateFeeCutOffDay={lateFeeCutOffDay}&lateFeeCutOffMonth={lateFeeCutOffMonth}";
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
         SetupApiBadRequestCall();
 
         // Act

@@ -73,31 +73,6 @@ public partial class OrganisationRegistrationSubmissionService(
         }
     }
 
-    //public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
-    //    Guid submissionId,
-    //    Guid userId,
-    //    int lateFeeCutOffDay,
-    //    int lateFeeCutOffMonth)
-    //{
-    //    List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
-
-    //    var lastSyncTime = await GetLastSyncTime();
-
-    //    if (lastSyncTime.HasValue)
-    //    {
-    //        deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
-    //    }
-
-    //    var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
-
-    //    if (deltaRegistrationDecisionsResponse.Count > 0 && requestedItem is not null)
-    //    {
-    //        MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
-    //    }
-
-    //    return requestedItem;
-    //}
-
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
         RegulatorDecisionCreateRequest request, Guid userId)
     {

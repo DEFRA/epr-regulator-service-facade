@@ -34,8 +34,8 @@ public class OrganisationRegistrationSubmissionServiceTests
     {
         queryParams = new Dictionary<string, string>
         {
-            { "lateFeeCutOffDay", "1" },
-            { "lateFeeCutOffMonth2", "4" }
+            { "LateFeeCutOffMonth_2025", "4" },
+            { "LateFeeCutOffDay_2025", "1" }
         };
 
         _sut = new OrganisationRegistrationSubmissionService(_commonDataServiceMock.Object,
@@ -492,8 +492,6 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         var submissionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
         var response = new SubmissionDetailsDto
         {
@@ -573,8 +571,6 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Arrage
         var submissionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
         var response = new SubmissionDetailsDto
         {
