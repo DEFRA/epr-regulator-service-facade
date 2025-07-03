@@ -2,9 +2,11 @@
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails
 {
+    [ExcludeFromCodeCoverage]
     public static class SubmissionDetailsMapper
     {
         public static OrganisationRegistrationSubmissionDetailsResponse MapFromSubmissionDetailsResponse(SubmissionDetailsDto dto)
