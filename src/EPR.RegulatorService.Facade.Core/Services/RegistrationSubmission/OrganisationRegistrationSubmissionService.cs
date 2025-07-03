@@ -175,7 +175,7 @@ public partial class OrganisationRegistrationSubmissionService(
             : [];
 
         // Submission Details
-        var submissionDetailsTask = commonDataService.GetOrganisationRegistrationSubmissionDetailsPartAsync(submissionId);
+        var submissionDetailsTask = commonDataService.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId);
         tasks.Add(submissionDetailsTask);
 
         // Paycal Parameters

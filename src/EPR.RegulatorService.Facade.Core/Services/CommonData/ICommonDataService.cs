@@ -18,10 +18,10 @@ public interface ICommonDataService
     Task<HttpResponseMessage> GetRegistrationSubmissions(GetRegistrationSubmissionsRequest registrationSubmissionsRequest);
 
     // TO DO: Refactor
-    Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
-        Guid submissionId,
-        int lateFeeCutOffDay,
-        int lateFeeCutOffMonth);
+    //Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
+    //    Guid submissionId,
+    //    int lateFeeCutOffDay,
+    //    int lateFeeCutOffMonth);
 
     Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter);
 
@@ -35,7 +35,7 @@ public interface ICommonDataService
         Guid submissionId,
         IDictionary<string, string> queryParams);
 
-    Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsPartAsync(
+    Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsAsync(
         Guid submissionId);
 
 }

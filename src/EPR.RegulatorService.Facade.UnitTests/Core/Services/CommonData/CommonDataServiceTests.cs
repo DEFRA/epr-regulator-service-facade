@@ -10,6 +10,7 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
@@ -31,7 +32,7 @@ public class CommonDataServiceTests
     private readonly ILogger<CommonDataService> _logger = new Mock<ILogger<CommonDataService>>().Object;
     private const string BaseAddress = "http://localhost";
     private const string GetPoMSubmissions = "GetPoMSubmissions";
-    private const string GetOrganisationRegistrationSubmissionDetails = "submissions/organisation-registration-submission/{0}?lateFeeCutOffDay={1}&lateFeeCutOffMonth={2}";
+    private const string GetOrganisationRegistrationSubmissionDetails = "submissions/organisation-registration-submission-details/{0}";
     private const string GetOrganisationRegistrationSubmissionsSummaries = "GetOrganisationRegistrationSubmissionsSummaries";
     private const string GetPomResubmissionPayCalParameters = "submissions/pom-resubmission-paycal-parameters";
     private HttpClient _httpClient;
@@ -244,33 +245,29 @@ public class CommonDataServiceTests
     {
         //Arrange
         var submissionId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
         _expectedUrl = $"{BaseAddress}/" + string.Format(
             _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails,
-            submissionId,
-            lateFeeCutOffDay,
-            lateFeeCutOffMonth);
+            submissionId);
 
         var expectedResult = _fixture
-            .Build<OrganisationRegistrationDetailsDto>()
+            .Build<SubmissionDetailsDto>()
             .With(x => x.SubmissionId, submissionId)     // Generate a valid Guid
             .With(x => x.OrganisationId, Guid.NewGuid())   // Another valid Guid
             .With(x => x.SubmittedUserId, Guid.NewGuid())  // Nullable Guid, still valid
             .With(x => x.RegulatorUserId, Guid.NewGuid())  // Another nullable Guid
             .With(x => x.OrganisationType, RandomOrganisationType().ToString())
-            .With(x => x.SubmittedDateTime, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"))
-            .With(x => x.StatusPendingDate, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"))
+            .With(x => x.SubmittedDateTime, DateTime.Now)
+            .With(x => x.StatusPendingDate, DateTime.Now)
             .With(x => x.SubmissionStatus, RandomStatus().ToString())
             .Create();
 
         SetupApiSuccessCall(JsonSerializer.Serialize(expectedResult));
 
         // Act
-        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId);
 
-        results.Should().BeOfType<RegistrationSubmissionOrganisationDetailsFacadeResponse>();
+        results.Should().BeOfType<SubmissionDetailsDto>();
         Assert.IsNotNull(results);
         Assert.AreEqual(results.SubmissionId, submissionId);
     }
@@ -279,19 +276,15 @@ public class CommonDataServiceTests
     public async Task Should_Return_Null_When_HTTP_Results_AreEmpty()
     {
         var submissionId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
         _expectedUrl = $"{BaseAddress}/" + string.Format(
             _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails,
-            submissionId,
-            lateFeeCutOffDay,
-            lateFeeCutOffMonth);
+            submissionId);
 
         SetupNullApiSuccessCall();
 
         // Act
-        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId);
 
         results.Should().BeNull();
     }
@@ -483,10 +476,8 @@ public class CommonDataServiceTests
 
         // Act
         Assert.ThrowsExceptionAsync<HttpRequestException>(() =>
-            _sut.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth));
+            _sut.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId));
     }
 
     private static RegistrationSubmissionOrganisationType RandomOrganisationType()

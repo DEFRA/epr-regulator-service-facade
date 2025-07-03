@@ -7,6 +7,7 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
@@ -49,8 +50,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         queryParams = new Dictionary<string, string>
         {
-            { "lateFeeCutOffDay", "1" },
-            { "lateFeeCutOffMonth2", "4" }
+            { "LateFeeCutOffMonth_2025", "4" },
+            { "LateFeeCutOffDay_2025", "1" }
         };
 
         _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceFake, _ctlLoggerMock.Object, _messageServiceMock.Object);
@@ -346,8 +347,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         // Arrange
         var submissionId = Guid.Empty;
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
         _sut.ModelState.AddModelError(keyName, errorMessage);
 
@@ -361,19 +360,17 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
 
     [TestMethod]
-    [Ignore("Ignore for temp")]
     public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_500_Internal_Server_Error()
     {
         // Arrange 
 
         var submissionId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
+
 
         var exception = new Exception("Test exception");
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId, lateFeeCutOffDay, lateFeeCutOffMonth)).ThrowsAsync(exception).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ThrowsAsync(exception).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams);
@@ -384,28 +381,19 @@ public class OrganisationRegistrationSubmissionsControllerTests
         objectResult?.StatusCode.Should().Be(500);
 
         _commonDataServiceMock.Verify(m =>
-            m.GetOrganisationRegistrationSubmissionDetails(
-                It.IsAny<Guid>(),
-                It.IsAny<int>(),
-                It.IsAny<int>())
-            , Times.AtMostOnce());
+            m.GetOrganisationRegistrationSubmissionDetailsAsync(
+                It.IsAny<Guid>()),Times.AtMostOnce());
     }
 
     [TestMethod]
     public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
     {
-        // Arrange
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
-
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth))
-            .ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsFacadeResponse).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
+            .ReturnsAsync(null as SubmissionDetailsDto).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams);
@@ -416,10 +404,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
         statusCodeResult?.StatusCode.Should().Be(404);
 
         _commonDataServiceMock.Verify(m =>
-            m.GetOrganisationRegistrationSubmissionDetails(
-                It.IsAny<Guid>(),
-                It.IsAny<int>(),
-                It.IsAny<int>())
+            m.GetOrganisationRegistrationSubmissionDetailsAsync(
+                It.IsAny<Guid>())
             , Times.AtMostOnce());
     }
 
@@ -428,15 +414,11 @@ public class OrganisationRegistrationSubmissionsControllerTests
     {
         // Arrange
         var submissionId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth))
-            .ReturnsAsync(new RegistrationSubmissionOrganisationDetailsFacadeResponse()).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
+            .ReturnsAsync(new SubmissionDetailsDto()).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId, 1, queryParams);
@@ -445,10 +427,8 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
         _commonDataServiceMock.Verify(r =>
-            r.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth)
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
             , Times.AtMostOnce);
     }
 

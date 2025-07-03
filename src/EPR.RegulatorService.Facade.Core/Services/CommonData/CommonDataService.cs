@@ -46,29 +46,29 @@ public class CommonDataService(
         return await httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
-        Guid submissionId,
-        int lateFeeCutOffDay,
-        int lateFeeCutOffMonth)
-    {
-        var url = string.Format(
-            $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
+    //public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
+    //    Guid submissionId,
+    //    int lateFeeCutOffDay,
+    //    int lateFeeCutOffMonth)
+    //{
+    //    var url = string.Format(
+    //        $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
 
-        var response = await httpClient.GetAsync(url);
+    //    var response = await httpClient.GetAsync(url);
 
-        response.EnsureSuccessStatusCode();
+    //    response.EnsureSuccessStatusCode();
 
-        string content = await response.Content.ReadAsStringAsync();
+    //    string content = await response.Content.ReadAsStringAsync();
 
-        if (string.IsNullOrWhiteSpace(content))
-        {
-            return null;
-        }
+    //    if (string.IsNullOrWhiteSpace(content))
+    //    {
+    //        return null;
+    //    }
 
-        var jsonObject = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(content, _deserialisationOptions);
+    //    var jsonObject = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(content, _deserialisationOptions);
 
-        return ConvertCommonDataDetailToFEData(jsonObject);
-    }
+    //    return ConvertCommonDataDetailToFEData(jsonObject);
+    //}
 
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
@@ -180,7 +180,7 @@ public class CommonDataService(
         return JsonSerializer.Deserialize<List<PaycalParametersDto>>(content, _deserialisationOptions);
     }
 
-    public async Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsPartAsync(
+    public async Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsAsync(
         Guid submissionId)
     {
         var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId);

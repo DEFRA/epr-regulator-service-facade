@@ -3,6 +3,7 @@ using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
@@ -163,7 +164,7 @@ public class OrganisationRegistrationSubmissionsController(
 
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(RegistrationSubmissionOrganisationDetailsFacadeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OrganisationRegistrationSubmissionDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -184,7 +185,7 @@ public class OrganisationRegistrationSubmissionsController(
                  await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
                      submissionId,
                      organisationType,
-                     User.UserId(),
+                     new Guid("BCEF5E6D-90D1-4080-837E-0B6FA9D3795A"),
                      queryParams);
 
             if (result is null)

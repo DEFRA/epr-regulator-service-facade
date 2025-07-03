@@ -16,6 +16,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using FluentAssertions;
 using System.Net;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -283,23 +284,19 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Arrage
         var submissionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small
+            OrganisationType = "small"
         };
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth))
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
 
         //Act
@@ -311,10 +308,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Assert
         Assert.IsNotNull(result);
         _commonDataServiceMock.Verify(r =>
-            r.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth)
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)
             , Times.AtMostOnce);
 
         _submissionsServiceMock.Verify(x =>
@@ -324,7 +318,6 @@ public class OrganisationRegistrationSubmissionServiceTests
                 It.IsAny<Guid>())
             , Times.Never);
     }
-    [Ignore("Ignore for temp")]
     [TestMethod]
     [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
     [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
@@ -335,30 +328,23 @@ public class OrganisationRegistrationSubmissionServiceTests
         var appRefNum = "APPREF123";
         var submissionId = Guid.NewGuid();
         var userId = Guid.NewGuid();
-        var lateFeeCutOffDay = 1;
-        var lateFeeCutOffMonth = 4;
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = appRefNum,
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small,
+            OrganisationType = "small",
             IsResubmission = true,
-            SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails
-            {
-                RegistrationDate = DateTime.UtcNow,
-                ResubmissionDate = DateTime.UtcNow
-            },
-            ResubmissionStatus = RegistrationSubmissionStatus.Granted
+            RegistrationDate = DateTime.UtcNow,
+            ResubmissionDate = DateTime.UtcNow,
+            ResubmissionStatus = "Granted"
         };
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth))
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
 
         var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
@@ -406,10 +392,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         result.SubmissionDetails.ResubmissionDate.Should().NotBeNull();
 
         _commonDataServiceMock.Verify(r =>
-            r.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth)
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
             , Times.AtMostOnce);
 
         _submissionsServiceMock.Verify(x =>
@@ -511,14 +495,14 @@ public class OrganisationRegistrationSubmissionServiceTests
         var lateFeeCutOffDay = 1;
         var lateFeeCutOffMonth = 4;
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small
+            OrganisationType = "small"
 
         };
 
@@ -544,10 +528,8 @@ public class OrganisationRegistrationSubmissionServiceTests
 
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth))
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
 
         _commonDataServiceMock.Setup(x =>
@@ -570,10 +552,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Assert
         Assert.IsNotNull(result);
         _commonDataServiceMock.Verify(r =>
-            r.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth)
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
             , Times.AtMostOnce);
 
         _submissionsServiceMock.Verify(x =>
@@ -596,14 +576,14 @@ public class OrganisationRegistrationSubmissionServiceTests
         var lateFeeCutOffDay = 1;
         var lateFeeCutOffMonth = 4;
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small
+            OrganisationType = "small"
 
         };
 
@@ -641,10 +621,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         };
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth))
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
 
         _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
@@ -664,10 +642,8 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Assert
         Assert.IsNotNull(result);
         _commonDataServiceMock.Verify(r =>
-            r.GetOrganisationRegistrationSubmissionDetails(
-                submissionId,
-                lateFeeCutOffDay,
-                lateFeeCutOffMonth)
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
             , Times.AtMostOnce);
 
         _submissionsServiceMock.Verify(x =>
