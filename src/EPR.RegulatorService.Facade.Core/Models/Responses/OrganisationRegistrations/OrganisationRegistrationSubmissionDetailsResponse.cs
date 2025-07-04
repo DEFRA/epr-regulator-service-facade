@@ -13,7 +13,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 
 [ExcludeFromCodeCoverage]
-public class RegistrationSubmissionOrganisationDetailsFacadeResponse
+public class OrganisationRegistrationSubmissionDetailsResponse
 {
     public Guid SubmissionId { get; set; }
     public Guid OrganisationId { get; set; }
@@ -63,7 +63,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public string? ResubmissionFileId { get; internal set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse
-        (RegistrationSubmissionOrganisationDetailsFacadeResponse details) => new()
+        (OrganisationRegistrationSubmissionDetailsResponse details) => new()
         {
             SubmissionId = details.SubmissionId,
             OrganisationId = details.OrganisationId,

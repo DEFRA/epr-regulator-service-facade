@@ -134,7 +134,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new OrganisationRegistrationSubmissionDetailsResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -208,7 +208,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             Statuses = "Test Status"
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new OrganisationRegistrationSubmissionDetailsResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
