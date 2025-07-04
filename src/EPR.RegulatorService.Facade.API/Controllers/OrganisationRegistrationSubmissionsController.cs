@@ -186,7 +186,7 @@ public class OrganisationRegistrationSubmissionsController(
                  await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
                      submissionId,
                      organisationType,
-                     new Guid("BCEF5E6D-90D1-4080-837E-0B6FA9D3795A"),
+                     User.UserId(),
                      queryParams);
 
             if (result is null)
