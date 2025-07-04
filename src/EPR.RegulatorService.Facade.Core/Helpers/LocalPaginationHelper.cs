@@ -11,7 +11,7 @@ namespace EPR.RegulatorService.Facade.Core.Helpers
     public static class LocalPaginationHelper
     {
         public static Tuple<int, List<OrganisationRegistrationSubmissionSummaryResponse>> FilterAndOrder(
-            List<RegistrationSubmissionOrganisationDetailsFacadeResponse> data,
+            List<OrganisationRegistrationSubmissionDetailsResponse> data,
             GetOrganisationRegistrationSubmissionsFilter filter)
         {
             var rawItems = data.AsQueryable();

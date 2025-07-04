@@ -16,6 +16,7 @@ using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using FluentAssertions;
 using System.Net;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -26,10 +27,17 @@ public class OrganisationRegistrationSubmissionServiceTests
     private readonly Mock<ICommonDataService> _commonDataServiceMock = new();
     private OrganisationRegistrationSubmissionService _sut;
     private IFixture _fixture;
+    private IDictionary<string, string> queryParams;
 
     [TestInitialize]
     public void Setup()
     {
+        queryParams = new Dictionary<string, string>
+        {
+            { "LateFeeCutOffMonth_2025", "4" },
+            { "LateFeeCutOffDay_2025", "1" }
+        };
+
         _sut = new OrganisationRegistrationSubmissionService(_commonDataServiceMock.Object,
                                                              _submissionsServiceMock.Object,
                                                              new Mock<ILogger<OrganisationRegistrationSubmissionService>>().Object);
@@ -126,7 +134,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new OrganisationRegistrationSubmissionDetailsResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -200,7 +208,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             Statuses = "Test Status"
         };
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new OrganisationRegistrationSubmissionDetailsResponse
         {
 
             OrganisationReference = "ORGREF1234567890",
@@ -274,30 +282,42 @@ public class OrganisationRegistrationSubmissionServiceTests
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails()
     {
         // Arrage
-
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small
+            OrganisationType = "small"
         };
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
 
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId,
+            OrganisationType.ComplianceScheme,
+            userId,queryParams);
 
         //Assert
         Assert.IsNotNull(result);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
-    }
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)
+            , Times.AtMostOnce);
 
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.Never);
+    }
     [TestMethod]
     [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
     [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
@@ -307,23 +327,24 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Arrange
         var appRefNum = "APPREF123";
         var submissionId = Guid.NewGuid();
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var userId = Guid.NewGuid();
+
+        var response = new SubmissionDetailsDto
         {
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = appRefNum,
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small,
+            OrganisationType = "small",
             IsResubmission = true,
-            SubmissionDetails = new RegistrationSubmissionOrganisationSubmissionSummaryDetails
-            {
-                RegistrationDate = DateTime.UtcNow,
-                ResubmissionDate = DateTime.UtcNow
-            },
-            ResubmissionStatus = RegistrationSubmissionStatus.Granted
+            RegistrationDate = DateTime.UtcNow,
+            ResubmissionDate = DateTime.UtcNow,
+            ResubmissionStatus = "Granted"
         };
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
 
         var submissionEventsLastSync = _fixture.Build<SubmissionEventsLastSync>().Create();
@@ -350,7 +371,9 @@ public class OrganisationRegistrationSubmissionServiceTests
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
         //Act
-        var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId, OrganisationType.DirectProducer,
+            userId,queryParams);
 
         //Assert
         Assert.IsNotNull(result);
@@ -364,11 +387,21 @@ public class OrganisationRegistrationSubmissionServiceTests
             result.ResubmissionStatus.Should().Be(expectedStatus);
             result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
         }
-        
+
         result.SubmissionDetails.RegistrationDate.Should().NotBeNull();
         result.SubmissionDetails.ResubmissionDate.Should().NotBeNull();
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtMostOnce);
+
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.AtMostOnce);
     }
 
     [TestMethod]
@@ -458,15 +491,16 @@ public class OrganisationRegistrationSubmissionServiceTests
         // Arrage
 
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small
+            OrganisationType = "small"
 
         };
 
@@ -491,20 +525,41 @@ public class OrganisationRegistrationSubmissionServiceTests
         };
 
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
-        _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
-        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()))
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetSubmissionLastSyncTime())
+            .ReturnsAsync(submissionLastSyncTimeResponse);
+
+        _submissionsServiceMock.Setup(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>()))
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
 
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId, OrganisationType.DirectProducer,
+            userId,queryParams);
 
         //Assert
         Assert.IsNotNull(result);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtLeastOnce);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.AtLeastOnce);
     }
 
 
@@ -514,17 +569,17 @@ public class OrganisationRegistrationSubmissionServiceTests
     public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_And_Assign_RegulatorDetails(string type)
     {
         // Arrage
-
         var submissionId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
 
-        var response = new RegistrationSubmissionOrganisationDetailsFacadeResponse
+        var response = new SubmissionDetailsDto
         {
 
             OrganisationReference = "ORGREF1234567890",
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = RegistrationSubmissionOrganisationType.small
+            OrganisationType = "small"
 
         };
 
@@ -546,6 +601,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             SubmissionId = submissionId,
             Type = type
         }).ToList();
+
         var submissionLastSyncTimeResponse = new HttpResponseMessage
         {
             StatusCode = System.Net.HttpStatusCode.OK,
@@ -560,20 +616,38 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         };
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
             .ReturnsAsync(response).Verifiable();
+
         _commonDataServiceMock.Setup(x => x.GetSubmissionLastSyncTime()).ReturnsAsync(submissionLastSyncTimeResponse);
-        _submissionsServiceMock.Setup(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()))
+
+        _submissionsServiceMock.Setup(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>()))
             .ReturnsAsync(deltaRegistrationDecisionsResponse);
 
-
         //Act
-        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, Guid.NewGuid());
+        var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
+            submissionId, OrganisationType.DirectProducer,
+            userId, queryParams);
 
         //Assert
         Assert.IsNotNull(result);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
-        _submissionsServiceMock.Verify(x => x.GetDeltaOrganisationRegistrationEvents(It.IsAny<DateTime>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.AtLeastOnce);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
+            , Times.AtMostOnce);
+
+        _submissionsServiceMock.Verify(x =>
+            x.GetDeltaOrganisationRegistrationEvents(
+                It.IsAny<DateTime>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>())
+            , Times.AtLeastOnce);
     }
 
     [TestMethod]
@@ -1085,9 +1159,9 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         // Helper: Create a default item with minimal setup
-        private RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
+        private static OrganisationRegistrationSubmissionDetailsResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
         {
-            return new RegistrationSubmissionOrganisationDetailsFacadeResponse
+            return new OrganisationRegistrationSubmissionDetailsResponse
             {
                 ApplicationReferenceNumber = appRef,
                 SubmissionStatus = initialStatus,

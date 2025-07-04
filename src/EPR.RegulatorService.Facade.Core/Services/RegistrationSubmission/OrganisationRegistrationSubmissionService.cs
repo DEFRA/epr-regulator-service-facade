@@ -6,6 +6,7 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
@@ -18,12 +19,6 @@ public partial class OrganisationRegistrationSubmissionService(
     ISubmissionService submissionService,
     ILogger<OrganisationRegistrationSubmissionService> logger) : IOrganisationRegistrationSubmissionService
 {
-
-    private static readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
 
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> HandleGetRegistrationSubmissionList(
         GetOrganisationRegistrationSubmissionsFilter filter, Guid userId)
@@ -76,27 +71,6 @@ public partial class OrganisationRegistrationSubmissionService(
                 items = []
             };
         }
-    }
-
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, Guid userId)
-    {
-        List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse = [];
-
-        var lastSyncTime = await GetLastSyncTime();
-
-        if (lastSyncTime.HasValue)
-        {
-            deltaRegistrationDecisionsResponse = await GetDeltaSubmissionEvents(lastSyncTime, userId, submissionId);
-        }
-
-        var requestedItem = await commonDataService.GetOrganisationRegistrationSubmissionDetails(submissionId);
-
-        if (deltaRegistrationDecisionsResponse.Count > 0 && requestedItem is not null)
-        {
-            MergeCosmosUpdates(deltaRegistrationDecisionsResponse, requestedItem);
-        }
-
-        return requestedItem;
     }
 
     public async Task<HttpResponseMessage> HandleCreateRegulatorDecisionSubmissionEvent(
@@ -165,6 +139,61 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
+    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, OrganisationType organisationType,Guid userId, IDictionary<string, string> queryParams)
+    {
+        var tasks = new List<Task>();
+
+        // Delta Registration Decisions
+        var lastSyncTime = await GetLastSyncTime();
+        var deltaEvents = lastSyncTime.HasValue
+            ? await GetDeltaSubmissionEvents(lastSyncTime.Value, userId, submissionId)
+            : [];
+
+        // Submission Details
+        var submissionDetailsTask = commonDataService.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId);
+        tasks.Add(submissionDetailsTask);
+
+        // Paycal Parameters
+        Task<PaycalParametersDto> producerTask = null;
+        Task<List<PaycalParametersDto>> csoTask = null;
+
+        queryParams.Add("beforeProducerSubmits","false");
+
+        if (organisationType == OrganisationType.ComplianceScheme)
+            csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
+        else
+            producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
+        
+
+        if (producerTask is not null) tasks.Add(producerTask);
+        if (csoTask is not null) tasks.Add(csoTask);
+
+        await Task.WhenAll(tasks);
+
+        var submissionDetails = await submissionDetailsTask;
+        var model = SubmissionDetailsMapper.MapFromSubmissionDetailsResponse(submissionDetails);
+
+        if (producerTask is not null)
+        {
+            var producerData = await producerTask;
+            SubmissionDetailsMapper.MapFromProducerPaycalParametersResponse(model, producerData);
+        }
+
+        if (csoTask is not null)
+        {
+            var csoData = await csoTask;
+            SubmissionDetailsMapper.MapFromCsoPaycalParametersResponse(model, csoData);
+        }
+
+        if (deltaEvents.Count > 0)
+        {
+            MergeCosmosUpdates(deltaEvents, model);
+        }
+
+        return model;
+    }
+
+
     private async Task<DateTime?> GetLastSyncTime()
     {
         var lastSyncResponse = await commonDataService.GetSubmissionLastSyncTime();
@@ -176,4 +205,9 @@ public partial class OrganisationRegistrationSubmissionService(
         var submissionEventsLastSync = await lastSyncResponse.Content.ReadFromJsonAsync<SubmissionEventsLastSync>();
         return submissionEventsLastSync.LastSyncTime;
     }
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 }
