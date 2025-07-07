@@ -9,6 +9,7 @@ using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
@@ -173,7 +174,7 @@ public class OrganisationRegistrationSubmissionsController(
     public async Task<IActionResult> GetRegistrationSubmissionDetails(
         [Required] Guid submissionId,
         [Required] OrganisationType organisationType,
-        [Required][FromQuery] IDictionary<string, string> queryParams = null)
+        [Required][FromQuery] IDictionary<string, string> lateFeeRules = null)
     {
         try
         {
@@ -186,8 +187,8 @@ public class OrganisationRegistrationSubmissionsController(
                  await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
                      submissionId,
                      organisationType,
-                     User.UserId(),
-                     queryParams);
+                     SafelyGetUserId(),
+                     lateFeeRules);
 
             if (result is null)
             {
@@ -202,6 +203,19 @@ public class OrganisationRegistrationSubmissionsController(
             return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
                 HttpContext.Request.Path,
                 StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    private Guid SafelyGetUserId()
+    {
+        bool isBeingDebugged = Debugger.IsAttached;
+
+        if (isBeingDebugged)
+        {
+            return Guid.NewGuid();
+        } else
+        {
+            return User.UserId();
         }
     }
 
