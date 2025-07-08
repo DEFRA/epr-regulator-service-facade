@@ -351,7 +351,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
         _sut.ModelState.AddModelError(keyName, errorMessage);
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams) as ObjectResult;
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.large, queryParams) as ObjectResult;
 
         // Assert
         Assert.IsNotNull(result);
@@ -373,7 +373,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ThrowsAsync(exception).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.ComplianceScheme, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
@@ -399,7 +399,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             x.GetProducerPaycalParametersAsync(submissionId,queryParams)).ThrowsAsync(exception).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.ComplianceScheme, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
@@ -425,7 +425,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             x.GetCsoPaycalParametersAsync(submissionId, queryParams)).ThrowsAsync(exception).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.ComplianceScheme, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
@@ -448,7 +448,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .ReturnsAsync(null as SubmissionDetailsDto).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.small, queryParams);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -472,7 +472,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .ReturnsAsync(new PaycalParametersDto()).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.large, queryParams);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -497,7 +497,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .ReturnsAsync(new List<PaycalParametersDto>()).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.small, queryParams);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -527,7 +527,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             .ReturnsAsync(new PaycalParametersDto()).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, OrganisationType.DirectProducer, queryParams);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.large, queryParams);
 
         // Assert
         var statusCodeResult = result as OkObjectResult;

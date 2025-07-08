@@ -120,10 +120,10 @@ public class CommonDataService(
         return default;
     }
 
-    public async Task<PaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    public async Task<PaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> lateFeeRules)
     {
         var url = string.Format($"{_config.Endpoints.GetProducerPaycalParameters}", submissionId, false);
-        string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
+        string urlWithParams = QueryHelpers.AddQueryString(url, lateFeeRules);
         var response = await httpClient.GetAsync(urlWithParams);
 
         response.EnsureSuccessStatusCode();
@@ -138,10 +138,10 @@ public class CommonDataService(
         return JsonSerializer.Deserialize<PaycalParametersDto>(content, _deserialisationOptions);
     }
 
-    public async Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
+    public async Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> lateFeeRules)
     {
         var url = string.Format($"{_config.Endpoints.GetCsoPaycalParameters}", submissionId, false);
-        string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
+        string urlWithParams = QueryHelpers.AddQueryString(url, lateFeeRules);
         var response = await httpClient.GetAsync(urlWithParams);
 
         response.EnsureSuccessStatusCode();

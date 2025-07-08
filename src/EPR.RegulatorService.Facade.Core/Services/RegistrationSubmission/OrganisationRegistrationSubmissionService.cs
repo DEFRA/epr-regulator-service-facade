@@ -139,7 +139,7 @@ public partial class OrganisationRegistrationSubmissionService(
         );
     }
 
-    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, OrganisationType organisationType,Guid userId, IDictionary<string, string> queryParams)
+    public async Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(Guid submissionId, RegistrationSubmissionOrganisationType organisationType,Guid userId, IDictionary<string, string> lateFeeRules)
     {
         var tasks = new List<Task>();
 
@@ -157,10 +157,10 @@ public partial class OrganisationRegistrationSubmissionService(
         Task<PaycalParametersDto> producerTask = null;
         Task<List<PaycalParametersDto>> csoTask = null;
 
-        if (organisationType == OrganisationType.ComplianceScheme)
-            csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, queryParams);
+        if (organisationType == RegistrationSubmissionOrganisationType.compliance)
+            csoTask = commonDataService.GetCsoPaycalParametersAsync(submissionId, lateFeeRules);
         else
-            producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, queryParams);
+            producerTask = commonDataService.GetProducerPaycalParametersAsync(submissionId, lateFeeRules);
         
 
         if (producerTask is not null) tasks.Add(producerTask);

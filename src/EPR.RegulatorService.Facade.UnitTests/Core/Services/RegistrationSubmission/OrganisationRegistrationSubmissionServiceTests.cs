@@ -302,7 +302,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         //Act
         var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
             submissionId,
-            OrganisationType.ComplianceScheme,
+            RegistrationSubmissionOrganisationType.compliance,
             userId,queryParams);
 
         //Assert
@@ -319,10 +319,13 @@ public class OrganisationRegistrationSubmissionServiceTests
             , Times.Never);
     }
     [TestMethod]
-    [DataRow("Granted", RegistrationSubmissionStatus.Accepted)]
-    [DataRow("Refused", RegistrationSubmissionStatus.Rejected)]
-    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled)]
-    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus)
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted, RegistrationSubmissionOrganisationType.large)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected, RegistrationSubmissionOrganisationType.large)]
+    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled, RegistrationSubmissionOrganisationType.large)]
+    [DataRow("Granted", RegistrationSubmissionStatus.Accepted, RegistrationSubmissionOrganisationType.small)]
+    [DataRow("Refused", RegistrationSubmissionStatus.Rejected, RegistrationSubmissionOrganisationType.small)]
+    [DataRow("Cancelled", RegistrationSubmissionStatus.Cancelled, RegistrationSubmissionOrganisationType.small)]
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetailsForResubmission(string actualStatus, RegistrationSubmissionStatus expectedStatus, RegistrationSubmissionOrganisationType organisationType)
     {
         // Arrange
         var appRefNum = "APPREF123";
@@ -336,7 +339,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = appRefNum,
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = "small",
+            OrganisationType = organisationType.ToString(),
             IsResubmission = true,
             RegistrationDate = DateTime.UtcNow,
             ResubmissionDate = DateTime.UtcNow,
@@ -372,7 +375,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Act
         var result = await _sut.HandleGetOrganisationRegistrationSubmissionDetails(
-            submissionId, OrganisationType.DirectProducer,
+            submissionId, organisationType,
             userId,queryParams);
 
         //Assert
@@ -486,7 +489,9 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
-    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_With_lastSyncTime_True()
+    [DataRow(RegistrationSubmissionOrganisationType.large)]
+    [DataRow(RegistrationSubmissionOrganisationType.small)]
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_With_lastSyncTime_True(RegistrationSubmissionOrganisationType organisationType)
     {
         // Arrage
 
@@ -500,7 +505,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = "small"
+            OrganisationType = organisationType.ToString()
 
         };
 
@@ -544,7 +549,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Act
         var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
-            submissionId, OrganisationType.DirectProducer,
+            submissionId, organisationType,
             userId,queryParams);
 
         //Assert
@@ -564,9 +569,11 @@ public class OrganisationRegistrationSubmissionServiceTests
 
 
     [TestMethod]
-    [DataRow("RegulatorRegistrationDecision")]
-    [DataRow("RegistrationApplicationSubmitted")]
-    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_And_Assign_RegulatorDetails(string type)
+    [DataRow("RegulatorRegistrationDecision", RegistrationSubmissionOrganisationType.large)]
+    [DataRow("RegistrationApplicationSubmitted", RegistrationSubmissionOrganisationType.large)]
+    [DataRow("RegulatorRegistrationDecision", RegistrationSubmissionOrganisationType.small)]
+    [DataRow("RegistrationApplicationSubmitted", RegistrationSubmissionOrganisationType.small)]
+    public async Task Should_Return_GetOrganisationRegistrationSubmissionDetails_And_Assign_RegulatorDetails(string type, RegistrationSubmissionOrganisationType organisationType)
     {
         // Arrage
         var submissionId = Guid.NewGuid();
@@ -579,7 +586,7 @@ public class OrganisationRegistrationSubmissionServiceTests
             OrganisationName = "Test Organisation",
             ApplicationReferenceNumber = "APPREF123",
             RegistrationReferenceNumber = "REGREF456",
-            OrganisationType = "small"
+            OrganisationType = organisationType.ToString()
 
         };
 
@@ -632,7 +639,7 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         //Act
         var result = _sut.HandleGetOrganisationRegistrationSubmissionDetails(
-            submissionId, OrganisationType.DirectProducer,
+            submissionId, organisationType,
             userId, queryParams);
 
         //Assert

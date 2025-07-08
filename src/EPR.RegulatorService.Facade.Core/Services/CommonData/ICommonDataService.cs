@@ -23,11 +23,11 @@ public interface ICommonDataService
 
     Task<PaycalParametersDto> GetProducerPaycalParametersAsync(
         Guid submissionId,
-        IDictionary<string, string> queryParams);
+        IDictionary<string, string> lateFeeRules);
 
     Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(
         Guid submissionId,
-        IDictionary<string, string> queryParams);
+        IDictionary<string, string> lateFeeRules);
 
     Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsAsync(
         Guid submissionId);

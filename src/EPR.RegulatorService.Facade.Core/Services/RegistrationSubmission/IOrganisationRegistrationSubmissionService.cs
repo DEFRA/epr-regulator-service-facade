@@ -25,7 +25,7 @@ public interface IOrganisationRegistrationSubmissionService
 
     Task<OrganisationRegistrationSubmissionDetailsResponse?> HandleGetOrganisationRegistrationSubmissionDetails(
         Guid submissionId,
-        OrganisationType organisationType,
+        RegistrationSubmissionOrganisationType organisationType,
         Guid userId,
-        IDictionary<string, string> queryParams);
+        IDictionary<string, string> lateFeeRules);
 }

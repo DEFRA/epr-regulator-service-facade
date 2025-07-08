@@ -4,7 +4,6 @@ using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
@@ -173,7 +172,7 @@ public class OrganisationRegistrationSubmissionsController(
     [Route("organisation-registration-submission-details/{submissionId:Guid}/{organisationType}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails(
         [Required] Guid submissionId,
-        [Required] OrganisationType organisationType,
+        [Required] RegistrationSubmissionOrganisationType registrationSubmissionOrganisationType,
         [Required][FromQuery] IDictionary<string, string> lateFeeRules = null)
     {
         try
@@ -186,7 +185,7 @@ public class OrganisationRegistrationSubmissionsController(
             var result =
                  await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
                      submissionId,
-                     organisationType,
+                     registrationSubmissionOrganisationType,
                      SafelyGetUserId(),
                      lateFeeRules);
 
