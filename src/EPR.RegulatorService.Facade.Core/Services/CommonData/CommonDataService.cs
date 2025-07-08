@@ -122,7 +122,7 @@ public class CommonDataService(
 
     public async Task<PaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
     {
-        var url = string.Format($"{_config.Endpoints.GetProducerPaycalParameters}", submissionId);
+        var url = string.Format($"{_config.Endpoints.GetProducerPaycalParameters}", submissionId, false);
         string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
         var response = await httpClient.GetAsync(urlWithParams);
 
@@ -140,7 +140,7 @@ public class CommonDataService(
 
     public async Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> queryParams)
     {
-        var url = string.Format($"{_config.Endpoints.GetCsoPaycalParameters}", submissionId);
+        var url = string.Format($"{_config.Endpoints.GetCsoPaycalParameters}", submissionId, false);
         string urlWithParams = QueryHelpers.AddQueryString(url, queryParams);
         var response = await httpClient.GetAsync(urlWithParams);
 
