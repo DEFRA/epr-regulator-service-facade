@@ -1,7 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Net.Http.Json;
-using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Extensions;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
@@ -10,9 +6,15 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.CommonData;
 
@@ -44,26 +46,6 @@ public class CommonDataService(
         return await httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(Guid submissionId)
-    {
-        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
-     
-        var response = await httpClient.GetAsync(url);
-
-        response.EnsureSuccessStatusCode();
-
-        string content = await response.Content.ReadAsStringAsync();
-
-        if ( string.IsNullOrWhiteSpace(content))
-        {
-            return null;
-        }
-
-        var jsonObject = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(content, _deserialisationOptions);
-
-        return ConvertCommonDataDetailToFEData(jsonObject);
-    }
-
     public async Task<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>> GetOrganisationRegistrationSubmissionList(GetOrganisationRegistrationSubmissionsFilter filter)
     {
         var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionsSummaries}/{filter.NationId}?{filter.GenerateQueryString()}";
@@ -74,7 +56,7 @@ public class CommonDataService(
 
         string content = await response.Content.ReadAsStringAsync();
 
-        if ( string.IsNullOrWhiteSpace(content))
+        if (string.IsNullOrWhiteSpace(content))
         {
             return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
             {
@@ -93,7 +75,7 @@ public class CommonDataService(
     public async Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId)
     {
         var url = $"{_config.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}";
-        
+
         if (complianceSchemeId.HasValue)
         {
             url += $"?ComplianceSchemeId={complianceSchemeId}";
@@ -103,16 +85,20 @@ public class CommonDataService(
         {
             var response = await httpClient.GetAsync(url);
 
-            if (response.StatusCode ==  HttpStatusCode.PreconditionFailed)
+            if (response.StatusCode == HttpStatusCode.PreconditionFailed)
             {
-                return new PomResubmissionPaycalParametersDto { 
-                    ReferenceFieldNotAvailable = true };
+                return new PomResubmissionPaycalParametersDto
+                {
+                    ReferenceFieldNotAvailable = true
+                };
             }
 
             if (response.StatusCode == HttpStatusCode.PreconditionRequired)
             {
-                return new PomResubmissionPaycalParametersDto { 
-                    ReferenceNotAvailable = true };
+                return new PomResubmissionPaycalParametersDto
+                {
+                    ReferenceNotAvailable = true
+                };
             }
 
             response.EnsureSuccessStatusCode();
@@ -134,6 +120,60 @@ public class CommonDataService(
         return default;
     }
 
+    public async Task<PaycalParametersDto> GetProducerPaycalParametersAsync(Guid submissionId, IDictionary<string, string> lateFeeRules)
+    {
+        var url = string.Format($"{_config.Endpoints.GetProducerPaycalParameters}", submissionId, false);
+        string urlWithParams = QueryHelpers.AddQueryString(url, lateFeeRules);
+        var response = await httpClient.GetAsync(urlWithParams);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<PaycalParametersDto>(content, _deserialisationOptions);
+    }
+
+    public async Task<List<PaycalParametersDto>> GetCsoPaycalParametersAsync(Guid submissionId, IDictionary<string, string> lateFeeRules)
+    {
+        var url = string.Format($"{_config.Endpoints.GetCsoPaycalParameters}", submissionId, false);
+        string urlWithParams = QueryHelpers.AddQueryString(url, lateFeeRules);
+        var response = await httpClient.GetAsync(urlWithParams);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<List<PaycalParametersDto>>(content, _deserialisationOptions);
+    }
+
+    public async Task<SubmissionDetailsDto> GetOrganisationRegistrationSubmissionDetailsAsync(
+        Guid submissionId)
+    {
+        var url = string.Format($"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId);
+        var response = await httpClient.GetAsync(url);
+
+        response.EnsureSuccessStatusCode();
+
+        string content = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<SubmissionDetailsDto>(content, _deserialisationOptions);
+    }
+
     [ExcludeFromCodeCoverage]
     private static PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse> ConvertCommonDataCollectionToFEData(PaginatedResponse<OrganisationRegistrationSummaryDto>? commonDataPaginatedCollection) => new()
     {
@@ -143,26 +183,4 @@ public class CommonDataService(
         pageSize = commonDataPaginatedCollection.pageSize
     };
 
-    [ExcludeFromCodeCoverage]
-    private RegistrationSubmissionOrganisationDetailsFacadeResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
-    {
-        if ( jsonObject == null) return null;
-
-        var objRet = (RegistrationSubmissionOrganisationDetailsFacadeResponse)jsonObject;
-
-        if (!string.IsNullOrWhiteSpace(jsonObject.CSOJson))
-        {
-            try
-            {
-                List<CsoMembershipDetailsDto> csoDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(jsonObject.CSOJson);
-                objRet.CsoMembershipDetails = csoDetails;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Cannot parse the CSO Membership details JSON object");
-            }
-        }
-
-        return objRet;
-    }
 }
