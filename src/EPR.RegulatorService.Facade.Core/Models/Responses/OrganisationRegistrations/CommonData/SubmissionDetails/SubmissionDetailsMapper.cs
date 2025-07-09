@@ -32,9 +32,9 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 response.SubmissionStatus = RegistrationSubmissionStatus.Pending;
             }
 
-            if (Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var resubmissionStatus))
+            if (Enum.TryParse<RegistrationSubmissionStatus>(dto.ResubmissionStatus, true, out var parsedResubmissionStatus))
             {
-                response.ResubmissionStatus = resubmissionStatus;
+                response.ResubmissionStatus = parsedResubmissionStatus;
             }
             else
             {
@@ -102,7 +102,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 Files = GetSubmissionFileDetails(dto),
                 SubmittedByUserId = dto.SubmittedUserId,
                 SubmissionPeriod = dto.SubmissionPeriod,
-                ResubmissionStatus = dto.ResubmissionStatus,
+                ResubmissionStatus = parsedResubmissionStatus == RegistrationSubmissionStatus.None ? RegistrationSubmissionStatus.Pending : parsedResubmissionStatus,
                 RegistrationDate = dto.RegistrationDate,
                 ResubmissionDate = dto.ResubmissionDate,
                 ResubmissionFileId = dto.ResubmissionFileId,

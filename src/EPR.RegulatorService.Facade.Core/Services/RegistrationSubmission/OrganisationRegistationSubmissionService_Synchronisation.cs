@@ -189,12 +189,12 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
             {
                 item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
-                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus;
             }
             else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
             {
                 item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
-                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus;
             }
             else
             {
