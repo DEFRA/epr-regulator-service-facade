@@ -172,7 +172,7 @@ public class OrganisationRegistrationSubmissionsController(
     [Route("organisation-registration-submission-details/{submissionId:Guid}/{organisationType}")]
     public async Task<IActionResult> GetRegistrationSubmissionDetails(
         [Required] Guid submissionId,
-        [Required] RegistrationSubmissionOrganisationType registrationSubmissionOrganisationType,
+        [Required] RegistrationSubmissionOrganisationType organisationType,
         [Required][FromQuery] IDictionary<string, string> lateFeeRules = null)
     {
         try
@@ -185,7 +185,7 @@ public class OrganisationRegistrationSubmissionsController(
             var result =
                  await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
                      submissionId,
-                     registrationSubmissionOrganisationType,
+                     organisationType,
                      SafelyGetUserId(),
                      lateFeeRules);
 
