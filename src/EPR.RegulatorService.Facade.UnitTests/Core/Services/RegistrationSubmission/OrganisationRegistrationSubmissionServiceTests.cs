@@ -383,12 +383,12 @@ public class OrganisationRegistrationSubmissionServiceTests
         if (expectedStatus == RegistrationSubmissionStatus.Cancelled)
         {
             result.SubmissionDetails.Status.Should().Be(expectedStatus);
-            result.SubmissionDetails.ResubmissionStatus.Should().NotBe(expectedStatus.ToString());
+            result.SubmissionDetails.ResubmissionStatus.Should().NotBe(expectedStatus);
         }
         else
         {
             result.ResubmissionStatus.Should().Be(expectedStatus);
-            result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus.ToString());
+            result.SubmissionDetails.ResubmissionStatus.Should().Be(expectedStatus);
         }
 
         result.SubmissionDetails.RegistrationDate.Should().NotBeNull();
