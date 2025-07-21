@@ -31,7 +31,7 @@ public class RegistrationSubmissionOrganisationSubmissionSummaryDetails
     public string SubmissionPeriod { get; internal set; }
     public int? AccountRoleId { get; internal set; }
     public string SubmittedBy { get; internal set; }
-    public string ResubmissionStatus { get; internal set; }
+    public RegistrationSubmissionStatus ResubmissionStatus { get; internal set; }
     public DateTime? RegistrationDate { get; internal set; }
     public DateTime? ResubmissionDate { get; internal set; }
     public bool IsResubmission { get; internal set; }

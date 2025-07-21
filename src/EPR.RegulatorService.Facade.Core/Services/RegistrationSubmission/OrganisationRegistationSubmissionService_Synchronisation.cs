@@ -86,7 +86,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
 
-        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, RegistrationSubmissionOrganisationDetailsFacadeResponse item)
+        public static void MergeCosmosUpdates(List<AbstractCosmosSubmissionEvent> deltaRegistrationDecisionsResponse, OrganisationRegistrationSubmissionDetailsResponse item)
         {
             var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
                                                                 .OrderBy(x => x.Created);
@@ -148,7 +148,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
 
-        private static void AssignRegulatorDetails(RegistrationSubmissionOrganisationDetailsFacadeResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
+        private static void AssignRegulatorDetails(OrganisationRegistrationSubmissionDetailsResponse item, AbstractCosmosSubmissionEvent? cosmosItem)
         {
             if (item.RegulatorDecisionDate is null || cosmosItem.Created >= item.RegulatorDecisionDate)
             {
@@ -184,17 +184,17 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
 
-        private static void SetResubmissionStatus(RegistrationSubmissionOrganisationDetailsFacadeResponse item, RegistrationSubmissionStatus resubmissionStatus)
+        private static void SetResubmissionStatus(OrganisationRegistrationSubmissionDetailsResponse item, RegistrationSubmissionStatus resubmissionStatus)
         {
             if (resubmissionStatus == RegistrationSubmissionStatus.Granted)
             {
                 item.ResubmissionStatus = RegistrationSubmissionStatus.Accepted;
-                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus;
             }
             else if (resubmissionStatus == RegistrationSubmissionStatus.Refused)
             {
                 item.ResubmissionStatus = RegistrationSubmissionStatus.Rejected;
-                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus.ToString();
+                item.SubmissionDetails.ResubmissionStatus = item.ResubmissionStatus;
             }
             else
             {

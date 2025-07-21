@@ -15,9 +15,9 @@ public static partial class RegistrationSubmissionTestData
         DummyData = GenerateRegistrationSubmissionDataCollection();
     }
 
-    public static List<RegistrationSubmissionOrganisationDetailsFacadeResponse> DummyData { get; }
+    public static List<OrganisationRegistrationSubmissionDetailsResponse> DummyData { get; }
 
-    public static async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse?> GetRegistrationSubmissionDetails(Guid submissionId, string url)
+    public static async Task<OrganisationRegistrationSubmissionDetailsResponse?> GetRegistrationSubmissionDetails(Guid submissionId, string url)
     {
         var result = DummyData.Find(x => x.SubmissionId == submissionId);
         if (null == result) return null;
@@ -29,9 +29,9 @@ public static partial class RegistrationSubmissionTestData
         return result;
     }
 
-    private static List<RegistrationSubmissionOrganisationDetailsFacadeResponse> GenerateRegistrationSubmissionDataCollection()
+    private static List<OrganisationRegistrationSubmissionDetailsResponse> GenerateRegistrationSubmissionDataCollection()
     {
-        List<RegistrationSubmissionOrganisationDetailsFacadeResponse> objRet = [];
+        List<OrganisationRegistrationSubmissionDetailsResponse> objRet = [];
 
         int count = 0;
         foreach (var line in RegistrationSubmissionTestData.TSVData)
@@ -39,7 +39,7 @@ public static partial class RegistrationSubmissionTestData
             var fields = line.Split('\t');
 
             var dateTime = DateTime.ParseExact(fields[8], "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            objRet.Add(new RegistrationSubmissionOrganisationDetailsFacadeResponse
+            objRet.Add(new OrganisationRegistrationSubmissionDetailsResponse
             {
                 OrganisationReference = fields[0],
                 OrganisationName = fields[1],
