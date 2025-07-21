@@ -38,7 +38,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             }
             else
             {
-                response.ResubmissionStatus = RegistrationSubmissionStatus.Pending;
+                response.ResubmissionStatus = RegistrationSubmissionStatus.None;
             }
 
             response.RegistrationDate = dto.RegistrationDate;
@@ -102,7 +102,7 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 Files = GetSubmissionFileDetails(dto),
                 SubmittedByUserId = dto.SubmittedUserId,
                 SubmissionPeriod = dto.SubmissionPeriod,
-                ResubmissionStatus = parsedResubmissionStatus == RegistrationSubmissionStatus.None ? RegistrationSubmissionStatus.Pending : parsedResubmissionStatus,
+                ResubmissionStatus = parsedResubmissionStatus,
                 RegistrationDate = dto.RegistrationDate,
                 ResubmissionDate = dto.ResubmissionDate,
                 ResubmissionFileId = dto.ResubmissionFileId,
