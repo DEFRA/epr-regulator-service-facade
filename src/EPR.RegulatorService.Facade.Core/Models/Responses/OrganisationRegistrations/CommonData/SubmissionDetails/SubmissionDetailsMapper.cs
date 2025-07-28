@@ -124,16 +124,13 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
             response.NumberOfOnlineSubsidiaries = producerPaycalParametersDto.NoOfSubsidiariesBeingOnlineMarketPlace;
             response.IsLateSubmission = producerPaycalParametersDto.IsLateFee;
 
-            if (response.SubBuildingName != null)
-            {
-                response.SubmissionDetails.SubmittedOnTime = producerPaycalParametersDto.IsLateFee;
-            }
+            response.SubmissionDetails.SubmittedOnTime = !producerPaycalParametersDto.IsLateFee;
         }
 
         public static void MapFromCsoPaycalParametersResponse(OrganisationRegistrationSubmissionDetailsResponse response,
                                                                List<PaycalParametersDto> csoPaycalParametersDtos)
         {
-            response.CsoMembershipDetails = csoPaycalParametersDtos.Select(x => new CsoMembershipDetailsDto
+            response.CsoMembershipDetails = [.. csoPaycalParametersDtos.Select(x => new CsoMembershipDetailsDto
             {
                 MemberId = x.CsoReference,
                 MemberType = x.OrganisationSize.Equals("L", StringComparison.CurrentCultureIgnoreCase) ? "large" : "small",
@@ -144,12 +141,9 @@ namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistra
                 RelevantYear = x.RelevantYear,
                 SubmittedDate = x.SubmittedDate,
                 SubmissionPeriodDescription = x.SubmissionPeriod
-            }).ToList();
+            })];
 
-            if (response.SubBuildingName != null)
-            {
-                response.SubmissionDetails.SubmittedOnTime = csoPaycalParametersDtos.TrueForAll(x => x.IsLateFee);
-            }
+            response.SubmissionDetails.SubmittedOnTime = !csoPaycalParametersDtos.TrueForAll(x => x.IsLateFee);
         }
 
         private static List<RegistrationSubmissionOrganisationSubmissionSummaryDetails.FileDetails> GetSubmissionFileDetails(SubmissionDetailsDto dto)
