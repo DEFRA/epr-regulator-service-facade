@@ -1,5 +1,3 @@
-using System.Net;
-using System.Text.Json;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
@@ -9,15 +7,19 @@ using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Requests.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.PoM;
 using EPR.RegulatorService.Facade.Core.Models.Responses.Submissions.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using FluentAssertions;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using System.Net;
+using System.Security.Policy;
+using System.Text.Json;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.CommonData;
 
@@ -31,16 +33,25 @@ public class CommonDataServiceTests
     private readonly ILogger<CommonDataService> _logger = new Mock<ILogger<CommonDataService>>().Object;
     private const string BaseAddress = "http://localhost";
     private const string GetPoMSubmissions = "GetPoMSubmissions";
-    private const string GetOrganisationRegistrationDetails = "GetOrganisationRegistrationDetails";
+    private const string GetOrganisationRegistrationSubmissionDetails = "submissions/organisation-registration-submission-details/{0}";
+    private const string GetProducerPaycalParameters = "submissions/organisation-registration-submission-paycal-params-producer/{0}";
+    private const string GetCsoPaycalParameters = "submissions/organisation-registration-submission-paycal-params-cso/{0}";
     private const string GetOrganisationRegistrationSubmissionsSummaries = "GetOrganisationRegistrationSubmissionsSummaries";
     private const string GetPomResubmissionPayCalParameters = "submissions/pom-resubmission-paycal-parameters";
     private HttpClient _httpClient;
     private string _expectedUrl;
     private Guid _userId = Guid.NewGuid();
+    private IDictionary<string, string> queryParams;
 
     [TestInitialize]
     public void Setup()
     {
+        queryParams = new Dictionary<string, string>
+        {
+            { "LateFeeCutOffMonth_2025", "4" },
+            { "LateFeeCutOffDay_2025", "1" }
+        };
+
         _configuration = Options.Create(new CommonDataApiConfig()
         {
             BaseUrl = BaseAddress,
@@ -49,9 +60,11 @@ public class CommonDataServiceTests
             Endpoints = new()
             {
                 GetPoMSubmissions = GetPoMSubmissions,
-                GetOrganisationRegistrationSubmissionDetails = GetOrganisationRegistrationDetails,
+                GetOrganisationRegistrationSubmissionDetails = GetOrganisationRegistrationSubmissionDetails,
                 GetOrganisationRegistrationSubmissionsSummaries = GetOrganisationRegistrationSubmissionsSummaries,
-                GetPomResubmissionPaycalParameters = GetPomResubmissionPayCalParameters
+                GetPomResubmissionPaycalParameters = GetPomResubmissionPayCalParameters,
+                GetProducerPaycalParameters = GetProducerPaycalParameters,
+                GetCsoPaycalParameters = GetCsoPaycalParameters,
             }
         });
         _httpClient = new HttpClient(_httpMessageHandlerMock.Object)
@@ -244,40 +257,146 @@ public class CommonDataServiceTests
     {
         //Arrange
         var submissionId = Guid.NewGuid();
-        _expectedUrl = $"{BaseAddress}/{ _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails,
+            submissionId);
 
         var expectedResult = _fixture
-            .Build<OrganisationRegistrationDetailsDto>()
-            .With(x => x.SubmissionId,submissionId)     // Generate a valid Guid
+            .Build<SubmissionDetailsDto>()
+            .With(x => x.SubmissionId, submissionId)     // Generate a valid Guid
             .With(x => x.OrganisationId, Guid.NewGuid())   // Another valid Guid
             .With(x => x.SubmittedUserId, Guid.NewGuid())  // Nullable Guid, still valid
             .With(x => x.RegulatorUserId, Guid.NewGuid())  // Another nullable Guid
             .With(x => x.OrganisationType, RandomOrganisationType().ToString())
-            .With(x => x.SubmittedDateTime, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"))
-            .With(x => x.StatusPendingDate, DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ"))
+            .With(x => x.SubmittedDateTime, DateTime.Now)
+            .With(x => x.StatusPendingDate, DateTime.Now)
             .With(x => x.SubmissionStatus, RandomStatus().ToString())
             .Create();
-        
+
         SetupApiSuccessCall(JsonSerializer.Serialize(expectedResult));
 
         // Act
-        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId);
 
-        results.Should().BeOfType<RegistrationSubmissionOrganisationDetailsFacadeResponse>();
+        results.Should().BeOfType<SubmissionDetailsDto>();
         Assert.IsNotNull(results);
         Assert.AreEqual(results.SubmissionId, submissionId);
+    }
+
+    [TestMethod]
+    public async Task Should_return_success_when_fetching_producer_paycal_parameters()
+    {
+        //Arrange
+        var submissionId = Guid.NewGuid();
+        var csoReference = "131095";
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetProducerPaycalParameters, submissionId);
+
+        _expectedUrl = QueryHelpers.AddQueryString(_expectedUrl, queryParams);
+
+        var expectedResult = _fixture
+            .Build<PaycalParametersDto>()
+            .With(x => x.CsoReference, csoReference)
+            .With(x => x.OrganisationSize, "small")
+            .With(x => x.RelevantYear, 2025)
+            .With(x => x.NoOfSubsidiariesBeingOnlineMarketPlace, 2)
+            .With(x => x.SubmittedDate, DateTime.Now)
+            .With(x => x.IsLateFee, true)
+            .With(x => x.NoOfSubsidiaries, 2)
+            .Create();
+
+        SetupApiSuccessCall(JsonSerializer.Serialize(expectedResult));
+
+        // Act
+        var results = await _sut.GetProducerPaycalParametersAsync(submissionId, queryParams);
+
+        results.Should().BeOfType<PaycalParametersDto>();
+        Assert.IsNotNull(results);
+        Assert.AreEqual(results.CsoReference, csoReference);
+    }
+
+    [TestMethod]
+    public async Task Should_return_success_when_fetching_cso_paycal_parameters()
+    {
+        //Arrange
+        var submissionId = Guid.NewGuid();
+        var csoReference = "131095";
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetCsoPaycalParameters, submissionId);
+        _expectedUrl = QueryHelpers.AddQueryString(_expectedUrl, queryParams);
+
+
+        var expectedResult = new List<PaycalParametersDto>
+        {       _fixture
+                .Build<PaycalParametersDto>()
+                .With(x => x.CsoReference, csoReference)
+                .With(x => x.OrganisationSize, "small")
+                .With(x => x.RelevantYear, 2025)
+                .With(x => x.NoOfSubsidiariesBeingOnlineMarketPlace, 2)
+                .With(x => x.SubmittedDate, DateTime.Now)
+                .With(x => x.IsLateFee, true)
+                .With(x => x.NoOfSubsidiaries, 2)
+                .Create()
+        };
+
+        SetupApiSuccessCall(JsonSerializer.Serialize(expectedResult));
+
+        // Act
+        var results = await _sut.GetCsoPaycalParametersAsync(submissionId, queryParams);
+
+        results.Should().BeOfType<List<PaycalParametersDto>>();
+        Assert.IsNotNull(results);
+        Assert.AreEqual(results.FirstOrDefault().CsoReference, csoReference);
     }
 
     [TestMethod]
     public async Task Should_Return_Null_When_HTTP_Results_AreEmpty()
     {
         var submissionId = Guid.NewGuid();
-        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails,
+            submissionId);
 
         SetupNullApiSuccessCall();
 
         // Act
-        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId);
+
+        results.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task Should_Return_Null_When_HTTP_Results_AreEmpty_For_GetProducerPaycalParameters()
+    {
+        var submissionId = Guid.NewGuid();
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetProducerPaycalParameters, submissionId);
+        _expectedUrl = QueryHelpers.AddQueryString(_expectedUrl, queryParams);
+        SetupNullApiSuccessCall();
+
+        // Act
+        var results = await _sut.GetProducerPaycalParametersAsync(submissionId, queryParams);
+
+        results.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task Should_Return_Null_When_HTTP_Results_AreEmpty_For_GetCsoPaycalParameters()
+    {
+        var submissionId = Guid.NewGuid();
+
+        _expectedUrl = $"{BaseAddress}/" + string.Format(
+            _configuration.Value.Endpoints.GetCsoPaycalParameters, submissionId);
+        _expectedUrl = QueryHelpers.AddQueryString(_expectedUrl, queryParams);
+        SetupNullApiSuccessCall();
+
+        // Act
+        var results = await _sut.GetCsoPaycalParametersAsync(submissionId, queryParams);
 
         results.Should().BeNull();
     }
@@ -333,7 +452,7 @@ public class CommonDataServiceTests
 
         results.Should().BeOfType<PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>>();
         results.Should().NotBeNull();
-        results.totalItems.Should().Be(0);  
+        results.totalItems.Should().Be(0);
         results.currentPage.Should().Be(1);
     }
 
@@ -342,7 +461,7 @@ public class CommonDataServiceTests
     {
         // Arrange
         var submissionId = Guid.NewGuid();
-        
+
         SetupNullApiSuccessCall();
 
         // Act
@@ -360,7 +479,7 @@ public class CommonDataServiceTests
         _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}";
 
         SetupApiSuccessCall("{}");
-        
+
         // Act
         await _sut.GetPomResubmissionPaycalDetails(submissionId, null);
 
@@ -459,11 +578,16 @@ public class CommonDataServiceTests
     public async Task Should_Throw_HttpRequestException_when_fetching_registration_submission_details_And_Api_Fails()
     {
         //Arrange
-        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}";
+        var submissionId = Guid.NewGuid();
+
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
         SetupApiBadRequestCall();
 
         // Act
-        Assert.ThrowsExceptionAsync<HttpRequestException>(() => _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid()));
+        Assert.ThrowsExceptionAsync<HttpRequestException>(() =>
+            _sut.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId));
     }
 
     private static RegistrationSubmissionOrganisationType RandomOrganisationType()

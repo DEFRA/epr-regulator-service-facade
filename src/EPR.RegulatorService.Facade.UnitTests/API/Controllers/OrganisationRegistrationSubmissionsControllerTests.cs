@@ -7,6 +7,7 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData.SubmissionDetails;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
@@ -37,6 +38,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private OrganisationRegistrationSubmissionsController _sut;
     private readonly Guid _oid = Guid.NewGuid();
+    private IDictionary<string, string> queryParams;
 
     [TestInitialize]
     public void Setup()
@@ -45,6 +47,12 @@ public class OrganisationRegistrationSubmissionsControllerTests
             _commonDataServiceMock.Object,
             _submissionsServiceMock.Object,
             new Mock<ILogger<OrganisationRegistrationSubmissionService>>().Object);
+
+        queryParams = new Dictionary<string, string>
+        {
+            { "LateFeeCutOffMonth_2025", "4" },
+            { "LateFeeCutOffDay_2025", "1" }
+        };
 
         _sut = new OrganisationRegistrationSubmissionsController(_registrationSubmissionServiceFake, _ctlLoggerMock.Object, _messageServiceMock.Object);
 
@@ -338,10 +346,12 @@ public class OrganisationRegistrationSubmissionsControllerTests
     public async Task Should_Return_ValidationProblem_When_Call_GetRegistrationSubmissionDetails_With_ModelState_Is_Invalid(string keyName, string errorMessage)
     {
         // Arrange
+        var submissionId = Guid.Empty;
+
         _sut.ModelState.AddModelError(keyName, errorMessage);
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(Guid.Empty) as ObjectResult;
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.large, queryParams) as ObjectResult;
 
         // Assert
         Assert.IsNotNull(result);
@@ -356,37 +366,171 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         var submissionId = Guid.NewGuid();
 
+
         var exception = new Exception("Test exception");
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ThrowsAsync(exception).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ThrowsAsync(exception).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
 
         // Assert
         result.Should().BeOfType<ObjectResult>();
         var objectResult = (ObjectResult)result;
         objectResult?.StatusCode.Should().Be(500);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetOrganisationRegistrationSubmissionDetailsAsync(
+                It.IsAny<Guid>()),Times.AtMostOnce());
     }
 
     [TestMethod]
-    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
+    public async Task When_Fetching_GetOrganisationRegistrationSubmissionDetails_And_CommondataService_Returns_Null_Then_Should_Return_NotFound_Result()
     {
         // Arrange 
 
         var submissionId = Guid.NewGuid();
 
         _commonDataServiceMock.Setup(x =>
-            x.GetOrganisationRegistrationSubmissionDetails(submissionId)).ReturnsAsync(null as RegistrationSubmissionOrganisationDetailsFacadeResponse).Verifiable();
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ReturnsAsync(default(SubmissionDetailsDto)).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
         var statusCodeResult = result as NotFoundResult;
         statusCodeResult?.StatusCode.Should().Be(404);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetOrganisationRegistrationSubmissionDetailsAsync(
+               It.IsAny<Guid>()), Times.AtMostOnce());
+    }
+    [TestMethod]
+    public async Task When_Fetching_GetProducerPaycalParameters_And_CommondataService_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    {
+        // Arrange 
+        var submissionId = Guid.NewGuid();
+
+        var exception = new Exception("Test exception");
+
+        _commonDataServiceMock.Setup(x =>
+         x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ReturnsAsync(new SubmissionDetailsDto()).Verifiable();
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetProducerPaycalParametersAsync(submissionId, queryParams)).ThrowsAsync(exception).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
+
+        // Assert
+        result.Should().BeOfType<ObjectResult>();
+        var objectResult = (ObjectResult)result;
+        objectResult?.StatusCode.Should().Be(500);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetProducerPaycalParametersAsync(
+               It.IsAny<Guid>(), It.IsAny<Dictionary<string, string>>()), Times.AtMostOnce());
+    }
+
+    [TestMethod]
+    public async Task When_Fetching_GetCsoPaycalParameters_And_CommondataService_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    {
+        // Arrange 
+
+        var submissionId = Guid.NewGuid();
+
+
+        var exception = new Exception("Test exception");
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetCsoPaycalParametersAsync(submissionId, queryParams)).ThrowsAsync(exception).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
+
+        // Assert
+        result.Should().BeOfType<ObjectResult>();
+        var objectResult = (ObjectResult)result;
+        objectResult?.StatusCode.Should().Be(500);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetCsoPaycalParametersAsync(
+                It.IsAny<Guid>(),It.IsAny<Dictionary<string,string>>()), Times.AtMostOnce());
+    }
+
+    [TestMethod]
+    public async Task When_Fetching_GetRegistrationSubmissionDetails_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
+    {
+        var submissionId = Guid.NewGuid();
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
+            .ReturnsAsync(null as SubmissionDetailsDto).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.small, queryParams);
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+        var statusCodeResult = result as NotFoundResult;
+        statusCodeResult?.StatusCode.Should().Be(404);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetOrganisationRegistrationSubmissionDetailsAsync(
+                It.IsAny<Guid>())
+            , Times.AtMostOnce());
+    }
+
+    [TestMethod]
+    public async Task When_Fetching_GetProducerPaycalParameters_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
+    {
+        var submissionId = Guid.NewGuid();
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetProducerPaycalParametersAsync(
+                submissionId,queryParams))
+            .ReturnsAsync(new PaycalParametersDto()).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.large, queryParams);
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+        var statusCodeResult = result as NotFoundResult;
+        statusCodeResult?.StatusCode.Should().Be(404);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetProducerPaycalParametersAsync(
+                It.IsAny<Guid>(),It.IsAny<Dictionary<string,string>>())
+            , Times.AtMostOnce());
+    }
+
+
+    [TestMethod]
+    public async Task When_Fetching_GetCsoPaycalParameters_And_CommondataService_Fails_Then_Should_Returns_NotFoundResult()
+    {
+        var submissionId = Guid.NewGuid();
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetCsoPaycalParametersAsync(
+                submissionId, queryParams))
+            .ReturnsAsync(new List<PaycalParametersDto>()).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.small, queryParams);
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+        var statusCodeResult = result as NotFoundResult;
+        statusCodeResult?.StatusCode.Should().Be(404);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetCsoPaycalParametersAsync(
+                It.IsAny<Guid>(), It.IsAny<Dictionary<string, string>>())
+            , Times.AtMostOnce());
     }
 
     [TestMethod]
@@ -395,16 +539,26 @@ public class OrganisationRegistrationSubmissionsControllerTests
         // Arrange
         var submissionId = Guid.NewGuid();
 
-        _commonDataServiceMock.Setup(x => x.GetOrganisationRegistrationSubmissionDetails(submissionId))
-            .ReturnsAsync(new RegistrationSubmissionOrganisationDetailsFacadeResponse()).Verifiable();
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId))
+            .ReturnsAsync(new SubmissionDetailsDto()).Verifiable();
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetProducerPaycalParametersAsync(
+                submissionId,queryParams))
+            .ReturnsAsync(new PaycalParametersDto()).Verifiable();
 
         // Act
-        var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.large, queryParams);
 
         // Assert
         var statusCodeResult = result as OkObjectResult;
         statusCodeResult?.StatusCode.Should().Be(200);
-        _commonDataServiceMock.Verify(r => r.GetOrganisationRegistrationSubmissionDetails(submissionId), Times.AtMostOnce);
+        _commonDataServiceMock.Verify(r =>
+            r.GetOrganisationRegistrationSubmissionDetailsAsync(
+                submissionId)
+            , Times.AtMostOnce);
     }
 
 

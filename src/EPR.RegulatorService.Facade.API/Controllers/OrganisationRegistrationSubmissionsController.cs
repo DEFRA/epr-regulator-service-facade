@@ -1,4 +1,5 @@
 ﻿using EPR.RegulatorService.Facade.API.Extensions;
+using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Accounts.EmailModels;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
@@ -7,6 +8,7 @@ using EPR.RegulatorService.Facade.Core.Services.Messaging;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EPR.RegulatorService.Facade.API.Controllers;
@@ -163,12 +165,15 @@ public class OrganisationRegistrationSubmissionsController(
 
     [HttpGet]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(RegistrationSubmissionOrganisationDetailsFacadeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(OrganisationRegistrationSubmissionDetailsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Route("organisation-registration-submission-details/{submissionId:Guid}")]
-    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
+    [Route("organisation-registration-submission-details/{submissionId:Guid}/{organisationType}")]
+    public async Task<IActionResult> GetRegistrationSubmissionDetails(
+        [Required] Guid submissionId,
+        [Required] RegistrationSubmissionOrganisationType organisationType,
+        [Required][FromQuery] IDictionary<string, string> lateFeeRules = null)
     {
         try
         {
@@ -178,7 +183,11 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
+                 await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
+                     submissionId,
+                     organisationType,
+                     SafelyGetUserId(),
+                     lateFeeRules);
 
             if (result is null)
             {
@@ -193,6 +202,19 @@ public class OrganisationRegistrationSubmissionsController(
             return Problem($"Exception occured processing {nameof(GetRegistrationSubmissionDetails)}",
                 HttpContext.Request.Path,
                 StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    private Guid SafelyGetUserId()
+    {
+        bool isBeingDebugged = Debugger.IsAttached;
+
+        if (isBeingDebugged)
+        {
+            return Guid.NewGuid();
+        } else
+        {
+            return User.UserId();
         }
     }
 
