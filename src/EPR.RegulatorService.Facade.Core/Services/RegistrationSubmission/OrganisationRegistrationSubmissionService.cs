@@ -171,6 +171,12 @@ public partial class OrganisationRegistrationSubmissionService(
         var submissionDetails = await submissionDetailsTask;
         var model = SubmissionDetailsMapper.MapFromSubmissionDetailsResponse(submissionDetails);
 
+        if(model is null)
+        {
+            logger.LogWarning("Submission details not found for submissionId: {SubmissionId}", submissionId);
+            return null;
+        }
+
         if (producerTask is not null)
         {
             var producerData = await producerTask;

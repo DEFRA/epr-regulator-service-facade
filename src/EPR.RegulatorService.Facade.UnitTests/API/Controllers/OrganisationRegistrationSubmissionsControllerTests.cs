@@ -386,17 +386,40 @@ public class OrganisationRegistrationSubmissionsControllerTests
     }
 
     [TestMethod]
-    public async Task When_Fetching_GetProducerPaycalParameters_And_CommondataService_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    public async Task When_Fetching_GetOrganisationRegistrationSubmissionDetails_And_CommondataService_Returns_Null_Then_Should_Return_NotFound_Result()
     {
         // Arrange 
 
         var submissionId = Guid.NewGuid();
 
+        _commonDataServiceMock.Setup(x =>
+            x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ReturnsAsync(default(SubmissionDetailsDto)).Verifiable();
+
+        // Act
+        var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
+
+        // Assert
+        result.Should().BeOfType<NotFoundResult>();
+        var statusCodeResult = result as NotFoundResult;
+        statusCodeResult?.StatusCode.Should().Be(404);
+
+        _commonDataServiceMock.Verify(m =>
+            m.GetOrganisationRegistrationSubmissionDetailsAsync(
+               It.IsAny<Guid>()), Times.AtMostOnce());
+    }
+    [TestMethod]
+    public async Task When_Fetching_GetProducerPaycalParameters_And_CommondataService_Fails_Then_Should_Returns_500_Internal_Server_Error()
+    {
+        // Arrange 
+        var submissionId = Guid.NewGuid();
 
         var exception = new Exception("Test exception");
 
         _commonDataServiceMock.Setup(x =>
-            x.GetProducerPaycalParametersAsync(submissionId,queryParams)).ThrowsAsync(exception).Verifiable();
+         x.GetOrganisationRegistrationSubmissionDetailsAsync(submissionId)).ReturnsAsync(new SubmissionDetailsDto()).Verifiable();
+
+        _commonDataServiceMock.Setup(x =>
+            x.GetProducerPaycalParametersAsync(submissionId, queryParams)).ThrowsAsync(exception).Verifiable();
 
         // Act
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId, RegistrationSubmissionOrganisationType.compliance, queryParams);
