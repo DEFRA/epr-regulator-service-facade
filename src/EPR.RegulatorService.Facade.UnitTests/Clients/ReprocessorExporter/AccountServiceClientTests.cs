@@ -22,6 +22,11 @@ public class AccountServiceClientTests
     private Mock<ILogger<AccountServiceClient>> _mockLogger = null!;
     private AccountServiceClient _client = null!;
     private Fixture _fixture = null!;
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+    };
 
     [TestInitialize]
     public void TestInitialize()
@@ -54,8 +59,7 @@ public class AccountServiceClientTests
         // Arrange
         int nationId = 1;
         var expectedDto = _fixture.Create<NationDetailsResponseDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, JsonSerializerOptions));
         _mockHttpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>(
         "SendAsync",
             ItExpr.Is<HttpRequestMessage>(msg =>
@@ -111,8 +115,7 @@ public class AccountServiceClientTests
         // Arrange
         var requestDto = _fixture.Create<PersonDetailsRequestDto>();
         var expectedResponseDto = _fixture.Create<List<PersonDetailsResponseDto>>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedResponseDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedResponseDto, JsonSerializerOptions));
         _mockHttpMessageHandler.Protected().Setup<Task<HttpResponseMessage>>(
         "SendAsync",
             ItExpr.Is<HttpRequestMessage>(msg =>
@@ -170,8 +173,7 @@ public class AccountServiceClientTests
         // Arrange
         var id = Guid.Parse("676b40a5-4b72-4646-ab39-8e3c85ccc175");
         var expectedDto = _fixture.Create<OrganisationDetailsResponseDto>();
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
