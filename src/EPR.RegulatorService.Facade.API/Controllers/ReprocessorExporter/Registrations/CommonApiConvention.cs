@@ -13,6 +13,8 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
         [SwaggerResponse(StatusCodes.Status204NoContent, $"Returns No Content", typeof(NoContentResult))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "If the request is invalid or a validation error occurs.", typeof(ProblemDetails))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "If an unexpected error occurs.", typeof(ContentResult))]
+#pragma warning disable S1186
         public static void Post() { }
+#pragma warning restore S1186
     }
 }

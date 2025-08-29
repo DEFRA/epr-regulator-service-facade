@@ -25,7 +25,6 @@ namespace EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Regist
 public class RegistrationsController : FileDownloadBaseController
 {
     private readonly IBlobStorageService _blobStorageService;
-    private readonly IAntivirusService _antivirusService;
     private readonly BlobStorageConfig _blobStorageConfig;
     private readonly IReprocessorExporterService _reprocessorExporterService;
     private readonly IValidator<UpdateRegulatorRegistrationTaskDto> _updateRegulatorRegistrationTaskValidator;
@@ -48,7 +47,6 @@ public class RegistrationsController : FileDownloadBaseController
         _updateRegulatorApplicationTaskValidator = updateRegulatorApplicationTaskValidator;
         _queryNoteRequestDtoValidator = queryNoteRequestDtoValidator;
         _blobStorageService = blobStorageService;
-        _antivirusService = antivirusService;
         _blobStorageConfig = blobStorageConfig.Value;
         _logger = logger;
     }
