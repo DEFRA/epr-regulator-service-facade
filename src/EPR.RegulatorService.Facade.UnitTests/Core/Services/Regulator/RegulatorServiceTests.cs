@@ -1,15 +1,17 @@
-using System.Net;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Services.Application;
+using FluentAssertions;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using FluentAssertions;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using System.Globalization;
+using System.Net;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
@@ -21,7 +23,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
         private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
         private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock = new();
         private const string BaseAddress = "http://localhost";
-        private const string PendingApplications = "PendingApplications";
+        private string PendingApplications = "PendingApplications?userId={0}&currentPage={1}&pageSize={2}&organisationName={3}&applicationType={4}";
         private const string GetOrganisationsApplications = "GetOrganisationsApplications";
         private const string ManageEnrolment = "ManageEnrolment";
         private const string TransferOrganisationNation = "TransferOrganisationNation";
@@ -65,7 +67,21 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
         public async Task Should_return_empty_list_when_no_pending_regulators()
         {
             // Arrange
-            _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.PendingApplications}";
+            var template = _configuration.Value.Endpoints.PendingApplications;
+            
+            var templateWithValues = string.Format(
+                CultureInfo.InvariantCulture,
+                template,
+                Uri.EscapeDataString(_userId.ToString()),
+                Uri.EscapeDataString(_currentPage.ToString(CultureInfo.InvariantCulture)),
+                Uri.EscapeDataString(_pageSize.ToString(CultureInfo.InvariantCulture)),
+                Uri.EscapeDataString(_organisationName),
+                Uri.EscapeDataString(_serviceRoleId)
+            );
+
+            _expectedUrl = $"{BaseAddress}/{templateWithValues}";
+
+            
             SetupApiCall(0);
 
             // Act
@@ -81,10 +97,84 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
         }
 
         [TestMethod]
+        public async Task PendingApplications_Should_Encode_OrganisationName()
+        {
+            // Arrange
+            var organisationName = "E&Z HOLDINGS LTD";
+            var applicationType = _serviceRoleId;
+
+            var template = _configuration.Value.Endpoints.PendingApplications;
+            var expectedRelativeUrl = string.Format(
+                CultureInfo.InvariantCulture,
+                template,
+                Uri.EscapeDataString(_userId.ToString()),
+                Uri.EscapeDataString(_currentPage.ToString(CultureInfo.InvariantCulture)),
+                Uri.EscapeDataString(_pageSize.ToString(CultureInfo.InvariantCulture)),
+                Uri.EscapeDataString(organisationName),
+                Uri.EscapeDataString(applicationType ?? string.Empty)
+            );
+
+            var apiResponse = _fixture.CreateMany<OrganisationEnrolments>(1).ToList();
+            HttpRequestMessage captured = null!;
+            _httpMessageHandlerMock.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Callback<HttpRequestMessage, CancellationToken>((req, _) => captured = req)
+                .ReturnsAsync(new HttpResponseMessage
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(apiResponse))
+                })
+                .Verifiable();
+
+            // Act
+            var result = await _sut.PendingApplications(_userId, _currentPage, _pageSize, organisationName, applicationType);
+
+            // Assert
+            _httpMessageHandlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Once(),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
+
+            captured.Should().NotBeNull();
+            var expectedPathAndQuery = "/" + expectedRelativeUrl.TrimStart('/');
+            captured.RequestUri!.PathAndQuery.Should().Be(expectedPathAndQuery);
+            captured.RequestUri!.OriginalString.Should().Contain("organisationName=E%26Z%20HOLDINGS%20LTD");
+
+            var qs = QueryHelpers.ParseQuery(captured.RequestUri.Query);
+            qs["userId"].ToString().Should().Be(_userId.ToString());
+            qs["currentPage"].ToString().Should().Be(_currentPage.ToString(CultureInfo.InvariantCulture));
+            qs["pageSize"].ToString().Should().Be(_pageSize.ToString(CultureInfo.InvariantCulture));
+            qs["organisationName"].ToString().Should().Be(organisationName);
+            qs["applicationType"].ToString().Should().Be(applicationType ?? string.Empty);
+
+            var responseString = await result.Content.ReadAsStringAsync();
+            var regulators = JsonConvert.DeserializeObject<List<OrganisationEnrolments>>(responseString);
+            regulators.Count.Should().Be(1);
+
+        }
+
+        [TestMethod]
         public async Task Should_return_pending_regulators_when_available()
         {
             // Arrange
-            _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.PendingApplications}";
+
+            var template = _configuration.Value.Endpoints.PendingApplications;
+
+            var templateWithValues = string.Format(
+                CultureInfo.InvariantCulture,
+                template,
+                Uri.EscapeDataString(_userId.ToString()),
+                Uri.EscapeDataString(_currentPage.ToString(CultureInfo.InvariantCulture)),
+                Uri.EscapeDataString(_pageSize.ToString(CultureInfo.InvariantCulture)),
+                Uri.EscapeDataString(_organisationName),
+                Uri.EscapeDataString(_serviceRoleId)
+            );
+
+            _expectedUrl = $"{BaseAddress}/{templateWithValues}";
             SetupApiCall(9);
 
             // Act

@@ -2,6 +2,7 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 using System.Net.Http.Json;
 
 namespace EPR.RegulatorService.Facade.Core.Services.Application;
@@ -26,7 +27,16 @@ public class ApplicationService : IApplicationService
     {
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
-        var url = string.Format($"{_config.Endpoints.PendingApplications}", userId, currentPage, pageSize, organisationName, applicationType);
+        var endpoint = _config.Endpoints.PendingApplications;
+        var url = string.Format(
+        CultureInfo.InvariantCulture,
+        endpoint,
+        Uri.EscapeDataString(userId.ToString()),
+        Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)),
+        Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)),
+        Uri.EscapeDataString(organisationName ?? string.Empty),
+        Uri.EscapeDataString(applicationType ?? string.Empty)
+        );
 
         return await _httpClient.GetAsync(url);
     }
