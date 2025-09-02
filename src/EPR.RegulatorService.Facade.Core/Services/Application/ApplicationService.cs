@@ -72,12 +72,11 @@ public class ApplicationService : IApplicationService
     private static string BuildPendingApplicationsUrl(
     string endpoint, Guid userId, int currentPage, int pageSize, string? organisationName, string? applicationType)
     {
-        return string.Format(CultureInfo.InvariantCulture, 
-            endpoint,
-            Uri.EscapeDataString(userId.ToString()),
-            Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)),
-            Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)),
-            Uri.EscapeDataString(organisationName ?? string.Empty),
-            Uri.EscapeDataString(applicationType ?? string.Empty));
+         return endpoint
+        .Replace("{0}", Uri.EscapeDataString(userId.ToString()), StringComparison.Ordinal)
+        .Replace("{1}", Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)), StringComparison.Ordinal)
+        .Replace("{2}", Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)), StringComparison.Ordinal)
+        .Replace("{3}", Uri.EscapeDataString(organisationName ?? string.Empty), StringComparison.Ordinal)
+        .Replace("{4}", Uri.EscapeDataString(applicationType ?? string.Empty), StringComparison.Ordinal);
     }
 }
