@@ -70,14 +70,14 @@ public class ApplicationService : IApplicationService
     }
 
     private static string BuildPendingApplicationsUrl(
-    string endpoint, Guid userId, int currentPage, int pageSize, string? organisationName, string? applicationType)
+        string endpoint, Guid userId, int currentPage, int pageSize, string? organisationName, string? applicationType)
     {
-        var url = endpoint
-        .Replace("{0}", Uri.EscapeDataString(userId.ToString()), StringComparison.Ordinal)
-        .Replace("{1}", Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)), StringComparison.Ordinal)
-        .Replace("{2}", Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)), StringComparison.Ordinal)
-        .Replace("{3}", Uri.EscapeDataString(organisationName ?? string.Empty), StringComparison.Ordinal)
-        .Replace("{4}", Uri.EscapeDataString(applicationType ?? string.Empty), StringComparison.Ordinal);
+        var url = endpoint;
+        url = url.Replace("{0}", Uri.EscapeDataString(userId.ToString()), StringComparison.Ordinal);
+        url = url.Replace("{1}", Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)), StringComparison.Ordinal);
+        url = url.Replace("{2}", Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)), StringComparison.Ordinal);
+        url = url.Replace("{3}", Uri.EscapeDataString(organisationName ?? string.Empty), StringComparison.Ordinal);
+        url = url.Replace("{4}", Uri.EscapeDataString(applicationType ?? string.Empty), StringComparison.Ordinal);
         return url;
     }
 }
