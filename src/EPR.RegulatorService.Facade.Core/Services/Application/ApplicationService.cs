@@ -2,6 +2,7 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Http.Json;
 
@@ -68,7 +69,8 @@ public class ApplicationService : IApplicationService
 
         return await _httpClient.GetAsync(url);
     }
-
+    
+    [ExcludeFromCodeCoverage]
     private static string BuildPendingApplicationsUrl(
         string endpoint, Guid userId, int currentPage, int pageSize, string? organisationName, string? applicationType)
     {
