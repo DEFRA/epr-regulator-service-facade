@@ -28,9 +28,7 @@ public class ApplicationService : IApplicationService
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
         var endpoint = _config.Endpoints.PendingApplications;
-        var url = string.Format(
-        CultureInfo.InvariantCulture,
-        endpoint,
+        var url = string.Format(CultureInfo.InvariantCulture,endpoint,
         Uri.EscapeDataString(userId.ToString()),
         Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)),
         Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)),
