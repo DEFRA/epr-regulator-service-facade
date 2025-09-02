@@ -28,13 +28,7 @@ public class ApplicationService : IApplicationService
         _logger.LogInformation("Attempting to fetch pending applications from the backend");
 
         var endpoint = _config.Endpoints.PendingApplications;
-        var url = string.Format(CultureInfo.InvariantCulture,endpoint,Uri.EscapeDataString(userId.ToString()),
-        Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)),
-        Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)),
-        Uri.EscapeDataString(organisationName ?? string.Empty),
-        Uri.EscapeDataString(applicationType ?? string.Empty)
-        );
-
+        var url = BuildPendingApplicationsUrl(endpoint, userId, currentPage, pageSize, organisationName, applicationType);
         return await _httpClient.GetAsync(url);
     }
 
@@ -73,5 +67,17 @@ public class ApplicationService : IApplicationService
         _logger.LogInformation("Attempting to fetch the organisations for user '{UserId}'", userId);
 
         return await _httpClient.GetAsync(url);
+    }
+
+    private static string BuildPendingApplicationsUrl(
+    string endpoint, Guid userId, int currentPage, int pageSize, string? organisationName, string? applicationType)
+    {
+        return string.Format(CultureInfo.InvariantCulture, 
+            endpoint,
+            Uri.EscapeDataString(userId.ToString()),
+            Uri.EscapeDataString(currentPage.ToString(CultureInfo.InvariantCulture)),
+            Uri.EscapeDataString(pageSize.ToString(CultureInfo.InvariantCulture)),
+            Uri.EscapeDataString(organisationName ?? string.Empty),
+            Uri.EscapeDataString(applicationType ?? string.Empty));
     }
 }
