@@ -47,7 +47,7 @@ resources:
     - repository: CommonTemplates
       name: defra/epr-webapps-code-deploy-templates
       type: github
-      ref: main
+      ref: new-changes-ado
       endpoint: DEFRA
 
 extends:
