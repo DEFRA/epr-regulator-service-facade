@@ -1,14 +1,10 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Moq;
 using Moq.Protected;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EPR.RegulatorService.Facade.Core.Clients;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Clients;
@@ -20,6 +16,10 @@ public class BaseHttpClientTests
     private HttpClient _httpClient = null!;
     private TestableBaseHttpClient _client = null!;
     private const string Url = "http://test-api.com/endpoint";
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
 
     [TestInitialize]
     public void TestInitialize()
@@ -54,7 +54,7 @@ public class BaseHttpClientTests
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
-            result!.Result.Should().Be("success");
+            result.Result.Should().Be("success");
         }
     }
 
@@ -114,7 +114,7 @@ public class BaseHttpClientTests
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
-            result!.Updated.Should().BeTrue();
+            result.Updated.Should().BeTrue();
         }
     }
 
@@ -164,10 +164,7 @@ public class BaseHttpClientTests
 
     private static string SerializeCamelCase<T>(T obj)
     {
-        return JsonSerializer.Serialize(obj, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        return JsonSerializer.Serialize(obj, JsonSerializerOptions);
     }
 
     private class TestableBaseHttpClient : BaseHttpClient

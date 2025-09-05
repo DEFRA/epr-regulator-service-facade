@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 
+#pragma warning disable S125
 public class PaymentServiceClient(
 HttpClient httpClient,
+#pragma warning disable CS9113 // Parameter is unread.
 IOptions<PaymentBackendServiceApiConfig> options,
+#pragma warning restore CS9113 // Parameter is unread.
 ILogger<PaymentServiceClient> logger)
 : BaseHttpClient(httpClient), IPaymentServiceClient
 {
     //private readonly PaymentBackendServiceApiConfig _config = options.Value;
+
     public async Task<PaymentFeeResponseDto> GetRegistrationPaymentFee(PaymentFeeRequestDto request)
     {
         logger.LogInformation(LogMessages.AttemptingRegistrationPaymentFee);
@@ -62,3 +66,4 @@ ILogger<PaymentServiceClient> logger)
         //return await PostAsync<SaveOfflinePaymentRequestDto, bool>(url, request);
     }
 }
+#pragma warning restore S125

@@ -1085,7 +1085,7 @@ public class OrganisationRegistrationSubmissionServiceTests
         }
 
         // Helper: Create a default item with minimal setup
-        private RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
+        private static RegistrationSubmissionOrganisationDetailsFacadeResponse CreateDefaultItem(string appRef, RegistrationSubmissionStatus initialStatus)
         {
             return new RegistrationSubmissionOrganisationDetailsFacadeResponse
             {

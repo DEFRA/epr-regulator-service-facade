@@ -26,7 +26,6 @@ public class AccreditationsController : FileDownloadBaseController
 {
 
     private readonly IBlobStorageService _blobStorageService;
-    private readonly IAntivirusService _antivirusService;
     private readonly BlobStorageConfig _blobStorageConfig;
     private readonly IReprocessorExporterService _reprocessorExporterService;
     private readonly IValidator<MarkAsDulyMadeRequestDto> _markAsDulyMadeRequestDtoValidator;
@@ -49,7 +48,6 @@ public class AccreditationsController : FileDownloadBaseController
         _updateAccreditationMaterialTaskValidator = updateAccreditationMaterialTaskValidator;
         _offlinePaymentRequestDtoValidator = offlinePaymentRequestDtoValidator;
         _blobStorageService =  blobStorageService;
-        _antivirusService = antivirusService;
         _blobStorageConfig = blobStorageConfig.Value;
         _logger = logger;
     }

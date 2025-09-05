@@ -62,7 +62,7 @@ public class CustomExceptionHandlingMiddleware(RequestDelegate next, ILogger<Cus
             detail = ex.Message
         };
 
-        logger.LogError(ex, title);
+        logger.HandleException(title, ex);
         await context.Response.WriteAsJsonAsync(errorResponse);
     }
 
