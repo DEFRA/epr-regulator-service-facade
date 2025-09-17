@@ -24,7 +24,7 @@ variables:
     value: epr_regulator_service_facade
   - name: runNugetTasks
     value: true
-   - name: runTests
+  - name: runTests
     value: true   
   - name: NUGET_PACKAGES
     value: $(Pipeline.Workspace)/.nuget/packages
