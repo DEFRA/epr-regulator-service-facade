@@ -244,7 +244,7 @@ public class OrganisationsSearchController : ControllerBase
             };
             
             _messagingService.SendEmailToInvitedNewApprovedPerson(emailModel);
-            _logger.LogInformation(@"Email sent to Invited new approved person. Organisation external Id: {OrganisationId} User: {InvitedPersonFirstName} {InvitedPersonLastName}", request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName);
+            _logger.LogInformation(@"Email sent to Invited new approved person. Organisation external Id: {OrganisationId}", request.OrganisationId);
 
             // Send email to Demoted users.
             var emailUser = addRemoveApprovedUserResponse.AssociatedPersonList.Where(r => !string.IsNullOrWhiteSpace(r.FirstName) && !string.IsNullOrWhiteSpace(r.LastName)).ToArray<AssociatedPersonResults>();
@@ -253,7 +253,7 @@ public class OrganisationsSearchController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, @"Error inviting new approved person. Organisation external Id: {OrganisationId} Invited user: {InvitedPersonFirstName} {InvitedPersonLastName} Invited by user email: {InvitedByUserEmail}", request.OrganisationId, request.InvitedPersonFirstName, request.InvitedPersonLastName, invitedByUserEmail);
+            _logger.LogError(e, @"Error inviting new approved person. Organisation external Id: {OrganisationId}", request.OrganisationId);
 
             return BadRequest("Failed to add / remove user");
         }
@@ -276,7 +276,7 @@ public class OrganisationsSearchController : ControllerBase
             var emailSent = SendNotificationEmailToDeletedPerson(email, email.EmailNotificationType);
             if (!emailSent)
             {
-                _logger.LogError("Error sending the notification email to user {FirstName} {LastName} for company {CompanyName}", email.FirstName, email.LastName, email.CompanyName);
+                _logger.LogError("Error sending the notification email to user for company {CompanyName}", email.CompanyName);
             }
          
         }
