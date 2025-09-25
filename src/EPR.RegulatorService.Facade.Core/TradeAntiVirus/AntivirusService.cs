@@ -49,7 +49,7 @@ namespace EPR.RegulatorService.Facade.Core.TradeAntiVirus
             return await _antivirusClient.VirusScanFile(fileDetails, truncatedFileName, fileStream);
         }
 
-        private string GetContainerName(string submissionType, string suffix) =>
+        private static string GetContainerName(string submissionType, string suffix) =>
             suffix is null ? submissionType : submissionType + suffix;
     }
 }

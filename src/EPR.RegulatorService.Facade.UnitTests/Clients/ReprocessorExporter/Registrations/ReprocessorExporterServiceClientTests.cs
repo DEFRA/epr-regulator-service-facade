@@ -20,6 +20,11 @@ public class ReprocessorExporterServiceClientTests
     private Mock<ILogger<ReprocessorExporterServiceClient>> _mockLogger = null!;
     private ReprocessorExporterServiceClient _client = null!;
     private Fixture _fixture = null!;
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+    };
 
     [TestInitialize]
     public void TestInitialize()
@@ -180,12 +185,8 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var requestDto = _fixture.Create<UpdateMaterialOutcomeWithReferenceDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(true, jsonOptions));
+      
+        var responseContent = new StringContent(JsonSerializer.Serialize(true, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -340,12 +341,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<MaterialsAuthorisedOnSiteDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -371,12 +367,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var requestDto = _fixture.Create<MarkAsDulyMadeWithUserIdDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(true, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(true, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -402,12 +393,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<RegistrationFeeContextDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -479,12 +465,7 @@ public class ReprocessorExporterServiceClientTests
     {
         // Arrange
         var expectedDto = _fixture.Create<AccreditationFeeContextDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -511,12 +492,7 @@ public class ReprocessorExporterServiceClientTests
         // Arrange
         var accreditationId = Guid.NewGuid();
         var requestDto = _fixture.Create<MarkAsDulyMadeWithUserIdDto>();
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
-        };
-        var responseContent = new StringContent(JsonSerializer.Serialize(true, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(true, JsonSerializerOptions));
 
         _mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -629,10 +605,9 @@ public class ReprocessorExporterServiceClientTests
         result.Should().BeEquivalentTo(expectedDto);
     }
 
-    private HttpContent SerialiseContent<T>(T expectedDto)
+    private static StringContent SerialiseContent<T>(T expectedDto)
     {
-        var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never };
-        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, jsonOptions));
+        var responseContent = new StringContent(JsonSerializer.Serialize(expectedDto, JsonSerializerOptions));
 
         return responseContent;
     }
