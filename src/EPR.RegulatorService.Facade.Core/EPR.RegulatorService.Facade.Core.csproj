@@ -10,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.21.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.25.1" />
     <PackageReference Include="Enums.NET" Version="5.0.0" />
-    <PackageReference Include="GovukNotify" Version="7.1.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="GovukNotify" Version="7.2.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
   </ItemGroup>
 
@@ -27,8 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
-    <PackageReference Update="SonarAnalyzer.CSharp" Version="9.30.0.95878" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageReference Update="SonarAnalyzer.CSharp" Version="10.15.0.120848" />
   </ItemGroup>
 
 </Project>
