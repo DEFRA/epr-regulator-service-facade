@@ -7,6 +7,7 @@
         <AssemblyName>EPR.RegulatorService.Facade.UnitTests</AssemblyName>
         <RootNamespace>EPR.RegulatorService.Facade.UnitTests</RootNamespace>
         <IsPackable>false</IsPackable>
+		<NoWarn>NU1605</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,8 +15,8 @@
         <PackageReference Include="FluentAssertions" Version="8.7.0" />
         <PackageReference Include="ILogger.Moq" Version="2.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.10.4" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.10.4" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.10.5" />
+        <PackageReference Include="MSTest.TestFramework" Version="3.10.5" />
         <PackageReference Include="coverlet.collector" Version="6.0.4">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
