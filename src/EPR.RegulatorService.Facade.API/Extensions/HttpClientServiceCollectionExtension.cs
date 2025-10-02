@@ -49,7 +49,12 @@ public static class HttpClientServiceCollectionExtension
             .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
             {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime)
+                PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime),
+                SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                {
+                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+                }
             });
 
         services.AddHttpClient<IRegulatorOrganisationService, RegulatorOrganisationService>((serviceProvider, client) =>
@@ -64,7 +69,12 @@ public static class HttpClientServiceCollectionExtension
             .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
             {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime)
+                PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime),
+                SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                {
+                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+                }
             });
 
         services.AddHttpClient<ISubmissionService, SubmissionsService>((sp, client) =>
@@ -72,14 +82,32 @@ public static class HttpClientServiceCollectionExtension
             client.BaseAddress = new Uri(submissionSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(submissionSettings.Timeout);
         })
-            .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount));
+            .AddPolicyHandler(GetRetryPolicy(submissionSettings.ServiceRetryCount))
+             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+             {
+
+                 SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                 {
+                     EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+                 }
+             });
 
         services.AddHttpClient<ICommonDataService, CommonDataService>((sp, client) =>
         {
             client.BaseAddress = new Uri(commonDataSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(commonDataSettings.Timeout);
         })
-            .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount));
+            .AddPolicyHandler(GetRetryPolicy(commonDataSettings.ServiceRetryCount))
+              .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+              {
+
+                  SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                  {
+                      EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+                  }
+              });
 
         services.AddHttpClient<IReprocessorExporterServiceClient, ReprocessorExporterServiceClient>((sp, client) =>
         {
@@ -87,15 +115,33 @@ public static class HttpClientServiceCollectionExtension
             client.Timeout = TimeSpan.FromSeconds(PrnServiceApiSettings.Timeout);
         })
         .AddHttpMessageHandler<PrnBackendServiceAuthorisationHandler>()
-        .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount));
-        
+        .AddPolicyHandler(GetRetryPolicy(PrnServiceApiSettings.ServiceRetryCount))
+          .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+          {
+
+              SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+              {
+                  EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+              }
+          });
+
         services.AddHttpClient<IPaymentServiceClient, PaymentServiceClient>((sp, client) =>
         {
             client.BaseAddress = new Uri(paymentServiceApiSettings.BaseUrl);
             client.Timeout = TimeSpan.FromSeconds(paymentServiceApiSettings.Timeout);
         })
         .AddHttpMessageHandler<PaymentBackendServiceAuthorisationHandler>()
-        .AddPolicyHandler(GetRetryPolicy(paymentServiceApiSettings.ServiceRetryCount));
+        .AddPolicyHandler(GetRetryPolicy(paymentServiceApiSettings.ServiceRetryCount))
+          .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+          {
+
+              SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+              {
+                  EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+              }
+          });
 
         services.AddHttpClient<IAccountServiceClient, AccountServiceClient>((sp, client) =>
         {
@@ -103,7 +149,16 @@ public static class HttpClientServiceCollectionExtension
             client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
         })
         .AddHttpMessageHandler<AccountServiceAuthorisationHandler>()
-        .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount));
+        .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
+          .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+          {
+
+              SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+              {
+                  EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+              }
+          });
 
         services.AddHttpClient<IProducerService, ProducerService>((sp, client) =>
         {
@@ -114,7 +169,12 @@ public static class HttpClientServiceCollectionExtension
             .AddPolicyHandler(GetRetryPolicy(settings.ServiceRetryCount))
             .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
             {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime)
+                PooledConnectionLifetime = TimeSpan.FromMinutes(settings.ServicePooledConnectionLifetime),
+                 SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                 {
+                     EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                             | System.Security.Authentication.SslProtocols.Tls13
+                 }
             });
         if (antivirusSettings.EnableDirectAccess)
         {
