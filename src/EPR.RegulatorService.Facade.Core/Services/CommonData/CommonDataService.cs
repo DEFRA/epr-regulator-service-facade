@@ -44,17 +44,21 @@ public class CommonDataService(
         return await httpClient.PostAsJsonAsync(url, registrationSubmissionsRequest);
     }
 
-    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(Guid submissionId)
+    public async Task<RegistrationSubmissionOrganisationDetailsFacadeResponse> GetOrganisationRegistrationSubmissionDetails(
+        Guid submissionId,
+        int lateFeeCutOffDay,
+        int lateFeeCutOffMonth)
     {
-        var url = $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
-     
+        var url = string.Format(
+            $"{_config.Endpoints.GetOrganisationRegistrationSubmissionDetails}", submissionId, lateFeeCutOffDay, lateFeeCutOffMonth);
+
         var response = await httpClient.GetAsync(url);
 
         response.EnsureSuccessStatusCode();
 
         string content = await response.Content.ReadAsStringAsync();
 
-        if ( string.IsNullOrWhiteSpace(content))
+        if (string.IsNullOrWhiteSpace(content))
         {
             return null;
         }
@@ -74,7 +78,7 @@ public class CommonDataService(
 
         string content = await response.Content.ReadAsStringAsync();
 
-        if ( string.IsNullOrWhiteSpace(content))
+        if (string.IsNullOrWhiteSpace(content))
         {
             return new PaginatedResponse<OrganisationRegistrationSubmissionSummaryResponse>
             {
@@ -93,7 +97,7 @@ public class CommonDataService(
     public async Task<PomResubmissionPaycalParametersDto?> GetPomResubmissionPaycalDetails(Guid submissionId, Guid? complianceSchemeId)
     {
         var url = $"{_config.Endpoints.GetPomResubmissionPaycalParameters}/{submissionId}";
-        
+
         if (complianceSchemeId.HasValue)
         {
             url += $"?ComplianceSchemeId={complianceSchemeId}";
@@ -103,16 +107,20 @@ public class CommonDataService(
         {
             var response = await httpClient.GetAsync(url);
 
-            if (response.StatusCode ==  HttpStatusCode.PreconditionFailed)
+            if (response.StatusCode == HttpStatusCode.PreconditionFailed)
             {
-                return new PomResubmissionPaycalParametersDto { 
-                    ReferenceFieldNotAvailable = true };
+                return new PomResubmissionPaycalParametersDto
+                {
+                    ReferenceFieldNotAvailable = true
+                };
             }
 
             if (response.StatusCode == HttpStatusCode.PreconditionRequired)
             {
-                return new PomResubmissionPaycalParametersDto { 
-                    ReferenceNotAvailable = true };
+                return new PomResubmissionPaycalParametersDto
+                {
+                    ReferenceNotAvailable = true
+                };
             }
 
             response.EnsureSuccessStatusCode();
@@ -146,7 +154,7 @@ public class CommonDataService(
     [ExcludeFromCodeCoverage]
     private RegistrationSubmissionOrganisationDetailsFacadeResponse ConvertCommonDataDetailToFEData(OrganisationRegistrationDetailsDto? jsonObject)
     {
-        if ( jsonObject == null) return null;
+        if (jsonObject == null) return null;
 
         var objRet = (RegistrationSubmissionOrganisationDetailsFacadeResponse)jsonObject;
 

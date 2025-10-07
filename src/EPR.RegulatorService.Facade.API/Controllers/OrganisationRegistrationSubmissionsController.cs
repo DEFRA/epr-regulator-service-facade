@@ -168,7 +168,10 @@ public class OrganisationRegistrationSubmissionsController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Route("organisation-registration-submission-details/{submissionId:Guid}")]
-    public async Task<IActionResult> GetRegistrationSubmissionDetails([Required] Guid submissionId)
+    public async Task<IActionResult> GetRegistrationSubmissionDetails(
+        [Required] Guid submissionId,
+        [Required][FromQuery] int lateFeeCutOffDay,
+        [Required][FromQuery] int lateFeeCutOffMonth)
     {
         try
         {
@@ -178,7 +181,11 @@ public class OrganisationRegistrationSubmissionsController(
             }
 
             var result =
-                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(submissionId, User.UserId());
+                await organisationRegistrationSubmissionService.HandleGetOrganisationRegistrationSubmissionDetails(
+                    submissionId,
+                    User.UserId(),
+                    lateFeeCutOffDay,
+                    lateFeeCutOffMonth);
 
             if (result is null)
             {
