@@ -69,6 +69,7 @@ public class OrganisationRegistrationDetailsDto
     public bool IsOnlineMarketPlace { get; set; }
     public int NumberOfSubsidiaries { get; set; }
     public int NumberOfOnlineSubsidiaries { get; set; }
+    public int NumberOfLateSubsidiaries { get; set; }
 
     public Guid? CompanyDetailsFileId { get; set; }
     public string? CompanyDetailsFileName { get; set; }
@@ -80,7 +81,7 @@ public class OrganisationRegistrationDetailsDto
     public string? BrandsFileName { get; set; }
     public string? BrandsBlobName { get; set; }
     public string? CSOJson { get; set; }
-
+    
     public static implicit operator RegistrationSubmissionOrganisationDetailsFacadeResponse(OrganisationRegistrationDetailsDto dto)
     {
         static DateTime? convertDateTime(string dateTimeString)
@@ -170,6 +171,7 @@ public class OrganisationRegistrationDetailsDto
         response.IsOnlineMarketPlace = dto.IsOnlineMarketPlace;
         response.NumberOfSubsidiaries = dto.NumberOfSubsidiaries;
         response.NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries;
+        response.NumberOfLateSubsidiaries = dto.NumberOfLateSubsidiaries;
         response.IsLateSubmission = dto.IsLateSubmission;
 
         // Creating and assigning SubmissionDetails
