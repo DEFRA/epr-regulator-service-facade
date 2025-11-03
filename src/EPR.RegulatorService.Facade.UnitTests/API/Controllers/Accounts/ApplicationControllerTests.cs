@@ -163,7 +163,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
         public async Task ApplicationController_Throws_500_When_MessagingService_Throws_Error()
         {
             // Arrange
@@ -182,7 +181,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.API.Controllers.Accounts
                 .Throws(new Exception("Invalid Request"));
 
             // Act
-            await _sut.GovNotification(govNotificationRequestModel);
+            await Assert.ThrowsExactlyAsync<Exception>(async () => await _sut.GovNotification(govNotificationRequestModel));
         }
 
         private static GovNotificationRequestModel GetGovNotificationRequestModel()

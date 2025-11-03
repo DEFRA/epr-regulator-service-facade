@@ -463,7 +463,7 @@ public class CommonDataServiceTests
         SetupApiBadRequestCall();
 
         // Act
-        Assert.ThrowsExceptionAsync<HttpRequestException>(() => _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid()));
+        Assert.ThrowsExactlyAsync<HttpRequestException>(() => _sut.GetOrganisationRegistrationSubmissionDetails(Guid.NewGuid()));
     }
 
     private static RegistrationSubmissionOrganisationType RandomOrganisationType()

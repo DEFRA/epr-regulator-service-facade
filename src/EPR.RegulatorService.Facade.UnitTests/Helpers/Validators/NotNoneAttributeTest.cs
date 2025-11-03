@@ -25,15 +25,14 @@ public class NotNoneAttributeTest
     [TestMethod]
     public void IsValid_NonEnumValue_ThrowsInvalidOperationException()
     {
-        var ex = Assert.ThrowsException<InvalidOperationException>(() => _attribute.IsValid("not-an-enum"));
+        var ex = Assert.ThrowsExactly<InvalidOperationException>(() => _attribute.IsValid("not-an-enum"));
         Assert.AreEqual("The NotDefaultEnumAttribute can only be used on enum types.", ex.Message);
     }
 
     [TestMethod]
     public void IsValid_EnumDefaultValue_ReturnsValidationError()
     {
-        var result = _attribute.IsValid(TestEnum.None);
-        Assert.IsNotNull(result);
+        var result = _attribute.IsValid(TestEnum.None);        
         Assert.IsFalse(result);
     }
 
@@ -41,13 +40,13 @@ public class NotNoneAttributeTest
     public void IsValid_EnumNonDefaultValue_ReturnsSuccess()
     {
         var result = _attribute.IsValid(TestEnum.Value1);
-        Assert.AreEqual(true, result);
+        Assert.IsTrue(result);
     }
 
     [TestMethod]
     public void IsValid_EnumOtherNonDefaultValue_ReturnsSuccess()
     {
         var result = _attribute.IsValid(TestEnum.Value2);
-        Assert.AreEqual(true, result);
+        Assert.IsTrue(result);
     }
 }

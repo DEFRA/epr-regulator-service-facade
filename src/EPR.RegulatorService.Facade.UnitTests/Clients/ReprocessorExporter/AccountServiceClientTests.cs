@@ -92,7 +92,7 @@ public class AccountServiceClientTests
         var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
         
         // Act and Assert
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
     }
 
     [TestMethod]
@@ -106,7 +106,7 @@ public class AccountServiceClientTests
         var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
 
         // Act and Assert
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => client.GetNationDetailsById(1));
     }
 
     [TestMethod]
@@ -148,7 +148,7 @@ public class AccountServiceClientTests
                 var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
         
         // Act and Assert
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetPersonDetailsByIds(requestDto));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => client.GetPersonDetailsByIds(requestDto));
     }
 
     [TestMethod]
@@ -163,7 +163,7 @@ public class AccountServiceClientTests
         var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
 
         // Act and Assert
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetPersonDetailsByIds(requestDto));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => client.GetPersonDetailsByIds(requestDto));
     }
 
 
@@ -205,6 +205,6 @@ public class AccountServiceClientTests
 
         var client = new AccountServiceClient(new HttpClient(_mockHttpMessageHandler.Object), _mockOptions.Object, _mockLogger.Object);
 
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => client.GetOrganisationDetailsById(Guid.NewGuid()));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => client.GetOrganisationDetailsById(Guid.NewGuid()));
     }
 }

@@ -78,7 +78,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Producer
 
             // Assert
             VerifyApiCall(expectedUrl, HttpMethod.Get);
-            var responseString = await result.Content.ReadAsStringAsync();
+            var responseString = await result.Content.ReadAsStringAsync(default);
 
             var regulators = JsonConvert.DeserializeObject<List<OrganisationSearchResult>>(responseString);
             regulators.Count.Should().Be(0);
@@ -120,7 +120,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Producer
 
             // Assert
             VerifyApiCall(expectedUrl, HttpMethod.Get);
-            var responseString = await result.Content.ReadAsStringAsync();
+            var responseString = await result.Content.ReadAsStringAsync(default);
 
             var organisation = JsonConvert.DeserializeObject<List<OrganisationDetails>>(responseString);
             organisation.Count.Should().Be(0);

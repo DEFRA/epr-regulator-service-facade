@@ -252,7 +252,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Regulator
 
             // Assert
             VerifyApiCall(expectedUrl, HttpMethod.Get);
-            var responseString = await result.Content.ReadAsStringAsync();
+            var responseString = await result.Content.ReadAsStringAsync(default);
 
             var regulators = JsonConvert.DeserializeObject<List<OrganisationUserOverviewResponseModel>>(responseString);
             regulators.Count.Should().Be(0);
