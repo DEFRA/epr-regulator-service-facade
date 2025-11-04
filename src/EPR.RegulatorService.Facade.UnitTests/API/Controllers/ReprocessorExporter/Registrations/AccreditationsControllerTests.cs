@@ -439,7 +439,7 @@ public class AccreditationsControllerTests
             .ThrowsAsync(new Exception(expectedMessage));
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<Exception>(async () =>
+        var exception = await Assert.ThrowsExactlyAsync<Exception>(async () =>
         {
             await _controller.GetBusinessPlanAsync(accreditationId);
         });

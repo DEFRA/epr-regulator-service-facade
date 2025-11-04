@@ -44,7 +44,7 @@ public class CustomExceptionHandlingMiddlewareTests
             context.Response.ContentType.Should().Be("application/json; charset=utf-8");
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var response = await JsonSerializer.DeserializeAsync<JsonElement>(context.Response.Body);
+            var response = await JsonSerializer.DeserializeAsync<JsonElement>(utf8Json: context.Response.Body, cancellationToken: default);
             response.GetProperty("status").GetInt32().Should().Be((int)HttpStatusCode.BadRequest);
             response.GetProperty("title").GetString().Should().Be("One or more validation errors occurred.");
         }
@@ -69,7 +69,7 @@ public class CustomExceptionHandlingMiddlewareTests
             context.Response.ContentType.Should().Be("application/json; charset=utf-8");
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var response = await JsonSerializer.DeserializeAsync<JsonElement>(context.Response.Body);
+            var response = await JsonSerializer.DeserializeAsync<JsonElement>(utf8Json: context.Response.Body, cancellationToken: default);
             response.GetProperty("status").GetInt32().Should().Be((int)HttpStatusCode.BadRequest);
             response.GetProperty("title").GetString().Should().Be("An invalid operation occurred.");
         }
@@ -94,7 +94,7 @@ public class CustomExceptionHandlingMiddlewareTests
             context.Response.ContentType.Should().Be("application/json; charset=utf-8");
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var response = await JsonSerializer.DeserializeAsync<JsonElement>(context.Response.Body);
+            var response = await JsonSerializer.DeserializeAsync<JsonElement>(utf8Json: context.Response.Body, cancellationToken: default);
             response.GetProperty("status").GetInt32().Should().Be((int)HttpStatusCode.InternalServerError);
             response.GetProperty("title").GetString().Should().Be("An HTTP request exception occurred.");
         }
@@ -119,7 +119,7 @@ public class CustomExceptionHandlingMiddlewareTests
             context.Response.ContentType.Should().Be("application/json; charset=utf-8");
 
             context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var response = await JsonSerializer.DeserializeAsync<JsonElement>(context.Response.Body);
+            var response = await JsonSerializer.DeserializeAsync<JsonElement>(utf8Json: context.Response.Body, cancellationToken: default);
             response.GetProperty("status").GetInt32().Should().Be((int)HttpStatusCode.NotFound);
             response.GetProperty("title").GetString().Should().Be("The requested resource could not be found.");
         }
@@ -135,7 +135,7 @@ public class CustomExceptionHandlingMiddlewareTests
                  .ThrowsAsync(new Exception("Unexpected error"));
 
         // Act & Assert
-        await Assert.ThrowsExceptionAsync<Exception>(async () => await _middleware.InvokeAsync(context));
+        await Assert.ThrowsExactlyAsync<Exception>(async () => await _middleware.InvokeAsync(context));
     }
 
 }

@@ -55,10 +55,10 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert  
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 15);
-        Assert.IsTrue(result.StartsWith('R'));
-        Assert.IsTrue(result.StartsWith($"R{year}"));
-        Assert.IsTrue(result.StartsWith($"R{year}EP"));
+        Assert.AreEqual(15, result.Length);
+        Assert.StartsWith("R", result);
+        Assert.StartsWith($"R{year}", result);
+        Assert.StartsWith($"R{year}EP", result);
     }
 
     [TestMethod]
@@ -79,11 +79,11 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert  
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 17);
-        Assert.IsTrue(result.StartsWith('R'));
-        Assert.IsTrue(result.StartsWith($"R{year}"));
-        Assert.IsTrue(result.StartsWith($"R{year}EC"));
-        Assert.IsTrue(result.StartsWith($"R{year}EC{orgId}234"));
+        Assert.AreEqual(17, result.Length);
+        Assert.StartsWith("R", result);
+        Assert.StartsWith($"R{year}", result);
+        Assert.StartsWith($"R{year}EC", result);
+        Assert.StartsWith($"R{year}EC{orgId}234", result);
     }
 
     [TestMethod]
@@ -581,7 +581,7 @@ public class OrganisationRegistrationSubmissionServiceTests
     {
         //Arrange  
         // Act
-        Assert.ThrowsException<ArgumentNullException>(() =>
+        Assert.ThrowsExactly<ArgumentNullException>(() =>
         _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, "123456"));
     }
 
@@ -603,11 +603,11 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert  
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 17);
-        Assert.IsTrue(result.StartsWith('R'));
-        Assert.IsTrue(result.StartsWith($"R{year}"));
-        Assert.IsTrue(result.StartsWith($"R{year}EE"));
-        Assert.IsTrue(result.EndsWith($"ST"));
+        Assert.AreEqual(17, result.Length);
+        Assert.StartsWith("R", result);
+        Assert.StartsWith($"R{year}", result);
+        Assert.StartsWith($"R{year}EE", result);
+        Assert.EndsWith($"ST", result);
     }
 
     [TestMethod]
@@ -629,18 +629,18 @@ public class OrganisationRegistrationSubmissionServiceTests
 
         // Assert  
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.Length == 17);
-        Assert.IsTrue(result.StartsWith('R'));
-        Assert.IsTrue(result.StartsWith($"R{year}"));
-        Assert.IsTrue(result.StartsWith($"R{year}ER"));
-        Assert.IsTrue(result.EndsWith($"PL"));
+        Assert.AreEqual(17, result.Length);
+        Assert.StartsWith("R", result);
+        Assert.StartsWith($"R{year}", result);
+        Assert.StartsWith($"R{year}ER", result);
+        Assert.EndsWith($"PL", result);
     }
 
     [TestMethod]
     public async Task Should_throw_exception_if_OrgId_IsNull()
     {
         // Act 
-        Assert.ThrowsException<ArgumentNullException>(() => _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, null));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _sut.GenerateReferenceNumber(CountryName.Eng, RegistrationSubmissionType.Producer, string.Empty, null));
     }
 
     [TestMethod]

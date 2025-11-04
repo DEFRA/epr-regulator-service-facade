@@ -58,7 +58,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         [DataRow("bob@hotmail.com", "firstName", "lastName", null, "123456789", "https://www.gov.uk/")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", null, "https://www.gov.uk/")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", "123456789", null)]
-        [ExpectedException(typeof(ArgumentException))]
         public void ApprovedPersonAccepted_ArgumentException_Thrown_When_Parameters_Invalid(string email,
             string firstName, string lastName, string organisationName, string organisationNumber,
             string accountLoginUrl)
@@ -81,7 +80,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.ApprovedPersonAccepted(model);
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.ApprovedPersonAccepted(model));
         }
 
         [TestMethod]
@@ -145,7 +144,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", null, "https://www.gov.uk/", "Not good enough")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", "123456789", null, "Not good enough")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", "123456789", "https://www.gov.uk/", null)]
-        [ExpectedException(typeof(ArgumentException))]
         public void ApprovedPersonRejected_ArgumentException_Thrown_When_Parameters_Invalid(string email,
             string firstName, string lastName, string organisationName, string organisationNumber,
             string accountLoginUrl, string rejectionComments)
@@ -170,7 +168,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.ApprovedPersonRejected(model);
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.ApprovedPersonRejected(model));
         }
 
         [TestMethod]
@@ -233,7 +231,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         [DataRow("bob@hotmail.com", "firstName", "lastName", null, "123456789", "https://www.gov.uk/")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", null, "https://www.gov.uk/")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "Org 1", "123456789", null)]
-        [ExpectedException(typeof(ArgumentException))]
         public void DelegatedPersonAccepted_ArgumentException_Thrown_When_Parameters_Invalid(string email,
             string firstName,
             string lastName, string organisationName, string organisationNumber, string accountLoginUrl)
@@ -252,11 +249,10 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.DelegatedPersonAccepted(model);
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.DelegatedPersonAccepted(model));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void DelegatedPersonAccepted_Throws_Exception_When_More_Than_Once_Delegated_User()
         {
             // Arrange
@@ -274,7 +270,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.DelegatedPersonAccepted(applicationEmailModel);
+            Assert.ThrowsExactly<InvalidOperationException>(() => _sut.DelegatedPersonAccepted(applicationEmailModel));
         }
 
         [TestMethod]
@@ -340,7 +336,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         [DataRow("bob4@hotmail.com", "firstName", "lastName", "Org 1", null, "https://www.gov.uk/", "Not good enough")]
         [DataRow("bob5@hotmail.com", "firstName", "lastName", "Org 1", "123456789", null, "Not good enough")]
         [DataRow("bob6@hotmail.com", "firstName", "lastName", "Org 1", "123456789", "https://www.gov.uk/", null)]
-        [ExpectedException(typeof(ArgumentException))]
         public void DelegatedPersonRejected_ArgumentException_Thrown_When_Parameters_Invalid(string email,
             string firstName, string lastName, string organisationName, string organisationNumber,
             string accountLoginUrl, string rejectionComments)
@@ -365,7 +360,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.DelegatedPersonRejected(model);
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.DelegatedPersonRejected(model));
         }
 
         [TestMethod]
@@ -629,7 +624,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         [DataRow("bob@hotmail.com", "", "lastName", "123456789", "DemotedDelegatedUsed")]
         [DataRow("bob@hotmail.com", "firstName", "", "123456789", "DemotedDelegatedUsed")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "", "DemotedDelegatedUsed")]
-        [ExpectedException(typeof(ArgumentException))]
         public void RemovedPerson_DelegatedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
            string email,
            string firstName,
@@ -651,7 +645,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType);
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType));
         }
 
         [TestMethod]
@@ -660,7 +654,6 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
         [DataRow("bob@hotmail.com", "firstName", "", "123456789", "Org 1", "RemovedApprovedUser")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "123456789", "", "RemovedApprovedUser")]
         [DataRow("bob@hotmail.com", "firstName", "lastName", "", "Org 1", "RemovedApprovedUser")]
-        [ExpectedException(typeof(ArgumentException))]
         public void RemovedPerson_ApprovedPerson_ArgumentException_Thrown_When_Parameters_Invalid(
             string email,
             string firstName,
@@ -684,7 +677,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
             // Act
-            _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType);
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.SendRemovedApprovedPersonNotification(model, model.EmailNotificationType));
         }
 
         [TestMethod]
@@ -1266,7 +1259,7 @@ namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.Accounts
 
             _sut = new MessagingService(_notificationClientMock.Object, messagingConfig, _nullLogger);
 
-            Assert.ThrowsException<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
+            Assert.ThrowsExactly<ArgumentException>(() => _sut.SendEmailToInvitedNewApprovedPerson(model));
         }
 
 
