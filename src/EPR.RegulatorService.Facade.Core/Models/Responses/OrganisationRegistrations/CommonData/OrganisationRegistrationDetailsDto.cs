@@ -85,12 +85,11 @@ public class OrganisationRegistrationDetailsDto
     {
         static DateTime? convertDateTime(string dateTimeString)
         {
-            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime tempDate)
-                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, out tempDate))
+            if (!DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime tempDate)
+                && !DateTime.TryParse(dateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out tempDate))
             {
                 return null;
             }
-
             return tempDate;
         }
 
