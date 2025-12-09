@@ -17,4 +17,5 @@ public class CsoMembershipDetailsDto
     public int RelevantYear { get; set; }
     public DateTime SubmittedDate { get;set; }
     public string SubmissionPeriodDescription {get;set;}
+    public int NumberOfLateSubsidiaries { get; set; }
 }
