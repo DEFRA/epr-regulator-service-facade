@@ -88,6 +88,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             UserId = Guid.NewGuid(),
             CountryName = CountryName.Eng,
             RegistrationSubmissionType = RegistrationSubmissionType.Producer,
+            ApplicationReferenceNumber = "PEPR123456726P1L",
             TwoDigitYear = "99",
             OrganisationAccountManagementId = "123456",
             DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc),
@@ -107,16 +108,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
-
-        _registrationSubmissionServiceMock.Setup(s =>
-        s.GenerateReferenceNumber(
-            It.IsAny<CountryName>(),
-            It.IsAny<RegistrationSubmissionType>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<MaterialType>()))
-            .Returns("EEE");
 
         // Act
         var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as CreatedResult;
@@ -157,15 +148,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
-
-        _registrationSubmissionServiceMock.Setup(s =>
-        s.GenerateReferenceNumber(
-            It.IsAny<CountryName>(),
-            It.IsAny<RegistrationSubmissionType>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<MaterialType>())).Returns("EEE");
 
         // Act
         var result = await _sut.CreateRegulatorSubmissionDecisionEvent(request) as CreatedResult;
@@ -666,6 +648,7 @@ public class OrganisationRegistrationSubmissionsControllerTests
             UserId = Guid.NewGuid(),
             CountryName = CountryName.Eng,
             RegistrationSubmissionType = RegistrationSubmissionType.Producer,
+            ApplicationReferenceNumber = "PEPR123456726P1L",
             TwoDigitYear = "99",
             OrganisationAccountManagementId = "123456",
             DecisionDate = new DateTime(2025, 4, 3, 0, 0, 0, DateTimeKind.Utc),
@@ -685,16 +668,6 @@ public class OrganisationRegistrationSubmissionsControllerTests
 
         _submissionsServiceMock.Setup(r => r.CreateSubmissionEvent(
             It.IsAny<Guid>(), It.IsAny<RegistrationSubmissionDecisionEvent>(), It.IsAny<Guid>())).ReturnsAsync(handlerResponse);
-
-        _registrationSubmissionServiceMock.Setup(s =>
-        s.GenerateReferenceNumber(
-            It.IsAny<CountryName>(),
-            It.IsAny<RegistrationSubmissionType>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<MaterialType>()))
-            .Returns("EEE");
 
         _messageServiceMock.Setup(x => x.OrganisationRegistrationSubmissionDecision(It.IsAny<OrganisationRegistrationSubmissionEmailModel>())).Throws(new Exception("Test Exception"));
 
