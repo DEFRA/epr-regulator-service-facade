@@ -1,21 +1,22 @@
-﻿using AutoFixture.AutoMoq;
-using AutoFixture;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.Applications;
+using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Requests.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
+using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 using EPR.RegulatorService.Facade.Core.Models.Submissions;
 using EPR.RegulatorService.Facade.Core.Services.CommonData;
 using EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
-using static EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.OrganisationRegistrationSubmissionService;
-using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
-using EPR.RegulatorService.Facade.Core.Models.RegistrationSubmissions;
-using FluentAssertions;
 using System.Net;
+using static EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission.OrganisationRegistrationSubmissionService;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Services.RegistrationSubmission;
 
@@ -38,7 +39,51 @@ public class OrganisationRegistrationSubmissionServiceTests
     }
 
     [TestMethod]
-    public async Task Should_return_valid_ReferenceNumber()
+    public void Should_return_valid_ReferenceNumber_For_Large_Submission()
+    {
+        var year = "26";
+        var organisationId = "123456";
+        var applicationReferenceNumber = "PEPR123456726P1L";
+
+        var organisationRegistrationSubmissionService = new OrganisationRegistrationSubmissionService(
+            null,
+            null,
+            new NullLogger<OrganisationRegistrationSubmissionService>());
+
+        var result = organisationRegistrationSubmissionService.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.ComplianceScheme,
+            applicationReferenceNumber,
+            organisationId, year);
+
+        Assert.StartsWith("R26EC123456", result);
+        Assert.EndsWith("L", result);
+    }
+
+    [TestMethod]
+    public void Should_return_valid_ReferenceNumber_For_Small_Submission()
+    {
+        var year = "26";
+        var organisationId = "123456";
+        var applicationReferenceNumber = "PEPR123456726P1S";
+
+        var organisationRegistrationSubmissionService = new OrganisationRegistrationSubmissionService(
+            null,
+            null,
+            new NullLogger<OrganisationRegistrationSubmissionService>());
+
+        var result = organisationRegistrationSubmissionService.GenerateReferenceNumber(
+            CountryName.Eng,
+            RegistrationSubmissionType.ComplianceScheme,
+            applicationReferenceNumber,
+            organisationId, year);
+
+        Assert.StartsWith("R26EC123456", result);
+        Assert.EndsWith("S", result);
+    }
+
+    [TestMethod]
+    public async Task Should_return_valid_ReferenceNumber_For_Missing_ApplicationReferenceNumber()
     {
         //Arrange  
         string year = "99";

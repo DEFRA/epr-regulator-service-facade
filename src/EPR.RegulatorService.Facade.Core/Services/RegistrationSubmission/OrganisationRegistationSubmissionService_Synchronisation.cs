@@ -16,9 +16,6 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
 {
     public partial class OrganisationRegistrationSubmissionService
     {
-        // 14 is used to support existing data and will be removed for R9.0
-        private const int _producerApplicationRefNumLength = 14;
-
         public string GenerateReferenceNumber(CountryName countryName,
                                               RegistrationSubmissionType registrationSubmissionType,
                                               string applicationReferenceNumber,
@@ -41,15 +38,23 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             var countryCode = ((char)countryName).ToString();
 
             var regType = ((char)registrationSubmissionType).ToString();
-
-            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme &&
-                applicationReferenceNumber.Length > _producerApplicationRefNumLength)
+            var regSize = string.Empty;
+            if (!string.IsNullOrEmpty(applicationReferenceNumber))
             {
-                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}{GenerateXDigitNumber(100, 1000)}";
+                regSize = applicationReferenceNumber.Last().ToString().ToUpper();
+                if (regSize != "S" && regSize != "L")
+                {
+                    regSize = string.Empty;
+                }
+            }
+
+            if (registrationSubmissionType == RegistrationSubmissionType.ComplianceScheme)
+            {
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{ExtractUniqueNumberFromAppRefNumber(applicationReferenceNumber)}{GenerateXDigitNumber(100, 1000)}{regSize}";
             }
             else
             {
-                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{GenerateXDigitNumber(1000, 10000)}";
+                refNumber = $"R{twoDigitYear}{countryCode}{regType}{organisationId}{GenerateXDigitNumber(1000, 10000)}{regSize}";
             }
 
             if (registrationSubmissionType == RegistrationSubmissionType.Reprocessor ||
@@ -90,7 +95,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
         {
             var cosmosItems = deltaRegistrationDecisionsResponse.Where(x => !string.IsNullOrWhiteSpace(x.AppReferenceNumber) && x.AppReferenceNumber.Equals(item.ApplicationReferenceNumber, StringComparison.OrdinalIgnoreCase))
                                                                 .OrderBy(x => x.Created);
-            var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderByDescending(x => x.Created );
+            var regulatorDecisions = cosmosItems.Where(x => x.Type.Equals("RegulatorRegistrationDecision", StringComparison.OrdinalIgnoreCase)).OrderByDescending(x => x.Created);
 
             foreach (var decision in regulatorDecisions)
             {
@@ -118,7 +123,7 @@ namespace EPR.RegulatorService.Facade.Core.Services.RegistrationSubmission
             }
         }
         private static void ProcessResubmissionDecision(
-            OrganisationRegistrationSubmissionSummaryResponse item,AbstractCosmosSubmissionEvent cosmosItem)
+            OrganisationRegistrationSubmissionSummaryResponse item, AbstractCosmosSubmissionEvent cosmosItem)
         {
             var resubmissionStatus = Enum.Parse<RegistrationSubmissionStatus>(cosmosItem.Decision);
             item.ResubmissionStatus = resubmissionStatus switch
