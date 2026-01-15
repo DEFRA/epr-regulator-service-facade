@@ -17,6 +17,8 @@ public class OrganisationRegistrationSubmissionSummaryResponse
     public string OrganisationReference { get; set; }
 
     public RegistrationSubmissionOrganisationType OrganisationType { get; set; }
+    public RegistrationJourneyType RegistrationJourneyType { get; set; }
+
 
     public string ApplicationReferenceNumber { get; set; }
 

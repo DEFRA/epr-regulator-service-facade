@@ -20,6 +20,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public string OrganisationReference { get; set; }
     public string OrganisationName { get; set; }
     public RegistrationSubmissionOrganisationType OrganisationType { get; set; }
+    public RegistrationJourneyType RegistrationJourneyType { get; set; }
     public int NationId { get; set; }
     public string NationCode { get; set; }
 
@@ -69,6 +70,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
             OrganisationId = details.OrganisationId,
             OrganisationName = details.OrganisationName,
             OrganisationType = details.OrganisationType,
+            RegistrationJourneyType = details.RegistrationJourneyType,
             OrganisationReference = details.OrganisationReference,
             RegistrationYear = details.RelevantYear,
             SubmissionStatus = details.SubmissionStatus,
