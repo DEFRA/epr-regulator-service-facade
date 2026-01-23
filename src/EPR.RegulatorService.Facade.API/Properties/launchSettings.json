@@ -27,8 +27,8 @@
       "applicationUrl": "https://localhost:7253;http://localhost:5076",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "AccountsServiceApiConfig:BaseUrl": "http://localhost:5000/api/",
-        "CommonDataApiConfig:BaseUrl": "http://localhost:5001/api/"
+        "AccountsServiceApiConfig:BaseUrl": "https://localhost:5000/api/",
+        "CommonDataApiConfig:BaseUrl": "https://localhost:5001/api/"
       }
     },
     "IIS Express": {
