@@ -1,1 +1,2 @@
 ﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("EPR.RegulatorService.Facade.UnitTests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("IntegrationTests")]
