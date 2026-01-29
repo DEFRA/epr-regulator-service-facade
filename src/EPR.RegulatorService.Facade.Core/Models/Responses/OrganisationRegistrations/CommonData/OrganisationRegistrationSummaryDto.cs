@@ -10,6 +10,7 @@ public class OrganisationRegistrationSummaryDto
     public Guid SubmissionId { get; set; }
     public Guid OrganisationId { get; set; }
     public string OrganisationType { get; set; }
+    public string RegistrationJourney { get; set; }
     public string OrganisationName { get; set; }
     public string OrganisationReference { get; set; }
     public string SubmissionStatus { get; set; }
@@ -45,6 +46,15 @@ public class OrganisationRegistrationSummaryDto
             // No need to assign here as the organisationType would have set to default
         }
         response.OrganisationType = organisationType;
+
+        if (Enum.TryParse<RegistrationJourneyType>(dto.RegistrationJourney, true, out var registrationJourneyType))
+        {
+            response.RegistrationJourneyType = registrationJourneyType;
+        }
+        else
+        {
+            response.RegistrationJourneyType = RegistrationJourneyType.Unknown;
+        }
 
         response.ApplicationReferenceNumber = dto.ApplicationReferenceNumber;
 
