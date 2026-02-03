@@ -136,4 +136,11 @@ app.MapHealthChecks(
     builder.Configuration.GetValue<string>("HealthCheckPath"),
     HealthCheckOptionBuilder.Build()).AllowAnonymous();
 
-await app.RunAsync();
+app.Run();
+
+namespace EPR.RegulatorService.Facade.API
+{
+    public partial class Program
+    {
+    }
+}
