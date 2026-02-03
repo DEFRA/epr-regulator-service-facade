@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "MockAccountService": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:5000/api/users/user-organisations?userId=a586e22f-0df0-4a24-8048-ae7d0aabbbbc"
+    }
+  }
+}

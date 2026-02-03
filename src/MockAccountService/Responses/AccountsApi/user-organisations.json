@@ -1,0 +1,29 @@
+{
+  "user": {
+    "id": "a586e22f-0df0-4a24-8048-ae7d0aabbbbc",
+    "firstName": "Test",
+    "lastName": "User",
+    "email": "test.user@example.com",
+    "roleInOrganisation": "Admin",
+    "enrolmentStatus": "Approved",
+    "serviceRole": "Regulator Basic",
+    "service": "Packaging",
+    "serviceRoleId": 5,
+    "organisations": [
+      {
+        "id": "f8d1c3e7-4a2b-4f9e-8d6c-1a2b3c4d5e6f",
+        "name": "Test Organisation 1",
+        "organisationRole": "Producer",
+        "organisationType": "Limited Company",
+        "nationId": 1
+      },
+      {
+        "id": "2b4c6d8e-9f1a-4b3c-8e7d-9a8b7c6d5e4f",
+        "name": "Test Organisation 2",
+        "organisationRole": "Compliance Scheme",
+        "organisationType": "Limited Company",
+        "nationId": 1
+      }
+    ]
+  }
+}
