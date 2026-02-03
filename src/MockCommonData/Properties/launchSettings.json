@@ -4,7 +4,7 @@
     "MockCommonData": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5001/api/submission-events/get-last-sync-time"
+      "launchUrl": "https://localhost:5001/api/submission-events/get-last-sync-time"
     }
   }
 }
