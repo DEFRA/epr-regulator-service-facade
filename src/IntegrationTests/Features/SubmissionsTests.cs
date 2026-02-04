@@ -72,12 +72,14 @@ public class SubmissionsTests : IntegrationTestBase
                 .WithHeader("Content-Type", "application/json")
                 .WithBody("[]"));
 
+        var submissionId = Guid.NewGuid();
+        var organisationId = Guid.NewGuid();
         var mockRegistrationData = new[]
         {
             new
             {
-                submissionId = Guid.NewGuid().ToString(),
-                organisationId = Guid.NewGuid().ToString(),
+                submissionId = submissionId.ToString(),
+                organisationId = organisationId.ToString(),
                 organisationName = "Test Organisation",
                 organisationReference = "100001",
                 organisationType = "large",
@@ -97,8 +99,39 @@ public class SubmissionsTests : IntegrationTestBase
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<JsonElement>(content);
+        
+        // Assert paginated response structure
         result.GetProperty("items").GetArrayLength().Should().Be(1);
         result.GetProperty("totalItems").GetInt32().Should().Be(1);
+        result.GetProperty("currentPage").GetInt32().Should().Be(1);
+        result.GetProperty("pageSize").GetInt32().Should().Be(20);
+        
+        // Assert full item structure and values - ensures all fields are passed through correctly
+        var item = result.GetProperty("items")[0];
+        item.GetProperty("submissionId").GetString().Should().Be(submissionId.ToString());
+        item.GetProperty("organisationId").GetString().Should().Be(organisationId.ToString());
+        item.GetProperty("organisationName").GetString().Should().Be("Test Organisation");
+        item.GetProperty("organisationReference").GetString().Should().Be("100001");
+        item.GetProperty("organisationType").GetString().Should().Be("large");
+        item.GetProperty("submissionPeriod").GetString().Should().Be("January to December 2025");
+        
+        // Verify response contains all expected properties from RegistrationSubmissionSummaryResponse
+        // This ensures existing and new fields are passed through correctly
+        var expectedProperties = new[]
+        {
+            "submissionId", "organisationId", "complianceSchemeId", "organisationName", "organisationReference",
+            "companiesHouseNumber", "buildingName", "subBuildingName", "buildingNumber", "street", "locality",
+            "dependantLocality", "town", "county", "country", "postCode", "organisationType", "producerType",
+            "userId", "firstName", "lastName", "email", "telephone", "serviceRole", "companyDetailsFileId",
+            "companyDetailsFileName", "companyDetailsBlobName", "partnershipFileId", "partnershipFileName",
+            "partnershipBlobName", "brandsFileId", "brandsFileName", "brandsBlobName", "submissionPeriod",
+            "registrationDate", "decision", "comments", "isResubmission", "previousRejectionComments", "nationId"
+        };
+        
+        foreach (var propertyName in expectedProperties)
+        {
+            item.TryGetProperty(propertyName, out _).Should().BeTrue($"Property '{propertyName}' should be present in the response");
+        }
     }
 
     [Fact]
@@ -127,9 +160,27 @@ public class SubmissionsTests : IntegrationTestBase
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<JsonElement>(content);
         
-        // Verify the response contains expected properties from PomResubmissionPaycalParametersDto
+        // Assert full response structure and values - ensures all fields are passed through correctly
+        result.GetProperty("isResubmission").GetBoolean().Should().BeFalse();
+        result.GetProperty("resubmissionDate").ValueKind.Should().Be(JsonValueKind.Null);
+        result.GetProperty("memberCount").ValueKind.Should().Be(JsonValueKind.Null);
+        result.GetProperty("reference").ValueKind.Should().Be(JsonValueKind.Null);
+        result.GetProperty("nationCode").ValueKind.Should().Be(JsonValueKind.Null);
         result.GetProperty("referenceNotAvailable").GetBoolean().Should().BeFalse();
         result.GetProperty("referenceFieldNotAvailable").GetBoolean().Should().BeFalse();
+        
+        // Verify response contains all expected properties from PomResubmissionPaycalParametersDto
+        // This ensures existing and new fields are passed through correctly
+        var expectedProperties = new[]
+        {
+            "isResubmission", "resubmissionDate", "memberCount", "reference", "nationCode",
+            "referenceNotAvailable", "referenceFieldNotAvailable"
+        };
+        
+        foreach (var propertyName in expectedProperties)
+        {
+            result.TryGetProperty(propertyName, out _).Should().BeTrue($"Property '{propertyName}' should be present in the response");
+        }
     }
 
     [Fact]
