@@ -1,15 +1,14 @@
 using System.Net.Http.Json;
-
-namespace IntegrationTests.Features;
-
 using System.Text.Json;
 using FluentAssertions;
 using IntegrationTests.Infrastructure;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 
-[Collection("Sequential")] // Shared mock common data can't be used safely in parallel
-public class OrganisationRegistrationSubmissionsTests : IntegrationTestBase
+namespace IntegrationTests.Features
+{
+    [Collection("Sequential")] // Shared mock common data can't be used safely in parallel
+    public class OrganisationRegistrationSubmissionsTests : IntegrationTestBase
 {
     [Fact]
     public async Task GetRegistrationSubmissionList_ReturnsSuccess_WithValidFilter()
@@ -168,5 +167,6 @@ public class OrganisationRegistrationSubmissionsTests : IntegrationTestBase
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
     }
 }

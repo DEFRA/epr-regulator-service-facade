@@ -1,5 +1,3 @@
-namespace IntegrationTests.Infrastructure;
-
 using EPR.RegulatorService.Facade.API.Controllers;
 using MockCommonData;
 
@@ -11,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using WireMock.Server;
 using System;
 
-public class FacadeWebApplicationFactory : CustomWebApplicationFactory<ApplicationController>
+namespace IntegrationTests.Infrastructure
+{
+    public class FacadeWebApplicationFactory : CustomWebApplicationFactory<ApplicationController>
 {
     private readonly WireMockServer _commonDataServer = MockCommonData.MockCommonDataServer.Start(useSsl: false);
 
@@ -65,5 +65,6 @@ public class FacadeWebApplicationFactory : CustomWebApplicationFactory<Applicati
             _commonDataServer?.Dispose();
         }
         base.Dispose(disposing);
+    }
     }
 }

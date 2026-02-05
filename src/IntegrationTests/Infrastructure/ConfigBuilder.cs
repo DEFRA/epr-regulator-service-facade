@@ -1,20 +1,21 @@
-namespace IntegrationTests.Infrastructure;
-
 using Microsoft.Extensions.Configuration;
 
-public static class ConfigBuilder
+namespace IntegrationTests.Infrastructure
 {
-    public static IConfiguration GenerateConfiguration()
+    public static class ConfigBuilder
     {
-        var configurationBuilder = new ConfigurationBuilder();
-        
-        // Add in-memory configuration for test settings
-        // This can be extended with additional test-specific configuration
-        configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+        public static IConfiguration GenerateConfiguration()
         {
-            // Add any default test configuration here if needed
-        });
-        
-        return configurationBuilder.Build();
+            var configurationBuilder = new ConfigurationBuilder();
+            
+            // Add in-memory configuration for test settings
+            // This can be extended with additional test-specific configuration
+            configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                // Add any default test configuration here if needed
+            });
+            
+            return configurationBuilder.Build();
+        }
     }
 }

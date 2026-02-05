@@ -1,12 +1,12 @@
-namespace MockCommonData.CommonDataApi;
-
 using System;
 using System.IO;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
-public static class CommonDataApi
+namespace MockCommonData.CommonDataApi
+{
+    public static class CommonDataApi
 {
     public static WireMockServer WithCommonDataApi(this WireMockServer server)
     {
@@ -80,5 +80,6 @@ public static class CommonDataApi
                 .WithBodyFromFile("Responses/CommonDataApi/pom-resubmission-paycal-parameters.json"));
 
         return server;
+    }
     }
 }

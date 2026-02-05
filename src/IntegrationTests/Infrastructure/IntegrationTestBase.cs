@@ -1,12 +1,11 @@
-namespace IntegrationTests.Infrastructure;
-
 using System.Text.Json;
-using FluentAssertions;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
-public abstract class IntegrationTestBase : IAsyncLifetime
+namespace IntegrationTests.Infrastructure
+{
+    public abstract class IntegrationTestBase : IAsyncLifetime
 {
     private FacadeWebApplicationFactory Factory { get; set; } = null!;
     protected HttpClient Client { get; private set; } = null!;
@@ -111,5 +110,6 @@ public abstract class IntegrationTestBase : IAsyncLifetime
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(JsonSerializer.Serialize(data)));
+    }
     }
 }
