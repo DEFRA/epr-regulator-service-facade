@@ -1,19 +1,17 @@
 namespace IntegrationTests.Infrastructure;
 
-using EPR.RegulatorService.Facade.API;
+using EPR.RegulatorService.Facade.API.Controllers;
 using MockCommonData;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using WireMock.Server;
 using System;
 
-public class FacadeWebApplicationFactory : WebApplicationFactory<EPR.RegulatorService.Facade.API.Program>
+public class FacadeWebApplicationFactory : CustomWebApplicationFactory<ApplicationController>
 {
     private readonly WireMockServer _commonDataServer = MockCommonData.MockCommonDataServer.Start(useSsl: false);
 
@@ -21,6 +19,8 @@ public class FacadeWebApplicationFactory : WebApplicationFactory<EPR.RegulatorSe
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        base.ConfigureWebHost(builder);
+        
         // Set environment variables to override appsettings.json (environment variables have higher priority)
         Environment.SetEnvironmentVariable("CommonDataApiConfig__BaseUrl", $"{_commonDataServer.Url}/api/");
         Environment.SetEnvironmentVariable("CommonDataApiConfig__Timeout", "30");
