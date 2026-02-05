@@ -32,6 +32,7 @@ public class OrganisationRegistrationDetailsDto
     public bool IsComplianceScheme { get; set; }
     public string OrganisationSize { get; set; }
     public string OrganisationType { get; set; }
+    public string RegistrationJourney { get; set; }
     public int NationId { get; set; }
     public string NationCode { get; set; }
 
@@ -143,6 +144,15 @@ public class OrganisationRegistrationDetailsDto
         else
         {
             response.OrganisationType = RegistrationSubmissionOrganisationType.none;
+        }
+
+        if (Enum.TryParse<RegistrationJourneyType>(dto.RegistrationJourney, true, out var registrationJourneyType))
+        {
+            response.RegistrationJourneyType = registrationJourneyType;
+        }
+        else
+        {
+            response.RegistrationJourneyType = RegistrationJourneyType.Unknown;
         }
 
         response.NationId = dto.NationId;
