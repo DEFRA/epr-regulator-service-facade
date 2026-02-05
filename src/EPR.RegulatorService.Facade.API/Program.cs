@@ -136,4 +136,4 @@ app.MapHealthChecks(
     builder.Configuration.GetValue<string>("HealthCheckPath"),
     HealthCheckOptionBuilder.Build()).AllowAnonymous();
 
-app.Run();
+await app.RunAsync();
