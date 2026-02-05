@@ -1,16 +1,8 @@
-﻿using Azure.Core;
-using EPR;
-using EPR.RegulatorService;
-using EPR.RegulatorService.Facade;
-using EPR.RegulatorService.Facade.Core;
-using EPR.RegulatorService.Facade.Core.Clients;
-using EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 
 namespace EPR.RegulatorService.Facade.Core.Clients.ReprocessorExporter;
 

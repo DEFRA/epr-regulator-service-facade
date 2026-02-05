@@ -1,13 +1,13 @@
-namespace IntegrationTests.Features;
-
 using System.Text.Json;
 using FluentAssertions;
 using IntegrationTests.Infrastructure;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 
-[Collection("Sequential")] // Shared mock common data can't be used safely in parallel
-public class SubmissionsTests : IntegrationTestBase
+namespace IntegrationTests.Features
+{
+    [Collection("Sequential")] // Shared mock common data can't be used safely in parallel
+    public class SubmissionsTests : IntegrationTestBase
 {
     [Fact]
     public async Task GetPoMSubmissions_ReturnsSuccess_WithValidRequest()
@@ -200,5 +200,6 @@ public class SubmissionsTests : IntegrationTestBase
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+    }
     }
 }
