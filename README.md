@@ -4,6 +4,7 @@ Provides data to the [regulator-frontend](https://github.com/DEFRA/epr-regulator
 
 ## Dependencies
 
+
 ### backend-account-service
 
 [DEFRA/epr-backend-account-microservice](https://github.com/DEFRA/epr-backend-account-microservice)
@@ -15,6 +16,12 @@ The auth handler is not needed for connecting to backend-account-service running
 ### common-data-api
 
 [DEFRA/epr-common-data-api](https://github.com/DEFRA/epr-common-data-api)
+
+### Anti Virus API
+
+See [ADR-023: Anti-Virus Service](https://eaflood.atlassian.net/wiki/spaces/MWR/pages/4318167185/ADR-023+Anti-Virus+Service)
+
+See [DEFRA Trade Anti Virus API - secret renewal](https://eaflood.atlassian.net/wiki/spaces/EDIA/pages/6447759417/DEFRA+Trade+Anti+Virus+API+-+secret+renewal)
 
 
 # Contributing to this project
