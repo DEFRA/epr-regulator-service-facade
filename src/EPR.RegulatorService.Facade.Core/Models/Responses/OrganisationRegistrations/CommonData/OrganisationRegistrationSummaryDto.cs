@@ -60,7 +60,7 @@ public class OrganisationRegistrationSummaryDto
 
         response.RegistrationReferenceNumber = dto.RegistrationReferenceNumber ?? string.Empty;
 
-        if (!DateTime.TryParse(dto.SubmittedDateTime, CultureInfo.InvariantCulture, out DateTime submissionDate))
+        if (!DateTime.TryParse(dto.SubmittedDateTime, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind,out DateTime submissionDate))
         {
             // No need to assign here as the submissionDate would have set to default
         }
@@ -78,7 +78,7 @@ public class OrganisationRegistrationSummaryDto
         response.StatusPendingDate = null;
         if (!string.IsNullOrWhiteSpace(dto.StatusPendingDate))
         {
-            response.StatusPendingDate = DateTime.Parse(dto.StatusPendingDate, CultureInfo.InvariantCulture);
+            response.StatusPendingDate = DateTime.Parse(dto.StatusPendingDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
 
         response.NationId = dto.NationId;
@@ -86,13 +86,13 @@ public class OrganisationRegistrationSummaryDto
         response.RegistrationDate = null;
         if (!string.IsNullOrWhiteSpace(dto.RegistrationDate))
         {
-            response.RegistrationDate = DateTime.Parse(dto.RegistrationDate, CultureInfo.InvariantCulture);
+            response.RegistrationDate = DateTime.Parse(dto.RegistrationDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
 
         response.ResubmissionDate = null;
         if (!string.IsNullOrWhiteSpace(dto.ResubmissionDate))
         {
-            response.ResubmissionDate = DateTime.Parse(dto.ResubmissionDate, CultureInfo.InvariantCulture);
+            response.ResubmissionDate = DateTime.Parse(dto.ResubmissionDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
 
         response.IsResubmission = dto.IsResubmission;
@@ -108,7 +108,7 @@ public class OrganisationRegistrationSummaryDto
         
         if (!string.IsNullOrWhiteSpace(dto.RegulatorDecisionDate))
         {
-            response.RegulatorDecisionDate = DateTime.Parse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture);
+            response.RegulatorDecisionDate = DateTime.Parse(dto.RegulatorDecisionDate, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
 
         return response;
