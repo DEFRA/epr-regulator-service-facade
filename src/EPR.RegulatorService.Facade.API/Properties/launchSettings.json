@@ -28,7 +28,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AccountsServiceApiConfig:BaseUrl": "https://localhost:5000/api/",
-        "CommonDataApiConfig:BaseUrl": "https://localhost:5001/api/"
+        "CommonDataApiConfig:BaseUrl": "https://localhost:5001/api/",
+        "SubmissionsApiConfig:BaseUrl": "https://localhost:5002/"
       }
     },
     "IIS Express": {

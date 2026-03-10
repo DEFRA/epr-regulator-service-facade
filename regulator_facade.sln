@@ -77,6 +77,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockAccountService", "src\MockAccountService\MockAccountService.csproj", "{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockSubmissionsApi", "src\MockSubmissionsApi\MockSubmissionsApi.csproj", "{E7E6DAC0-128D-485E-B597-5FAED1B26E70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,10 @@ Global
 		{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
