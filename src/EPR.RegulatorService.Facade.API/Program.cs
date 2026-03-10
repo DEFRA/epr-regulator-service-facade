@@ -14,8 +14,16 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, _, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+    config.Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName);
+});
 
 builder.Services
     .AddApplicationInsightsTelemetry()
@@ -56,9 +64,6 @@ builder.Services.AddApiVersioning(options =>
 });
 
 builder.Services.AddFeatureManagement();
-
-// Logging
-builder.Services.AddLogging();
 
 // Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -115,6 +120,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
