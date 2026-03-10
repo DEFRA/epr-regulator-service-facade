@@ -2,7 +2,6 @@
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 
 namespace EPR.RegulatorService.Facade.API.Controllers
 {
