@@ -105,6 +105,7 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SwashbuckleHeaderFilter>();
     options.OperationFilter<ExampleRequestsFilter>();
     options.DocumentFilter<FeatureEnabledDocumentFilter>();
+    options.DocumentFilter<HealthEndpointDocumentFilter>();
     options.OperationFilter<FeatureGateOperationFilter>();
     options.EnableAnnotations();
 });
