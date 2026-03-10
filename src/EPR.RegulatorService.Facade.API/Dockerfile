@@ -23,5 +23,10 @@ FROM base AS final
 # Switch to the non-root user
 USER dotnet
 
+ARG BUILD_NUMBER
+ARG GIT_SHA
+ENV BUILD_NUMBER=$BUILD_NUMBER
+ENV GIT_SHA=$GIT_SHA
+
 COPY --from=publish /home/dotnet/publish .
 ENTRYPOINT ["dotnet", "EPR.RegulatorService.Facade.API.dll"]
