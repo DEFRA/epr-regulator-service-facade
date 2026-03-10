@@ -133,6 +133,6 @@ app.MapControllers();
 
 app.MapHealthChecks(
     builder.Configuration.GetValue<string>("HealthCheckPath"),
-    HealthCheckOptionBuilder.Build()).AllowAnonymous();
+    HealthCheckOptionBuilder.Build(buildNumber, gitSha)).AllowAnonymous();
 
 await app.RunAsync();
