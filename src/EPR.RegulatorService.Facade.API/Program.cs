@@ -1,33 +1,34 @@
 using System.Text.Json.Serialization;
 using Asp.Versioning;
-using Asp.Versioning;
 using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.API.Filters.Swashbuckle;
 using EPR.RegulatorService.Facade.API.HealthChecks;
 using EPR.RegulatorService.Facade.API.Helpers;
-using EPR.RegulatorService.Facade.API.Helpers;
-using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Middlewares;
 using EPR.RegulatorService.Facade.API.Swagger;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
-using EPR.RegulatorService.Facade.API.Helpers;
-using Microsoft.FeatureManagement;
-using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
-using FluentValidation.AspNetCore;
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
-using EPR.RegulatorService.Facade.API.Middlewares;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var buildNumber = builder.Configuration.GetValue<string>("BUILD_NUMBER");
+var gitSha = builder.Configuration.GetValue<string>("GIT_SHA");
+
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, _, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+    config.Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName);
+    config.Enrich.WithProperty("BuildNumber", buildNumber ?? "NOT_SET");
+    config.Enrich.WithProperty("GitSha", gitSha ?? "NOT_SET");
+});
 
 builder.Services
     .AddApplicationInsightsTelemetry()
@@ -69,9 +70,6 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddFeatureManagement();
 
-// Logging
-builder.Services.AddLogging();
-
 // Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(options =>
@@ -107,6 +105,7 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SwashbuckleHeaderFilter>();
     options.OperationFilter<ExampleRequestsFilter>();
     options.DocumentFilter<FeatureEnabledDocumentFilter>();
+    options.DocumentFilter<HealthEndpointDocumentFilter>();
     options.OperationFilter<FeatureGateOperationFilter>();
     options.EnableAnnotations();
 });
@@ -127,6 +126,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -134,6 +134,6 @@ app.MapControllers();
 
 app.MapHealthChecks(
     builder.Configuration.GetValue<string>("HealthCheckPath"),
-    HealthCheckOptionBuilder.Build()).AllowAnonymous();
+    HealthCheckOptionBuilder.Build(buildNumber, gitSha)).AllowAnonymous();
 
 await app.RunAsync();

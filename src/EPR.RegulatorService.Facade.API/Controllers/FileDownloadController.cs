@@ -1,11 +1,6 @@
-﻿using EPR.RegulatorService.Facade.API.Constants;
-using EPR.RegulatorService.Facade.API.Extensions;
-using EPR.RegulatorService.Facade.API.Helpers;
+﻿using EPR.RegulatorService.Facade.API.Extensions;
 using EPR.RegulatorService.Facade.Core.Configs;
-using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Enums;
-using EPR.RegulatorService.Facade.Core.Extensions;
-using EPR.RegulatorService.Facade.Core.Helpers;
 using EPR.RegulatorService.Facade.Core.Models.Requests;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;

@@ -77,6 +77,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockAccountService", "src\MockAccountService\MockAccountService.csproj", "{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockSubmissionsApi", "src\MockSubmissionsApi\MockSubmissionsApi.csproj", "{E7E6DAC0-128D-485E-B597-5FAED1B26E70}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "release-notes", "release-notes", "{06E1D3F7-8364-4772-B977-42790A64BC4D}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\release-notes\README.md = pipelines\release-notes\README.md
+		pipelines\release-notes\cliff.toml = pipelines\release-notes\cliff.toml
+		pipelines\release-notes\generate-release-notes.sh = pipelines\release-notes\generate-release-notes.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +116,10 @@ Global
 		{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4CD740E-3E5C-4A77-BB44-FDF8DAA22896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7E6DAC0-128D-485E-B597-5FAED1B26E70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,5 +132,6 @@ Global
 		{F4414335-52B4-4277-9C3E-B74551214253} = {0B93F1BA-6D4D-4C3E-9533-EEEAB86979F6}
 		{37FBC036-0C16-49BF-A07B-59CDDF992F4B} = {F4414335-52B4-4277-9C3E-B74551214253}
 		{BA0D7669-2CF2-463A-A471-ABD2BBC5CEAC} = {F4414335-52B4-4277-9C3E-B74551214253}
+		{06E1D3F7-8364-4772-B977-42790A64BC4D} = {F4414335-52B4-4277-9C3E-B74551214253}
 	EndGlobalSection
 EndGlobal
