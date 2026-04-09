@@ -42,7 +42,9 @@ public class OrganisationRegistrationDetailsDto
     public string? ProducerCommentDate { get; set; }
     public string? RegulatorResubmissionDecisionDate { get; set; }
     public Guid? RegulatorUserId { get; set; }
-
+    
+    public bool IsClosedLoopRecycler { get; set; }
+    
     // organisation details
     public string? CompaniesHouseNumber { get; set; }
     public string? BuildingName { get; set; }
@@ -157,7 +159,8 @@ public class OrganisationRegistrationDetailsDto
 
         response.NationId = dto.NationId;
         response.NationCode = dto.NationCode;
-
+        response.IsClosedLoopRecycler = dto.IsClosedLoopRecycler;
+        
         response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
         response.ProducerComments = dto.ProducerComment ?? string.Empty;
         response.RegulatorDecisionDate = convertDateTime(dto.RegulatorDecisionDate);
