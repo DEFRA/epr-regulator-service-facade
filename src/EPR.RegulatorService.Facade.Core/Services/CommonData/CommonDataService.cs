@@ -155,6 +155,10 @@ public class CommonDataService(
             try
             {
                 List<CsoMembershipDetailsDto> csoDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(jsonObject.CSOJson);
+                foreach (var member in csoDetails)
+                {
+                    member.IsClosedLoopRecycler ??= jsonObject.IsClosedLoopRecycler;
+                }
                 objRet.CsoMembershipDetails = csoDetails;
             }
             catch (Exception ex)
