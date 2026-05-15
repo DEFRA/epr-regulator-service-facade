@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 
@@ -43,7 +44,8 @@ public class OrganisationRegistrationDetailsDto
     public string? RegulatorResubmissionDecisionDate { get; set; }
     public Guid? RegulatorUserId { get; set; }
     
-    public bool IsClosedLoopRecycler { get; set; }
+    [JsonPropertyName("isClosedLoopRecycler")]
+    public bool? IsClosedLoopRecycling { get; set; }
     
     // organisation details
     public string? CompaniesHouseNumber { get; set; }
@@ -159,7 +161,7 @@ public class OrganisationRegistrationDetailsDto
 
         response.NationId = dto.NationId;
         response.NationCode = dto.NationCode;
-        response.IsClosedLoopRecycler = dto.IsClosedLoopRecycler;
+        response.IsClosedLoopRecycling = dto.IsClosedLoopRecycling ?? false;
         
         response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
         response.ProducerComments = dto.ProducerComment ?? string.Empty;
