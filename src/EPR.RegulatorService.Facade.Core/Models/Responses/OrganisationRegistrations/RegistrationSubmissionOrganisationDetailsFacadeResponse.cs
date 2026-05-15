@@ -32,7 +32,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public DateTime? StatusPendingDate { get; set; }
     public bool IsResubmission { get; set; }
     public DateTime? RegistrationDate { get; set; }
-    public bool IsClosedLoopRecycler { get; set; }
+    public bool IsClosedLoopRecycling { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
     public string? ProducerComments { get; set; } = string.Empty;
     public string ApplicationReferenceNumber { get; set; } = string.Empty;
