@@ -14,7 +14,7 @@ public class OrganisationRegistrationDetailsDtoTests
     };
 
     [TestMethod]
-    public void Deserialize_FromCommonDataApi_MapsIsClosedLoopRecyclerToIsClosedLoopRecycling()
+    public void Deserialize_FromCommonDataApi_Maps_IsClosedLoopRecycler_FromJson()
     {
         const string json = """
             {
@@ -43,11 +43,11 @@ public class OrganisationRegistrationDetailsDtoTests
         var dto = JsonSerializer.Deserialize<OrganisationRegistrationDetailsDto>(json, DeserialisationOptions);
 
         dto.Should().NotBeNull();
-        dto!.IsClosedLoopRecycling.Should().BeTrue();
+        dto!.IsClosedLoopRecycler.Should().BeTrue();
     }
 
     [TestMethod]
-    public void ImplicitOperator_MapsIsClosedLoopRecyclingToFacadeResponse()
+    public void ImplicitOperator_Maps_IsClosedLoopRecycler_ToFacadeResponse()
     {
         var dto = new OrganisationRegistrationDetailsDto
         {
@@ -67,11 +67,11 @@ public class OrganisationRegistrationDetailsDtoTests
             RegistrationJourney = "LargeProducer",
             NationId = 1,
             NationCode = "GB-ENG",
-            IsClosedLoopRecycling = true
+            IsClosedLoopRecycler = true
         };
 
         var response = (RegistrationSubmissionOrganisationDetailsFacadeResponse)dto;
 
-        response.IsClosedLoopRecycling.Should().BeTrue();
+        response.IsClosedLoopRecycler.Should().BeTrue();
     }
 }

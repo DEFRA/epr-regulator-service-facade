@@ -63,18 +63,24 @@ namespace IntegrationTests.Features
         result.GetProperty("totalItems").GetInt32().Should().Be(1);
     }
 
-    [Fact]
-    public async Task GetRegistrationSubmissionDetails_ReturnsSuccess_WithValidSubmissionId()
-    {
-        // Arrange
-        var submissionId = Guid.Parse("0163A629-7780-445F-B00E-1898546BDF0C");
-        var organisationId = Guid.Parse("EE29CFAE-81AB-435F-8759-7285959530DB");
+    private sealed record OrganisationRegistrationDetailsMockVariation(
+        bool? IsClosedLoopRecycler,
+        bool IsComplianceScheme,
+        string OrganisationType,
+        string RegistrationJourney,
+        string OrganisationName,
+        string? OrganisationSize,
+        string? CompaniesHouseNumber,
+        string? CsoJson);
 
-        var mockData = new
+    // Common Data organisation-registration payload shape (camelCase anon-type properties match WireMock JSON).
+    private static object CreateOrganisationRegistrationDetailsMock(Guid submissionId, Guid organisationId, OrganisationRegistrationDetailsMockVariation variation)
+    {
+        return new
         {
             submissionId = submissionId.ToString(),
             organisationId = organisationId.ToString(),
-            organisationName = "Compliance Scheme Ltd",
+            organisationName = variation.OrganisationName,
             organisationReference = "100001",
             applicationReferenceNumber = "REG-2025-001",
             registrationReferenceNumber = (string?)null,
@@ -89,10 +95,10 @@ namespace IntegrationTests.Features
             registrationDate = (string?)null,
             resubmissionDate = (string?)null,
             resubmissionFileId = (string?)null,
-            isComplianceScheme = true,
-            organisationSize = (string?)null,
-            organisationType = "compliance",
-            registrationJourney = "CsoLargeProducer",
+            isComplianceScheme = variation.IsComplianceScheme,
+            organisationSize = variation.OrganisationSize,
+            organisationType = variation.OrganisationType,
+            registrationJourney = variation.RegistrationJourney,
             nationId = 1,
             nationCode = "GB-ENG",
             regulatorComment = "",
@@ -101,7 +107,8 @@ namespace IntegrationTests.Features
             producerCommentDate = (string?)null,
             regulatorResubmissionDecisionDate = (string?)null,
             regulatorUserId = (string?)null,
-            companiesHouseNumber = "CS123456",
+            isClosedLoopRecycler = variation.IsClosedLoopRecycler,
+            companiesHouseNumber = variation.CompaniesHouseNumber,
             buildingName = "Test Building",
             subBuildingName = "1",
             buildingNumber = "1",
@@ -131,8 +138,30 @@ namespace IntegrationTests.Features
             brandsFileId = (string?)null,
             brandsFileName = (string?)null,
             brandsBlobName = (string?)null,
-            csoJson = "[{\"memberId\":\"100001\",\"memberType\":\"large\",\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"NumberOfSubsidiariesOnlineMarketPlace\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-10T07:24:00\",\"submissionPeriodDescription\":\"January to December 2025\"}]"
+            csoJson = variation.CsoJson
         };
+    }
+
+    [Fact]
+    public async Task GetRegistrationSubmissionDetails_ReturnsSuccess_WithValidSubmissionId()
+    {
+        // Arrange
+        var submissionId = Guid.Parse("0163A629-7780-445F-B00E-1898546BDF0C");
+        var organisationId = Guid.Parse("EE29CFAE-81AB-435F-8759-7285959530DB");
+
+        const string csoJsonWithoutMemberClosedLoopFlag =
+            "[{\"memberId\":\"100001\",\"memberType\":\"large\",\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"NumberOfSubsidiariesOnlineMarketPlace\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-10T07:24:00\",\"submissionPeriodDescription\":\"January to December 2025\"}]";
+
+        var mockData = CreateOrganisationRegistrationDetailsMock(submissionId, organisationId,
+            new OrganisationRegistrationDetailsMockVariation(
+                IsClosedLoopRecycler: null,
+                IsComplianceScheme: true,
+                OrganisationType: "compliance",
+                RegistrationJourney: "CsoLargeProducer",
+                OrganisationName: "Compliance Scheme Ltd",
+                OrganisationSize: null,
+                CompaniesHouseNumber: "CS123456",
+                CsoJson: csoJsonWithoutMemberClosedLoopFlag));
 
         SetupCommonDataMockOrganisationRegistrationDetails(submissionId, mockData);
 
@@ -145,6 +174,102 @@ namespace IntegrationTests.Features
         var result = JsonSerializer.Deserialize<JsonElement>(content);
         result.GetProperty("submissionId").GetString().Should().Be(submissionId.ToString());
         result.GetProperty("organisationName").GetString().Should().Be("Compliance Scheme Ltd");
+    }
+
+    [Fact]
+    public async Task
+        GetRegistrationSubmissionDetails_FromCommonData_When_OrganisationIsClosedLoopRecyclerTrue_MapsResponseIsClosedLoopRecyclerTrue_ForDirectProducer()
+    {
+        var submissionId = Guid.Parse("1163A629-7780-445F-B00E-1898546BDF0C");
+        var organisationId = Guid.Parse("FE29CFAE-81AB-435F-8759-7285959530DB");
+
+        var mockData = CreateOrganisationRegistrationDetailsMock(submissionId, organisationId,
+            new OrganisationRegistrationDetailsMockVariation(
+                IsClosedLoopRecycler: true,
+                IsComplianceScheme: false,
+                OrganisationType: "Direct",
+                RegistrationJourney: "LargeProducer",
+                OrganisationName: "Direct Producer Ltd",
+                OrganisationSize: "Large",
+                CompaniesHouseNumber: "CH999999",
+                CsoJson: null));
+
+        SetupCommonDataMockOrganisationRegistrationDetails(submissionId, mockData);
+
+        var response = await Client.GetAsync($"/api/organisation-registration-submission-details/{submissionId}");
+
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(content);
+        result.GetProperty("isClosedLoopRecycler").GetBoolean().Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task
+        GetRegistrationSubmissionDetails_WhenCsoMemberOmitsIsClosedLoopRecycler_AppliesOrganisationFlagToMember()
+    {
+        var submissionId = Guid.Parse("2263A629-7780-445F-B00E-1898546BDF0C");
+        var organisationId = Guid.Parse("AE29CFAE-81AB-435F-8759-7285959530DB");
+
+        const string csoJsonWithoutMemberClosedLoopFlag =
+            "[{\"memberId\":\"100002\",\"memberType\":\"large\",\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"NumberOfSubsidiariesOnlineMarketPlace\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-10T07:24:00\",\"submissionPeriodDescription\":\"January to December 2025\"}]";
+
+        var mockData = CreateOrganisationRegistrationDetailsMock(submissionId, organisationId,
+            new OrganisationRegistrationDetailsMockVariation(
+                IsClosedLoopRecycler: true,
+                IsComplianceScheme: true,
+                OrganisationType: "compliance",
+                RegistrationJourney: "CsoLargeProducer",
+                OrganisationName: "Compliance Scheme Ltd",
+                OrganisationSize: null,
+                CompaniesHouseNumber: "CS123456",
+                CsoJson: csoJsonWithoutMemberClosedLoopFlag));
+
+        SetupCommonDataMockOrganisationRegistrationDetails(submissionId, mockData);
+
+        var response = await Client.GetAsync($"/api/organisation-registration-submission-details/{submissionId}");
+
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(content);
+        result.GetProperty("isClosedLoopRecycler").GetBoolean().Should().BeTrue();
+        var members = result.GetProperty("csoMembershipDetails");
+        members.GetArrayLength().Should().Be(1);
+        members[0].GetProperty("isClosedLoopRecycler").GetBoolean().Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task
+        GetRegistrationSubmissionDetails_WhenCsoMemberSetsIsClosedLoopRecyclerFalse_DoesNotOverrideOrgTrueWithMemberFallback()
+    {
+        var submissionId = Guid.Parse("3363A629-7780-445F-B00E-1898546BDF0C");
+        var organisationId = Guid.Parse("BE29CFAE-81AB-435F-8759-7285959530DB");
+
+        const string csoJsonMemberExplicitFalse =
+            "[{\"memberId\":\"100003\",\"memberType\":\"large\",\"isClosedLoopRecycler\":false,\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"NumberOfSubsidiariesOnlineMarketPlace\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-10T07:24:00\",\"submissionPeriodDescription\":\"January to December 2025\"}]";
+
+        var mockData = CreateOrganisationRegistrationDetailsMock(submissionId, organisationId,
+            new OrganisationRegistrationDetailsMockVariation(
+                IsClosedLoopRecycler: true,
+                IsComplianceScheme: true,
+                OrganisationType: "compliance",
+                RegistrationJourney: "CsoLargeProducer",
+                OrganisationName: "Compliance Scheme Ltd",
+                OrganisationSize: null,
+                CompaniesHouseNumber: "CS123456",
+                CsoJson: csoJsonMemberExplicitFalse));
+
+        SetupCommonDataMockOrganisationRegistrationDetails(submissionId, mockData);
+
+        var response = await Client.GetAsync($"/api/organisation-registration-submission-details/{submissionId}");
+
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(content);
+        result.GetProperty("isClosedLoopRecycler").GetBoolean().Should().BeTrue();
+        var members = result.GetProperty("csoMembershipDetails");
+        members.GetArrayLength().Should().Be(1);
+        members[0].GetProperty("isClosedLoopRecycler").GetBoolean().Should().BeFalse();
     }
 
     [Fact]

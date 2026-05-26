@@ -269,7 +269,7 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
-    public async Task Should_map_isClosedLoopRecycler_from_common_data_and_apply_cso_member_fallback()
+    public async Task Should_map_common_data_IsClosedLoopRecycler_and_apply_cso_member_fallback()
     {
         var submissionId = Guid.NewGuid();
         _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
@@ -304,9 +304,9 @@ public class CommonDataServiceTests
         var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
 
         results.Should().NotBeNull();
-        results!.IsClosedLoopRecycling.Should().BeTrue();
+        results!.IsClosedLoopRecycler.Should().BeTrue();
         results.CsoMembershipDetails.Should().HaveCount(1);
-        results.CsoMembershipDetails![0].IsClosedLoopRecycling.Should().BeTrue();
+        results.CsoMembershipDetails![0].IsClosedLoopRecycler.Should().BeTrue();
     }
 
     [TestMethod]
@@ -336,7 +336,7 @@ public class CommonDataServiceTests
               "registrationJourney": "CsoLargeProducer",
               "nationId": 1,
               "nationCode": "GB-ENG",
-              "csoJson": "[{\"memberId\":\"100002\",\"memberType\":\"large\",\"isClosedLoopRecycling\":false,\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-11T08:24:00\",\"submissionPeriodDescription\":\"2025\"}]"
+              "csoJson": "[{\"memberId\":\"100002\",\"memberType\":\"large\",\"isClosedLoopRecycler\":false,\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-11T08:24:00\",\"submissionPeriodDescription\":\"2025\"}]"
             }
             """;
 
@@ -345,8 +345,8 @@ public class CommonDataServiceTests
         var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
 
         results.Should().NotBeNull();
-        results!.IsClosedLoopRecycling.Should().BeTrue();
-        results.CsoMembershipDetails![0].IsClosedLoopRecycling.Should().BeFalse();
+        results!.IsClosedLoopRecycler.Should().BeTrue();
+        results.CsoMembershipDetails![0].IsClosedLoopRecycler.Should().BeFalse();
     }
 
     [TestMethod]
