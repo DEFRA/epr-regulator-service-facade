@@ -269,6 +269,87 @@ public class CommonDataServiceTests
     }
 
     [TestMethod]
+    public async Task Should_map_common_data_IsClosedLoopRecycler_and_apply_cso_member_fallback()
+    {
+        var submissionId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
+        const string commonDataJson = """
+            {
+              "submissionId": "1b2c3d4e-5f6a-7b8c-9d0e-1f2a3b4c5d6e",
+              "organisationId": "2c3d4e5f-6a7b-8c9d-0e1f-2a3b4c5d6e7f",
+              "organisationName": "CSO Producer",
+              "organisationReference": "100002",
+              "applicationReferenceNumber": "REG-2025-002",
+              "submissionStatus": "Granted",
+              "submittedDateTime": "2025-01-11T10:30:00Z",
+              "isLateSubmission": false,
+              "isClosedLoopRecycler": true,
+              "submissionPeriod": "2025",
+              "relevantYear": 2025,
+              "isResubmission": false,
+              "resubmissionStatus": "Pending",
+              "isComplianceScheme": true,
+              "organisationSize": "Large",
+              "organisationType": "compliance",
+              "registrationJourney": "CsoLargeProducer",
+              "nationId": 1,
+              "nationCode": "GB-ENG",
+              "csoJson": "[{\"memberId\":\"100002\",\"memberType\":\"large\",\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-11T08:24:00\",\"submissionPeriodDescription\":\"2025\"}]"
+            }
+            """;
+
+        SetupApiSuccessCall(commonDataJson);
+
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+
+        results.Should().NotBeNull();
+        results!.IsClosedLoopRecycler.Should().BeTrue();
+        results.CsoMembershipDetails.Should().HaveCount(1);
+        results.CsoMembershipDetails![0].IsClosedLoopRecycler.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Should_not_override_explicit_false_cso_member_closed_loop_flag()
+    {
+        var submissionId = Guid.NewGuid();
+        _expectedUrl = $"{BaseAddress}/{_configuration.Value.Endpoints.GetOrganisationRegistrationSubmissionDetails}/{submissionId}";
+
+        const string commonDataJson = """
+            {
+              "submissionId": "1b2c3d4e-5f6a-7b8c-9d0e-1f2a3b4c5d6e",
+              "organisationId": "2c3d4e5f-6a7b-8c9d-0e1f-2a3b4c5d6e7f",
+              "organisationName": "CSO Producer",
+              "organisationReference": "100002",
+              "applicationReferenceNumber": "REG-2025-002",
+              "submissionStatus": "Granted",
+              "submittedDateTime": "2025-01-11T10:30:00Z",
+              "isLateSubmission": false,
+              "isClosedLoopRecycler": true,
+              "submissionPeriod": "2025",
+              "relevantYear": 2025,
+              "isResubmission": false,
+              "resubmissionStatus": "Pending",
+              "isComplianceScheme": true,
+              "organisationSize": "Large",
+              "organisationType": "compliance",
+              "registrationJourney": "CsoLargeProducer",
+              "nationId": 1,
+              "nationCode": "GB-ENG",
+              "csoJson": "[{\"memberId\":\"100002\",\"memberType\":\"large\",\"isClosedLoopRecycler\":false,\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":0,\"relevantYear\":2025,\"submittedDate\":\"2025-01-11T08:24:00\",\"submissionPeriodDescription\":\"2025\"}]"
+            }
+            """;
+
+        SetupApiSuccessCall(commonDataJson);
+
+        var results = await _sut.GetOrganisationRegistrationSubmissionDetails(submissionId);
+
+        results.Should().NotBeNull();
+        results!.IsClosedLoopRecycler.Should().BeTrue();
+        results.CsoMembershipDetails![0].IsClosedLoopRecycler.Should().BeFalse();
+    }
+
+    [TestMethod]
     public async Task Should_Return_Null_When_HTTP_Results_AreEmpty()
     {
         var submissionId = Guid.NewGuid();

@@ -10,6 +10,8 @@ public class CsoMembershipDetailsDto
     public string MemberType { get; set; }
     public bool IsOnlineMarketPlace { get; set; }
     public bool IsLateFeeApplicable { get; set; }
+
+    public bool? IsClosedLoopRecycler { get; set; }
     public int NumberOfSubsidiaries { get; set; }
 
     [JsonPropertyName("NumberOfSubsidiariesOnlineMarketPlace")]
