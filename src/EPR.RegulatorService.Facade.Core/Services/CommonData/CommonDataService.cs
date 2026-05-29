@@ -157,7 +157,8 @@ public class CommonDataService(
                 List<CsoMembershipDetailsDto> csoDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(jsonObject.CSOJson, _deserialisationOptions);
                 foreach (var member in csoDetails)
                 {
-                    member.IsClosedLoopRecycler ??= jsonObject.IsClosedLoopRecycler;
+                    member.NumberOfHoldingCompaniesClosedLoopRecycling ??= jsonObject.NumberOfHoldingCompaniesClosedLoopRecycling;
+                    member.NumberOfSubsidiariesClosedLoopRecycling ??= jsonObject.NumberOfSubsidiariesClosedLoopRecycling;
                 }
                 objRet.CsoMembershipDetails = csoDetails;
             }
