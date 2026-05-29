@@ -57,6 +57,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public bool IsOnlineMarketPlace { get; internal set; }
     public int NumberOfSubsidiaries { get; internal set; }
     public int NumberOfOnlineSubsidiaries { get; internal set; }
+    public int NumberOfSubsidiariesClosedLoopRecycling { get; set; }
     public bool IsLateSubmission { get; internal set; }
     public string OrganisationSize { get; internal set; }
     public bool IsComplianceScheme { get; internal set; }

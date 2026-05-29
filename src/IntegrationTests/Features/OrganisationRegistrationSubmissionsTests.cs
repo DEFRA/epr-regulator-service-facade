@@ -71,7 +71,8 @@ namespace IntegrationTests.Features
         string OrganisationName,
         string? OrganisationSize,
         string? CompaniesHouseNumber,
-        string? CsoJson);
+        string? CsoJson,
+        int NumberOfSubsidiariesClosedLoopRecycling = 0);
 
     // Common Data organisation-registration payload shape (camelCase anon-type properties match WireMock JSON).
     private static object CreateOrganisationRegistrationDetailsMock(Guid submissionId, Guid organisationId, OrganisationRegistrationDetailsMockVariation variation)
@@ -129,6 +130,7 @@ namespace IntegrationTests.Features
             isOnlineMarketPlace = false,
             numberOfSubsidiaries = 0,
             numberOfOnlineSubsidiaries = 0,
+            numberOfSubsidiariesClosedLoopRecycling = variation.NumberOfSubsidiariesClosedLoopRecycling,
             companyDetailsFileId = "F1A2B3C4-D5E6-7890-ABCD-EF1234567890",
             companyDetailsFileName = "reg-20250110_093000.csv",
             companyDetailsBlobName = "B1C2D3E4-F5A6-7890-ABCD-EF1234567890",
@@ -192,7 +194,8 @@ namespace IntegrationTests.Features
                 OrganisationName: "Direct Producer Ltd",
                 OrganisationSize: "Large",
                 CompaniesHouseNumber: "CH999999",
-                CsoJson: null));
+                CsoJson: null,
+                NumberOfSubsidiariesClosedLoopRecycling: 12));
 
         SetupCommonDataMockOrganisationRegistrationDetails(submissionId, mockData);
 
@@ -202,6 +205,40 @@ namespace IntegrationTests.Features
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<JsonElement>(content);
         result.GetProperty("isClosedLoopRecycler").GetBoolean().Should().BeTrue();
+        result.GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(12);
+    }
+
+    [Fact]
+    public async Task
+        GetRegistrationSubmissionDetails_WhenCsoMemberIncludesClosedLoopSubsidiaryCount_MapsToCsoMembershipDetails()
+    {
+        var submissionId = Guid.Parse("4463A629-7780-445F-B00E-1898546BDF0C");
+        var organisationId = Guid.Parse("CE29CFAE-81AB-435F-8759-7285959530DB");
+
+        const string csoJsonWithClosedLoopSubsidiaryCount =
+            "[{\"memberId\":\"100004\",\"memberType\":\"large\",\"isOnlineMarketPlace\":false,\"isLateFeeApplicable\":true,\"numberOfSubsidiaries\":5,\"NumberOfSubsidiariesOnlineMarketPlace\":0,\"NumberOfSubsidiariesClosedLoopRecycling\":3,\"relevantYear\":2025,\"submittedDate\":\"2025-01-10T07:24:00\",\"submissionPeriodDescription\":\"January to December 2025\"}]";
+
+        var mockData = CreateOrganisationRegistrationDetailsMock(submissionId, organisationId,
+            new OrganisationRegistrationDetailsMockVariation(
+                IsClosedLoopRecycler: true,
+                IsComplianceScheme: true,
+                OrganisationType: "compliance",
+                RegistrationJourney: "CsoLargeProducer",
+                OrganisationName: "Compliance Scheme Ltd",
+                OrganisationSize: null,
+                CompaniesHouseNumber: "CS123456",
+                CsoJson: csoJsonWithClosedLoopSubsidiaryCount));
+
+        SetupCommonDataMockOrganisationRegistrationDetails(submissionId, mockData);
+
+        var response = await Client.GetAsync($"/api/organisation-registration-submission-details/{submissionId}");
+
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(content);
+        var members = result.GetProperty("csoMembershipDetails");
+        members.GetArrayLength().Should().Be(1);
+        members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(3);
     }
 
     [Fact]

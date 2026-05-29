@@ -72,6 +72,7 @@ public class OrganisationRegistrationDetailsDto
     public bool IsOnlineMarketPlace { get; set; }
     public int NumberOfSubsidiaries { get; set; }
     public int NumberOfOnlineSubsidiaries { get; set; }
+    public int NumberOfSubsidiariesClosedLoopRecycling { get; set; }
 
     public Guid? CompanyDetailsFileId { get; set; }
     public string? CompanyDetailsFileName { get; set; }
@@ -183,6 +184,7 @@ public class OrganisationRegistrationDetailsDto
         response.IsOnlineMarketPlace = dto.IsOnlineMarketPlace;
         response.NumberOfSubsidiaries = dto.NumberOfSubsidiaries;
         response.NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries;
+        response.NumberOfSubsidiariesClosedLoopRecycling = dto.NumberOfSubsidiariesClosedLoopRecycling;
         response.IsLateSubmission = dto.IsLateSubmission;
 
         // Creating and assigning SubmissionDetails

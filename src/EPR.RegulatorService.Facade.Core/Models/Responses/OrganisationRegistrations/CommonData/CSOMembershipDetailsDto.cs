@@ -16,6 +16,8 @@ public class CsoMembershipDetailsDto
 
     [JsonPropertyName("NumberOfSubsidiariesOnlineMarketPlace")]
     public int NoOfSubsidiariesOnlineMarketplace { get; set; }
+
+    public int NumberOfSubsidiariesClosedLoopRecycling { get; set; }
     public int RelevantYear { get; set; }
     public DateTime SubmittedDate { get;set; }
     public string SubmissionPeriodDescription {get;set;}
