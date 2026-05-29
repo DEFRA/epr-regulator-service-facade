@@ -43,8 +43,6 @@ public class OrganisationRegistrationDetailsDto
     public string? RegulatorResubmissionDecisionDate { get; set; }
     public Guid? RegulatorUserId { get; set; }
 
-    public bool? IsClosedLoopRecycler { get; set; }
-
     // organisation details
     public string? CompaniesHouseNumber { get; set; }
     public string? BuildingName { get; set; }
@@ -72,6 +70,8 @@ public class OrganisationRegistrationDetailsDto
     public bool IsOnlineMarketPlace { get; set; }
     public int NumberOfSubsidiaries { get; set; }
     public int NumberOfOnlineSubsidiaries { get; set; }
+    public int NumberOfHoldingCompaniesClosedLoopRecycling { get; set; }
+    public int NumberOfSubsidiariesClosedLoopRecycling { get; set; }
 
     public Guid? CompanyDetailsFileId { get; set; }
     public string? CompanyDetailsFileName { get; set; }
@@ -159,8 +159,7 @@ public class OrganisationRegistrationDetailsDto
 
         response.NationId = dto.NationId;
         response.NationCode = dto.NationCode;
-        response.IsClosedLoopRecycler = dto.IsClosedLoopRecycler ?? false;
-        
+
         response.RegulatorComments = dto.RegulatorComment ?? string.Empty;
         response.ProducerComments = dto.ProducerComment ?? string.Empty;
         response.RegulatorDecisionDate = convertDateTime(dto.RegulatorDecisionDate);
@@ -183,6 +182,8 @@ public class OrganisationRegistrationDetailsDto
         response.IsOnlineMarketPlace = dto.IsOnlineMarketPlace;
         response.NumberOfSubsidiaries = dto.NumberOfSubsidiaries;
         response.NumberOfOnlineSubsidiaries = dto.NumberOfOnlineSubsidiaries;
+        response.NumberOfHoldingCompaniesClosedLoopRecycling = dto.NumberOfHoldingCompaniesClosedLoopRecycling;
+        response.NumberOfSubsidiariesClosedLoopRecycling = dto.NumberOfSubsidiariesClosedLoopRecycling;
         response.IsLateSubmission = dto.IsLateSubmission;
 
         // Creating and assigning SubmissionDetails

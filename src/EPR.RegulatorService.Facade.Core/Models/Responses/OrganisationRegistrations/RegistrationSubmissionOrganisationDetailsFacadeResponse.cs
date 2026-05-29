@@ -32,7 +32,6 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public DateTime? StatusPendingDate { get; set; }
     public bool IsResubmission { get; set; }
     public DateTime? RegistrationDate { get; set; }
-    public bool IsClosedLoopRecycler { get; set; }
     public string? RegulatorComments { get; set; } = string.Empty;
     public string? ProducerComments { get; set; } = string.Empty;
     public string ApplicationReferenceNumber { get; set; } = string.Empty;
@@ -57,6 +56,8 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public bool IsOnlineMarketPlace { get; internal set; }
     public int NumberOfSubsidiaries { get; internal set; }
     public int NumberOfOnlineSubsidiaries { get; internal set; }
+    public int NumberOfHoldingCompaniesClosedLoopRecycling { get; set; }
+    public int NumberOfSubsidiariesClosedLoopRecycling { get; set; }
     public bool IsLateSubmission { get; internal set; }
     public string OrganisationSize { get; internal set; }
     public bool IsComplianceScheme { get; internal set; }
