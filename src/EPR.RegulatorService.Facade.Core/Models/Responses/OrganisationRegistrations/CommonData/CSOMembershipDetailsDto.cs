@@ -11,11 +11,13 @@ public class CsoMembershipDetailsDto
     public bool IsOnlineMarketPlace { get; set; }
     public bool IsLateFeeApplicable { get; set; }
 
-    public bool? IsClosedLoopRecycler { get; set; }
     public int NumberOfSubsidiaries { get; set; }
 
     [JsonPropertyName("NumberOfSubsidiariesOnlineMarketPlace")]
     public int NoOfSubsidiariesOnlineMarketplace { get; set; }
+
+    public int? NumberOfHoldingCompaniesClosedLoopRecycling { get; set; }
+    public int? NumberOfSubsidiariesClosedLoopRecycling { get; set; }
     public int RelevantYear { get; set; }
     public DateTime SubmittedDate { get;set; }
     public string SubmissionPeriodDescription {get;set;}
