@@ -241,7 +241,7 @@ namespace IntegrationTests.Features
 
     [Fact]
     public async Task
-        GetRegistrationSubmissionDetails_WhenCsoMemberOmitsClosedLoopSubsidiaryCount_AppliesOrganisationCountToMember()
+        GetRegistrationSubmissionDetails_WhenCsoMemberOmitsClosedLoopCounts_DoesNotApplyOrganisationCountsToMember()
     {
         var submissionId = Guid.Parse("2263A629-7780-445F-B00E-1898546BDF0C");
         var organisationId = Guid.Parse("AE29CFAE-81AB-435F-8759-7285959530DB");
@@ -272,13 +272,13 @@ namespace IntegrationTests.Features
         result.GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(7);
         var members = result.GetProperty("csoMembershipDetails");
         members.GetArrayLength().Should().Be(1);
-        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").GetInt32().Should().Be(2);
-        members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(7);
+        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").ValueKind.Should().Be(JsonValueKind.Null);
+        members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").ValueKind.Should().Be(JsonValueKind.Null);
     }
 
     [Fact]
     public async Task
-        GetRegistrationSubmissionDetails_WhenCsoMemberSetsClosedLoopSubsidiaryCountZero_DoesNotOverrideOrgCountWithMemberFallback()
+        GetRegistrationSubmissionDetails_WhenCsoMemberSetsClosedLoopSubsidiaryCountZero_PreservesExplicitZeroWithoutOrgFallback()
     {
         var submissionId = Guid.Parse("3363A629-7780-445F-B00E-1898546BDF0C");
         var organisationId = Guid.Parse("BE29CFAE-81AB-435F-8759-7285959530DB");
@@ -309,7 +309,7 @@ namespace IntegrationTests.Features
         result.GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(7);
         var members = result.GetProperty("csoMembershipDetails");
         members.GetArrayLength().Should().Be(1);
-        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").GetInt32().Should().Be(2);
+        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").ValueKind.Should().Be(JsonValueKind.Null);
         members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(0);
     }
 
