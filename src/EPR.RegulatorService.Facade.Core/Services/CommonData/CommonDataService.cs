@@ -154,13 +154,9 @@ public class CommonDataService(
         {
             try
             {
-                List<CsoMembershipDetailsDto> csoDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(jsonObject.CSOJson, _deserialisationOptions);
-                foreach (var member in csoDetails)
-                {
-                    member.NumberOfHoldingCompaniesClosedLoopRecycling ??= jsonObject.NumberOfHoldingCompaniesClosedLoopRecycling;
-                    member.NumberOfSubsidiariesClosedLoopRecycling ??= jsonObject.NumberOfSubsidiariesClosedLoopRecycling;
-                }
-                objRet.CsoMembershipDetails = csoDetails;
+                objRet.CsoMembershipDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(
+                    jsonObject.CSOJson,
+                    _deserialisationOptions);
             }
             catch (Exception ex)
             {
