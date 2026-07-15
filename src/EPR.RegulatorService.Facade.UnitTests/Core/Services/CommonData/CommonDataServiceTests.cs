@@ -387,7 +387,7 @@ public class CommonDataServiceTests
         results.Should().NotBeNull();
         results!.NumberOfSubsidiariesClosedLoopRecycling.Should().Be(5);
         results.CsoMembershipDetails.Should().HaveCount(1);
-        results.CsoMembershipDetails![0].NumberOfSubsidiariesClosedLoopRecycling.Should().BeNull();
+        results.CsoMembershipDetails![0].NumberOfSubsidiariesClosedLoopRecycling.Should().Be(0);
     }
 
     [TestMethod]
@@ -428,7 +428,7 @@ public class CommonDataServiceTests
         results.Should().NotBeNull();
         results!.NumberOfHoldingCompaniesClosedLoopRecycling.Should().Be(2);
         results.CsoMembershipDetails.Should().HaveCount(1);
-        results.CsoMembershipDetails![0].NumberOfHoldingCompaniesClosedLoopRecycling.Should().BeNull();
+        results.CsoMembershipDetails![0].NumberOfHoldingCompaniesClosedLoopRecycling.Should().Be(0);
         results.CsoMembershipDetails[0].IsClosedLoopRecycling.Should().BeFalse();
     }
 

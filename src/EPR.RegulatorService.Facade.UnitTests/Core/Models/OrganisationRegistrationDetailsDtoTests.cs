@@ -136,4 +136,53 @@ public class OrganisationRegistrationDetailsDtoTests
         dto.Should().NotBeNull();
         dto!.NumberOfSubsidiariesClosedLoopRecycling.Should().Be(4);
     }
+
+    [TestMethod]
+    public void CsoMembershipDetailsDto_ImplicitOperator_DefaultsNullSubsidiariesClosedLoopRecycling_ToZero()
+    {
+        var dto = new CsoMembershipDetailsDto
+        {
+            MemberId = "100001",
+            MemberType = "large",
+            NumberOfSubsidiariesClosedLoopRecycling = null,
+            NumberOfHoldingCompaniesClosedLoopRecycling = null
+        };
+
+        CsoMembershipDetailsResponse response = dto;
+
+        response.NumberOfSubsidiariesClosedLoopRecycling.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void CsoMembershipDetailsDto_ImplicitOperator_DefaultsNullHoldingCompaniesClosedLoopRecycling_ToZero()
+    {
+        var dto = new CsoMembershipDetailsDto
+        {
+            MemberId = "100001",
+            MemberType = "large",
+            NumberOfSubsidiariesClosedLoopRecycling = null,
+            NumberOfHoldingCompaniesClosedLoopRecycling = null
+        };
+
+        CsoMembershipDetailsResponse response = dto;
+
+        response.NumberOfHoldingCompaniesClosedLoopRecycling.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void CsoMembershipDetailsDto_ImplicitOperator_PreservesExplicitClosedLoopRecyclingValues()
+    {
+        var dto = new CsoMembershipDetailsDto
+        {
+            MemberId = "100001",
+            MemberType = "large",
+            NumberOfSubsidiariesClosedLoopRecycling = 3,
+            NumberOfHoldingCompaniesClosedLoopRecycling = 5
+        };
+
+        CsoMembershipDetailsResponse response = dto;
+
+        response.NumberOfSubsidiariesClosedLoopRecycling.Should().Be(3);
+        response.NumberOfHoldingCompaniesClosedLoopRecycling.Should().Be(5);
+    }
 }

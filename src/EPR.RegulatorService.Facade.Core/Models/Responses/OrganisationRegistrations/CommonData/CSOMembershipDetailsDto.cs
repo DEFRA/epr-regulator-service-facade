@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 
@@ -20,4 +21,20 @@ public class CsoMembershipDetailsDto
     public int RelevantYear { get; set; }
     public DateTime SubmittedDate { get;set; }
     public string SubmissionPeriodDescription {get;set;}
+
+    public static implicit operator CsoMembershipDetailsResponse(CsoMembershipDetailsDto dto) => new()
+    {
+        MemberId = dto.MemberId,
+        MemberType = dto.MemberType,
+        IsOnlineMarketPlace = dto.IsOnlineMarketPlace,
+        IsLateFeeApplicable = dto.IsLateFeeApplicable,
+        IsClosedLoopRecycling = dto.IsClosedLoopRecycling,
+        NumberOfSubsidiaries = dto.NumberOfSubsidiaries,
+        NumberOfSubsidiariesOnlineMarketPlace = dto.NumberOfSubsidiariesOnlineMarketPlace,
+        NumberOfHoldingCompaniesClosedLoopRecycling = dto.NumberOfHoldingCompaniesClosedLoopRecycling ?? 0,
+        NumberOfSubsidiariesClosedLoopRecycling = dto.NumberOfSubsidiariesClosedLoopRecycling ?? 0,
+        RelevantYear = dto.RelevantYear,
+        SubmittedDate = dto.SubmittedDate,
+        SubmissionPeriodDescription = dto.SubmissionPeriodDescription
+    };
 }
