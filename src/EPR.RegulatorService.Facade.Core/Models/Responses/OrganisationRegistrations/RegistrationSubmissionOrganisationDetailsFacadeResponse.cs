@@ -7,7 +7,6 @@ using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models;
 using EPR.RegulatorService.Facade.Core.Models.Responses;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
-using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
 using EPR.RegulatorService.Facade.Core.Models.Responses.RegistrationSubmissions;
 
 namespace EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
@@ -62,7 +61,7 @@ public class RegistrationSubmissionOrganisationDetailsFacadeResponse
     public string OrganisationSize { get; internal set; }
     public bool IsComplianceScheme { get; internal set; }
     public string SubmissionPeriod { get; internal set; }
-    public List<CsoMembershipDetailsDto> CsoMembershipDetails { get; set; }
+    public List<CsoMembershipDetailsResponse> CsoMembershipDetails { get; set; }
     public string? ResubmissionFileId { get; internal set; }
 
     public static implicit operator OrganisationRegistrationSubmissionSummaryResponse

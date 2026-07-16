@@ -156,7 +156,8 @@ public class CommonDataService(
             {
                 objRet.CsoMembershipDetails = JsonSerializer.Deserialize<List<CsoMembershipDetailsDto>>(
                     jsonObject.CSOJson,
-                    _deserialisationOptions);
+                    _deserialisationOptions)
+                    ?.Select(x => (CsoMembershipDetailsResponse)x).ToList() ?? [];
             }
             catch (Exception ex)
             {

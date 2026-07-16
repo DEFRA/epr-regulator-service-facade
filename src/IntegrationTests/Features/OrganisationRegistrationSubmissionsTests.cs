@@ -272,8 +272,8 @@ namespace IntegrationTests.Features
         result.GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(7);
         var members = result.GetProperty("csoMembershipDetails");
         members.GetArrayLength().Should().Be(1);
-        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").ValueKind.Should().Be(JsonValueKind.Null);
-        members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").ValueKind.Should().Be(JsonValueKind.Null);
+        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").GetInt32().Should().Be(0);
+        members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(0);
     }
 
     [Fact]
@@ -309,7 +309,7 @@ namespace IntegrationTests.Features
         result.GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(7);
         var members = result.GetProperty("csoMembershipDetails");
         members.GetArrayLength().Should().Be(1);
-        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").ValueKind.Should().Be(JsonValueKind.Null);
+        members[0].GetProperty("numberOfHoldingCompaniesClosedLoopRecycling").GetInt32().Should().Be(0);
         members[0].GetProperty("numberOfSubsidiariesClosedLoopRecycling").GetInt32().Should().Be(0);
     }
 
