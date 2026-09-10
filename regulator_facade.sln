@@ -50,7 +50,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vars", "vars", "{37FBC036-0
 	ProjectSection(SolutionItems) = preProject
 		pipelines\vars\DEV9-development.yaml = pipelines\vars\DEV9-development.yaml
 		pipelines\vars\DEV12-development.yaml = pipelines\vars\DEV12-development.yaml
-		pipelines\vars\DEV11-development.yaml = pipelines\vars\DEV11-development.yaml
 		pipelines\vars\preprod.yaml = pipelines\vars\preprod.yaml
 		pipelines\vars\DEV6-development.yaml = pipelines\vars\DEV6-development.yaml
 		pipelines\vars\DEV3-development.yaml = pipelines\vars\DEV3-development.yaml
