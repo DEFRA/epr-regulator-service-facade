@@ -231,6 +231,17 @@ public class OrganisationsSearchController : ControllerBase
                 
             var response = await _regulatorOrganisationService.AddRemoveApprovedUser(addRemoveApprovedUserRequest);
 
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    var validationProblem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+                    return ValidationProblem(validationProblem);
+                }
+                var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+                return Problem(statusCode: problem?.Status, detail: problem?.Detail);
+            }
+            
             var addRemoveApprovedUserResponse = await response.Content.ReadFromJsonAsync<AddRemoveApprovedPersonResponseModel>();
             
             var emailModel = new AddRemoveNewApprovedPersonEmailModel
