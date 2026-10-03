@@ -181,7 +181,7 @@ public class OrganisationRegistrationSubmissionsController(
 
             if (result is null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok(result);

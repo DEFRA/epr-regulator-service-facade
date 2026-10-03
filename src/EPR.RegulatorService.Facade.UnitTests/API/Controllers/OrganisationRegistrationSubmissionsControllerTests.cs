@@ -366,9 +366,9 @@ public class OrganisationRegistrationSubmissionsControllerTests
         var result = await _sut.GetRegistrationSubmissionDetails(submissionId);
 
         // Assert
-        result.Should().BeOfType<NotFoundResult>();
-        var statusCodeResult = result as NotFoundResult;
-        statusCodeResult?.StatusCode.Should().Be(404);
+        result.Should().BeOfType<NoContentResult>();
+        var statusCodeResult = result as NoContentResult;
+        statusCodeResult?.StatusCode.Should().Be(204);
     }
 
     [TestMethod]
