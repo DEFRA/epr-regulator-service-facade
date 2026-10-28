@@ -1,7 +1,12 @@
-
 variables:
-  azureSubscription: 'AZD-RWD-DEV9'
-  docker.imageName: 'eprregulatorfacadeendregistry'
-  acr.azureContainerRegistryName: 'devrwdinfac1401'
-  acr.repositoryName: 'eprregulatorfacadeendregistry'
-  serviceName: 'devrwdwebwa9406'
+- group: ServiceConnections
+- name: azureSubscription
+  value: $(ServiceConnectionDEV9)
+- name: docker.imageName
+  value: 'eprregulatorfacadeendregistry'
+- name: acr.azureContainerRegistryName
+  value: 'devrwdinfac1401'
+- name: acr.repositoryName
+  value: 'eprregulatorfacadeendregistry'
+- name: serviceName
+  value: 'devrwdwebwa9406'
