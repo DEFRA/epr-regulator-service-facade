@@ -10,12 +10,14 @@ namespace IntegrationTests.Infrastructure
     private FacadeWebApplicationFactory Factory { get; set; } = null!;
     protected HttpClient Client { get; private set; } = null!;
     protected WireMockServer CommonDataServer => Factory.CommonDataServer;
+    protected WireMockServer AccountsServer => Factory.AccountsServer;
 
     public virtual Task InitializeAsync()
     {
         Factory = new FacadeWebApplicationFactory();
         Client = Factory.CreateClient();
         CommonDataServer.ResetMappings(); // Avoid mystery-guest of json based default mappings. Tests should define their own required data explicitly
+        AccountsServer.ResetMappings();
         return Task.CompletedTask;
     }
 
