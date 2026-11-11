@@ -13,6 +13,8 @@ namespace IntegrationTests.Infrastructure
             configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 // Add any default test configuration here if needed
+                ["MessagingConfig:ApiKey"] =
+                    "integration-test-key-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000"
             });
             
             return configurationBuilder.Build();

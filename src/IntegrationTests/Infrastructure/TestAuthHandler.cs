@@ -20,6 +20,7 @@ namespace IntegrationTests.Infrastructure
             var claims = new[]
             {
                 new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", testUserId),
+                new Claim(ClaimTypes.Email, "regulator@test.example"),
             };
 
             var authenticateResult = AuthenticateResult.Success(

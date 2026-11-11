@@ -17,11 +17,16 @@ namespace IntegrationTests.Infrastructure
 
     public WireMockServer CommonDataServer => _commonDataServer;
 
+    private readonly WireMockServer _accountsServer = WireMockServer.Start();
+
+    public WireMockServer AccountsServer => _accountsServer;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         base.ConfigureWebHost(builder);
         
         // Set environment variables to override appsettings.json (environment variables have higher priority)
+        Environment.SetEnvironmentVariable("AccountsServiceApiConfig__BaseUrl", $"{_accountsServer.Url}/api/");
         Environment.SetEnvironmentVariable("CommonDataApiConfig__BaseUrl", $"{_commonDataServer.Url}/api/");
         Environment.SetEnvironmentVariable("CommonDataApiConfig__Timeout", "30");
         Environment.SetEnvironmentVariable("CommonDataApiConfig__ServiceRetryCount", "6");
@@ -63,6 +68,8 @@ namespace IntegrationTests.Infrastructure
         {
             _commonDataServer?.Stop();
             _commonDataServer?.Dispose();
+            _accountsServer?.Stop();
+            _accountsServer?.Dispose();
         }
         base.Dispose(disposing);
     }
