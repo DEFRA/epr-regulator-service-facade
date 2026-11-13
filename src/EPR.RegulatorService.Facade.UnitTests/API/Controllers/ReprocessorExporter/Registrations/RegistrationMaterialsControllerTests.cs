@@ -3,8 +3,8 @@ using EPR.RegulatorService.Facade.API.Controllers.ReprocessorExporter.Registrati
 using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;

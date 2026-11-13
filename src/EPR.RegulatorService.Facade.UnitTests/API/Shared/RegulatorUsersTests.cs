@@ -4,7 +4,7 @@ using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.API.Controllers;
 using EPR.RegulatorService.Facade.API.Shared;
 using EPR.RegulatorService.Facade.Core.Services.Regulator;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Text.Json;

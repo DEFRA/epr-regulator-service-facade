@@ -3,7 +3,7 @@ using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Enums;
 using EPR.RegulatorService.Facade.Core.Models.TradeAntiVirus;
 using EPR.RegulatorService.Facade.Core.TradeAntiVirus;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 

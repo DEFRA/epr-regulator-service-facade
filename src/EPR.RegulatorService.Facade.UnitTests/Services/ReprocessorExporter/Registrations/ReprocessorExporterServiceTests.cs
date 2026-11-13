@@ -5,7 +5,7 @@ using EPR.RegulatorService.Facade.Core.Constants;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Services.ReprocessorExporter.Registrations;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using System;
 using System.Threading.Tasks;

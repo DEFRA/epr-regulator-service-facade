@@ -1,7 +1,7 @@
 ﻿using AutoFixture.AutoMoq;
 using AutoFixture;
 using EPR.RegulatorService.Facade.API.Helpers;
-using FluentAssertions.Execution;
+using AwesomeAssertions.Execution;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.FeatureManagement.Mvc;
 using Microsoft.FeatureManagement;
@@ -9,7 +9,7 @@ using Microsoft.OpenApi.Models;
 using Moq;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Helpers;

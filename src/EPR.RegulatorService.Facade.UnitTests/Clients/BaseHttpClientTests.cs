@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Moq;
 using Moq.Protected;
 using EPR.RegulatorService.Facade.Core.Clients;

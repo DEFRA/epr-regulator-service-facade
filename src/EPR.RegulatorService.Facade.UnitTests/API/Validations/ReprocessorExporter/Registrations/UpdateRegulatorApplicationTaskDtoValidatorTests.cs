@@ -2,7 +2,7 @@
 using EPR.RegulatorService.Facade.API.Validations.ReprocessorExporter.Registrations;
 using EPR.RegulatorService.Facade.Core.Enums.ReprocessorExporter;
 using EPR.RegulatorService.Facade.Core.Models.ReprocessorExporter.Registrations;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPR.RegulatorService.Facade.UnitTests.API.Validations.ReprocessorExporter.Registrations;

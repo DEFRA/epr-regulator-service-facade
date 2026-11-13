@@ -3,7 +3,7 @@ using AutoFixture.AutoMoq;
 using EPR.RegulatorService.Facade.Core.Configs;
 using EPR.RegulatorService.Facade.Core.Models.Submissions.Events;
 using EPR.RegulatorService.Facade.Core.Services.Submissions;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
