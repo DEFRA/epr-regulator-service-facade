@@ -1,6 +1,6 @@
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Organisations;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Models;
 

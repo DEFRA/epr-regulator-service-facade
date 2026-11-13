@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using IntegrationTests.Infrastructure;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;

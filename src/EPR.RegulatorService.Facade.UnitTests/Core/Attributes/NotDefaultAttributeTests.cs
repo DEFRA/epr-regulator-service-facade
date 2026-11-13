@@ -1,5 +1,5 @@
 using EPR.RegulatorService.Facade.Core.Attributes;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Attributes
 {

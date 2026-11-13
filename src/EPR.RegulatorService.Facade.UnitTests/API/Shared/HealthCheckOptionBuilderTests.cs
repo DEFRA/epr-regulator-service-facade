@@ -1,5 +1,5 @@
 using EPR.RegulatorService.Facade.API.HealthChecks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 

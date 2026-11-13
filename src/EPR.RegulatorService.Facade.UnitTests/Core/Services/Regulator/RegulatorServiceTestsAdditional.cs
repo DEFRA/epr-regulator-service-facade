@@ -6,7 +6,7 @@ using EPR.RegulatorService.Facade.Core.Models.Applications;
 using EPR.RegulatorService.Facade.Core.Services.Application;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using FluentAssertions;
+using AwesomeAssertions;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;

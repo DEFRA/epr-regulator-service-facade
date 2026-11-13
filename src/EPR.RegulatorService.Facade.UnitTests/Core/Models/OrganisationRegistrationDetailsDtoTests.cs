@@ -1,7 +1,7 @@
 using System.Text.Json;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations;
 using EPR.RegulatorService.Facade.Core.Models.Responses.OrganisationRegistrations.CommonData;
-using FluentAssertions;
+using AwesomeAssertions;
 
 namespace EPR.RegulatorService.Facade.UnitTests.Core.Models;
 
