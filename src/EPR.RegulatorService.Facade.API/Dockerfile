@@ -1,10 +1,10 @@
 ﻿# Pinned to an exact release so patched images are an explicit change: https://hub.docker.com/r/defradigital/dotnetcore/tags
-FROM defradigital/dotnetcore:2.1.8-dotnet8.0 AS base
+FROM defradigital/dotnetcore:2.1.8-dotnet10.0 AS base
 ENV ASPNETCORE_URLS=http://*:8080
 EXPOSE 8080
 
 # Pinned to an exact release so patched images are an explicit change: https://hub.docker.com/r/defradigital/dotnetcore-development/tags
-FROM defradigital/dotnetcore-development:2.1.8-dotnet8.0 AS build
+FROM defradigital/dotnetcore-development:2.1.8-dotnet10.0 AS build
 USER root
 
 COPY ["EPR.RegulatorService.Facade.API/EPR.RegulatorService.Facade.API.csproj", "EPR.RegulatorService.Facade.API/"]
